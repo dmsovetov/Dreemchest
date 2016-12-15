@@ -293,15 +293,11 @@ void RenderingContextHal::commandCreateTexture(Texture_ id, u16 width, u16 heigh
 // ** RenderingContextHal::applyStates
 PipelineFeatures RenderingContextHal::applyStates( const RenderFrame& frame, const StateBlock* const * stateBlocks, s32 count )
 {
-    // Merge all state blocks to a single array of rendering states
-    const s32 maxStates = 16;
-    State states[maxStates];
+    State states[MaxStateChanges];
     PipelineFeatures userDefined;
     
-    s32 stateCount = mergeStateBlocks(stateBlocks, count, states, maxStates, userDefined);
-    
-    // This will start recording pipeline changes
-    m_pipeline.beginStateBlock();
+    // This will notify a pipeline that we started the stage change process
+    s32 stateCount = startPipelineConfiguration(stateBlocks, count, states, MaxStateChanges, userDefined);
     
     // Apply all states
     for (s32 i = 0; i < stateCount; i++)
@@ -313,15 +309,8 @@ PipelineFeatures RenderingContextHal::applyStates( const RenderFrame& frame, con
         NIMBLE_ABORT_IF( m_stateSwitches[state.type] == NULL, "unhandled render state type" );
         (this->*m_stateSwitches[state.type])(frame, state);
     }
-
-    // Apply a user defined feature mask
-    m_pipeline.activateUserFeatures(userDefined);
     
-    // Finish applying state blocks
-    m_pipeline.endStateBlock();
-    
-    //return features;
-    return m_pipeline.features();
+    return finishPipelineConfiguration(userDefined);
 }
     
 // ** RenderingContextHal::activateShaderPermutation
@@ -340,9 +329,6 @@ void RenderingContextHal::activateShaderPermutation( PipelineFeatures features )
     // Do we have any pipeline changes that may invalidate an active program permutation?
     if (m_pipeline.changes())
     {
-        // Get an active program handle
-        Program program = m_pipeline.program();
-        
         // Now compile a program permutation
         m_activeProgram = compileShaderPermutation(program, m_pipeline.features(), m_pipeline.featureLayout());
         
@@ -374,36 +360,13 @@ ShaderPtr RenderingContextHal::compileShaderPermutation(Program program, Pipelin
     {
         return permutation->second;
     }
-    
-    // Generate macro definitions from features
-    String macro = "";
-    String debug = "";
-    
-    for( u32 i = 0, n = featureLayout && featureLayout->elementCount(); i < n; i++ )
-    {
-        const PipelineFeatureLayout::Element& element = featureLayout->elementAt(i);
-        
-        if( element.mask & features )
-        {
-            macro += "#define " + element.name + " " + toString( (element.mask & features) >> element.offset ) + "\n";
-            if( debug.length() ) debug += ", ";
-            debug += element.name;
-        }
-    }
-    
-    LogVerbose( "shader", "compiling permutation %s\n", debug.empty() ? "" : ("(" + debug + ")").c_str() );
-    
-    // Includes
-    //for( s32 i = 0, n = static_cast<s32>( m_includes.size() ); i < n; i++ ) {
-    //    macro += m_includes[i];
-    //}
-    
+
     // Get a shader source code
-    const String& vertex   = m_shaderLibrary.vertexShader(descriptor.vertexShader);
-    const String& fragment = m_shaderLibrary.fragmentShader(descriptor.fragmentShader);
+    String vertex = generateShaderCode(m_shaderLibrary.vertexShader(descriptor.vertexShader), features, featureLayout);
+    String fragment = generateShaderCode(m_shaderLibrary.fragmentShader(descriptor.fragmentShader), features, featureLayout);
     
     // Compile the shader
-    ShaderPtr compiled = m_hal->createShader( (macro + vertex).c_str(), (macro + fragment).c_str() );
+    ShaderPtr compiled = m_hal->createShader( vertex.c_str(), fragment.c_str() );
     NIMBLE_BREAK_IF( !compiled.valid() );
     
     // Put it to a cache

@@ -24,38 +24,35 @@
  
  **************************************************************************/
 
-#ifndef __DC_Renderer_OpenGLRenderingContext_H__
-#define __DC_Renderer_OpenGLRenderingContext_H__
-
-#include "../RenderingContext.h"
-#include "OpenGLHal.h"
+#include "OpenGLRenderingContext.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Renderer
 {
-    //! A base class for all OpenGL-based rendering contexts.
-    class OpenGLRenderingContext : public RenderingContext
+
+// ** OpenGLRenderingContext::lookupPermutation
+GLuint OpenGLRenderingContext::lookupPermutation(Program program, PipelineFeatures features) const
+{
+    if (static_cast<s32>(program) >= m_permutations.count())
     {
-    protected:
-        
-        //! Searches for a suitable shader program permutation.
-        GLuint                                  lookupPermutation(Program program, PipelineFeatures features) const;
-        
-    protected:
+        m_permutations.emplace(program, ProgramPermutations());
+    }
     
-        //! A container type to store program permutations.
-        typedef HashMap<PipelineFeatures, GLuint> ProgramPermutations;
-        
-        FixedArray<GLuint>                      m_vertexBuffers;    //!< Allocated vertex buffers.
-        FixedArray<GLuint>                      m_indexBuffers;     //!< Allocated index buffers.
-        FixedArray<GLuint>                      m_constantBuffers;  //!< Allocated constant buffers.
-        FixedArray<GLuint>                      m_textures;         //!< Allocated textures.
-        mutable FixedArray<ProgramPermutations> m_permutations;     //!< Available program permutations.
-    };
+    ProgramPermutations& permutations = m_permutations[program];
+    
+    // Now lookup a permutation cache
+    ProgramPermutations::const_iterator permutation = permutations.find(features);
+    
+    if (permutation != permutations.end())
+    {
+        return permutation->second;
+    }
+    
+    // Nothing found :(
+    return 0;
+}
     
 } // namespace Renderer
 
 DC_END_DREEMCHEST
-
-#endif  /*  __DC_Renderer_OpenGLRenderingContext_H__    */

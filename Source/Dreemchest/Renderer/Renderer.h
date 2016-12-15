@@ -156,6 +156,12 @@ namespace Renderer {
         //! Compares two resource identifiers.
         bool                        operator == (const ResourceIdentifier& other) const;
         
+        //! Compares two resource identifiers.
+        bool                        operator != (const ResourceIdentifier& other) const;
+        
+        //! Sets a resource identifier from a value.
+        void                        set(TIdentifier value);
+        
         //! Create a resource identifier from a specified value.
         static ResourceIdentifier   create(TIdentifier value);
         
@@ -210,6 +216,20 @@ namespace Renderer {
     NIMBLE_INLINE bool ResourceIdentifier<TResource, TIdentifier>::operator == (const ResourceIdentifier& other) const
     {
         return m_id == other.m_id;
+    }
+    
+    // ** ResourceIdentifier::operator !=
+    template<RenderResourceType::Enum TResource, typename TIdentifier>
+    NIMBLE_INLINE bool ResourceIdentifier<TResource, TIdentifier>::operator != (const ResourceIdentifier& other) const
+    {
+        return m_id != other.m_id;
+    }
+    
+    // ** ResourceIdentifier::set
+    template<RenderResourceType::Enum TResource, typename TIdentifier>
+    NIMBLE_INLINE void ResourceIdentifier<TResource, TIdentifier>::set(TIdentifier value)
+    {
+        m_id = value;
     }
     
     // ** ResourceIdentifier::operator TIdentifier
@@ -284,9 +304,10 @@ namespace Renderer {
     };
 
     //! Clear mask bits that are passed to Hal::clear method.
-    enum ClearMask {
-        ClearColor        = BIT( 0 ),                                 //!< Clear color buffer.
-        ClearDepth        = BIT( 1 ),                                 //!< Clear depth buffer.
+    enum ClearMask
+    {
+        ClearColor      = BIT( 0 ),                                 //!< Clear color buffer.
+        ClearDepth      = BIT( 1 ),                                 //!< Clear depth buffer.
         ClearStencil    = BIT( 2 ),                                 //!< Clear stencil buffer.
         ClearAll        = ClearColor | ClearDepth | ClearStencil    //!< Clear all buffers.
     };
@@ -316,6 +337,7 @@ namespace Renderer {
         BlendInvSrcAlpha,
         BlendDstAlpha,
         BlendInvDstAlpha,
+        TotalBlendFactors
     };
 
     //! Color mask bits used as an argument for Hal::setColorMask method.

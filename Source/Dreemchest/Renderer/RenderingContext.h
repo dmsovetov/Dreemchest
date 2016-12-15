@@ -111,6 +111,15 @@ namespace Renderer
         //! Creates a vertex buffer layout instance from a flexible vertex format.
         VertexBufferLayoutUPtr                  createVertexBufferLayout(VertexFormat vertexFormat) const;
         
+        //! Starts a process of pipeline state configuration.
+        s32                                     startPipelineConfiguration(const StateBlock* const * stateBlocks, s32 blockCount, State* states, s32 maxStates, PipelineFeatures& userDefined);
+        
+        //! Finishes a process of pipeline state configration.
+        PipelineFeatures                        finishPipelineConfiguration(PipelineFeatures userDefined);
+        
+        //! Generates a shader source code.
+        String                                  generateShaderCode(const String& source, PipelineFeatures features, const PipelineFeatureLayout* featureLayout) const;
+        
     private:
         
         //! Allocates a new render resource identifier of specified type.
@@ -126,6 +135,9 @@ namespace Renderer
         
         //! A maximum number of input layout types
         enum { MaxInputLayouts = 255 };
+        
+        //! A maximum number of state changes that can be applied in a row.
+        enum { MaxStateChanges = 16 };
         
         PersistentResourceIdentifiers           m_resourceIdentifiers[RenderResourceType::TotalTypes];  //!< An array of resource identifier managers.
         FixedArray<PipelineFeatureLayoutUPtr>   m_pipelineFeatureLayouts;                               //!< An array of constructed pipeline feature layouts.

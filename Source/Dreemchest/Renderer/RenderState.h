@@ -94,7 +94,22 @@ namespace Renderer
 
                                         //! Constructs a polygon offset state.
                                         State( f32 factor, f32 units );
+        
+        //! Returns a source blend factor stored in a state.
+        BlendFactor                     sourceBlendFactor() const;
 
+        //! Returns a destination blend factor stored in a state.
+        BlendFactor                     destBlendFactor() const;
+        
+        //! Returns an alpha reference value converted to a float.
+        f32                             alphaReference() const;
+        
+        //! Returns a polygon offset factor value.
+        f32                             polygonOffsetFactor() const;
+        
+        //! Returns a polygon offset units value.
+        f32                             polygonOffsetUnits() const;
+        
         union
         {
             PersistentResourceId        resourceId;         //!< Resource identifier to be bound to a pipeline.

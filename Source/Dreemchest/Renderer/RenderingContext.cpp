@@ -513,7 +513,32 @@ s32 RenderingContext::mergeStateBlocks(const StateBlock* const * stateBlocks, s3
     
     return statesWritten;
 }
+
+// ** RenderingContext::startPipelineConfiguration
+s32 RenderingContext::startPipelineConfiguration(const StateBlock* const * stateBlocks, s32 blockCount, State* states, s32 maxStates, PipelineFeatures& userDefined)
+{
+    // Merge all state blocks to a single array of rendering states
+    s32 stateCount = mergeStateBlocks(stateBlocks, blockCount, states, maxStates, userDefined);
     
+    // This will start recording pipeline changes
+    m_pipeline.beginStateBlock();
+    
+    return stateCount;
+}
+
+// ** RenderingContext::finishPipelineConfiguration
+PipelineFeatures RenderingContext::finishPipelineConfiguration(PipelineFeatures userDefined)
+{
+    // Apply a user defined feature mask
+    m_pipeline.activateUserFeatures(userDefined);
+    
+    // Finish applying state blocks
+    m_pipeline.endStateBlock();
+    
+    //return features;
+    return m_pipeline.features();
+}
+
 // ** RenderingContext::createVertexBufferLayout
 VertexBufferLayoutUPtr RenderingContext::createVertexBufferLayout(VertexFormat vertexFormat) const
 {
@@ -543,6 +568,36 @@ VertexBufferLayoutUPtr RenderingContext::createVertexBufferLayout(VertexFormat v
     }
     
     return inputLayout;
+}
+    
+// ** RenderingContext::generateShaderCode
+String RenderingContext::generateShaderCode(const String& source, PipelineFeatures features, const PipelineFeatureLayout* featureLayout) const
+{
+    // No feature layout, so just return a shader code
+    if (!featureLayout)
+    {
+        return source;
+    }
+    
+    // Generate macro definitions from features
+    String macro = "";
+    String debug = "";
+    
+    for (s32 i = 0, n = featureLayout->elementCount(); i < n; i++)
+    {
+        const PipelineFeatureLayout::Element& element = featureLayout->elementAt(i);
+        
+        if (element.mask & features)
+        {
+            macro += "#define " + element.name + " " + toString((element.mask & features) >> element.offset) + "\n";
+            if(debug.length()) debug += ", ";
+            debug += element.name;
+        }
+    }
+    
+    LogVerbose( "renderingContext", "compiling permutation %s\n", debug.empty() ? "" : ("(" + debug + ")").c_str() );
+    
+    return macro + source;
 }
 
 // ** RenderingContext::deprecatedRequestShader

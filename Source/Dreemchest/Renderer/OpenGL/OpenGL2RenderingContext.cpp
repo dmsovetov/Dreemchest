@@ -25,20 +25,371 @@
  **************************************************************************/
 
 #include "OpenGL2RenderingContext.h"
-#include "OpenGL2Rvm.h"
+#include "../VertexFormat.h"
+#include "../CommandBuffer.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Renderer
 {
+    
+// ** createOpenGL2RenderingContext
+RenderingContextPtr createOpenGL2RenderingContext( void )
+{
+    return RenderingContextPtr(DC_NEW OpenGL2RenderingContext);
+}
 
-#if !DEV_DEPRECATED_HAL
 // ** OpenGL2RenderingContext::OpenGL2RenderingContext
 OpenGL2RenderingContext::OpenGL2RenderingContext( void )
-    : RenderingContext(DC_NEW OpenGL2Rvm(this))
 {
 }
-#endif  /*  #if !DEV_DEPRECATED_HAL */
+
+// ** OpenGL2RenderingContext::applyStateBlock
+PipelineFeatures OpenGL2RenderingContext::applyStateBlock(const RenderFrame& frame, const StateBlock& stateBlock)
+{
+    const StateBlock* blocks[] = { &stateBlock };
+    return applyStates(frame, blocks, 1).features;
+}
+
+// ** OpenGL2RenderingContext::executeCommandBuffer
+void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, const CommandBuffer& commands)
+{
+    RequestedState              requestedState;
+    TransientRenderTarget       transientRenderTarget;
+    const ConstantBufferLayout* constantBufferLayout = nullptr;
+    GLenum                      id;
+    
+    for (s32 i = 0, n = commands.size(); i < n; i++)
+    {
+        // Get a render operation at specified index
+        const CommandBuffer::OpCode& opCode = commands.opCodeAt( i );
+        
+        // Perform a draw call
+        switch(opCode.type)
+        {
+            case CommandBuffer::OpCode::Clear:
+                OpenGL2::clear(opCode.clear.color, opCode.clear.mask, opCode.clear.depth, opCode.clear.stencil);
+                break;
+                
+            case CommandBuffer::OpCode::Execute:
+                execute(frame, *opCode.execute.commands);
+                break;
+                
+            case CommandBuffer::OpCode::UploadConstantBuffer:
+                NIMBLE_NOT_IMPLEMENTED
+                break;
+                
+            case CommandBuffer::OpCode::UploadVertexBuffer:
+                OpenGL2::bufferSubData(GL_ARRAY_BUFFER, m_vertexBuffers[opCode.upload.id], 0, opCode.upload.size, opCode.upload.data);
+                break;
+                
+            case CommandBuffer::OpCode::CreateInputLayout:
+                m_inputLayouts.emplace(opCode.createInputLayout.id, createVertexBufferLayout(opCode.createInputLayout.format));
+                break;
+                
+            case CommandBuffer::OpCode::CreateTexture:
+                NIMBLE_NOT_IMPLEMENTED
+                break;
+                
+            case CommandBuffer::OpCode::CreateIndexBuffer:
+                id = OpenGL2::createBuffer(GL_ARRAY_BUFFER, opCode.createBuffer.data, opCode.createBuffer.size, GL_DYNAMIC_DRAW);
+                m_indexBuffers.emplace(opCode.createBuffer.id, id);
+                break;
+                
+            case CommandBuffer::OpCode::CreateVertexBuffer:
+                id = OpenGL2::createBuffer(GL_ELEMENT_ARRAY_BUFFER, opCode.createBuffer.data, opCode.createBuffer.size, GL_DYNAMIC_DRAW);
+                m_vertexBuffers.emplace(opCode.createBuffer.id, id);
+                break;
+                
+            case CommandBuffer::OpCode::CreateConstantBuffer:
+                NIMBLE_NOT_IMPLEMENTED
+                constantBufferLayout = reinterpret_cast<const ConstantBufferLayout*>(opCode.createBuffer.userData);
+                //commandCreateConstantBuffer(opCode.createBuffer.id, opCode.createBuffer.data, opCode.createBuffer.size, layout);
+                break;
+                
+            case CommandBuffer::OpCode::RenderTarget:
+                NIMBLE_NOT_IMPLEMENTED
+                break;
+                
+            case CommandBuffer::OpCode::AcquireRenderTarget:
+                NIMBLE_NOT_IMPLEMENTED
+                //TransientRenderTarget id = acquireRenderTarget(opCode.intermediateRenderTarget.width, opCode.intermediateRenderTarget.height, opCode.intermediateRenderTarget.format);
+                //loadTransientTarget(opCode.intermediateRenderTarget.id, id);
+                break;
+                
+            case CommandBuffer::OpCode::ReleaseRenderTarget:
+                NIMBLE_NOT_IMPLEMENTED
+                //TransientRenderTarget id = intermediateTarget(opCode.intermediateRenderTarget.id);
+                //releaseRenderTarget(id);
+                //unloadTransientTarget(opCode.intermediateRenderTarget.id);
+                break;
+                
+            case CommandBuffer::OpCode::DrawIndexed:
+                // Apply rendering states from a stack
+                requestedState = applyStates(frame, opCode.drawCall.states, MaxStateStackDepth);
+                
+                // Now activate a matching shader permutation
+                compilePipelineState(requestedState);
+                
+                // Perform an actual draw call
+                OpenGL2::drawElements(opCode.drawCall.primitives, GL_UNSIGNED_SHORT, opCode.drawCall.first, opCode.drawCall.count);
+                break;
+                
+            case CommandBuffer::OpCode::DrawPrimitives:
+                // Apply rendering states from a stack
+                requestedState = applyStates(frame, opCode.drawCall.states, MaxStateStackDepth);
+                
+                // Now activate a matching shader permutation
+                compilePipelineState(requestedState);
+                
+                // Perform an actual draw call
+                OpenGL2::drawArrays(opCode.drawCall.primitives, opCode.drawCall.first, opCode.drawCall.count);
+                break;
+                
+            default:
+                NIMBLE_NOT_IMPLEMENTED;
+        }
+    }
+}
+    
+// ** OpenGL2RenderingContext::applyStates
+OpenGL2RenderingContext::RequestedState OpenGL2RenderingContext::applyStates(const RenderFrame& frame, const StateBlock* const * stateBlocks, s32 count)
+{
+    State states[MaxStateChanges];
+    PipelineFeatures userDefined;
+    
+    // This will be modified by a render state changes below
+    RequestedState requestedState = m_activeState;
+    
+    // This will notify a pipeline that we started the stage change process
+    s32 stateCount = startPipelineConfiguration(stateBlocks, count, states, MaxStateChanges, userDefined);
+    
+    // Apply all states
+    for (s32 i = 0; i < stateCount; i++)
+    {
+        // Get a state at specified index
+        const State& state = states[i];
+        
+        // And now apply it
+        switch (state.type)
+        {
+            case State::VertexBuffer:
+                requestedState.vertexBuffer.set(state.resourceId);
+                break;
+                
+            case State::IndexBuffer:
+                requestedState.indexBuffer.set(state.resourceId);
+                break;
+                
+            case State::InputLayout:
+                requestedState.inputLayout.set(state.resourceId);
+                break;
+                
+            case State::FeatureLayout:
+                requestedState.featureLayout.set(state.resourceId);
+                m_pipeline.setFeatureLayout(m_pipelineFeatureLayouts[state.resourceId].get());
+                break;
+                
+            case State::ConstantBuffer:
+                NIMBLE_NOT_IMPLEMENTED
+                break;
+                
+            case State::Shader:
+                requestedState.program.set(state.resourceId);
+                m_pipeline.setProgram(requestedState.program);
+                break;
+                
+            case State::Blending:
+            {
+                // Decode blend factors from a command
+                BlendFactor source      = state.sourceBlendFactor();
+                BlendFactor destination = state.destBlendFactor();
+                
+                // Apply the blend state
+                if(source == BlendDisabled || destination == BlendDisabled)
+                {
+                    glDisable(GL_BLEND);
+                }
+                else
+                {
+                    glEnable(GL_BLEND);
+                    glBlendFunc(OpenGL2::convertBlendFactor(source), OpenGL2::convertBlendFactor(destination));
+                }
+            }
+                break;
+                
+            case State::PolygonOffset:
+            {
+                f32 factor = state.polygonOffsetFactor();
+                f32 units  = state.polygonOffsetUnits();
+                
+                if (equal3(factor, units, 0.0f))
+                {
+                    glDisable(GL_POLYGON_OFFSET_FILL);
+                } else
+                {
+                    glEnable(GL_POLYGON_OFFSET_FILL);
+                    glPolygonOffset(factor, units);
+                }
+            }
+                break;
+                
+            case State::DepthState:
+                glDepthMask(state.data.depthWrite ? GL_TRUE : GL_FALSE);
+                glDepthFunc(OpenGL2::convertCompareFunction(static_cast<Compare>(state.compareFunction)));
+                break;
+                
+            case State::AlphaTest:
+                if (state.compareFunction == CompareDisabled)
+                {
+                    glDisable(GL_ALPHA_TEST);
+                }
+                else
+                {
+                    glEnable(GL_ALPHA_TEST);
+                    glAlphaFunc(OpenGL2::convertCompareFunction(static_cast<Compare>(state.compareFunction)), state.alphaReference());
+                }
+                break;
+                
+            case State::CullFace:
+                if (state.cullFace == TriangleFaceNone)
+                {
+                    glDisable(GL_CULL_FACE);
+                }
+                else
+                {
+                    glEnable(GL_CULL_FACE);
+                    glFrontFace(GL_CCW);
+                    glCullFace(OpenGL2::convertTriangleFace(static_cast<TriangleFace>(state.cullFace)));
+                }
+                break;
+                
+            case State::Texture:
+                NIMBLE_NOT_IMPLEMENTED
+                break;
+                
+            default:
+                NIMBLE_NOT_IMPLEMENTED
+        }
+    }
+    
+    // Finish pipeline configuration and store the final features bitmask
+    requestedState.features = finishPipelineConfiguration(userDefined);
+    
+    return requestedState;
+}
+
+// ** OpenGL2RenderingContext::compilePipelineState
+void OpenGL2RenderingContext::compilePipelineState(RequestedState requested)
+{
+    NIMBLE_ABORT_IF(!requested.inputLayout, "no valid input layout set");
+    NIMBLE_ABORT_IF(!requested.vertexBuffer, "no valid vertex buffer set");
+    
+    // Bind an indexed buffer
+    if (requested.indexBuffer != m_activeState.indexBuffer)
+    {
+        OpenGL2::bindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[requested.indexBuffer]);
+    }
+    
+    // Bind a vertex buffer
+    if (requested.vertexBuffer != m_activeState.vertexBuffer)
+    {
+        OpenGL2::bindBuffer(GL_ARRAY_BUFFER, m_vertexBuffers[requested.vertexBuffer]);
+    }
+    
+    // Switch the input layout
+    if (requested.inputLayout != m_activeState.inputLayout)
+    {
+        // Disable the previous input layout
+        if (m_activeState.inputLayout)
+        {
+            OpenGL2::disableInputLayout(*m_inputLayouts[m_activeState.inputLayout]);
+        }
+        
+        // Now enable a new one
+        OpenGL2::enableInputLayout(NULL, *m_inputLayouts[requested.inputLayout]);
+    }
+    
+    // Switch the program one the pipeline state was changed
+    if (m_pipeline.changes())
+    {
+        // Now compile a program permutation
+        GLuint activeProgram = compileShaderPermutation(m_pipeline.program(), m_pipeline.features(), m_pipeline.featureLayout());
+        glUseProgram(activeProgram);
+        
+        // Accept these changes
+        m_pipeline.acceptChanges();
+    }
+    
+    // Update an active rendering state
+    m_activeState = requested;
+}
+    
+// ** OpenGL2RenderingContext::compileShaderPermutation
+GLuint OpenGL2RenderingContext::compileShaderPermutation(Program program, PipelineFeatures features, const PipelineFeatureLayout* featureLayout)
+{
+    // Get an active program
+    NIMBLE_ABORT_IF(!program && !m_defaultProgram, "no valid program set and no default one specified");
+    
+    // Use a default program if nothing was set by a user
+    if (!program)
+    {
+        program = m_defaultProgram;
+    }
+    
+    // Lookup a shader permutation in cache
+    GLuint permutation = lookupPermutation(program, features);
+    
+    if (permutation)
+    {
+        return permutation;
+    }
+    
+    // Get a shader program descriptor and corresponding permutations container
+    const ShaderProgramDescriptor& descriptor = m_programs[program];
+    
+    // Nothing found so we have to compile a new one
+    s8 error[2048];
+    
+    // Get shader source code
+    const String& vertexSource   = m_shaderLibrary.vertexShader(descriptor.vertexShader);
+    const String& fragmentSource = m_shaderLibrary.fragmentShader(descriptor.fragmentShader);
+    
+    // Preprocess shader source code
+    String vertex   = generateShaderCode(vertexSource, features, featureLayout);
+    String fragment = generateShaderCode(fragmentSource, features, featureLayout);
+    
+    // Compile the vertex shader
+    GLuint vertexShader = OpenGL2::compileShader(GL_VERTEX_SHADER, vertex.c_str(), error, sizeof(error));
+    if (vertexShader == 0)
+    {
+        return 0;
+    }
+    
+    // Compile the fragment shader
+    GLuint fragmentShader = OpenGL2::compileShader(GL_FRAGMENT_SHADER, fragment.c_str(), error, sizeof(error));
+    if (fragmentShader == 0)
+    {
+        OpenGL2::deleteShader(vertexShader);
+        return 0;
+    }
+    
+    // Now link a program
+    GLuint shaders[] = {vertexShader, fragmentShader};
+    permutation = OpenGL2::createProgram(shaders, 2, error, sizeof(error));
+    
+    if (permutation == 0)
+    {
+        OpenGL2::deleteShader(vertexShader);
+        OpenGL2::deleteShader(fragmentShader);
+        return 0;
+    }
+    
+    // Finally save a compiled permutation
+    m_permutations[program][features] = permutation;
+    
+    return permutation;
+}
     
 } // namespace Renderer
 

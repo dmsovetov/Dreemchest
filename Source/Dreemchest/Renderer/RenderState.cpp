@@ -108,6 +108,36 @@ State::State(f32 factor, f32 units)
     polygonOffset.units  = units * 128.0f;
 }
 
+// ** State::sourceBlendFactor
+BlendFactor State::sourceBlendFactor() const
+{
+    return static_cast<BlendFactor>(data.blend >> 4);
+}
+
+// ** State::sourceBlendFactor
+BlendFactor State::destBlendFactor() const
+{
+    return static_cast<BlendFactor>(data.blend & 0xF);
+}
+    
+// ** State::alphaReference
+f32 State::alphaReference() const
+{
+    return data.alphaReference / 255.0f;
+}
+    
+// ** State::polygonOffsetFactor
+f32 State::polygonOffsetFactor() const
+{
+    return polygonOffset.factor / 128.0f;
+}
+
+// ** State::polygonOffsetUnits
+f32 State::polygonOffsetUnits() const
+{
+    return polygonOffset.units / 128.0f;
+}
+
 // -------------------------------------------------------------------------- StateBlock -------------------------------------------------------------------------- //
 
 // ** StateBlock::StateBlock

@@ -27,19 +27,53 @@
 #ifndef __DC_Renderer_OpenGL2RenderingContext_H__
 #define __DC_Renderer_OpenGL2RenderingContext_H__
 
-#include "../RenderingContext.h"
-#include "OpenGLHal.h"
+#include "OpenGLRenderingContext.h"
+#include "OpenGL2.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Renderer
 {
     //! OpenGL 2 rendering context implementation.
-    class OpenGL2RenderingContext : public RenderingContext
+    class OpenGL2RenderingContext : public OpenGLRenderingContext
     {
     public:
-                                //! Constructs an OpenGL2RenderingContext instance.
-                                OpenGL2RenderingContext( void );
+                                    //! Constructs an OpenGL2RenderingContext instance.
+                                    OpenGL2RenderingContext( void );
+        
+    protected:
+        
+        //! A pipeline state that was constructed from an array of render state changes.
+        struct RequestedState
+        {
+            VertexBuffer_           vertexBuffer;   //!< A vertex buffer that should be set.
+            IndexBuffer_            indexBuffer;    //!< An index buffer that should be set.
+            InputLayout             inputLayout;    //!< An input layout that should be set.
+            FeatureLayout           featureLayout;  //!< A feature layout that should be set.
+            Program                 program;        //!< A shader program that should be set.
+            PipelineFeatures        features;       //!< A bitmask of user-defined pipeline features.
+            
+                                    RequestedState() : features(0) {}
+        };
+        
+        //! Applies a specified state block.
+        virtual PipelineFeatures    applyStateBlock(const RenderFrame& frame, const StateBlock& stateBlock) NIMBLE_OVERRIDE;
+        
+        //! Executes a specified command buffer.
+        virtual void                executeCommandBuffer(const RenderFrame& frame, const CommandBuffer& commands) NIMBLE_OVERRIDE;
+        
+        //! Unrolls a state stack an applies all state changes, returns an up-to-date pipeline feature mask.
+        RequestedState              applyStates(const RenderFrame& frame, const StateBlock* const * stateBlocks, s32 count);
+        
+        //! Compiles the requested rendering state (activates a shader permuation that best matches active pipeline state, bind buffers, textures, etc.).
+        void                        compilePipelineState(RequestedState state);
+        
+        //! Compiles a shader program permutation.
+        GLuint                      compileShaderPermutation(Program program, PipelineFeatures features, const PipelineFeatureLayout* featureLayout);
+        
+    private:
+        
+        RequestedState              m_activeState;  //!< An active rendering pipeline state.
     };
     
 } // namespace Renderer
