@@ -110,7 +110,10 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 ConstantBuffer constantBuffer;
                 constantBuffer.layout = reinterpret_cast<const ConstantBufferLayout*>(opCode.createBuffer.userData);
                 constantBuffer.data.resize(opCode.createBuffer.size);
-                memcpy(&constantBuffer.data[0], opCode.createBuffer.data, opCode.createBuffer.size);
+                if (opCode.createBuffer.data)
+                {
+                    memcpy(&constantBuffer.data[0], opCode.createBuffer.data, opCode.createBuffer.size);
+                }
                 m_constantBuffers.emplace(opCode.createBuffer.id, constantBuffer);
             }
                 break;
