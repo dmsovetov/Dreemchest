@@ -32,14 +32,11 @@ DC_USE_DREEMCHEST
 // ** CocoaOpenGLView
 @implementation CocoaOpenGLView
 
-#if 0   // It looks like this code is useless
-
 // ** getFrameForTime
 - ( CVReturn ) getFrameForTime : ( const CVTimeStamp* )outputTime
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-
-    //    [self drawView];
+    
     [self setNeedsDisplay: YES];
     [pool release];
 
@@ -52,13 +49,6 @@ static CVReturn displayCallback( CVDisplayLinkRef displayLink, const CVTimeStamp
     CVReturn result = [(CocoaOpenGLView*)displayLinkContext getFrameForTime:outputTime];
     return result;
 }
-#else
-// ** displayCallback
-static CVReturn displayCallback( CVDisplayLinkRef displayLink, const CVTimeStamp* now, const CVTimeStamp* outputTime, CVOptionFlags flagsIn, CVOptionFlags* flagsOut, void* displayLinkContext )
-{
-    return kCVReturnSuccess;
-}
-#endif  /*  #if 0   */
 
 // ** initWithWindow
 -( id ) initWithWindow: ( NSWindow* )window depthStencil:( int )depthStencil;
