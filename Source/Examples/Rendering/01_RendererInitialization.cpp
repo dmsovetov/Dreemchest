@@ -37,31 +37,33 @@ using namespace Platform;
 using namespace Renderer;
 
 // Application delegate is used to handle an events raised by application instance.
-class RendererInitialization : public ApplicationDelegate {
-
+class RendererInitialization : public ApplicationDelegate
+{
     // This method will be called once an application is launched.
-    virtual void handleLaunched( Application* application ) {
+    virtual void handleLaunched(Application* application)
+    {
         // Set the default log handler.
         Logger::setStandardLogger();
 
         // Create a 800x600 window like we did in previous example.
         // This window will contain a rendering viewport.
-        Window* window = Window::create( 800, 600 );
+        Window* window = Window::create(800, 600);
 
         // Create a rendering view.
-        RenderView* view   = Hal::createOpenGLView( window->handle() );
+        RenderViewPtr view = createOpenGLView(window->handle(), PixelD24S8);
 
         // Now create the main renderer interface called HAL (hardware abstraction layer).
-        m_hal = Hal::create( OpenGL, view );
+        m_hal = Hal::create(OpenGL, view);
 
         // Finally subscribe to updates events.
-        window->subscribe<Window::Update>( dcThisMethod( RendererInitialization::handleUpdate ) );
+        window->subscribe<Window::Update>(dcThisMethod(RendererInitialization::handleWindowUpdate));
     }
 
     // Called each frame and renders a single frame
-    virtual void handleUpdate( const Window::Update& e ) {
+    virtual void handleWindowUpdate(const Window::Update& e)
+    {
         // First clear a viewport with a color
-        m_hal->clear( Rgba( 0.3f, 0.3f, 0.3f ) );
+        m_hal->clear(Rgba(0.3f, 0.3f, 0.3f));
 
         // And now just present all rendered data to the screen
         m_hal->present();
@@ -71,4 +73,4 @@ class RendererInitialization : public ApplicationDelegate {
 };
 
 // Now declare an application entry point with RendererInitialization application delegate.
-dcDeclareApplication( new RendererInitialization )
+dcDeclareApplication(new RendererInitialization)

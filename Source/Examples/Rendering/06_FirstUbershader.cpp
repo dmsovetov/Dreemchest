@@ -38,23 +38,51 @@ static f32 s_vertices[] =
      0.0f,  1.0f, 0.0f,
 };
 
-// Declare a vertex shader code that will output a received vertex.
+// A ubershader is a regular shader with a set of options that dictate
+// what features should be used in a compile time. Each set of options
+// produces a unique shader permutation that is used during rendering.
+
+// A vertex shader stays the same as before
 static String s_vertexShader =
     "void main()                                    \n"
     "{                                              \n"
-    "   gl_Position = gl_Vertex;                    \n"
+    "    gl_Position = gl_Vertex;                   \n"
     "}                                              \n"
     ;
 
-// Declare a fragment shader that will output fragments with a constant color.
+// Here we define a shader that has a single option - F_Pink
+// that controlls an output color of all fragments output
+// by a shader program.
 static String s_fragmentShader =
     "void main()                                    \n"
     "{                                              \n"
-    "   gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);    \n"
-    "}                                              \n"
+    "#if defined( F_Pink )                          \n"
+    "    gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);   \n"
+    "#else                                          \n"
+    "    gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);   \n"
+    "#endif  // F_Pink                              \n"
+    "}"
     ;
 
-class Shaders : public RenderingApplicationDelegate
+// The last one thing we need is a feature layout that tells
+// a rendering context how to map from pipeline features to
+// actual shader options.
+
+// Declara a user-defined feature constant
+PipelineFeatures Pink = BIT(0);
+
+static PipelineFeature s_features[] =
+{
+    // This item tells a rendering context that 'F_Pink' option
+    // should be passed to a shader program each time the 'Pink'
+    // option was set by user.
+    { "F_Pink", PipelineFeature::user(Pink) },
+    
+    // A sentinel item
+    { NULL }
+};
+
+class FirstUbershader : public RenderingApplicationDelegate
 {
     StateBlock m_renderStates;
     RenderFrame m_renderFrame;
@@ -68,33 +96,31 @@ class Shaders : public RenderingApplicationDelegate
             application->quit(-1);
         }
 
-        Renderer::InputLayout inputLayout  = m_renderingContext->requestInputLayout(VertexFormat::Position);
-        Renderer::VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(s_vertices, sizeof(s_vertices));
+        InputLayout inputLayout = m_renderingContext->requestInputLayout(VertexFormat::Position);
+        VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(s_vertices, sizeof(s_vertices));
+        Program program = m_renderingContext->requestProgram(s_vertexShader, s_fragmentShader);
         
-        // Create a program that consists from a vertex and fragment shaders.
-        Renderer::Program program = m_renderingContext->requestProgram(s_vertexShader, s_fragmentShader);
+        // Create a feature layout
+        FeatureLayout featureLayout = m_renderingContext->requestPipelineFeatureLayout(s_features);
         
-        // As always, configure the rendering states block
         m_renderStates.bindVertexBuffer(vertexBuffer);
         m_renderStates.bindInputLayout(inputLayout);
-        
-        // And make sure to bind a previously created shader program
         m_renderStates.bindProgram(program);
+        
+        // Bind feature layout and set a 'Pink' option
+        m_renderStates.bindFeatureLayout(featureLayout);
+        m_renderStates.enableFeatures(Pink);
     }
 
     virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
     {
-        // Note, that a shader program was bound to a rendering states block,
-        // upon initialization, so this method stays same as in a
-        // 'First Triangle' exmple.
-        
         CommandBuffer& commands = m_renderFrame.entryPoint();
-        
+
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
-        commands.drawPrimitives(0, PrimTriangles, 0, 3, &m_renderStates);
+        commands.drawPrimitives(0, Renderer::PrimTriangles, 0, 3, &m_renderStates);
         
         m_renderingContext->display(m_renderFrame);
     }
 };
 
-dcDeclareApplication(new Shaders)
+dcDeclareApplication(new FirstUbershader)

@@ -31,85 +31,60 @@ DC_USE_DREEMCHEST
 using namespace Platform;
 using namespace Renderer;
 
-class RendererInitialization : public ApplicationDelegate
+static f32 s_vertices[] =
 {
-    virtual void handleLaunched( Application* application )
-    {
-        // Set the default log handler.
-        Logger::setStandardLogger();
-
-        // Create a 800x600 window like we did in previous example.
-        // This window will contain a rendering viewport.
-        Window* window = Window::create( 800, 600 );
-
-        // Create a rendering view.
-        RenderView* view   = Renderer::createOpenGLView( window->handle(), Renderer::PixelD24S8 );
-
-    #if DEV_DEPRECATED_HAL
-        // Now create the main renderer interface called HAL (hardware abstraction layer).
-        m_hal = Hal::create( OpenGL, view );
-        m_renderingContext = Renderer::createDeprecatedRenderingContext(m_hal);
-    #else
-        m_renderingContext = Renderer::RenderingContext::create(Renderer::RenderingContext::OpenGL2);
-    #endif  /*  #if DEV_DEPRECATED_HAL  */
-
-        static f32 vertices[] =
-        {
-            -0.7f, -0.7f, 0.0f,
-             0.7f, -0.7f, 0.0f,
-             0.7f,  0.7f, 0.0f,
-            -0.7f,  0.7f, 0.0f,
-        };
-        static u16 indices[] =
-        {
-            0, 1, 2, // First triangle
-            0, 2, 3, // Second triangle
-        };
-        
-        // Request all required resources from a rendering context
-        Renderer::InputLayout   inputLayout   = m_renderingContext->requestInputLayout(VertexFormat::Position);
-        Renderer::VertexBuffer_ vertexBuffer  = m_renderingContext->requestVertexBuffer(vertices, sizeof(vertices));
-        Renderer::IndexBuffer_  indexBuffer   = m_renderingContext->requestIndexBuffer(indices, sizeof(indices));
-        
-        // Setup a render state block that will be used during rendering
-        m_renderState.bindVertexBuffer(vertexBuffer);
-        m_renderState.bindIndexBuffer(indexBuffer);
-        m_renderState.bindInputLayout(inputLayout);
-        
-        // Finally subscribe to updates events.
-        window->subscribe<Window::Update>( dcThisMethod( RendererInitialization::handleWindowUpdate ) );
-    }
-
-    // Called each frame and renders a single frame
-    virtual void handleWindowUpdate( const Window::Update& e )
-    {
-        // Get an entry point command buffer
-        Renderer::CommandBuffer& commands = m_renderFrame.entryPoint();
-
-        // Now fill a command buffer with required commands
-        
-        // First clear the viewport
-        commands.clear(Rgba(0.3f, 0.3f, 0.3f), Renderer::ClearAll);
-        
-        // Now emit a drawIndexed command with a render state block configured upon initialization
-        commands.drawIndexed(0, Renderer::PrimTriangles, 0, 6, &m_renderState);
-        
-        // Rendering frame is now ready, so pass it to RVM to display it on a screen.
-        m_renderingContext->display(m_renderFrame);
-
-    #if DEV_DEPRECATED_HAL
-        m_hal->present();
-    #endif  /*  #if DEV_DEPRECATED_HAL  */
-    }
-    
-#if DEV_DEPRECATED_HAL
-    HalPtr                          m_hal;              //!< Rendering HAL.
-#endif  /*  #if DEV_DEPRECATED_HAL  */
-    Renderer::RenderingContextPtr   m_renderingContext; //!< Rendering context instance.
-    
-    Renderer::StateBlock            m_renderState;      //!< Render state block is a composition of rendering states required for rendering.
-    Renderer::RenderFrame           m_renderFrame;      //!< A render frame instance records all data required to render a single frame.
+    -0.7f, -0.7f, 0.0f,
+     0.7f, -0.7f, 0.0f,
+     0.7f,  0.7f, 0.0f,
+    -0.7f,  0.7f, 0.0f,
 };
 
-// Now declare an application entry point with RendererInitialization application delegate.
-dcDeclareApplication( new RendererInitialization )
+// This time we will also declare an index buffer to render a rectangle.
+// It should be STATIC too.
+static u16 s_indices[] =
+{
+    0, 1, 2, // First triangle
+    0, 2, 3, // Second triangle
+};
+
+class IndexBuffers : public RenderingApplicationDelegate
+{
+    StateBlock m_renderStates;
+    RenderFrame m_renderFrame;
+    
+    virtual void handleLaunched(Application* application) NIMBLE_OVERRIDE
+    {
+        Logger::setStandardLogger();
+
+        if (!initialize(800, 600))
+        {
+            application->quit(-1);
+        }
+        
+        Renderer::InputLayout inputLayout = m_renderingContext->requestInputLayout(VertexFormat::Position);
+        Renderer::VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(s_vertices, sizeof(s_vertices));
+        
+        // Now request an index buffer handle.
+        Renderer::IndexBuffer_ indexBuffer = m_renderingContext->requestIndexBuffer(s_indices, sizeof(s_indices));
+        
+        // As before configure a render state block...
+        m_renderStates.bindVertexBuffer(vertexBuffer);
+        m_renderStates.bindInputLayout(inputLayout);
+        
+        // ...but also bind an index buffer
+        m_renderStates.bindIndexBuffer(indexBuffer);
+    }
+
+    virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
+    {
+        CommandBuffer& commands = m_renderFrame.entryPoint();
+        commands.clear(Rgba(0.3f, 0.3f, 0.3f), Renderer::ClearAll);
+        
+        // This is a main difference - we have to invoke a drawIndexed method.
+        commands.drawIndexed(0, Renderer::PrimTriangles, 0, 6, &m_renderStates);
+
+        m_renderingContext->display(m_renderFrame);
+    }
+};
+
+dcDeclareApplication(new IndexBuffers)

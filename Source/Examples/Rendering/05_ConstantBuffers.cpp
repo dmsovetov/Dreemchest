@@ -38,7 +38,6 @@ static f32 s_vertices[] =
      0.0f,  1.0f, 0.0f,
 };
 
-// Declare a vertex shader code that will output a received vertex.
 static String s_vertexShader =
     "void main()                                    \n"
     "{                                              \n"
@@ -46,15 +45,31 @@ static String s_vertexShader =
     "}                                              \n"
     ;
 
-// Declare a fragment shader that will output fragments with a constant color.
 static String s_fragmentShader =
-    "void main()                                    \n"
-    "{                                              \n"
-    "   gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);    \n"
-    "}                                              \n"
+    "struct Material { vec4 color; float brightness; };         \n"
+    "uniform Material material;                                 \n"
+    "void main()                                                \n"
+    "{                                                          \n"
+    "   gl_FragColor = material.color * material.brightness;    \n"
+    "}                                                          \n"
     ;
 
-class Shaders : public RenderingApplicationDelegate
+// Declare a C structure of our constant buffer
+struct Material
+{
+    Vec4    color;
+    f32     brightness;
+} s_material;
+
+// Every constant buffer should have an associated layout
+static ConstantBufferLayout s_bufferLayout[] =
+{
+      { "material.color",      ConstantBufferLayout::Vec4,  offsetof(Material, color)       }
+    , { "material.brightness", ConstantBufferLayout::Float, offsetof(Material, brightness)  }
+    , { NULL }
+};
+
+class ConstantBuffers : public RenderingApplicationDelegate
 {
     StateBlock m_renderStates;
     RenderFrame m_renderFrame;
@@ -62,39 +77,40 @@ class Shaders : public RenderingApplicationDelegate
     virtual void handleLaunched(Application* application) NIMBLE_OVERRIDE
     {
         Logger::setStandardLogger();
-
+        
         if (!initialize(800, 600))
         {
             application->quit(-1);
         }
 
-        Renderer::InputLayout inputLayout  = m_renderingContext->requestInputLayout(VertexFormat::Position);
-        Renderer::VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(s_vertices, sizeof(s_vertices));
+        InputLayout inputLayout = m_renderingContext->requestInputLayout(VertexFormat::Position);
+        VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(s_vertices, sizeof(s_vertices));
+        Program program = m_renderingContext->requestProgram(s_vertexShader, s_fragmentShader);
         
-        // Create a program that consists from a vertex and fragment shaders.
-        Renderer::Program program = m_renderingContext->requestProgram(s_vertexShader, s_fragmentShader);
+        // Initialize a material constant buffer
+        s_material.color = Vec4(1.0f, 0.5f, 0.25f, 1.0f);
+        s_material.brightness = 0.75f;
         
-        // As always, configure the rendering states block
+        // Create a constant buffer
+        ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&s_material, sizeof(s_material), s_bufferLayout);
+        
         m_renderStates.bindVertexBuffer(vertexBuffer);
         m_renderStates.bindInputLayout(inputLayout);
-        
-        // And make sure to bind a previously created shader program
         m_renderStates.bindProgram(program);
+        
+        // Bind a created constant buffer to a rendering states block
+        m_renderStates.bindConstantBuffer(constantBuffer, 0);
     }
 
     virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
     {
-        // Note, that a shader program was bound to a rendering states block,
-        // upon initialization, so this method stays same as in a
-        // 'First Triangle' exmple.
-        
         CommandBuffer& commands = m_renderFrame.entryPoint();
         
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
         commands.drawPrimitives(0, PrimTriangles, 0, 3, &m_renderStates);
-        
+
         m_renderingContext->display(m_renderFrame);
     }
 };
 
-dcDeclareApplication(new Shaders)
+dcDeclareApplication(new ConstantBuffers)

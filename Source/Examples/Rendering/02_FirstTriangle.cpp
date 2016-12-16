@@ -31,76 +31,71 @@ DC_USE_DREEMCHEST
 using namespace Platform;
 using namespace Renderer;
 
-class RendererInitialization : public ApplicationDelegate
+// A STATIC array of vertex coordinates to make sure that vertex
+// pointer it still valid upon vertex buffer construction.
+static f32 s_vertices[] =
 {
-    virtual void handleLaunched( Application* application )
-    {
-        // Set the default log handler.
-        Logger::setStandardLogger();
-
-        // Create a 800x600 window like we did in previous example.
-        // This window will contain a rendering viewport.
-        Window* window = Window::create( 800, 600 );
-
-        // Create a rendering view.
-        RenderView* view   = Renderer::createOpenGLView( window->handle(), Renderer::PixelD24S8 );
-
-    #if DEV_DEPRECATED_HAL
-        // Now create the main renderer interface called HAL (hardware abstraction layer).
-        m_hal = Hal::create( OpenGL, view );
-        m_renderingContext = Renderer::createDeprecatedRenderingContext(m_hal);
-    #else
-        m_renderingContext = Renderer::RenderingContext::create(Renderer::RenderingContext::OpenGL2);
-    #endif  /*  #if DEV_DEPRECATED_HAL  */
-
-        static f32 vertices[] = {
-            -1.0f, -1.0f, 0.0f,
-            1.0f, -1.0f, 0.0f,
-            0.0f,  1.0f, 0.0f,
-        };
-
-        // Request all required resources from a rendering context
-        Renderer::InputLayout   inputLayout   = m_renderingContext->requestInputLayout(VertexFormat::Position);
-        Renderer::VertexBuffer_ vertexBuffer  = m_renderingContext->requestVertexBuffer(vertices, sizeof(vertices));
-        
-        // Setup a render state block that will be used during rendering
-        m_renderState.bindVertexBuffer(vertexBuffer);
-        m_renderState.bindInputLayout(inputLayout);
-        
-        // Finally subscribe to updates events.
-        window->subscribe<Window::Update>( dcThisMethod( RendererInitialization::handleWindowUpdate ) );
-    }
-
-    // Called each frame and renders a single frame
-    virtual void handleWindowUpdate( const Window::Update& e )
-    {
-        // Get an entry point command buffer
-        Renderer::CommandBuffer& commands = m_renderFrame.entryPoint();
-
-        // Now fill a command buffer with required commands
-        
-        // First clear the viewport
-        commands.clear(Rgba(0.3f, 0.3f, 0.3f), Renderer::ClearAll);
-        
-        // Now emit a drawIndexed command with a render state block configured upon initialization
-        commands.drawPrimitives(0, Renderer::PrimTriangles, 0, 3, &m_renderState);
-        
-        // Rendering frame is now ready, so pass it to RVM to display it on a screen.
-        m_renderingContext->display(m_renderFrame);
-
-    #if DEV_DEPRECATED_HAL
-        m_hal->present();
-    #endif  /*  #if DEV_DEPRECATED_HAL  */
-    }
-    
-#if DEV_DEPRECATED_HAL
-    HalPtr                          m_hal;              //!< Rendering HAL.
-#endif  /*  #if DEV_DEPRECATED_HAL  */
-    Renderer::RenderingContextPtr   m_renderingContext; //!< Rendering context instance.
-    
-    Renderer::StateBlock            m_renderState;      //!< Render state block is a composition of rendering states required for rendering.
-    Renderer::RenderFrame           m_renderFrame;      //!< A render frame instance records all data required to render a single frame.
+    -1.0f, -1.0f, 0.0f,
+     1.0f, -1.0f, 0.0f,
+     0.0f,  1.0f, 0.0f,
 };
 
-// Now declare an application entry point with RendererInitialization application delegate.
-dcDeclareApplication( new RendererInitialization )
+// This time our application delegate will be a subclass of the Renderer::RenderingApplicationDelegate
+// to reduce an amount of code to be written to initialize an application.
+class FirstTriangle : public RenderingApplicationDelegate
+{
+    // Here we declare a rendering state block that will be used in
+    // rendering process. Render state block is a composition of
+    // rendering states required for rendering, like vertex buffer
+    // binding or blend state changes.
+    StateBlock m_renderStates;
+    
+    // A render frame instance records all data and commands required
+    // to render a single frame.
+    RenderFrame m_renderFrame;
+    
+    virtual void handleLaunched(Application* application) NIMBLE_OVERRIDE
+    {
+        Logger::setStandardLogger();
+        
+        // We will use the initialization method declared in Renderer::RenderingApplicationDelegate class
+        // to create a window instance and a rendering context.
+        if (!initialize(800, 600))
+        {
+            application->quit(-1);
+        }
+
+        // Here we create an input layout from a flexible vertex format with just a position inside.
+        Renderer::InputLayout inputLayout = m_renderingContext->requestInputLayout(VertexFormat::Position);
+        
+        // Now request a vertex buffer handle.
+        Renderer::VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(s_vertices, sizeof(s_vertices));
+        
+        // Finally configure a render state block that will be used during rendering
+        m_renderStates.bindVertexBuffer(vertexBuffer);
+        m_renderStates.bindInputLayout(inputLayout);
+    }
+
+    // This method should be implemented in a subclass of RenderingApplicationDelegate to
+    // actually render a frame each time the window is updated.
+    virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
+    {
+        // A process of rendering a frame consist from a command buffer generation
+        // and then submitting it to a device.
+        // Here we take an entry point command buffer from our rendering frame.
+        CommandBuffer& commands = m_renderFrame.entryPoint();
+
+        // Emit a command that clears a viewport
+        commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
+        
+        // Now emit a drawPrimitives command with a render state block configured upon initialization
+        // as a last argument.
+        commands.drawPrimitives(0, PrimTriangles, 0, 3, &m_renderStates);
+        
+        // Rendering frame is now ready, so pass it to a rendering context to display it on a screen.
+        m_renderingContext->display(m_renderFrame);
+    }
+};
+
+// Now declare an application entry point with FirstTriangle application delegate.
+dcDeclareApplication(new FirstTriangle)
