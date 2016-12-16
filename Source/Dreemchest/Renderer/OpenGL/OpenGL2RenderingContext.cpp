@@ -326,31 +326,31 @@ void OpenGL2RenderingContext::compilePipelineState(RequestedState requested)
         OpenGL2::enableInputLayout(NULL, *m_inputLayouts[requested.inputLayout]);
     }
     
+    Program          program  = m_pipeline.program();
+    PipelineFeatures features = m_pipeline.features();
+    
+    // Get an active program
+    NIMBLE_ABORT_IF(!program && !m_defaultProgram, "no valid program set and no default one specified");
+    
+    // Use a default program if nothing was set by a user
+    if (!program)
+    {
+        program = m_defaultProgram;
+    }
+    
     // Switch the program one the pipeline state was changed
     if (m_pipeline.changes())
     {
-        Program          program  = m_pipeline.program();
-        PipelineFeatures features = m_pipeline.features();
-        
-        // Get an active program
-        NIMBLE_ABORT_IF(!program && !m_defaultProgram, "no valid program set and no default one specified");
-        
-        // Use a default program if nothing was set by a user
-        if (!program)
-        {
-            program = m_defaultProgram;
-        }
-        
         // Now compile a program permutation
         GLuint activeProgram = compileShaderPermutation(program, features, m_pipeline.featureLayout());
         glUseProgram(activeProgram);
         
-        // Update all uniforms
-        updateUniforms(requested, features, program);
-        
         // Accept these changes
         m_pipeline.acceptChanges();
     }
+    
+    // Update all uniforms
+    updateUniforms(requested, features, program);
     
     // Update an active rendering state
     m_activeState = requested;
