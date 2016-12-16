@@ -16,6 +16,9 @@ target_link_libraries(05_ConstantBuffers Dreemchest)
 add_executable(06_FirstUbershader WIN32 MACOSX_BUNDLE 06_FirstUbershader.cpp)
 target_link_libraries(06_FirstUbershader Dreemchest)
 
+add_executable(07_Cubes WIN32 MACOSX_BUNDLE 07_Cubes.cpp)
+target_link_libraries(07_Cubes Dreemchest)
+
 # Add solution folders
 set_property(TARGET 01_RendererInitialization PROPERTY FOLDER "Examples")
 set_property(TARGET 02_FirstTriangle PROPERTY FOLDER "Examples")
@@ -23,3 +26,4 @@ set_property(TARGET 03_IndexBuffers PROPERTY FOLDER "Examples")
 set_property(TARGET 04_Shaders PROPERTY FOLDER "Examples")
 set_property(TARGET 05_ConstantBuffers PROPERTY FOLDER "Examples")
 set_property(TARGET 06_FirstUbershader PROPERTY FOLDER "Examples")
+set_property(TARGET 07_Cubes PROPERTY FOLDER "Examples")
