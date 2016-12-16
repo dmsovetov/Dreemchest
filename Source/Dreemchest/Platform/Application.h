@@ -29,6 +29,7 @@
 
 #include "Platform.h"
 #include "Arguments.h"
+#include "Window.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -64,20 +65,37 @@ namespace Platform {
     };
 
     //! Base class for windowed applications.
-    class WindowedApplicationDelegate : public ApplicationDelegate {
-    public:
+    class WindowedApplicationDelegate : public ApplicationDelegate
+    {
+    protected:
 
-        //! Abstract method to be overridden in a subclass to setup application after window creation.
-        virtual bool            initialize( void ) = 0;
-
-    private:
-
-        //! Handles the application start and creates the window.
-        virtual void            handleLaunched( Application* application ) NIMBLE_OVERRIDE;
+        //! Creates and initializes a window instance.
+        virtual bool            initialize(s32 width, s32 height);
+        
+        //! Sets a window caption.
+        void                    setCaption(const String& value);
+        
+        // This method is called when mouse/touch is pressed.
+        virtual void            handleTouchBegan(const Window::TouchBegan& e) {}
+        
+        // This method is called when mouse/touch is released.
+        virtual void            handleTouchEnded(const Window::TouchEnded& e) {}
+        
+        // This method is called when mouse/touch is moved.
+        virtual void            handleTouchMoved(const Window::TouchMoved& e) {}
+        
+        // This method is called when key is pressed.
+        virtual void            handleKeyPressed(const Window::KeyPressed& e) {}
+        
+        // This method is called when key is released.
+        virtual void            handleKeyReleased(const Window::KeyReleased& e) {}
+        
+        // This method is called each frame
+        virtual void            handleWindowUpdate(const Window::Update& e) {}
 
     protected:
 
-        WindowPtr                m_window;    //!< Main application window.
+        WindowPtr               m_window;    //!< Main application window.
     };
 
     //! Application class is an entry point for applications.

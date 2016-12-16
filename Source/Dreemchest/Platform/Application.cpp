@@ -144,7 +144,38 @@ ServiceApplication* ServiceApplication::create( const Arguments& args )
 
     return NULL;
 }
+    
+// ------------------------------------------------------------ WindowedApplicationDelegate ---------------------------------------------------------- //
 
+// ** WindowedApplicationDelegate::initialize
+bool WindowedApplicationDelegate::initialize(s32 width, s32 height)
+{
+    // Create a window
+    m_window = Window::create(width, height);
+    
+    if (!m_window.valid())
+    {
+        return false;
+    }
+    
+    // Now subscribe for window events.
+    m_window->subscribe<Window::TouchBegan>(dcThisMethod(WindowedApplicationDelegate::handleTouchBegan));
+    m_window->subscribe<Window::TouchEnded>(dcThisMethod(WindowedApplicationDelegate::handleTouchEnded));
+    m_window->subscribe<Window::TouchMoved>(dcThisMethod(WindowedApplicationDelegate::handleTouchMoved));
+    m_window->subscribe<Window::KeyPressed>(dcThisMethod(WindowedApplicationDelegate::handleKeyPressed));
+    m_window->subscribe<Window::KeyReleased>(dcThisMethod(WindowedApplicationDelegate::handleKeyReleased));
+    m_window->subscribe<Window::Update>(dcThisMethod(WindowedApplicationDelegate::handleWindowUpdate));
+    
+    return true;
+}
+ 
+// ** WindowedApplicationDelegate::initialize
+void WindowedApplicationDelegate::setCaption(const String& value)
+{
+    NIMBLE_ABORT_IF(!m_window.valid(), "invalid window");
+    m_window->setCaption(value);
+}
+    
 } // namespace Platform
 
 DC_END_DREEMCHEST
