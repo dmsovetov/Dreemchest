@@ -332,8 +332,8 @@ namespace Renderer
         //! Returns the stack size.
         s32                         size( void ) const;
         
-        //! Clears a render state stack.
-        void                        clear( void );
+        //! Resets a render state stack.
+        void                        reset( void );
 
         //! Returns the stack pointer.
         const StateBlock**    states( void ) const;
@@ -348,6 +348,7 @@ namespace Renderer
         LinearAllocator             m_allocator;    //!< Allocates a state block instances.
         const StateBlock**          m_stack;        //!< State blocks pushed onto a stack.
         s32                         m_size;         //!< Current stack size.
+        s32                         m_maxStackSize; //!< A maximum stack size.
     };
 
 } // namespace Renderer

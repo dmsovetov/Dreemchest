@@ -310,12 +310,13 @@ const StateScope& StateScope::operator = ( StateScope& other )
 // -------------------------------------------------------------------------- StateStack -------------------------------------------------------------------------- //
 
 // ** StateStack::StateStack
-StateStack::StateStack( s32 maxStateBlocks, s32 maxStackSize )
-    : m_allocator( maxStateBlocks * sizeof( StateBlock ) + sizeof( StateBlock* ) * maxStackSize )
-    , m_stack( NULL )
-    , m_size( 0 )
+StateStack::StateStack(s32 maxStateBlocks, s32 maxStackSize)
+    : m_allocator(maxStateBlocks * sizeof(StateBlock) + sizeof(StateBlock*) * maxStackSize)
+    , m_stack(NULL)
+    , m_size(0)
+    , m_maxStackSize(maxStackSize)
 {
-    m_stack = reinterpret_cast<const StateBlock**>( m_allocator.allocate( sizeof( StateBlock* ) * maxStackSize ) );
+    reset();
 }
 
 // ** StateStack::newScope
@@ -370,9 +371,12 @@ const StateBlock** StateStack::states( void ) const
     return m_stack;
 }
     
-// ** StateStack::clear
-void StateStack::clear( void )
+// ** StateStack::reset
+void StateStack::reset( void )
 {
+    memset(m_stack, 0, sizeof(m_stack[0]) * m_size);
+    m_allocator.reset();
+    m_stack = reinterpret_cast<const StateBlock**>(m_allocator.allocate(sizeof(StateBlock*) * m_maxStackSize));
     m_size = 0;
 }
 

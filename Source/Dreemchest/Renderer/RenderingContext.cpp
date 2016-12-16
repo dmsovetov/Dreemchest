@@ -301,9 +301,6 @@ void RenderingContext::display( RenderFrame& frame )
     // Reset rendering states
     applyStateBlock(frame, m_defaultStateBlock);
     
-    // Clear this frame
-    frame.clear();
-    
     // End frame
     if (m_view.valid())
     {

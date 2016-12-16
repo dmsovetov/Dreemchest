@@ -88,6 +88,7 @@ void RenderFrame::clear( void )
     m_entryPoint = &createCommandBuffer();
 
     m_allocator.reset();
+    m_stateStack.reset();
 }
 
 } // namespace Renderer
