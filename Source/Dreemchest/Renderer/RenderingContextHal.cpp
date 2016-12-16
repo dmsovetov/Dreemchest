@@ -35,10 +35,17 @@ DC_BEGIN_DREEMCHEST
 
 namespace Renderer
 {
+    
+// ** createDeprecatedRenderingContext
+RenderingContextPtr createDeprecatedRenderingContext(RenderViewPtr view, HalPtr hal)
+{
+    return DC_NEW RenderingContextHal(view, hal);
+}
 
 // ** RenderingContextHal::RenderingContextHal
-RenderingContextHal::RenderingContextHal( HalWPtr hal )
-    : m_hal( hal )
+RenderingContextHal::RenderingContextHal(RenderViewPtr view, HalPtr hal)
+    : RenderingContext(view)
+    , m_hal(hal)
 {
     // Reset all state switchers
     memset( m_stateSwitches, 0, sizeof( m_stateSwitches ) );

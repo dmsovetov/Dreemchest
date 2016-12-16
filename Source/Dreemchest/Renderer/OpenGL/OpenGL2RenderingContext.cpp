@@ -34,14 +34,19 @@ namespace Renderer
 {
     
 // ** createOpenGL2RenderingContext
-RenderingContextPtr createOpenGL2RenderingContext( void )
+RenderingContextPtr createOpenGL2RenderingContext(RenderViewPtr view)
 {
-    return RenderingContextPtr(DC_NEW OpenGL2RenderingContext);
+    return RenderingContextPtr(DC_NEW OpenGL2RenderingContext(view));
 }
 
 // ** OpenGL2RenderingContext::OpenGL2RenderingContext
-OpenGL2RenderingContext::OpenGL2RenderingContext( void )
+OpenGL2RenderingContext::OpenGL2RenderingContext(RenderViewPtr view)
+    : OpenGLRenderingContext(view)
 {
+    if (m_view.valid())
+    {
+        m_view->makeCurrent();
+    }
 }
 
 // ** OpenGL2RenderingContext::applyStateBlock

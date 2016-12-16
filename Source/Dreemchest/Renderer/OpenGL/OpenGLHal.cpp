@@ -39,9 +39,9 @@ namespace Renderer {
 // ----------------------------------------------- OpenGLHal ----------------------------------------------- //
 
 // ** OpenGLHal::OpenGLHal
-OpenGLHal::OpenGLHal( RenderView* view ) : Hal( view )
+OpenGLHal::OpenGLHal( RenderViewPtr view ) : Hal( view )
 {
-    if( m_view ) m_view->makeCurrent();
+    if( m_view.valid() ) m_view->makeCurrent();
 
     NIMBLE_BREAK_IF( glGetString( GL_EXTENSIONS ) == NULL, "the OpenGL was not properly initialized" )
 

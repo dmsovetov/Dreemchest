@@ -29,6 +29,8 @@
 
 #include "../Dreemchest.h"
 
+#include <Platform/Application.h>
+
 DC_BEGIN_DREEMCHEST
 
 namespace Renderer {
@@ -71,7 +73,8 @@ namespace Renderer {
     dcDeclarePtrs(Shader);
 #endif  /*  #if DEV_DEPRECATED_HAL  */
     
-    dcDeclarePtrs( RenderingContext )
+    dcDeclarePtrs(RenderingContext)
+    dcDeclarePtrs(RenderView);
     
     //! A pipeline feature mask type.
     typedef u64 PipelineFeatures;
@@ -274,6 +277,23 @@ namespace Renderer {
         ComputeShader       computeShader;  //!< A compute shader to be attached to a program.
     };
     
+    //! Rendering viewport interface that is exposed to a rendering context
+    class RenderView : public RefCounted
+    {
+    public:
+        
+        virtual                     ~RenderView( void ) {}
+        
+        //! Activates the view for rendering.
+        virtual bool                makeCurrent( void ) { return false; }
+        
+        //! Begins a frame rendering.
+        virtual bool                beginFrame( void ) { return false; }
+        
+        //! Ends a frame rendering.
+        virtual void                endFrame( void ) {}
+    };
+    
 #if DEV_DEPRECATED_HAL
     // ** class RenderResource
     //! RenderResource is a base class for all render resources.
@@ -465,6 +485,27 @@ namespace Renderer {
         , RenderTargetColor2            //!< A #3 color texture attachment.
         , RenderTargetColor3            //!< A #4 color texture attachment.
         , TotalRenderTargetAttachments  //!< A total number of available texture attachments.
+    };
+    
+    //! Base class for windowed applications.
+    class RenderingApplicationDelegate : public Platform::WindowedApplicationDelegate
+    {
+    protected:
+        
+        //! Creates a window and a context.
+        virtual bool            initialize(s32 width, s32 height) NIMBLE_OVERRIDE;
+        
+        //! Renders a single frame.
+        virtual void            handleRenderFrame(const Platform::Window::Update& e) NIMBLE_ABSTRACT;
+        
+    private:
+        
+        //! Handles a window update event and renders a single frame.
+        virtual void            handleWindowUpdate(const Platform::Window::Update& e) NIMBLE_OVERRIDE;
+        
+    protected:
+        
+        RenderingContextPtr     m_renderingContext; //!< A rendering context instance.
     };
 
 } // namespace Renderer

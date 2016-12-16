@@ -39,6 +39,9 @@ namespace Renderer
     {
     protected:
         
+                                                //! Constructs an OpenGLRenderingContext instance.
+                                                OpenGLRenderingContext(RenderViewPtr view);
+        
         //! Searches for a suitable shader program permutation.
         GLuint                                  lookupPermutation(Program program, PipelineFeatures features) const;
         

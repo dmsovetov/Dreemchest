@@ -223,15 +223,10 @@ Texture_ RenderingContext::ConstructionCommandBuffer::createTexture(Texture_ id,
 }
     
 // -------------------------------------------------------------------------------- RenderingContext -------------------------------------------------------------------------------- //
-
-// ** createDeprecatedRenderingContext
-RenderingContextPtr createDeprecatedRenderingContext( HalWPtr hal )
-{
-    return DC_NEW RenderingContextHal(hal);
-}
     
 // ** RenderingContext::RenderingContext
-RenderingContext::RenderingContext( void )
+RenderingContext::RenderingContext(RenderViewPtr view)
+    : m_view(view)
 {
     // Create a construction command buffer instance
     m_constructionCommandBuffer = DC_NEW ConstructionCommandBuffer;
@@ -290,6 +285,12 @@ void RenderingContext::setDefaultProgram(Program value)
 // ** RenderingContext::display
 void RenderingContext::display( RenderFrame& frame )
 {
+    // Begin frame
+    if (m_view.valid())
+    {
+        m_view->beginFrame();
+    }
+    
     // First execute a construction command buffer
     execute(frame, *m_constructionCommandBuffer);
     m_constructionCommandBuffer->reset();
@@ -302,6 +303,12 @@ void RenderingContext::display( RenderFrame& frame )
     
     // Clear this frame
     frame.clear();
+    
+    // End frame
+    if (m_view.valid())
+    {
+        m_view->endFrame();
+    }
 }
     
 // ** RenderingContext::execute

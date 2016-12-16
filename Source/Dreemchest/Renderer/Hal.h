@@ -54,28 +54,6 @@ namespace Renderer {
     };
 #endif  /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
 
-    // ** class RenderView
-    //! RenderView class is a container for rendering surface.
-    class dcInterface RenderView {
-    public:
-        
-        virtual                     ~RenderView( void ) {}
-
-        //! Activates the view for rendering.
-        virtual bool                makeCurrent( void ) { return false; }
-
-        //! Begins a frame rendering.
-        virtual bool                beginFrame( void ) { return false; }
-
-        //! Ends a frame rendering.
-        virtual void                endFrame( void ) {}
-    };
-        
-#ifdef DC_OPENGL_ENABLED
-    //! Platform-specific OpenGL view constructor.
-    extern RenderView* createOpenGLView( void* window, PixelFormat depthStencil );
-#endif    /*    DC_OPENGL_ENABLED    */
-
 #if DEV_DEPRECATED_HAL
     
     // ** class Hal
@@ -317,7 +295,7 @@ namespace Renderer {
          \param renderer Rendering API to be used.
          \param view Rendering viewport to be used.
          */
-        static Hal*                 create( RenderingHal renderer, RenderView* view = NULL );
+        static Hal*                 create( RenderingHal renderer, RenderViewPtr view = RenderViewPtr() );
 
         //! Creates and initializes a new OpenGL view.
         /*!
@@ -332,12 +310,12 @@ namespace Renderer {
                                     /*!
                                      \param view Viewport container.
                                      */
-                                    Hal( RenderView* view );
+                                    Hal( RenderViewPtr view );
 
     protected:
 
         //! Rendering viewport.
-        RenderView*                 m_view;
+        RenderViewPtr                 m_view;
 
     #ifdef DC_THREADS_ENABLED
         //! Current render thread ID.

@@ -39,7 +39,7 @@ namespace Renderer
     {
     public:
                                     //! Constructs an OpenGL2RenderingContext instance.
-                                    OpenGL2RenderingContext( void );
+                                    OpenGL2RenderingContext(RenderViewPtr view);
         
     protected:
         

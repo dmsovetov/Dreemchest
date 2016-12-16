@@ -142,7 +142,7 @@ namespace Renderer {
     class OpenGLHal : public Hal {
     public:
 
-                                    OpenGLHal( RenderView* view );
+                                    OpenGLHal( RenderViewPtr view );
 
         // ** Renderer
         virtual bool                clear( const Rgba& clearColor, f32 depth, u32 stencil, u32 mask );

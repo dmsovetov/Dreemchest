@@ -39,7 +39,7 @@ namespace Renderer
     public:
         
                                     //! Constructs a RenderingContextHal instance.
-                                    RenderingContextHal( HalWPtr hal );
+                                    RenderingContextHal(RenderViewPtr view, HalPtr hal);
 
     protected:
 
@@ -141,7 +141,7 @@ namespace Renderer
         //! A container type to store program permutations.
         typedef HashMap<PipelineFeatures, ShaderPtr> ProgramPermutations;
 
-        Renderer::HalWPtr                   m_hal;                                  //!< Rendering HAL to be used.
+        HalPtr                              m_hal;                                  //!< Rendering HAL to be used.
         FixedArray<VertexBufferPtr>         m_vertexBuffers;                        //!< Allocated vertex buffers.
         FixedArray<IndexBufferPtr>          m_indexBuffers;                         //!< Allocated index buffers.
         FixedArray<ConstantBufferPtr>       m_constantBuffers;                      //!< Allocated constant buffers.

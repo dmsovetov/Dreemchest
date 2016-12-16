@@ -88,7 +88,7 @@ namespace Renderer
     protected:
         
                                                 //! Constructs a RenderingContext instance.
-                                                RenderingContext( void );
+                                                RenderingContext(RenderViewPtr view);
         
         //! Applies a specified state block.
         virtual PipelineFeatures                applyStateBlock(const RenderFrame& frame, const StateBlock& stateBlock) NIMBLE_ABSTRACT;
@@ -139,6 +139,7 @@ namespace Renderer
         //! A maximum number of state changes that can be applied in a row.
         enum { MaxStateChanges = 16 };
         
+        RenderViewPtr                           m_view;                                                 //!< A rendering viewport.
         PersistentResourceIdentifiers           m_resourceIdentifiers[RenderResourceType::TotalTypes];  //!< An array of resource identifier managers.
         FixedArray<PipelineFeatureLayoutUPtr>   m_pipelineFeatureLayouts;                               //!< An array of constructed pipeline feature layouts.
         FixedArray<VertexBufferLayoutUPtr>      m_inputLayouts;                                         //!< Allocated input layouts.
@@ -153,10 +154,15 @@ namespace Renderer
     };
     
     //! Creates a rendering context that uses a deprecated rendering HAL interface.
-    RenderingContextPtr createDeprecatedRenderingContext( HalWPtr hal );
+    RenderingContextPtr createDeprecatedRenderingContext(RenderViewPtr view, HalPtr hal);
+    
+#ifdef DC_OPENGL_ENABLED
+    //! Platform-specific OpenGL view constructor.
+    extern RenderViewPtr createOpenGLView(void* window, PixelFormat depthStencil);
     
     //! Creates a rendering context that uses an OpenGL 2 rendering API.
-    RenderingContextPtr createOpenGL2RenderingContext( void );
+    RenderingContextPtr createOpenGL2RenderingContext(RenderViewPtr view);
+#endif    /*    DC_OPENGL_ENABLED    */
     
 } // namespace Renderer
 

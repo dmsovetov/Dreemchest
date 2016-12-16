@@ -24,39 +24,40 @@
  
  **************************************************************************/
 
-#include "OpenGLRenderingContext.h"
+#include "Renderer.h"
+#include "RenderingContext.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace Renderer
-{
+namespace Renderer {
     
-// ** OpenGLRenderingContext::OpenGLRenderingContext
-OpenGLRenderingContext::OpenGLRenderingContext(RenderViewPtr view)
-    : RenderingContext(view)
+// ** RenderingApplicationDelegate::initialize
+bool RenderingApplicationDelegate::initialize(s32 width, s32 height)
 {
+    // First create a window
+    if (!WindowedApplicationDelegate::initialize(width, height))
+    {
+        return false;
+    }
+    
+    // Create a rendering view.
+    RenderViewPtr view = createOpenGLView(m_window->handle(), Renderer::PixelD24S8);
+    
+    // Now create a rendering context that is attached to a created window instance
+#if 0
+    // Now create the main renderer interface called HAL (hardware abstraction layer).
+    m_renderingContext = createDeprecatedRenderingContext(view, Hal::create(OpenGL, view));
+#else
+    m_renderingContext = createOpenGL2RenderingContext(view);
+#endif
+    
+    return m_renderingContext.valid();
 }
 
-// ** OpenGLRenderingContext::lookupPermutation
-GLuint OpenGLRenderingContext::lookupPermutation(Program program, PipelineFeatures features) const
+// ** RenderingApplicationDelegate::handleWindowUpdate
+void RenderingApplicationDelegate::handleWindowUpdate(const Platform::Window::Update& e)
 {
-    if (static_cast<s32>(program) >= m_permutations.count())
-    {
-        m_permutations.emplace(program, ProgramPermutations());
-    }
-    
-    ProgramPermutations& permutations = m_permutations[program];
-    
-    // Now lookup a permutation cache
-    ProgramPermutations::const_iterator permutation = permutations.find(features);
-    
-    if (permutation != permutations.end())
-    {
-        return permutation->second;
-    }
-    
-    // Nothing found :(
-    return 0;
+    handleRenderFrame(e);
 }
     
 } // namespace Renderer

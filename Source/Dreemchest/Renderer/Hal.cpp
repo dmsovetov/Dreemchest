@@ -49,7 +49,7 @@ namespace Renderer {
 
 #if DEV_DEPRECATED_HAL
 // ** Hal::Hal
-Hal::Hal( RenderView* view ) : m_view( view ), m_lastInputLayout( NULL ), m_activeInputLayout( NULL )
+Hal::Hal( RenderViewPtr view ) : m_view( view ), m_lastInputLayout( NULL ), m_activeInputLayout( NULL )
 {
     //m_batchRenderer = NULL;
 
@@ -74,7 +74,7 @@ Hal::~Hal( void )
 }
 
 // ** Hal::create
-Hal* Hal::create( RenderingHal renderer, RenderView* view )
+Hal* Hal::create( RenderingHal renderer, RenderViewPtr view )
 {
     switch( renderer ) {
     case OpenGL:    
@@ -92,21 +92,10 @@ Hal* Hal::create( RenderingHal renderer, RenderView* view )
     return NULL;
 }
 
-// ** Hal::createOpenGLView
-RenderView* Hal::createOpenGLView( void* window, PixelFormat depthStencil )
-{
-#if defined( DC_OPENGL_ENABLED )
-    return Renderer::createOpenGLView( window, depthStencil );
-#else
-    LogError( "hal", "%s", "the target platform doesn't support OpenGL.\n" );
-    return NULL;
-#endif
-}
-
 // ** Hal::clear
 bool Hal::clear( const Rgba& clearColor, f32 depth, u32 stencil, u32 mask )
 {
-    if( m_view ) {
+    if( m_view.valid() ) {
         return m_view->beginFrame();
     }
 
@@ -116,7 +105,7 @@ bool Hal::clear( const Rgba& clearColor, f32 depth, u32 stencil, u32 mask )
 // ** Hal::present
 void Hal::present( void )
 {
-    if( m_view ) m_view->endFrame();
+    if( m_view.valid() ) m_view->endFrame();
 }
 
 // ** Hal::renderIndexed
