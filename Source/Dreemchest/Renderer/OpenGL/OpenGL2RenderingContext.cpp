@@ -80,7 +80,11 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 break;
                 
             case CommandBuffer::OpCode::UploadConstantBuffer:
-                NIMBLE_NOT_IMPLEMENTED
+            {
+                ConstantBuffer& constantBuffer = m_constantBuffers[opCode.upload.id];
+                NIMBLE_ABORT_IF(constantBuffer.data.size() < opCode.upload.size, "buffer is too small");
+                memcpy(&constantBuffer.data[0], opCode.upload.data, opCode.upload.size);
+            }
                 break;
                 
             case CommandBuffer::OpCode::UploadVertexBuffer:
