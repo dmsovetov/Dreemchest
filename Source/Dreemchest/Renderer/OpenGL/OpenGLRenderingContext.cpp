@@ -38,25 +38,53 @@ OpenGLRenderingContext::OpenGLRenderingContext(RenderViewPtr view)
 }
 
 // ** OpenGLRenderingContext::lookupPermutation
-GLuint OpenGLRenderingContext::lookupPermutation(Program program, PipelineFeatures features) const
+bool OpenGLRenderingContext::lookupPermutation(Program program, PipelineFeatures features, const Permutation** permutation) const
 {
     if (static_cast<s32>(program) >= m_permutations.count())
     {
         m_permutations.emplace(program, ProgramPermutations());
+        return false;
     }
     
     ProgramPermutations& permutations = m_permutations[program];
     
     // Now lookup a permutation cache
-    ProgramPermutations::const_iterator permutation = permutations.find(features);
+    ProgramPermutations::const_iterator i = permutations.find(features);
     
-    if (permutation != permutations.end())
+    if (i != permutations.end())
     {
-        return permutation->second;
+        *permutation = &i->second;
+        return true;
     }
     
-    // Nothing found :(
-    return 0;
+    return false;
+}
+    
+// ** OpenGLRenderingContext::savePermutation
+void OpenGLRenderingContext::savePermutation(Program program, PipelineFeatures features, GLuint id)
+{
+    Permutation permutation;
+    permutation.program = id;
+    m_permutations[program][features] = permutation;
+}
+ 
+// ** OpenGLRenderingContext::findUniformLocation
+GLint OpenGLRenderingContext::findUniformLocation(Program program, PipelineFeatures features, const FixedString& name)
+{
+    Permutation& permutation = m_permutations[program][features];
+    UniformLocations& uniforms = permutation.uniforms;
+    
+    UniformLocations::const_iterator i = uniforms.find(name.hash());
+    
+    if (i != uniforms.end())
+    {
+        return i->second;
+    }
+    
+    GLint location = OpenGL2::Program::uniformLocation(permutation.program, name);
+    uniforms[name.hash()] = location;
+    
+    return location;
 }
     
 } // namespace Renderer

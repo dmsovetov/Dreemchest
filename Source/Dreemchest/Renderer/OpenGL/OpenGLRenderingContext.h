@@ -29,6 +29,7 @@
 
 #include "../RenderingContext.h"
 #include "OpenGLHal.h"
+#include "OpenGL2.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -39,16 +40,32 @@ namespace Renderer
     {
     protected:
         
+        //! A container type to store cached uniform locations.
+        typedef HashMap<String32, GLint> UniformLocations;
+        
+        //! A shader program permutation entry.
+        struct Permutation
+        {
+            GLuint              program;
+            UniformLocations    uniforms;
+        };
+        
                                                 //! Constructs an OpenGLRenderingContext instance.
                                                 OpenGLRenderingContext(RenderViewPtr view);
         
         //! Searches for a suitable shader program permutation.
-        GLuint                                  lookupPermutation(Program program, PipelineFeatures features) const;
+        bool                                    lookupPermutation(Program program, PipelineFeatures features, const Permutation** permutation) const;
+        
+        //! Puts a new permutation to a cache.
+        void                                    savePermutation(Program program, PipelineFeatures features, GLuint id);
+        
+        //! Searches a uniform location by a name.
+        GLint                                   findUniformLocation(Program program, PipelineFeatures features, const FixedString& name);
         
     protected:
     
         //! A container type to store program permutations.
-        typedef HashMap<PipelineFeatures, GLuint> ProgramPermutations;
+        typedef HashMap<PipelineFeatures, Permutation> ProgramPermutations;
         
         FixedArray<GLuint>                      m_vertexBuffers;    //!< Allocated vertex buffers.
         FixedArray<GLuint>                      m_indexBuffers;     //!< Allocated index buffers.

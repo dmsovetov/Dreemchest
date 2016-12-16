@@ -28,7 +28,6 @@
 #define __DC_Renderer_OpenGL2RenderingContext_H__
 
 #include "OpenGLRenderingContext.h"
-#include "OpenGL2.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -46,12 +45,13 @@ namespace Renderer
         //! A pipeline state that was constructed from an array of render state changes.
         struct RequestedState
         {
-            VertexBuffer_           vertexBuffer;   //!< A vertex buffer that should be set.
-            IndexBuffer_            indexBuffer;    //!< An index buffer that should be set.
-            InputLayout             inputLayout;    //!< An input layout that should be set.
-            FeatureLayout           featureLayout;  //!< A feature layout that should be set.
-            Program                 program;        //!< A shader program that should be set.
-            PipelineFeatures        features;       //!< A bitmask of user-defined pipeline features.
+            VertexBuffer_           vertexBuffer;                               //!< A vertex buffer that should be set.
+            IndexBuffer_            indexBuffer;                                //!< An index buffer that should be set.
+            InputLayout             inputLayout;                                //!< An input layout that should be set.
+            FeatureLayout           featureLayout;                              //!< A feature layout that should be set.
+            Program                 program;                                    //!< A shader program that should be set.
+            ConstantBuffer_         constantBuffer[State::MaxConstantBuffers];  //!< An array of bound constant buffers.
+            PipelineFeatures        features;                                   //!< A bitmask of user-defined pipeline features.
             
                                     RequestedState() : features(0) {}
         };
@@ -71,9 +71,20 @@ namespace Renderer
         //! Compiles a shader program permutation.
         GLuint                      compileShaderPermutation(Program program, PipelineFeatures features, const PipelineFeatureLayout* featureLayout);
         
+        //! Update uniforms from active constant buffers.
+        void                        updateUniforms(const RequestedState& state, PipelineFeatures features, Program program);
+        
     private:
         
-        RequestedState              m_activeState;  //!< An active rendering pipeline state.
+        //! A software-emulated constant buffer
+        struct ConstantBuffer
+        {
+            Array<u8>                   data;       //!< Actual buffer data.
+            const ConstantBufferLayout* layout;     //!< A constant buffer layout.
+        };
+        
+        RequestedState              m_activeState;      //!< An active rendering pipeline state.
+        FixedArray<ConstantBuffer>  m_constantBuffers;  //!< An array of allocated constant buffer instances.
     };
     
 } // namespace Renderer

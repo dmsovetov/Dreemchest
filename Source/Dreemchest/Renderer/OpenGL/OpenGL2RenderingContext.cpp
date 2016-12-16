@@ -61,7 +61,6 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
 {
     RequestedState              requestedState;
     TransientRenderTarget       transientRenderTarget;
-    const ConstantBufferLayout* constantBufferLayout = nullptr;
     GLenum                      id;
     
     for (s32 i = 0, n = commands.size(); i < n; i++)
@@ -200,7 +199,8 @@ OpenGL2RenderingContext::RequestedState OpenGL2RenderingContext::applyStates(con
                 break;
                 
             case State::ConstantBuffer:
-                NIMBLE_NOT_IMPLEMENTED
+                requestedState.constantBuffer[state.data.index].set(state.resourceId);
+                m_pipeline.activateConstantBuffer(state.data.index);
                 break;
                 
             case State::Shader:
@@ -322,9 +322,24 @@ void OpenGL2RenderingContext::compilePipelineState(RequestedState requested)
     // Switch the program one the pipeline state was changed
     if (m_pipeline.changes())
     {
+        Program          program  = m_pipeline.program();
+        PipelineFeatures features = m_pipeline.features();
+        
+        // Get an active program
+        NIMBLE_ABORT_IF(!program && !m_defaultProgram, "no valid program set and no default one specified");
+        
+        // Use a default program if nothing was set by a user
+        if (!program)
+        {
+            program = m_defaultProgram;
+        }
+        
         // Now compile a program permutation
-        GLuint activeProgram = compileShaderPermutation(m_pipeline.program(), m_pipeline.features(), m_pipeline.featureLayout());
+        GLuint activeProgram = compileShaderPermutation(program, features, m_pipeline.featureLayout());
         glUseProgram(activeProgram);
+        
+        // Update all uniforms
+        updateUniforms(requested, features, program);
         
         // Accept these changes
         m_pipeline.acceptChanges();
@@ -334,24 +349,99 @@ void OpenGL2RenderingContext::compilePipelineState(RequestedState requested)
     m_activeState = requested;
 }
     
+// ** OpenGL2RenderingContext::updateUniforms
+void OpenGL2RenderingContext::updateUniforms(const RequestedState& state, PipelineFeatures features, Program program)
+{
+    // Bind texture samplers
+    static FixedString s_samplers[] =
+    {
+          "Texture0"
+        , "Texture1"
+        , "Texture2"
+        , "Texture3"
+        , "Texture4"
+        , "Texture5"
+        , "Texture6"
+        , "Texture7"
+    };
+    
+    s32 nSamplers = sizeof(s_samplers) / sizeof(s_samplers[1]);
+    NIMBLE_ABORT_IF(nSamplers != State::MaxTextureSamplers, "invalid sampler name initialization");
+    
+    for (s32 i = 0, n = nSamplers; i < n; i++ )
+    {
+        GLint location = findUniformLocation(program, features, s_samplers[i]);
+        
+        if (location)
+        {
+            OpenGL2::Program::uniform1i(location, i);
+        }
+    }
+    
+    // Process each bound constant buffer
+    for (s32 i = 0; i < State::MaxConstantBuffers; i++)
+    {
+        // No constant buffer bound to this slot
+        if (!state.constantBuffer[i])
+        {
+            continue;
+        }
+        
+        // Get a constant buffer at index
+        const ConstantBuffer& constantBuffer = m_constantBuffers[state.constantBuffer[i]];
+    
+        // Submit all constants to a shader
+        for (const ConstantBufferLayout* constant = constantBuffer.layout; constant->name; constant++)
+        {
+            // Lookup a uniform location by name
+            GLint location = findUniformLocation(program, features, constant->name);
+            
+            // Not found - skip
+            if (location == 0)
+            {
+                continue;
+            }
+            
+            // Submit constant to a shader
+            switch (constant->type)
+            {
+                case ConstantBufferLayout::Integer:
+                    OpenGL2::Program::uniform1i(location, *reinterpret_cast<const s32*>(&constantBuffer.data[constant->offset]));
+                    break;
+                    
+                case ConstantBufferLayout::Float:
+                    OpenGL2::Program::uniform1f(location, *reinterpret_cast<const f32*>(&constantBuffer.data[constant->offset]));
+                    break;
+                    
+                case ConstantBufferLayout::Vec2:
+                    OpenGL2::Program::uniform2f(location, reinterpret_cast<const f32*>(&constantBuffer.data[constant->offset]));
+                    break;
+                    
+                case ConstantBufferLayout::Vec3:
+                    OpenGL2::Program::uniform3f(location, reinterpret_cast<const f32*>(&constantBuffer.data[constant->offset]));
+                    break;
+                    
+                case ConstantBufferLayout::Vec4:
+                    OpenGL2::Program::uniform4f(location, reinterpret_cast<const f32*>(&constantBuffer.data[constant->offset]));
+                    break;
+                    
+                case ConstantBufferLayout::Matrix4:
+                    OpenGL2::Program::uniformMatrix4(location, reinterpret_cast<const f32*>(&constantBuffer.data[constant->offset]));
+                    break;
+            }
+        }
+    }
+}
+    
 // ** OpenGL2RenderingContext::compileShaderPermutation
 GLuint OpenGL2RenderingContext::compileShaderPermutation(Program program, PipelineFeatures features, const PipelineFeatureLayout* featureLayout)
 {
-    // Get an active program
-    NIMBLE_ABORT_IF(!program && !m_defaultProgram, "no valid program set and no default one specified");
-    
-    // Use a default program if nothing was set by a user
-    if (!program)
-    {
-        program = m_defaultProgram;
-    }
-    
     // Lookup a shader permutation in cache
-    GLuint permutation = lookupPermutation(program, features);
-    
-    if (permutation)
+    const Permutation* permutation = NULL;
+
+    if (lookupPermutation(program, features, &permutation))
     {
-        return permutation;
+        return permutation->program;
     }
     
     // Get a shader program descriptor and corresponding permutations container
