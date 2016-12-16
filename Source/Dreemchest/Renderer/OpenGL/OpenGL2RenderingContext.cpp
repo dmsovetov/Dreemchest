@@ -85,7 +85,7 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 break;
                 
             case CommandBuffer::OpCode::UploadVertexBuffer:
-                OpenGL2::bufferSubData(GL_ARRAY_BUFFER, m_vertexBuffers[opCode.upload.id], 0, opCode.upload.size, opCode.upload.data);
+                OpenGL2::Buffer::subData(GL_ARRAY_BUFFER, m_vertexBuffers[opCode.upload.id], 0, opCode.upload.size, opCode.upload.data);
                 break;
                 
             case CommandBuffer::OpCode::CreateInputLayout:
@@ -97,19 +97,23 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 break;
                 
             case CommandBuffer::OpCode::CreateIndexBuffer:
-                id = OpenGL2::createBuffer(GL_ARRAY_BUFFER, opCode.createBuffer.data, opCode.createBuffer.size, GL_DYNAMIC_DRAW);
+                id = OpenGL2::Buffer::create(GL_ARRAY_BUFFER, opCode.createBuffer.data, opCode.createBuffer.size, GL_DYNAMIC_DRAW);
                 m_indexBuffers.emplace(opCode.createBuffer.id, id);
                 break;
                 
             case CommandBuffer::OpCode::CreateVertexBuffer:
-                id = OpenGL2::createBuffer(GL_ELEMENT_ARRAY_BUFFER, opCode.createBuffer.data, opCode.createBuffer.size, GL_DYNAMIC_DRAW);
+                id = OpenGL2::Buffer::create(GL_ELEMENT_ARRAY_BUFFER, opCode.createBuffer.data, opCode.createBuffer.size, GL_DYNAMIC_DRAW);
                 m_vertexBuffers.emplace(opCode.createBuffer.id, id);
                 break;
                 
             case CommandBuffer::OpCode::CreateConstantBuffer:
-                NIMBLE_NOT_IMPLEMENTED
-                constantBufferLayout = reinterpret_cast<const ConstantBufferLayout*>(opCode.createBuffer.userData);
-                //commandCreateConstantBuffer(opCode.createBuffer.id, opCode.createBuffer.data, opCode.createBuffer.size, layout);
+            {
+                ConstantBuffer constantBuffer;
+                constantBuffer.layout = reinterpret_cast<const ConstantBufferLayout*>(opCode.createBuffer.userData);
+                constantBuffer.data.resize(opCode.createBuffer.size);
+                memcpy(&constantBuffer.data[0], opCode.createBuffer.data, opCode.createBuffer.size);
+                m_constantBuffers.emplace(opCode.createBuffer.id, constantBuffer);
+            }
                 break;
                 
             case CommandBuffer::OpCode::RenderTarget:
@@ -293,13 +297,13 @@ void OpenGL2RenderingContext::compilePipelineState(RequestedState requested)
     // Bind an indexed buffer
     if (requested.indexBuffer != m_activeState.indexBuffer)
     {
-        OpenGL2::bindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[requested.indexBuffer]);
+        OpenGL2::Buffer::bind(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[requested.indexBuffer]);
     }
     
     // Bind a vertex buffer
     if (requested.vertexBuffer != m_activeState.vertexBuffer)
     {
-        OpenGL2::bindBuffer(GL_ARRAY_BUFFER, m_vertexBuffers[requested.vertexBuffer]);
+        OpenGL2::Buffer::bind(GL_ARRAY_BUFFER, m_vertexBuffers[requested.vertexBuffer]);
     }
     
     // Switch the input layout
@@ -365,35 +369,35 @@ GLuint OpenGL2RenderingContext::compileShaderPermutation(Program program, Pipeli
     String fragment = generateShaderCode(fragmentSource, features, featureLayout);
     
     // Compile the vertex shader
-    GLuint vertexShader = OpenGL2::compileShader(GL_VERTEX_SHADER, vertex.c_str(), error, sizeof(error));
+    GLuint vertexShader = OpenGL2::Program::compileShader(GL_VERTEX_SHADER, vertex.c_str(), error, sizeof(error));
     if (vertexShader == 0)
     {
         return 0;
     }
     
     // Compile the fragment shader
-    GLuint fragmentShader = OpenGL2::compileShader(GL_FRAGMENT_SHADER, fragment.c_str(), error, sizeof(error));
+    GLuint fragmentShader = OpenGL2::Program::compileShader(GL_FRAGMENT_SHADER, fragment.c_str(), error, sizeof(error));
     if (fragmentShader == 0)
     {
-        OpenGL2::deleteShader(vertexShader);
+        OpenGL2::Program::deleteShader(vertexShader);
         return 0;
     }
     
     // Now link a program
     GLuint shaders[] = {vertexShader, fragmentShader};
-    permutation = OpenGL2::createProgram(shaders, 2, error, sizeof(error));
+    GLuint id = OpenGL2::Program::createProgram(shaders, 2, error, sizeof(error));
     
-    if (permutation == 0)
+    if (id == 0)
     {
-        OpenGL2::deleteShader(vertexShader);
-        OpenGL2::deleteShader(fragmentShader);
+        OpenGL2::Program::deleteShader(vertexShader);
+        OpenGL2::Program::deleteShader(fragmentShader);
         return 0;
     }
     
     // Finally save a compiled permutation
-    m_permutations[program][features] = permutation;
+    savePermutation(program, features, id);
     
-    return permutation;
+    return id;
 }
     
 } // namespace Renderer

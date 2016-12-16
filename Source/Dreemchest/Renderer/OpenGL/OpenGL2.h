@@ -80,17 +80,65 @@ namespace Renderer
     {
     public:
         
-        //! Creates a buffer object with a specified type and returns it's identifier.
-        static GLuint   createBuffer(GLenum type, const void* data, s32 size, GLenum usage);
+        //! An internal class that contains all buffer object related functions.
+        class Buffer
+        {
+        public:
+            
+            //! Binds a buffer object to a pipeline.
+            static void     bind(GLenum type, GLuint id);
+            
+            //! Creates a buffer object with a specified type and returns it's identifier.
+            static GLuint   create(GLenum type, const void* data, s32 size, GLenum usage);
+            
+            //! Updates a part of a buffer.
+            static void     subData(GLenum target, GLuint id, GLintptr offset, GLsizeiptr size, const GLvoid* data);
+        };
+        
+        //! An internal class that contains all shader related functions.
+        class Program
+        {
+        public:
+            
+            //! Compiles a shader program from a source code.
+            static GLuint   compileShader(GLenum type, CString source, s8* error, s32 maxErrorSize);
+            
+            //! Creates a program from an array of shaders.
+            static GLuint   createProgram(const GLuint* shaders, s32 count, s8* error, s32 maxErrorSize);
+            
+            //! Destroys a program.
+            static void     deleteProgram(GLuint id);
+            
+            //! Destroys a shader.
+            static void     deleteShader(GLuint id);
+            
+            //! Searches for a uniform location.
+            static GLint    uniformLocation(GLuint program, CString name);
+            
+            //! Searches for a uniform location.
+            static GLint    uniformLocation(GLuint program, const FixedString& name);
+            
+            //! Sets a mat4 uniform value.
+            static void     uniformMatrix4(GLint location, const f32 value[16], GLboolean transpose = GL_FALSE);
+            
+            //! Sets an int uniform value.
+            static void     uniform1i(GLint location, s32 value);
+            
+            //! Sets an float uniform value.
+            static void     uniform1f(GLint location, f32 value);
+            
+            //! Sets an vec2 uniform value.
+            static void     uniform2f(GLint location, const f32 value[2]);
+            
+            //! Sets an vec3 uniform value.
+            static void     uniform3f(GLint location, const f32 value[3]);
+            
+            //! Sets an vec4 uniform value.
+            static void     uniform4f(GLint location, const f32 value[4]);
+        };
         
         //! Clears an active viewport.
         static void     clear(const GLclampf* color, u8 mask, GLclampd depth, GLint stencil);
-        
-        //! Binds a buffer object to a pipeline.
-        static void     bindBuffer(GLenum type, GLuint id);
-        
-        //! Updates a part of a buffer.
-        static void     bufferSubData(GLenum target, GLuint id, GLintptr offset, GLsizeiptr size, const GLvoid* data);
         
         //! Converts a blend factor constant to an OpenGL value.
         static GLenum   convertBlendFactor(BlendFactor value);
@@ -112,18 +160,6 @@ namespace Renderer
         
         //! Disables a vertex buffer layout.
         static void     disableInputLayout(const VertexBufferLayout& layout);
-        
-        //! Compiles a shader program from a source code.
-        static GLuint   compileShader(GLenum type, CString source, s8* error, s32 maxErrorSize);
-        
-        //! Creates a program from an array of shaders.
-        static GLuint   createProgram(const GLuint* shaders, s32 count, s8* error, s32 maxErrorSize);
-        
-        //! Destroys a program.
-        static void     deleteProgram(GLuint id);
-        
-        //! Destroys a shader.
-        static void     deleteShader(GLuint id);
     };
     
 } // namespace Renderer

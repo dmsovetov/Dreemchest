@@ -36,9 +36,11 @@ DC_BEGIN_DREEMCHEST
 
 namespace Renderer
 {
+    
+// ----------------------------------------------------------- OpenGL2::Buffer ----------------------------------------------------------- //
 
-// ** OpenGL2::createBuffer
-GLuint OpenGL2::createBuffer(GLenum type, const void* data, s32 size, GLenum usage)
+// ** OpenGL2::Buffer::create
+GLuint OpenGL2::Buffer::create(GLenum type, const void* data, s32 size, GLenum usage)
 {
     DC_CHECK_GL;
     
@@ -50,41 +52,8 @@ GLuint OpenGL2::createBuffer(GLenum type, const void* data, s32 size, GLenum usa
     return id;
 }
     
-// ** OpenGL2::clear
-void OpenGL2::clear(const GLclampf* color, u8 mask, GLclampd depth, GLint stencil)
-{
-    DC_CHECK_GL;
-    
-    GLbitfield flags = 0;
-    
-    if(mask & ClearColor)
-    {
-        flags |= GL_COLOR_BUFFER_BIT;
-    }
-    if(mask & ClearDepth)
-    {
-        flags |= GL_DEPTH_BUFFER_BIT;
-    }
-    if(mask & ClearStencil)
-    {
-        flags |= GL_STENCIL_BUFFER_BIT;
-    }
-    
-    glClearColor(color[0], color[1], color[2], color[3]);
-    glClearDepth(depth);
-    glClearStencil(stencil);
-    glClear(flags);
-}
-    
-// ** OpenGL2::bindBuffer
-void OpenGL2::bindBuffer(GLenum type, GLuint id)
-{
-    DC_CHECK_GL;
-    glBindBuffer(type, id);
-}
-    
-// ** OpenGL2::bufferSubData
-void OpenGL2::bufferSubData(GLenum target, GLuint id, GLintptr offset, GLsizeiptr size, const GLvoid* data)
+// ** OpenGL2::Buffer::subData
+void OpenGL2::Buffer::subData(GLenum target, GLuint id, GLintptr offset, GLsizeiptr size, const GLvoid* data)
 {
     DC_CHECK_GL;
     glBindBuffer(target, id);
@@ -92,22 +61,31 @@ void OpenGL2::bufferSubData(GLenum target, GLuint id, GLintptr offset, GLsizeipt
     glBindBuffer(target, 0);
 }
 
-// ** OpenGL2::deleteProgram
-void OpenGL2::deleteProgram(GLuint id)
+// ** OpenGL2::Buffer::bind
+void OpenGL2::Buffer::bind(GLenum type, GLuint id)
+{
+    DC_CHECK_GL;
+    glBindBuffer(type, id);
+}
+    
+// ----------------------------------------------------------- OpenGL2::Program ---------------------------------------------------------- //
+
+// ** OpenGL2::Program::deleteProgram
+void OpenGL2::Program::deleteProgram(GLuint id)
 {
     DC_CHECK_GL;
     glDeleteProgram(id);
 }
 
-// ** OpenGL2::deleteShader
-void OpenGL2::deleteShader(GLuint id)
+// ** OpenGL2::Program::deleteShader
+void OpenGL2::Program::deleteShader(GLuint id)
 {
     DC_CHECK_GL;
     glDeleteShader(id);
 }
-    
-// ** OpenGL2::compileShader
-GLuint OpenGL2::compileShader(GLenum type, CString source, s8* error, s32 maxErrorSize)
+
+// ** OpenGL2::Program::compileShader
+GLuint OpenGL2::Program::compileShader(GLenum type, CString source, s8* error, s32 maxErrorSize)
 {
     DC_CHECK_GL;
     
@@ -117,7 +95,7 @@ GLuint OpenGL2::compileShader(GLenum type, CString source, s8* error, s32 maxErr
     glShaderSource(id, 1, &source, NULL);
     glCompileShader(id);
     glGetShaderiv(id, GL_COMPILE_STATUS, &result);
-
+    
     // Get a status of a compiled shader
     GLsizei errLogSize;
     glGetShaderInfoLog(id, maxErrorSize, &errLogSize, error);
@@ -141,9 +119,9 @@ GLuint OpenGL2::compileShader(GLenum type, CString source, s8* error, s32 maxErr
     
     return id;
 }
-    
-// ** OpenGL2::createProgram
-GLuint OpenGL2::createProgram(const GLuint* shaders, s32 count, s8* error, s32 maxErrorSize)
+
+// ** OpenGL2::Program::createProgram
+GLuint OpenGL2::Program::createProgram(const GLuint* shaders, s32 count, s8* error, s32 maxErrorSize)
 {
     DC_CHECK_GL;
     
@@ -189,6 +167,89 @@ GLuint OpenGL2::createProgram(const GLuint* shaders, s32 count, s8* error, s32 m
     
     deleteProgram(program);
     return 0;
+}
+    
+// ** OpenGL2::Program::uniformLocation
+GLint OpenGL2::Program::uniformLocation(GLuint program, CString name)
+{
+    return uniformLocation(program, FixedString(name));
+}
+
+// ** OpenGL2::Program::uniformLocation
+GLint OpenGL2::Program::uniformLocation(GLuint program, const FixedString& name)
+{
+    DC_CHECK_GL;
+    return glGetUniformLocation(program, name) + 1;
+}
+    
+// ** OpenGL2::Program::uniformMatrix4
+void OpenGL2::Program::uniformMatrix4(GLint location, const f32 value[16], GLboolean transpose)
+{
+    DC_CHECK_GL;
+    glUniformMatrix4fv(location - 1, 1, transpose, value);
+}
+
+// ** OpenGL2::Program::uniform1i
+void OpenGL2::Program::uniform1i(GLint location, s32 value)
+{
+    DC_CHECK_GL;
+    glUniform1i(location - 1, value);
+}
+
+// ** OpenGL2::Program::uniform1f
+void OpenGL2::Program::uniform1f(GLint location, f32 value)
+{
+    DC_CHECK_GL;
+    glUniform1f(location - 1, value);
+}
+
+// ** OpenGL2::Program::uniform2f
+void OpenGL2::Program::uniform2f(GLint location, const f32 value[2])
+{
+    DC_CHECK_GL;
+    glUniform2fv(location - 1, 1, value);
+}
+
+// ** OpenGL2::Program::uniform3f
+void OpenGL2::Program::uniform3f(GLint location, const f32 value[3])
+{
+    DC_CHECK_GL;
+    glUniform3fv(location - 1, 1, value);
+}
+
+// ** OpenGL2::Program::uniform4f
+void OpenGL2::Program::uniform4f(GLint location, const f32 value[4])
+{
+    DC_CHECK_GL;
+    glUniform4fv(location - 1, 1, value);
+}
+
+// --------------------------------------------------------------- OpenGL2 --------------------------------------------------------------- //
+    
+// ** OpenGL2::clear
+void OpenGL2::clear(const GLclampf* color, u8 mask, GLclampd depth, GLint stencil)
+{
+    DC_CHECK_GL;
+    
+    GLbitfield flags = 0;
+    
+    if(mask & ClearColor)
+    {
+        flags |= GL_COLOR_BUFFER_BIT;
+    }
+    if(mask & ClearDepth)
+    {
+        flags |= GL_DEPTH_BUFFER_BIT;
+    }
+    if(mask & ClearStencil)
+    {
+        flags |= GL_STENCIL_BUFFER_BIT;
+    }
+    
+    glClearColor(color[0], color[1], color[2], color[3]);
+    glClearDepth(depth);
+    glClearStencil(stencil);
+    glClear(flags);
 }
     
 // ** OpenGL2::enableInputLayout
