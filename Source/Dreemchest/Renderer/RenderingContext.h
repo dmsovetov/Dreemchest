@@ -84,6 +84,9 @@ namespace Renderer
         
         //! Queues a program instance creation and returns it's index.
         Program                                 requestProgram(const String& vertex, const String& fragment);
+
+        //! Returns a uniform buffer layout by a name.
+        const UniformElement*                   findUniformLayout(const String& name) const;
         
         //! Queues a shader instance creation and returns it's index.
         Program                                 deprecatedRequestShader(const String& fileName);
@@ -148,6 +151,7 @@ namespace Renderer
         FixedArray<VertexBufferLayoutUPtr>      m_inputLayouts;                                         //!< Allocated input layouts.
         FixedArray<ShaderProgramDescriptor>     m_programs;                                             //!< Allocated shader programs.
         FixedArray<UniformBufferLayout>         m_uniformLayouts;                                       //!< Allocated uniform layouts.
+        Map<String, UniformLayout>              m_uniformLayoutByName;                                  //!< Maps from a name to a uniform layout id.
         InputLayout                             m_inputLayoutCache[MaxInputLayouts];                    //!< A lookup table for input layout types.
         ConstructionCommandBuffer*              m_constructionCommandBuffer;                            //!< A command buffer that is used for resource construction commands.
         TransientTargetStack*                   m_intermediateTargets;                                  //!< An intermediate render target stack.

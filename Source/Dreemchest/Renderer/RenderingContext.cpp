@@ -383,9 +383,24 @@ UniformLayout RenderingContext::requestUniformLayout(const String& name, const U
     {
         m_uniformLayouts[id].push_back(*element);
     }
+
+    // Now sort elements by an offset
+    struct OrderBy
+    {
+        static bool offset(const UniformElement& first, const UniformElement& second)
+        {
+            return first.offset < second.offset;
+        }
+    };
+
+    std::sort(m_uniformLayouts[id].begin(), m_uniformLayouts[id].end(), OrderBy::offset);
     
+    // Finally add the sentinel
     UniformElement sentinel = { NULL };
     m_uniformLayouts[id].push_back(sentinel);
+
+    // Save this layout to a name mapping
+    m_uniformLayoutByName[name] = id;
 
     return id;
 }
@@ -476,6 +491,19 @@ Program RenderingContext::requestProgram(const String& vertex, const String& fra
     Program id = requestProgram(vertexShader, fragmentShader);
     
     return id;
+}
+
+// ** RenderingContext::findUniformLayout
+const UniformElement* RenderingContext::findUniformLayout(const String& name) const
+{
+    Map<String, UniformLayout>::const_iterator i = m_uniformLayoutByName.find(name);
+
+    if (i != m_uniformLayoutByName.end())
+    {
+        return &m_uniformLayouts[i->second][0];
+    }
+
+    return NULL;
 }
 
 // ** RenderingContext::mergeStateBlocks

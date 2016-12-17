@@ -82,6 +82,13 @@ namespace Renderer
             Array<u8>               data;       //!< Actual buffer data.
             const UniformElement*   layout;     //!< A constant buffer layout.
         };
+
+        //! Generates a uniform structure from a cbuffer definition.
+        class ShaderPreprocessor : public UniformBufferPreprocessor
+        {
+            //! Generates a uniform definition.
+            virtual String          generateBufferDefinition(const RenderingContext& renderingContext, const String& type, const String& name) const NIMBLE_OVERRIDE;
+        };
         
         RequestedState              m_activeState;      //!< An active rendering pipeline state.
         FixedArray<ConstantBuffer>  m_constantBuffers;  //!< An array of allocated constant buffer instances.

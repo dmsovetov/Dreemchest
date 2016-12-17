@@ -112,6 +112,20 @@ namespace Renderer
         FixedArray<Shader>              m_shaders[TotalShaderTypes];        //!< An array of shader containers.
         List<ShaderPreprocessorUPtr>    m_preprocessors;                    //!< A list of shader preprocessors that are consequently invoked.
     };
+
+    //! A base class for all shader preprocessors that rgenerate uniform buffer definitions.
+    class UniformBufferPreprocessor : public ShaderPreprocessor
+    {
+    public:
+
+        //! Extracts all uniform buffer declarations from a shader source code.
+        virtual bool                    preprocess(const RenderingContext& renderingContext, String& source) const NIMBLE_OVERRIDE;
+
+    protected:
+
+        //! Generates a uniform buffer definition from it's type and name.
+        virtual String                  generateBufferDefinition(const RenderingContext& renderingContext, const String& type, const String& name) const NIMBLE_ABSTRACT;
+    };
     
 } // namespace Renderer
 

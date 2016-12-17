@@ -32,7 +32,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Renderer
 {
-    
+
 // ** createOpenGL2RenderingContext
 RenderingContextPtr createOpenGL2RenderingContext(RenderViewPtr view)
 {
@@ -43,6 +43,43 @@ RenderingContextPtr createOpenGL2RenderingContext(RenderViewPtr view)
 
     return RenderingContextPtr(DC_NEW OpenGL2RenderingContext(view));
 }
+    
+// ------------------------------------------------------ OpenGL2RenderingContext::ShaderPreprocessor -------------------------------------------------- //
+
+// ** OpenGL2RenderingContext::ShaderPreprocessor::generateBufferDefinition
+String OpenGL2RenderingContext::ShaderPreprocessor::generateBufferDefinition(const RenderingContext& renderingContext, const String& type, const String& name) const
+{
+    // A static array to map from an element type to GLSL data type.
+    static const String s_types[] = 
+    {
+          "int"
+        , "float"
+        , "vec2"
+        , "vec3"
+        , "vec4"
+        , "mat4"
+    };
+
+    // First find a uniform layout by name
+    const UniformElement* elements = renderingContext.findUniformLayout(type);
+    
+    if (elements == NULL)
+    {
+        return "";
+    }
+
+    String definition = "struct " + type + " {\n";
+
+    for (const UniformElement* element = elements; element->name; element++)
+    {
+        definition += "\t" + s_types[element->type] + " " + element->name.value() + ";\n";
+    }
+    definition += "}; uniform " + type + " " + name + ";\n";
+
+    return definition;
+}
+
+// ----------------------------------------------------------------- OpenGL2RenderingContext ----------------------------------------------------------- //
 
 // ** OpenGL2RenderingContext::OpenGL2RenderingContext
 OpenGL2RenderingContext::OpenGL2RenderingContext(RenderViewPtr view)
@@ -52,6 +89,8 @@ OpenGL2RenderingContext::OpenGL2RenderingContext(RenderViewPtr view)
     {
         m_view->makeCurrent();
     }
+
+    m_shaderLibrary.addPreprocessor(DC_NEW ShaderPreprocessor);
 }
 
 // ** OpenGL2RenderingContext::applyStateBlock

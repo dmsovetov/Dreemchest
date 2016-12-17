@@ -198,6 +198,61 @@ void ShaderLibrary::addPreprocessor(ShaderPreprocessorUPtr preprocessor)
     m_preprocessors.push_back(preprocessor);
 }
 
+// --------------------------------------------------- UniformBufferPreprocessor --------------------------------------------------- //
+
+// ** UniformBufferPreprocessor::preprocess
+bool UniformBufferPreprocessor::preprocess(const RenderingContext& renderingContext, String& source) const
+{
+    static const String s_cbuffer = "cbuffer";
+    static const String s_whitespace = " \t\n";
+
+    size_t offset = source.find(s_cbuffer);
+
+    while (offset != String::npos)
+    {
+        // Save the start of a cbuffer expression
+        size_t start = offset;
+
+        // Skip a 'cbuffer' token
+        offset += s_cbuffer.length();
+
+        // Now skip spaces
+        offset = source.find_first_not_of(s_whitespace, offset);
+        NIMBLE_ABORT_IF(offset == String::npos, "shader parsing error");
+
+        // Parse uniform buffer type
+        String type;
+
+        while (!isspace(source[offset]))
+        {
+            type += source[offset++];
+        }
+
+        // Skip spaces again
+        offset = source.find_first_not_of(s_whitespace, offset);
+        NIMBLE_ABORT_IF(offset == String::npos, "shader parsing error");
+
+        // Parse uniform name.
+        String name;
+
+        while (!isspace(source[offset]) && source[offset] != ';')
+        {
+            name += source[offset++];
+        }
+
+        // Generate a cbuffer definition
+        String definition = generateBufferDefinition(renderingContext, type, name);
+
+        // And replace it.
+        source.replace(start, offset - start, definition);
+
+        // Search for a next one
+        offset = source.find(s_cbuffer, start + definition.length());
+    }
+
+    return true;
+}
+
 } // namespace Renderer
 
 DC_END_DREEMCHEST

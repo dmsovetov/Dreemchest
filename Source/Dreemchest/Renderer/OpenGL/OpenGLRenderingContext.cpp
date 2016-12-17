@@ -30,7 +30,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Renderer
 {
-    
+
 // ** OpenGLRenderingContext::OpenGLRenderingContext
 OpenGLRenderingContext::OpenGLRenderingContext(RenderViewPtr view)
     : RenderingContext(view)
