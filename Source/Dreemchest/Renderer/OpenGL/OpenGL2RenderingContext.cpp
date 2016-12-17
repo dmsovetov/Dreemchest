@@ -117,7 +117,7 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
             case CommandBuffer::OpCode::CreateConstantBuffer:
             {
                 ConstantBuffer constantBuffer;
-                constantBuffer.layout = reinterpret_cast<const ConstantBufferElement*>(opCode.createBuffer.userData);
+                constantBuffer.layout = &m_uniformLayouts[opCode.createBuffer.layout][0];
                 constantBuffer.data.resize(opCode.createBuffer.size);
                 if (opCode.createBuffer.data)
                 {
@@ -403,7 +403,7 @@ void OpenGL2RenderingContext::updateUniforms(const RequestedState& state, Pipeli
         const ConstantBuffer& constantBuffer = m_constantBuffers[state.constantBuffer[i]];
     
         // Submit all constants to a shader
-        for (const ConstantBufferElement* constant = constantBuffer.layout; constant->name; constant++)
+        for (const UniformElement* constant = constantBuffer.layout; constant->name; constant++)
         {
             // Lookup a uniform location by name
             GLint location = findUniformLocation(program, features, constant->name);
@@ -417,27 +417,27 @@ void OpenGL2RenderingContext::updateUniforms(const RequestedState& state, Pipeli
             // Submit constant to a shader
             switch (constant->type)
             {
-                case ConstantBufferElement::Integer:
+                case UniformElement::Integer:
                     OpenGL2::Program::uniform1i(location, *reinterpret_cast<const s32*>(&constantBuffer.data[constant->offset]));
                     break;
                     
-                case ConstantBufferElement::Float:
+                case UniformElement::Float:
                     OpenGL2::Program::uniform1f(location, *reinterpret_cast<const f32*>(&constantBuffer.data[constant->offset]));
                     break;
                     
-                case ConstantBufferElement::Vec2:
+                case UniformElement::Vec2:
                     OpenGL2::Program::uniform2f(location, reinterpret_cast<const f32*>(&constantBuffer.data[constant->offset]));
                     break;
                     
-                case ConstantBufferElement::Vec3:
+                case UniformElement::Vec3:
                     OpenGL2::Program::uniform3f(location, reinterpret_cast<const f32*>(&constantBuffer.data[constant->offset]));
                     break;
                     
-                case ConstantBufferElement::Vec4:
+                case UniformElement::Vec4:
                     OpenGL2::Program::uniform4f(location, reinterpret_cast<const f32*>(&constantBuffer.data[constant->offset]));
                     break;
                     
-                case ConstantBufferElement::Matrix4:
+                case UniformElement::Matrix4:
                     OpenGL2::Program::uniformMatrix4(location, reinterpret_cast<const f32*>(&constantBuffer.data[constant->offset]));
                     break;
             }

@@ -36,7 +36,7 @@ RenderPassBase::RenderPassBase( Renderer::RenderingContext& context, RenderScene
     , m_renderScene( renderScene )
 {
     // Create a material constant buffer
-    m_materialCBuffer = m_context.requestConstantBuffer( NULL, sizeof( RenderScene::CBuffer::Material ), RenderScene::CBuffer::Material::Layout );
+    m_materialCBuffer = m_context.deprecatedRequestConstantBuffer( NULL, sizeof( RenderScene::CBuffer::Material ), RenderScene::CBuffer::Material::Layout );
 }
 
 // ** RenderPassBase::renderWithColor

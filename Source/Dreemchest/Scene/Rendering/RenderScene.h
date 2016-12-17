@@ -53,7 +53,7 @@ namespace Scene
         //! A constant buffer types
         struct CBuffer
         {
-            typedef Renderer::ConstantBufferElement BufferLayout;
+            typedef Renderer::UniformElement BufferLayout;
             struct Scene
             {
                 static BufferLayout Layout[];
@@ -284,7 +284,7 @@ namespace Scene
         Ptr<LightCache>                         m_lights;           //!< Light nodes cache.
         Ptr<CameraCache>                        m_cameras;          //!< Camera nodes cache.
         Ptr<StaticMeshCache>                    m_staticMeshes;     //!< Static mesh nodes cache.
-        Ptr<SpriteCache>                        m_sprites;            //!< Sprite nodes cache.
+        Ptr<SpriteCache>                        m_sprites;          //!< Sprite nodes cache.
     };
 
     // ** RenderScene::addRenderSystem

@@ -154,7 +154,7 @@ public:
     IndexBuffer_                createIndexBuffer(IndexBuffer_ id, const void* data, s32 size);
     
     //! Emits a constant buffer creation command.
-    ConstantBuffer_             createConstantBuffer(ConstantBuffer_ id, const void* data, s32 size, const ConstantBufferElement* layout);
+    ConstantBuffer_             createConstantBuffer(ConstantBuffer_ id, const void* data, s32 size, UniformLayout layout);
     
     //! Emits a texture creation command.
     Texture_                    createTexture(Texture_ id, const void* data, u16 width, u16 height, PixelFormat format);
@@ -196,14 +196,14 @@ IndexBuffer_ RenderingContext::ConstructionCommandBuffer::createIndexBuffer(Inde
 }
 
 // ** RenderingContext::ConstructionCommandBuffer::createConstantBuffer
-ConstantBuffer_ RenderingContext::ConstructionCommandBuffer::createConstantBuffer(ConstantBuffer_ id, const void* data, s32 size, const ConstantBufferElement* layout)
+ConstantBuffer_ RenderingContext::ConstructionCommandBuffer::createConstantBuffer(ConstantBuffer_ id, const void* data, s32 size, UniformLayout layout)
 {
     OpCode opCode;
     opCode.type = OpCode::CreateConstantBuffer;
     opCode.createBuffer.id = id;
     opCode.createBuffer.data = data;
     opCode.createBuffer.size = size;
-    opCode.createBuffer.userData = layout;
+    opCode.createBuffer.layout = layout;
     push( opCode );
     return id;
 }
@@ -369,6 +369,26 @@ InputLayout RenderingContext::requestInputLayout( const VertexFormat& format )
     return id;
 }
 
+// ** RenderingContext::requestUniformLayout
+UniformLayout RenderingContext::requestUniformLayout(const String& name, const UniformElement* elements)
+{
+    // Allocate next uniform layout id.
+    UniformLayout id = allocateResourceIdentifier(RenderResourceType::UniformLayout);
+
+    // Construct a uniform instance
+    m_uniformLayouts.emplace(id, UniformBufferLayout());
+
+    for (const UniformElement* element = elements; element->name; element++)
+    {
+        m_uniformLayouts[id].push_back(*element);
+    }
+    
+    UniformElement sentinel = { NULL };
+    m_uniformLayouts[id].push_back(sentinel);
+
+    return id;
+}
+
 // ** RenderingContext::requestPipelineFeatureLayout
 FeatureLayout RenderingContext::requestPipelineFeatureLayout(const PipelineFeature* features)
 {
@@ -405,7 +425,7 @@ IndexBuffer_ RenderingContext::requestIndexBuffer( const void* data, s32 size )
 }
 
 // ** RenderingContext::requestConstantBuffer
-ConstantBuffer_ RenderingContext::requestConstantBuffer( const void* data, s32 size, const ConstantBufferElement* layout )
+ConstantBuffer_ RenderingContext::requestConstantBuffer(const void* data, s32 size, UniformLayout layout)
 {
     ConstantBuffer_ id = allocateResourceIdentifier(RenderResourceType::ConstantBuffer);
     return m_constructionCommandBuffer->createConstantBuffer(id, data, size, layout);

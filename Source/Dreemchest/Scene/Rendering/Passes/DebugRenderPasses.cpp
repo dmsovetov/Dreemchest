@@ -100,7 +100,7 @@ DebugRenderTarget::DebugRenderTarget( RenderingContext& context, RenderScene& re
     : StreamedRenderPassBase( context, renderScene, 6 )
 {
     // Create a view constant buffer
-    m_cbuffer = m_context.requestConstantBuffer( NULL, sizeof( RenderScene::CBuffer::View ), RenderScene::CBuffer::View::Layout );
+    m_cbuffer = m_context.deprecatedRequestConstantBuffer( NULL, sizeof( RenderScene::CBuffer::View ), RenderScene::CBuffer::View::Layout );
 
     // Create a shader
     m_shader = m_context.deprecatedRequestShader( "../../Source/Dreemchest/Scene/Rendering/Shaders/Default.shader" );

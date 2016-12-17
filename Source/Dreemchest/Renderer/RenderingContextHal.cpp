@@ -129,8 +129,7 @@ void RenderingContextHal::executeCommandBuffer( const RenderFrame& frame, const 
         case CommandBuffer::OpCode::CreateVertexBuffer:     commandCreateVertexBuffer(opCode.createBuffer.id, opCode.createBuffer.data, opCode.createBuffer.size);
                                                             break;
         case CommandBuffer::OpCode::CreateConstantBuffer:   {
-                                                                const ConstantBufferElement* layout = reinterpret_cast<const ConstantBufferElement*>(opCode.createBuffer.userData);
-                                                                commandCreateConstantBuffer(opCode.createBuffer.id, opCode.createBuffer.data, opCode.createBuffer.size, layout);
+                                                                commandCreateConstantBuffer(opCode.createBuffer.id, opCode.createBuffer.data, opCode.createBuffer.size, opCode.createBuffer.layout);
                                                             }
                                                             break;
         case CommandBuffer::OpCode::RenderTarget:           renderToTarget( frame, opCode.renderTarget.id, opCode.renderTarget.viewport, *opCode.renderTarget.commands );
@@ -258,11 +257,11 @@ void RenderingContextHal::commandCreateIndexBuffer(IndexBuffer_ id, const void* 
 }
 
 // ** RenderingContextHal::commandCreateConstantBuffer
-void RenderingContextHal::commandCreateConstantBuffer(ConstantBuffer_ id, const void* data, s32 size, const ConstantBufferElement* layout)
+void RenderingContextHal::commandCreateConstantBuffer(ConstantBuffer_ id, const void* data, s32 size, UniformLayout layout)
 {
     //NIMBLE_BREAK_IF( m_constantBuffers[id].valid(), "resource was already constructed" );
         
-    ConstantBufferPtr constantBuffer = m_hal->createConstantBuffer( size, layout );
+    ConstantBufferPtr constantBuffer = m_hal->createConstantBuffer( size, &m_uniformLayouts[layout][0]);
     
     // Upload data to a GPU buffer
     if( data )

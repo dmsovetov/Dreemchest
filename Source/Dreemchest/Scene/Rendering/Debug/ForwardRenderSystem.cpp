@@ -39,7 +39,7 @@ ForwardRenderSystem::ForwardRenderSystem( RenderingContext& context, RenderScene
     , m_debugRenderTarget( context, renderScene )
 {
     m_phongShader       = m_context.deprecatedRequestShader( "../../Source/Dreemchest/Scene/Rendering/Shaders/Phong.shader" );
-    m_clipPlanesCBuffer = m_context.requestConstantBuffer( NULL, sizeof( RenderScene::CBuffer::ClipPlanes ), RenderScene::CBuffer::ClipPlanes::Layout );
+    m_clipPlanesCBuffer = m_context.deprecatedRequestConstantBuffer( NULL, sizeof( RenderScene::CBuffer::ClipPlanes ), RenderScene::CBuffer::ClipPlanes::Layout );
 }
 
 // ** ForwardRenderSystem::emitRenderOperations

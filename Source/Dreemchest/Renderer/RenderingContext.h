@@ -54,6 +54,9 @@ namespace Renderer
         
         //! Queues an input layout instance for creation and returns it's index.
         InputLayout                             requestInputLayout( const VertexFormat& vertexFormat );
+
+        //! Queues a uniform layut instance for creation and returns it's index.
+        UniformLayout                           requestUniformLayout(const String& name, const UniformElement* elements);
         
         //! Queues a vertex buffer instance for creation and returns it's index.
         VertexBuffer_                           requestVertexBuffer( const void* data, s32 size );
@@ -62,7 +65,10 @@ namespace Renderer
         IndexBuffer_                            requestIndexBuffer( const void* data, s32 size );
         
         //! Queues a constant buffer instance for creation and returns it's index.
-        ConstantBuffer_                         requestConstantBuffer( const void* data, s32 size, const ConstantBufferElement* layout );
+        ConstantBuffer_                         requestConstantBuffer(const void* data, s32 size, UniformLayout layout);
+
+        //! Queues a constant buffer instance for creation and returns it's index.
+        ConstantBuffer_                         deprecatedRequestConstantBuffer(const void* data, s32 size, const UniformElement* elements);
         
         //! Queues a texture instance for creation and returns it's index.
         Texture_                                requestTexture( const void* data, u16 width, u16 height, PixelFormat format );
@@ -141,6 +147,7 @@ namespace Renderer
         FixedArray<PipelineFeatureLayoutUPtr>   m_pipelineFeatureLayouts;                               //!< An array of constructed pipeline feature layouts.
         FixedArray<VertexBufferLayoutUPtr>      m_inputLayouts;                                         //!< Allocated input layouts.
         FixedArray<ShaderProgramDescriptor>     m_programs;                                             //!< Allocated shader programs.
+        FixedArray<UniformBufferLayout>         m_uniformLayouts;                                       //!< Allocated uniform layouts.
         InputLayout                             m_inputLayoutCache[MaxInputLayouts];                    //!< A lookup table for input layout types.
         ConstructionCommandBuffer*              m_constructionCommandBuffer;                            //!< A command buffer that is used for resource construction commands.
         TransientTargetStack*                   m_intermediateTargets;                                  //!< An intermediate render target stack.

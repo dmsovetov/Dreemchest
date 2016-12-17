@@ -79,8 +79,8 @@ namespace Renderer
         //! A software-emulated constant buffer
         struct ConstantBuffer
         {
-            Array<u8>                       data;       //!< Actual buffer data.
-            const ConstantBufferElement*    layout;     //!< A constant buffer layout.
+            Array<u8>               data;       //!< Actual buffer data.
+            const UniformElement*   layout;     //!< A constant buffer layout.
         };
         
         RequestedState              m_activeState;      //!< An active rendering pipeline state.

@@ -116,7 +116,7 @@ namespace Renderer
         void                        commandCreateIndexBuffer(IndexBuffer_ id, const void* data, s32 size);
         
         //! Handles an index buffer creation command.
-        void                        commandCreateConstantBuffer(ConstantBuffer_ id, const void* data, s32 size, const ConstantBufferElement* layout);
+        void                        commandCreateConstantBuffer(ConstantBuffer_ id, const void* data, s32 size, UniformLayout layout);
         
         //! Handles a texture creation command.
         void                        commandCreateTexture(Texture_ id, u16 width, u16 height, const void* data, PixelFormat format);

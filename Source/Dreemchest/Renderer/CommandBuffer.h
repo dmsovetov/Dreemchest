@@ -119,7 +119,7 @@ namespace Renderer
                     PersistentResourceId        id;                         //!< Handle to a buffer object being constructed.
                     const void*                 data;                       //!< Data that should be uploaded to a buffer after construction.
                     s32                         size;                       //!< A buffer size.
-                    const void*                 userData;                   //!< Used by a constant buffer constructor.
+                    PersistentResourceId        layout;                     //!< Used by a constant buffer constructor.
                 } createBuffer;
                 
                 struct

@@ -213,7 +213,7 @@ VertexBufferPtr OpenGLHal::createVertexBuffer( s32 size, bool GPU )
 }
 
 // ** OpenGLHal::createConstantBuffer
-ConstantBufferPtr OpenGLHal::createConstantBuffer( u32 size, const ConstantBufferElement* layout )
+ConstantBufferPtr OpenGLHal::createConstantBuffer( u32 size, const UniformElement* layout )
 {
     DC_CHECK_GL_CONTEXT
     DC_CHECK_GL;

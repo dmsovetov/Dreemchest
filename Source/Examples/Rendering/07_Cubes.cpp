@@ -93,25 +93,25 @@ struct View
 {
     Matrix4 projection;
     Matrix4 view;
-    static ConstantBufferElement s_layout[];
+    static UniformElement s_layout[];
 } s_view;
 
-ConstantBufferElement View::s_layout[] =
+UniformElement View::s_layout[] =
 {
-      { "view.projection", ConstantBufferElement::Matrix4, offsetof(View, projection) }
-    , { "view.view",       ConstantBufferElement::Matrix4, offsetof(View, view)       }
+      { "view.projection", UniformElement::Matrix4, offsetof(View, projection) }
+    , { "view.view",       UniformElement::Matrix4, offsetof(View, view)       }
     , { NULL }
 };
 
 struct Instance
 {
     Matrix4 transform;
-    static ConstantBufferElement s_layout[];
+    static UniformElement s_layout[];
 } s_instance;
 
-ConstantBufferElement Instance::s_layout[] =
+UniformElement Instance::s_layout[] =
 {
-      { "instance.transform", ConstantBufferElement::Matrix4, offsetof(Instance, transform) }
+      { "instance.transform", UniformElement::Matrix4, offsetof(Instance, transform) }
     , { NULL }
 };
 
@@ -136,8 +136,10 @@ class Cubes : public RenderingApplicationDelegate
         InputLayout inputLayout = m_renderingContext->requestInputLayout(VertexFormat::Position | VertexFormat::Color);
         VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(s_vertices, sizeof(s_vertices));
         IndexBuffer_ indexBuffer = m_renderingContext->requestIndexBuffer(s_indices, sizeof(s_indices));
-        ConstantBuffer_ viewConstantBuffer = m_renderingContext->requestConstantBuffer(&s_view, sizeof(s_view), View::s_layout);
-        m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(s_instance), Instance::s_layout);
+        UniformLayout viewUniformLayout = m_renderingContext->requestUniformLayout("View", View::s_layout);
+        ConstantBuffer_ viewConstantBuffer = m_renderingContext->requestConstantBuffer(&s_view, sizeof(s_view), viewUniformLayout);
+        UniformLayout instanceUniformLayout = m_renderingContext->requestUniformLayout("Instance", Instance::s_layout);
+        m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(s_instance), instanceUniformLayout);
         
         Program program = m_renderingContext->requestProgram(s_vertexShader, s_fragmentShader);
 

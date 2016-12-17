@@ -123,7 +123,7 @@ namespace Renderer {
             , VertexBuffer
             , IndexBuffer
             , ConstantBuffer
-            , ConstantBufferLayout
+            , UniformLayout
             , RenderTarget
             , Program
             , Texture
@@ -248,7 +248,7 @@ namespace Renderer {
     typedef ResourceIdentifier<RenderResourceType::VertexBuffer, PersistentResourceId> VertexBuffer_;
     typedef ResourceIdentifier<RenderResourceType::IndexBuffer, PersistentResourceId> IndexBuffer_;
     typedef ResourceIdentifier<RenderResourceType::ConstantBuffer, PersistentResourceId> ConstantBuffer_;
-    typedef ResourceIdentifier<RenderResourceType::ConstantBufferLayout, PersistentResourceId> ConstantBufferLayout;
+    typedef ResourceIdentifier<RenderResourceType::UniformLayout, PersistentResourceId> UniformLayout;
     typedef ResourceIdentifier<RenderResourceType::RenderTarget, PersistentResourceId> RenderTarget_;
     typedef ResourceIdentifier<RenderResourceType::Program, PersistentResourceId> Program;
     typedef ResourceIdentifier<RenderResourceType::Texture, PersistentResourceId> Texture_;
@@ -312,7 +312,7 @@ namespace Renderer {
     struct State;
     class StateBlock;
     class VertexFormat;
-    struct ConstantBufferElement;
+    struct UniformElement;
     class RenderFrame;
     class PipelineFeatureLayout;
     

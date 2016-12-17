@@ -33,8 +33,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Renderer {
 
-    //! A constant buffer internal layout used to emulate constant buffers on platforms that do not have a native support of them.
-    struct ConstantBufferElement
+    //! An array of uniform elements defines a uniform buffer layout.
+    struct UniformElement
     {
         //! Constant type.
         enum Type
@@ -52,6 +52,7 @@ namespace Renderer {
         u32         offset;     //!< Uniform offset.
     };
 
+    typedef Array<UniformElement> UniformBufferLayout;
 #if DEV_DEPRECATED_HAL
     
     // ** class Hal
@@ -154,7 +155,7 @@ namespace Renderer {
          \param GPU     Determines a location where to store a constant buffer data (RAM or GPU).
          \return        ConstantBuffer instance.
          */
-        virtual ConstantBufferPtr    createConstantBuffer( u32 size, const ConstantBufferElement* layout );
+        virtual ConstantBufferPtr    createConstantBuffer( u32 size, const UniformElement* layout );
 
         //! Binds a shader.
         virtual void    setShader( const ShaderPtr& shader );
@@ -562,12 +563,12 @@ namespace Renderer {
     public:
 
                                     //! Constructs a ConstantBuffer instance.
-                                    ConstantBuffer( u32 size, const ConstantBufferElement* layout );
+                                    ConstantBuffer( u32 size, const UniformElement* layout );
         virtual                        ~ConstantBuffer( void );
 
     #if DEV_RENDERER_SOFTWARE_CBUFFERS
         //! Returns a constant buffer layout.
-        const ConstantBufferElement* layout( void ) const;
+        const UniformElement* layout( void ) const;
 
         //! Returns a constant buffer data pointer.
         const u8*                   data( void ) const;
@@ -591,7 +592,7 @@ namespace Renderer {
         u32                         m_size;     //!< Constant buffer size.
     #if DEV_RENDERER_SOFTWARE_CBUFFERS
         u8*                         m_data;     //!< Constant buffer data.
-        const ConstantBufferElement* m_layout;   //!< An array of constants that are stored inside a buffer.
+        const UniformElement* m_layout;   //!< An array of constants that are stored inside a buffer.
     #endif  /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
     };
 

@@ -171,7 +171,7 @@ VertexBufferPtr Hal::createVertexBuffer( s32 size, bool GPU )
 }
 
 // ** Hal::createConstantBuffer
-ConstantBufferPtr Hal::createConstantBuffer( u32 size, const ConstantBufferElement* layout )
+ConstantBufferPtr Hal::createConstantBuffer( u32 size, const UniformElement* layout )
 {
     if( layout == NULL ) {
         LogWarning( "hal", "%s", "GPU constant buffers are not supported\n" );
@@ -232,7 +232,7 @@ void Hal::setShader( const ShaderPtr& shader )
         const u8* data = constantBuffer->data();
 
         // Submit all constants to a shader
-        for( const ConstantBufferElement* constant = constantBuffer->layout(); constant->name; constant++ ) {
+        for( const UniformElement* constant = constantBuffer->layout(); constant->name; constant++ ) {
             // Lookup a uniform location by name
             u32 location = shader->findUniformLocation( constant->name );
 
@@ -243,17 +243,17 @@ void Hal::setShader( const ShaderPtr& shader )
 
             // Submit constant to a shader
             switch( constant->type ) {
-            case ConstantBufferElement::Integer: const_cast<ShaderPtr&>( shader )->setInt( location, *reinterpret_cast<const u32*>( data + constant->offset ) );
+            case UniformElement::Integer: const_cast<ShaderPtr&>( shader )->setInt( location, *reinterpret_cast<const u32*>( data + constant->offset ) );
                                                 break;
-            case ConstantBufferElement::Float:   const_cast<ShaderPtr&>( shader )->setFloat( location, *reinterpret_cast<const f32*>( data + constant->offset ) );
+            case UniformElement::Float:   const_cast<ShaderPtr&>( shader )->setFloat( location, *reinterpret_cast<const f32*>( data + constant->offset ) );
                                                 break;
-            case ConstantBufferElement::Vec2:    const_cast<ShaderPtr&>( shader )->setVec2( location, *reinterpret_cast<const Vec2*>( data + constant->offset ) );
+            case UniformElement::Vec2:    const_cast<ShaderPtr&>( shader )->setVec2( location, *reinterpret_cast<const Vec2*>( data + constant->offset ) );
                                                 break;
-            case ConstantBufferElement::Vec3:    const_cast<ShaderPtr&>( shader )->setVec3( location, *reinterpret_cast<const Vec3*>( data + constant->offset ) );
+            case UniformElement::Vec3:    const_cast<ShaderPtr&>( shader )->setVec3( location, *reinterpret_cast<const Vec3*>( data + constant->offset ) );
                                                 break;
-            case ConstantBufferElement::Vec4:    const_cast<ShaderPtr&>( shader )->setVec4( location, *reinterpret_cast<const Vec4*>( data + constant->offset ) );
+            case UniformElement::Vec4:    const_cast<ShaderPtr&>( shader )->setVec4( location, *reinterpret_cast<const Vec4*>( data + constant->offset ) );
                                                 break;
-            case ConstantBufferElement::Matrix4: const_cast<ShaderPtr&>( shader )->setMatrix( location, *reinterpret_cast<const Matrix4*>( data + constant->offset ) );
+            case UniformElement::Matrix4: const_cast<ShaderPtr&>( shader )->setMatrix( location, *reinterpret_cast<const Matrix4*>( data + constant->offset ) );
                                                 break;
             }
         }
@@ -817,7 +817,7 @@ void IndexBuffer::unlock( void )
 // ----------------------------------------------- ConstantBuffer -------------------------------------------------- //
 
 // ** ConstantBuffer::ConstantBuffer
-ConstantBuffer::ConstantBuffer( u32 size, const ConstantBufferElement* layout )
+ConstantBuffer::ConstantBuffer( u32 size, const UniformElement* layout )
     : m_size( size )
     , m_data( NULL )
     , m_layout( layout )
@@ -860,7 +860,7 @@ const u8* ConstantBuffer::data( void ) const
 }
 
 // ** ConstantBuffer::size
-const ConstantBufferElement* ConstantBuffer::layout( void ) const
+const UniformElement* ConstantBuffer::layout( void ) const
 {
     return m_layout;
 }
