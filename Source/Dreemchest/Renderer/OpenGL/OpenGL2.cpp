@@ -36,6 +36,49 @@ DC_BEGIN_DREEMCHEST
 
 namespace Renderer
 {
+
+// --------------------------------------------------------------------------------------------------------------------------------------- //
+
+#ifdef DC_PLATFORM_WINDOWS
+
+// GL_ARB_multitexture
+static PFNGLACTIVETEXTUREARBPROC        glActiveTexture         = NULL;
+static PFNGLCLIENTACTIVETEXTUREARBPROC  glClientActiveTexture   = NULL;
+
+// GL_ARB_vertex_buffer_object
+static PFNGLBINDBUFFERARBPROC           glBindBuffer            = NULL;
+static PFNGLDELETEBUFFERSARBPROC        glDeleteBuffers         = NULL;
+static PFNGLGENBUFFERSARBPROC           glGenBuffers            = NULL;
+static PFNGLBUFFERDATAARBPROC           glBufferData            = NULL;
+static PFNGLBUFFERSUBDATAARBPROC        glBufferSubData         = NULL;
+
+// GL_ARB_shading_language_100 & GL_ARB_shader_objects
+static PFNGLCREATEPROGRAMPROC           glCreateProgram         = NULL;
+static PFNGLCREATESHADERPROC            glCreateShader          = NULL;
+static PFNGLLINKPROGRAMPROC             glLinkProgram           = NULL;
+static PFNGLDELETEPROGRAMPROC           glDeleteProgram         = NULL;
+static PFNGLDELETESHADERPROC            glDeleteShader          = NULL;
+static PFNGLATTACHSHADERPROC            glAttachShader          = NULL;
+static PFNGLCOMPILESHADERPROC           glCompileShader         = NULL;
+static PFNGLSHADERSOURCEPROC            glShaderSource          = NULL;
+static PFNGLUSEPROGRAMPROC              glUseProgram            = NULL;
+static PFNGLGETSHADERINFOLOGPROC        glGetShaderInfoLog      = NULL;
+static PFNGLGETPROGRAMINFOLOGPROC       glGetProgramInfoLog     = NULL;
+static PFNGLGETSHADERIVPROC             glGetShaderiv           = NULL;
+static PFNGLGETPROGRAMIVPROC            glGetProgramiv          = NULL;
+static PFNGLGETUNIFORMLOCATIONARBPROC   glGetUniformLocation    = NULL;
+static PFNGLUNIFORM4FARBPROC            glUniform4f             = NULL;
+static PFNGLUNIFORM3FARBPROC            glUniform3f             = NULL;
+static PFNGLUNIFORM2FARBPROC            glUniform2f             = NULL;
+static PFNGLUNIFORM1IARBPROC            glUniform1i             = NULL;
+static PFNGLUNIFORM1FARBPROC            glUniform1f             = NULL;
+static PFNGLUNIFORM1FVARBPROC           glUniform1fv            = NULL;
+static PFNGLUNIFORM2FVARBPROC           glUniform2fv            = NULL;
+static PFNGLUNIFORM3FVARBPROC           glUniform3fv            = NULL;
+static PFNGLUNIFORM4FVARBPROC           glUniform4fv            = NULL;
+static PFNGLUNIFORMMATRIX4FVARBPROC     glUniformMatrix4fv      = NULL;
+
+#endif  //  #ifdef DC_PLATFORM_WINDOWS
     
 // ----------------------------------------------------------- OpenGL2::Buffer ----------------------------------------------------------- //
 
@@ -104,7 +147,7 @@ GLuint OpenGL2::Program::compileShader(GLenum type, CString source, s8* error, s
     {
         StringArray messages = split( error, "\n" );
         
-        for( s32 i = 0; i < messages.size(); i++ )
+        for (size_t i = 0; i < messages.size(); i++)
         {
             if( result == GL_FALSE )
             {
@@ -152,7 +195,7 @@ GLuint OpenGL2::Program::createProgram(const GLuint* shaders, s32 count, s8* err
     {
         StringArray messages = split(error, "\n");
         
-        for (s32 i = 0; i < messages.size(); i++)
+        for (size_t i = 0; i < messages.size(); i++)
         {
             if (result == GL_FALSE)
             {
@@ -224,8 +267,55 @@ void OpenGL2::Program::uniform4f(GLint location, const f32 value[4])
     glUniform4fv(location - 1, 1, value);
 }
 
+// ** OpenGL2::Program::use
+void OpenGL2::Program::use(GLuint program)
+{
+    glUseProgram(program);
+}
+
 // --------------------------------------------------------------- OpenGL2 --------------------------------------------------------------- //
-    
+
+// ** OpenGL2::initialize
+bool OpenGL2::initialize()
+{
+#ifdef DC_PLATFORM_WINDOWS
+    glActiveTexture         = ( PFNGLACTIVETEXTUREARBPROC )         wglGetProcAddress( "glActiveTextureARB" );
+    glClientActiveTexture   = ( PFNGLCLIENTACTIVETEXTUREARBPROC )   wglGetProcAddress( "glClientActiveTextureARB" );
+
+    glBindBuffer            = ( PFNGLBINDBUFFERARBPROC )            wglGetProcAddress( "glBindBufferARB" );
+    glDeleteBuffers         = ( PFNGLDELETEBUFFERSARBPROC )         wglGetProcAddress( "glDeleteBuffersARB" );
+    glGenBuffers            = ( PFNGLGENBUFFERSARBPROC )            wglGetProcAddress( "glGenBuffersARB" );
+    glBufferData            = ( PFNGLBUFFERDATAARBPROC )            wglGetProcAddress( "glBufferDataARB" );
+    glBufferSubData         = ( PFNGLBUFFERSUBDATAARBPROC )         wglGetProcAddress( "glBufferSubDataARB" );
+
+    glCreateProgram         =  (PFNGLCREATEPROGRAMPROC )            wglGetProcAddress( "glCreateProgram" );
+    glCreateShader          = ( PFNGLCREATESHADERPROC )             wglGetProcAddress( "glCreateShader" );
+    glLinkProgram           = ( PFNGLLINKPROGRAMPROC )              wglGetProcAddress( "glLinkProgram" );
+    glDeleteProgram         = ( PFNGLDELETEPROGRAMPROC )            wglGetProcAddress( "glDeleteProgram" );
+    glDeleteShader          = ( PFNGLDELETESHADERPROC )             wglGetProcAddress( "glDeleteShader" );
+    glAttachShader          = ( PFNGLATTACHSHADERPROC)              wglGetProcAddress( "glAttachShader" );
+    glCompileShader         = ( PFNGLCOMPILESHADERPROC )            wglGetProcAddress( "glCompileShader" );
+    glShaderSource          = ( PFNGLSHADERSOURCEPROC )             wglGetProcAddress( "glShaderSource" );
+    glUseProgram            = ( PFNGLUSEPROGRAMPROC )               wglGetProcAddress( "glUseProgram" );
+    glGetShaderInfoLog      = ( PFNGLGETSHADERINFOLOGPROC )         wglGetProcAddress( "glGetShaderInfoLog" );
+    glGetProgramInfoLog     = ( PFNGLGETPROGRAMINFOLOGPROC )        wglGetProcAddress( "glGetProgramInfoLog" );
+    glGetProgramiv          = ( PFNGLGETPROGRAMIVPROC )             wglGetProcAddress( "glGetProgramiv" );
+    glGetShaderiv           = ( PFNGLGETSHADERIVPROC )              wglGetProcAddress( "glGetShaderiv" );
+    glGetUniformLocation    = ( PFNGLGETUNIFORMLOCATIONARBPROC )    wglGetProcAddress( "glGetUniformLocationARB" );
+    glUniform4f             = ( PFNGLUNIFORM4FARBPROC )             wglGetProcAddress( "glUniform4fARB" );
+    glUniform3f             = ( PFNGLUNIFORM3FARBPROC )             wglGetProcAddress( "glUniform3fARB" );
+    glUniform2f             = ( PFNGLUNIFORM2FARBPROC )             wglGetProcAddress( "glUniform2fARB" );
+    glUniform1i             = ( PFNGLUNIFORM1IARBPROC )             wglGetProcAddress( "glUniform1iARB" );
+    glUniform1f             = ( PFNGLUNIFORM1FARBPROC )             wglGetProcAddress( "glUniform1fARB" );
+    glUniform1fv            = ( PFNGLUNIFORM1FVARBPROC )            wglGetProcAddress( "glUniform1fvARB" );
+    glUniform2fv            = ( PFNGLUNIFORM2FVARBPROC )            wglGetProcAddress( "glUniform2fvARB" );
+    glUniform3fv            = ( PFNGLUNIFORM3FVARBPROC )            wglGetProcAddress( "glUniform3fvARB" );
+    glUniform4fv            = ( PFNGLUNIFORM4FVARBPROC )            wglGetProcAddress( "glUniform4fvARB" );
+    glUniformMatrix4fv      = ( PFNGLUNIFORMMATRIX4FVARBPROC )      wglGetProcAddress( "glUniformMatrix4fvARB" );
+#endif  //  #ifdef DC_PLATFORM_WINDOWS
+    return true;
+}
+
 // ** OpenGL2::clear
 void OpenGL2::clear(const GLclampf* color, u8 mask, GLclampd depth, GLint stencil)
 {

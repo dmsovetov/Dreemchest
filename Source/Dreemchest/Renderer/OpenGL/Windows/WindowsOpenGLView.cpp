@@ -31,7 +31,7 @@ DC_BEGIN_DREEMCHEST
 namespace Renderer {
 
 // ** createOpenGLView
-RenderView* createOpenGLView( void* window, PixelFormat depthStencil )
+RenderViewPtr createOpenGLView(void* window, PixelFormat depthStencil)
 {
     WindowsOpenGLView* view = DC_NEW WindowsOpenGLView;
     view->initialize( reinterpret_cast<HWND>( window ), depthStencil );

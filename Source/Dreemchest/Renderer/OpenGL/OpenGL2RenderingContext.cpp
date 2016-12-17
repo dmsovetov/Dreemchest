@@ -36,6 +36,11 @@ namespace Renderer
 // ** createOpenGL2RenderingContext
 RenderingContextPtr createOpenGL2RenderingContext(RenderViewPtr view)
 {
+    if (!OpenGL2::initialize())
+    {
+        return RenderingContextPtr();
+    }
+
     return RenderingContextPtr(DC_NEW OpenGL2RenderingContext(view));
 }
 
@@ -82,7 +87,7 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
             case CommandBuffer::OpCode::UploadConstantBuffer:
             {
                 ConstantBuffer& constantBuffer = m_constantBuffers[opCode.upload.id];
-                NIMBLE_ABORT_IF(constantBuffer.data.size() < opCode.upload.size, "buffer is too small");
+                NIMBLE_ABORT_IF(static_cast<s32>(constantBuffer.data.size()) < opCode.upload.size, "buffer is too small");
                 memcpy(&constantBuffer.data[0], opCode.upload.data, opCode.upload.size);
             }
                 break;
@@ -343,7 +348,7 @@ void OpenGL2RenderingContext::compilePipelineState(RequestedState requested)
     {
         // Now compile a program permutation
         GLuint activeProgram = compileShaderPermutation(program, features, m_pipeline.featureLayout());
-        glUseProgram(activeProgram);
+        OpenGL2::Program::use(activeProgram);
         
         // Accept these changes
         m_pipeline.acceptChanges();

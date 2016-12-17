@@ -135,7 +135,13 @@ namespace Renderer
             
             //! Sets an vec4 uniform value.
             static void     uniform4f(GLint location, const f32 value[4]);
+
+            //! Binds a shader program.
+            static void     use(GLuint program);
         };
+
+        //! Initializes an OpenGL 2 wrapper.
+        static bool     initialize();
         
         //! Clears an active viewport.
         static void     clear(const GLclampf* color, u8 mask, GLclampd depth, GLint stencil);
