@@ -67,16 +67,14 @@ static const u16 s_indices[] =
 };
 
 static String s_vertexShader =
-    "struct View { mat4 projection; mat4 view; };   \n"
-    "struct Instance { mat4 transform; };           \n"
-    "uniform View view;                             \n"
-    "uniform Instance instance;                     \n"
+    "cbuffer Pass pass : 0;                         \n"
+    "cbuffer Instance instance : 1;                 \n"
     "varying vec4 v_color;                          \n"
     "                                               \n"
     "void main()                                    \n"
     "{                                              \n"
     "    v_color     = gl_Color;                    \n"
-    "    gl_Position = view.projection * view.view * instance.transform * gl_Vertex;                   \n"
+    "    gl_Position = pass.projection * pass.view * instance.transform * gl_Vertex;                   \n"
     "}                                              \n"
     ;
 
@@ -89,17 +87,17 @@ static String s_fragmentShader =
     "}                                              \n"
     ;
 
-struct View
+struct Pass
 {
     Matrix4 projection;
     Matrix4 view;
     static UniformElement s_layout[];
-} s_view;
+} s_pass;
 
-UniformElement View::s_layout[] =
+UniformElement Pass::s_layout[] =
 {
-      { "view.projection", UniformElement::Matrix4, offsetof(View, projection) }
-    , { "view.view",       UniformElement::Matrix4, offsetof(View, view)       }
+      { "projection", UniformElement::Matrix4, offsetof(Pass, projection) }
+    , { "view",       UniformElement::Matrix4, offsetof(Pass, view)       }
     , { NULL }
 };
 
@@ -111,7 +109,7 @@ struct Instance
 
 UniformElement Instance::s_layout[] =
 {
-      { "instance.transform", UniformElement::Matrix4, offsetof(Instance, transform) }
+      { "transform", UniformElement::Matrix4, offsetof(Instance, transform) }
     , { NULL }
 };
 
@@ -130,14 +128,14 @@ class Cubes : public RenderingApplicationDelegate
             application->quit(-1);
         }
         
-        s_view.projection = Matrix4::perspective(60.0f, m_window->aspectRatio(), 0.1f, 100.0f);
-        s_view.view       = Matrix4::lookAt(Vec3(0.0f, 0.0f, -35.0f), Vec3::zero(), Vec3(0.0f, 1.0f, 0.0f));
+        s_pass.projection = Matrix4::perspective(60.0f, m_window->aspectRatio(), 0.1f, 100.0f);
+        s_pass.view       = Matrix4::lookAt(Vec3(0.0f, 0.0f, -35.0f), Vec3::zero(), Vec3(0.0f, 1.0f, 0.0f));
 
         InputLayout inputLayout = m_renderingContext->requestInputLayout(VertexFormat::Position | VertexFormat::Color);
         VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(s_vertices, sizeof(s_vertices));
         IndexBuffer_ indexBuffer = m_renderingContext->requestIndexBuffer(s_indices, sizeof(s_indices));
-        UniformLayout viewUniformLayout = m_renderingContext->requestUniformLayout("View", View::s_layout);
-        ConstantBuffer_ viewConstantBuffer = m_renderingContext->requestConstantBuffer(&s_view, sizeof(s_view), viewUniformLayout);
+        UniformLayout viewUniformLayout = m_renderingContext->requestUniformLayout("Pass", Pass::s_layout);
+        ConstantBuffer_ viewConstantBuffer = m_renderingContext->requestConstantBuffer(&s_pass, sizeof(s_pass), viewUniformLayout);
         UniformLayout instanceUniformLayout = m_renderingContext->requestUniformLayout("Instance", Instance::s_layout);
         m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(s_instance), instanceUniformLayout);
         

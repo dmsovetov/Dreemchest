@@ -151,11 +151,11 @@ GLuint OpenGL2::Program::compileShader(GLenum type, CString source, s8* error, s
         {
             if( result == GL_FALSE )
             {
-                LogError("opengl", "%s\n", messages[i].c_str());
+                LogError("opengl2", "%s\n", messages[i].c_str());
             }
             else
             {
-                LogWarning("opengl", "%s\n", messages[i].c_str());
+                LogWarning("opengl2", "%s\n", messages[i].c_str());
             }
         }
     }

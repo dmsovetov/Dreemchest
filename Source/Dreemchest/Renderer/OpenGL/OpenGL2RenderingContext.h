@@ -87,7 +87,7 @@ namespace Renderer
         class ShaderPreprocessor : public UniformBufferPreprocessor
         {
             //! Generates a uniform definition.
-            virtual String          generateBufferDefinition(const RenderingContext& renderingContext, const String& type, const String& name) const NIMBLE_OVERRIDE;
+            virtual String          generateBufferDefinition(const RenderingContext& renderingContext, const String& type, const String& name, s32 slot) const NIMBLE_OVERRIDE;
         };
         
         RequestedState              m_activeState;      //!< An active rendering pipeline state.

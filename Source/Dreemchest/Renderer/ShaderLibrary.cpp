@@ -235,13 +235,31 @@ bool UniformBufferPreprocessor::preprocess(const RenderingContext& renderingCont
         // Parse uniform name.
         String name;
 
-        while (!isspace(source[offset]) && source[offset] != ';')
+        while (!isspace(source[offset]))
         {
             name += source[offset++];
         }
 
+        // Skip spaces
+        offset = source.find_first_not_of(s_whitespace, offset);
+        NIMBLE_ABORT_IF(offset == String::npos, "shader parsing error");
+
+        NIMBLE_ABORT_IF(source[offset] != ':', "shader parsing error");
+        offset++;
+
+        offset = source.find_first_not_of(s_whitespace, offset);
+        NIMBLE_ABORT_IF(offset == String::npos, "shader parsing error");
+
+        // Parse slot index
+        String slot;
+
+        while (!isspace(source[offset]) && source[offset] != ';')
+        {
+            slot += source[offset++];
+        }
+
         // Generate a cbuffer definition
-        String definition = generateBufferDefinition(renderingContext, type, name);
+        String definition = generateBufferDefinition(renderingContext, type, name, atoi(slot.c_str()));
 
         // And replace it.
         source.replace(start, offset - start, definition);

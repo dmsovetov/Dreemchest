@@ -124,7 +124,7 @@ namespace Renderer
     protected:
 
         //! Generates a uniform buffer definition from it's type and name.
-        virtual String                  generateBufferDefinition(const RenderingContext& renderingContext, const String& type, const String& name) const NIMBLE_ABSTRACT;
+        virtual String                  generateBufferDefinition(const RenderingContext& renderingContext, const String& type, const String& name, s32 slot) const NIMBLE_ABSTRACT;
     };
     
 } // namespace Renderer

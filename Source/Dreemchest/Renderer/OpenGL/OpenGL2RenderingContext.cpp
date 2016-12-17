@@ -47,7 +47,7 @@ RenderingContextPtr createOpenGL2RenderingContext(RenderViewPtr view)
 // ------------------------------------------------------ OpenGL2RenderingContext::ShaderPreprocessor -------------------------------------------------- //
 
 // ** OpenGL2RenderingContext::ShaderPreprocessor::generateBufferDefinition
-String OpenGL2RenderingContext::ShaderPreprocessor::generateBufferDefinition(const RenderingContext& renderingContext, const String& type, const String& name) const
+String OpenGL2RenderingContext::ShaderPreprocessor::generateBufferDefinition(const RenderingContext& renderingContext, const String& type, const String& name, s32 slot) const
 {
     // A static array to map from an element type to GLSL data type.
     static const String s_types[] = 
@@ -74,7 +74,7 @@ String OpenGL2RenderingContext::ShaderPreprocessor::generateBufferDefinition(con
     {
         definition += "\t" + s_types[element->type] + " " + element->name.value() + ";\n";
     }
-    definition += "}; uniform " + type + " " + name + ";\n";
+    definition += "}; uniform " + type + " cb_" + toString(slot) + ";\n#define " + name + " cb_" + toString(slot) + "\n";
 
     return definition;
 }
@@ -444,12 +444,16 @@ void OpenGL2RenderingContext::updateUniforms(const RequestedState& state, Pipeli
         // Submit all constants to a shader
         for (const UniformElement* constant = constantBuffer.layout; constant->name; constant++)
         {
+            // Create a uniform name here for now, but in future this sould be cached somewhere (probably in a ConstantBuffer instance).
+            String uniform = "cb_" + toString(i) + "." + constant->name.value();
+
             // Lookup a uniform location by name
-            GLint location = findUniformLocation(program, features, constant->name);
+            GLint location = findUniformLocation(program, features, uniform.c_str());
             
             // Not found - skip
             if (location == 0)
             {
+                LogWarning("opengl2", "a uniform location '%s' for constant buffer %d could not be found\n", constant->name.value(), i);
                 continue;
             }
             

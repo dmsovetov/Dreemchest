@@ -46,8 +46,7 @@ static String s_vertexShader =
     ;
 
 static String s_fragmentShader =
-    "struct Material { vec4 color; float brightness; };         \n"
-    "uniform Material material;                                 \n"
+    "cbuffer Material material : 0;                             \n"
     "void main()                                                \n"
     "{                                                          \n"
     "   gl_FragColor = material.color * material.brightness;    \n"
@@ -64,8 +63,8 @@ struct Material
 // Every constant buffer should have an associated layout
 static UniformElement s_bufferLayout[] =
 {
-      { "material.color",      UniformElement::Vec4,  offsetof(Material, color)       }
-    , { "material.brightness", UniformElement::Float, offsetof(Material, brightness)  }
+      { "color",      UniformElement::Vec4,  offsetof(Material, color)       }
+    , { "brightness", UniformElement::Float, offsetof(Material, brightness)  }
     , { NULL }
 };
 
@@ -92,7 +91,8 @@ class ConstantBuffers : public RenderingApplicationDelegate
         s_material.brightness = 0.75f;
         
         // Create a constant buffer
-        ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&s_material, sizeof(s_material), s_bufferLayout);
+        UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Material", s_bufferLayout);
+        ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&s_material, sizeof(s_material), uniformLayout);
         
         m_renderStates.bindVertexBuffer(vertexBuffer);
         m_renderStates.bindInputLayout(inputLayout);
