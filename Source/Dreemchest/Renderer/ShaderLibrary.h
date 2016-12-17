@@ -64,7 +64,15 @@ namespace Renderer
         
         //! Returns a compute shader code by a handle.
         const String&                   computeShader(ComputeShader id) const;
+
+        //! Generates a shader source code.
+        bool                            generateShaderCode(const ShaderProgramDescriptor& program, PipelineFeatures features, const PipelineFeatureLayout* featureLayout, String result[TotalShaderTypes]) const;
         
+    private:
+
+        //! Generates a string of definitions from a pipeline feature mask.
+        String                          generateOptionsString(PipelineFeatures features, const PipelineFeatureLayout* featureLayout) const;
+
     private:
         
         //! An internal structure to contain all info associated with a shader.

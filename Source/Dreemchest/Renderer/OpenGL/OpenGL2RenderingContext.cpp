@@ -455,30 +455,23 @@ GLuint OpenGL2RenderingContext::compileShaderPermutation(Program program, Pipeli
     {
         return permutation->program;
     }
-    
-    // Get a shader program descriptor and corresponding permutations container
-    const ShaderProgramDescriptor& descriptor = m_programs[program];
-    
+
+    // Now create a shader source code from a descriptor
+    String shaderSourceCode[TotalShaderTypes];
+    m_shaderLibrary.generateShaderCode(m_programs[program], features, featureLayout, shaderSourceCode);
+
     // Nothing found so we have to compile a new one
     s8 error[2048];
     
-    // Get shader source code
-    const String& vertexSource   = m_shaderLibrary.vertexShader(descriptor.vertexShader);
-    const String& fragmentSource = m_shaderLibrary.fragmentShader(descriptor.fragmentShader);
-    
-    // Preprocess shader source code
-    String vertex   = generateShaderCode(vertexSource, features, featureLayout);
-    String fragment = generateShaderCode(fragmentSource, features, featureLayout);
-    
     // Compile the vertex shader
-    GLuint vertexShader = OpenGL2::Program::compileShader(GL_VERTEX_SHADER, vertex.c_str(), error, sizeof(error));
+    GLuint vertexShader = OpenGL2::Program::compileShader(GL_VERTEX_SHADER, shaderSourceCode[VertexShaderType].c_str(), error, sizeof(error));
     if (vertexShader == 0)
     {
         return 0;
     }
     
     // Compile the fragment shader
-    GLuint fragmentShader = OpenGL2::Program::compileShader(GL_FRAGMENT_SHADER, fragment.c_str(), error, sizeof(error));
+    GLuint fragmentShader = OpenGL2::Program::compileShader(GL_FRAGMENT_SHADER, shaderSourceCode[FragmentShaderType].c_str(), error, sizeof(error));
     if (fragmentShader == 0)
     {
         OpenGL2::Program::deleteShader(vertexShader);

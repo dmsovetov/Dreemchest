@@ -369,11 +369,11 @@ ShaderPtr RenderingContextHal::compileShaderPermutation(Program program, Pipelin
     }
 
     // Get a shader source code
-    String vertex = generateShaderCode(m_shaderLibrary.vertexShader(descriptor.vertexShader), features, featureLayout);
-    String fragment = generateShaderCode(m_shaderLibrary.fragmentShader(descriptor.fragmentShader), features, featureLayout);
-    
+    String shaderSourceCode[TotalShaderTypes];
+    m_shaderLibrary.generateShaderCode(m_programs[program], features, featureLayout, shaderSourceCode);
+ 
     // Compile the shader
-    ShaderPtr compiled = m_hal->createShader( vertex.c_str(), fragment.c_str() );
+    ShaderPtr compiled = m_hal->createShader( shaderSourceCode[VertexShaderType].c_str(), shaderSourceCode[FragmentShaderType].c_str() );
     NIMBLE_BREAK_IF( !compiled.valid() );
     
     // Put it to a cache

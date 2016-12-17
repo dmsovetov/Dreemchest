@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "ShaderLibrary.h"
+#include "PipelineFeatureLayout.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -112,6 +113,65 @@ PersistentResourceId ShaderLibrary::allocateShader(const String& name, const Str
     m_shaders[type].emplace(id, shader);
     
     return id;
+}
+
+// ** ShaderLibrary::generateShaderCode
+bool ShaderLibrary::generateShaderCode(const ShaderProgramDescriptor& program, PipelineFeatures features, const PipelineFeatureLayout* featureLayout, String result[TotalShaderTypes]) const
+{
+    // Generate an options string
+    String options = generateOptionsString(features, featureLayout);
+
+    if (program.vertexShader)
+    {
+        result[VertexShaderType] = options + vertexShader(program.vertexShader);
+    }
+
+    if (program.geometryShader)
+    {
+        result[GeometryShaderType] = options + geometryShader(program.geometryShader);
+    }
+
+    if (program.fragmentShader)
+    {
+        result[FragmentShaderType] = options + fragmentShader(program.fragmentShader);
+    }
+
+    if (program.computeShader)
+    {
+        result[ComputeShaderType] = options + computeShader(program.computeShader);
+    }
+
+    return true;
+}
+
+// ** ShaderLibrary::generateOptionsString
+String ShaderLibrary::generateOptionsString(PipelineFeatures features, const PipelineFeatureLayout* featureLayout) const
+{
+    // No feature layout, so just return an empty string
+    if (!featureLayout)
+    {
+        return "";
+    }
+    
+    // Generate macro definitions from features
+    String macro = "";
+    String debug = "";
+    
+    for (s32 i = 0, n = featureLayout->elementCount(); i < n; i++)
+    {
+        const PipelineFeatureLayout::Element& element = featureLayout->elementAt(i);
+        
+        if (element.mask & features)
+        {
+            macro += "#define " + element.name + " " + toString((element.mask & features) >> element.offset) + "\n";
+            if(debug.length()) debug += ", ";
+            debug += element.name;
+        }
+    }
+
+    LogVerbose( "shaderLibrary", "compiling permutation %s\n", debug.empty() ? "" : ("(" + debug + ")").c_str() );
+    
+    return macro;
 }
 
 } // namespace Renderer

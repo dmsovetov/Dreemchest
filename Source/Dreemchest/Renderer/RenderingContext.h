@@ -117,9 +117,6 @@ namespace Renderer
         //! Finishes a process of pipeline state configration.
         PipelineFeatures                        finishPipelineConfiguration(PipelineFeatures userDefined);
         
-        //! Generates a shader source code.
-        String                                  generateShaderCode(const String& source, PipelineFeatures features, const PipelineFeatureLayout* featureLayout) const;
-        
     private:
         
         //! Allocates a new render resource identifier of specified type.
