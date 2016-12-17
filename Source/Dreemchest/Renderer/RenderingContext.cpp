@@ -227,6 +227,7 @@ Texture_ RenderingContext::ConstructionCommandBuffer::createTexture(Texture_ id,
 // ** RenderingContext::RenderingContext
 RenderingContext::RenderingContext(RenderViewPtr view)
     : m_view(view)
+    , m_shaderLibrary(*this)
 {
     // Create a construction command buffer instance
     m_constructionCommandBuffer = DC_NEW ConstructionCommandBuffer;

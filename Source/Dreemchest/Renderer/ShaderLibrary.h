@@ -33,13 +33,27 @@ DC_BEGIN_DREEMCHEST
 
 namespace Renderer
 {
+    //! Shader source code preprocessor.
+    class ShaderPreprocessor
+    {
+    public:
+
+        virtual                         ~ShaderPreprocessor( void ) {}
+
+        //1 Performs a shader source code preprocessing.
+        virtual bool                    preprocess(const RenderingContext& renderingContext, String& shader) const NIMBLE_ABSTRACT;
+    };
+
     //! Shader library contains all shader sources exposed to a rendering context.
     class ShaderLibrary
     {
     public:
+
+        //! A shader preprocessor unique pointer type.
+        typedef UPtr<ShaderPreprocessor> ShaderPreprocessorUPtr;
         
                                         //! Constructs a ShaderLibrary instance.
-                                        ShaderLibrary( void );
+                                        ShaderLibrary(const RenderingContext& renderingContext);
         
         //! Adds a new vertex shader
         VertexShader                    addVertexShader(const String& code, const String& name = "");
@@ -68,10 +82,16 @@ namespace Renderer
         //! Generates a shader source code.
         bool                            generateShaderCode(const ShaderProgramDescriptor& program, PipelineFeatures features, const PipelineFeatureLayout* featureLayout, String result[TotalShaderTypes]) const;
         
+        //! Adds a new shader preprocessor to this library.
+        void                            addPreprocessor(ShaderPreprocessorUPtr preprocessor);
+
     private:
 
         //! Generates a string of definitions from a pipeline feature mask.
         String                          generateOptionsString(PipelineFeatures features, const PipelineFeatureLayout* featureLayout) const;
+
+        //! Performs a shader preprocessing.
+        void                            preprocess(String& shader) const;
 
     private:
         
@@ -86,9 +106,11 @@ namespace Renderer
         PersistentResourceId            allocateShader(const String& name, const String& code, ShaderType type);
         
     private:
-        
-        PersistentResourceIdentifiers   m_identifiers[TotalShaderTypes];  //!< An array of shader resource identifiers.
-        FixedArray<Shader>              m_shaders[TotalShaderTypes];      //!< An array of shader containers.
+
+        const RenderingContext&         m_renderingContext;                 //!< Parent rendering context instance.
+        PersistentResourceIdentifiers   m_identifiers[TotalShaderTypes];    //!< An array of shader resource identifiers.
+        FixedArray<Shader>              m_shaders[TotalShaderTypes];        //!< An array of shader containers.
+        List<ShaderPreprocessorUPtr>    m_preprocessors;                    //!< A list of shader preprocessors that are consequently invoked.
     };
     
 } // namespace Renderer

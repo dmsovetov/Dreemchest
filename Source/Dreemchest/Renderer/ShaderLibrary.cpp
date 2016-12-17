@@ -33,7 +33,8 @@ namespace Renderer
 {
 
 // ** ShaderLibrary::ShaderLibrary
-ShaderLibrary::ShaderLibrary( void )
+ShaderLibrary::ShaderLibrary(const RenderingContext& renderingContext)
+    : m_renderingContext(renderingContext)
 {
     for (s32 i = 0; i < TotalShaderTypes; i++)
     {
@@ -141,6 +142,14 @@ bool ShaderLibrary::generateShaderCode(const ShaderProgramDescriptor& program, P
         result[ComputeShaderType] = options + computeShader(program.computeShader);
     }
 
+    for (s32 i = 0; i < TotalShaderTypes; i++)
+    {
+        if (result[i].length())
+        {
+            preprocess(result[i]);
+        }
+    }
+
     return true;
 }
 
@@ -172,6 +181,21 @@ String ShaderLibrary::generateOptionsString(PipelineFeatures features, const Pip
     LogVerbose( "shaderLibrary", "compiling permutation %s\n", debug.empty() ? "" : ("(" + debug + ")").c_str() );
     
     return macro;
+}
+
+// ** ShaderLibrary::preprocess
+void ShaderLibrary::preprocess(String& shader) const
+{
+    for (List<ShaderPreprocessorUPtr>::const_iterator i = m_preprocessors.begin(); i != m_preprocessors.end(); ++i)
+    {
+        (*i)->preprocess(m_renderingContext, shader);
+    }
+}
+
+// ** ShaderLibrary::addPreprocessor
+void ShaderLibrary::addPreprocessor(ShaderPreprocessorUPtr preprocessor)
+{
+    m_preprocessors.push_back(preprocessor);
 }
 
 } // namespace Renderer
