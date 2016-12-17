@@ -154,7 +154,7 @@ public:
     IndexBuffer_                createIndexBuffer(IndexBuffer_ id, const void* data, s32 size);
     
     //! Emits a constant buffer creation command.
-    ConstantBuffer_             createConstantBuffer(ConstantBuffer_ id, const void* data, s32 size, const ConstantBufferLayout* layout);
+    ConstantBuffer_             createConstantBuffer(ConstantBuffer_ id, const void* data, s32 size, const ConstantBufferElement* layout);
     
     //! Emits a texture creation command.
     Texture_                    createTexture(Texture_ id, const void* data, u16 width, u16 height, PixelFormat format);
@@ -196,7 +196,7 @@ IndexBuffer_ RenderingContext::ConstructionCommandBuffer::createIndexBuffer(Inde
 }
 
 // ** RenderingContext::ConstructionCommandBuffer::createConstantBuffer
-ConstantBuffer_ RenderingContext::ConstructionCommandBuffer::createConstantBuffer(ConstantBuffer_ id, const void* data, s32 size, const ConstantBufferLayout* layout)
+ConstantBuffer_ RenderingContext::ConstructionCommandBuffer::createConstantBuffer(ConstantBuffer_ id, const void* data, s32 size, const ConstantBufferElement* layout)
 {
     OpCode opCode;
     opCode.type = OpCode::CreateConstantBuffer;
@@ -405,7 +405,7 @@ IndexBuffer_ RenderingContext::requestIndexBuffer( const void* data, s32 size )
 }
 
 // ** RenderingContext::requestConstantBuffer
-ConstantBuffer_ RenderingContext::requestConstantBuffer( const void* data, s32 size, const ConstantBufferLayout* layout )
+ConstantBuffer_ RenderingContext::requestConstantBuffer( const void* data, s32 size, const ConstantBufferElement* layout )
 {
     ConstantBuffer_ id = allocateResourceIdentifier(RenderResourceType::ConstantBuffer);
     return m_constructionCommandBuffer->createConstantBuffer(id, data, size, layout);

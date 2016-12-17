@@ -93,25 +93,25 @@ struct View
 {
     Matrix4 projection;
     Matrix4 view;
-    static ConstantBufferLayout s_layout[];
+    static ConstantBufferElement s_layout[];
 } s_view;
 
-ConstantBufferLayout View::s_layout[] =
+ConstantBufferElement View::s_layout[] =
 {
-      { "view.projection", ConstantBufferLayout::Matrix4, offsetof(View, projection) }
-    , { "view.view",       ConstantBufferLayout::Matrix4, offsetof(View, view)       }
+      { "view.projection", ConstantBufferElement::Matrix4, offsetof(View, projection) }
+    , { "view.view",       ConstantBufferElement::Matrix4, offsetof(View, view)       }
     , { NULL }
 };
 
 struct Instance
 {
     Matrix4 transform;
-    static ConstantBufferLayout s_layout[];
+    static ConstantBufferElement s_layout[];
 } s_instance;
 
-ConstantBufferLayout Instance::s_layout[] =
+ConstantBufferElement Instance::s_layout[] =
 {
-      { "instance.transform", ConstantBufferLayout::Matrix4, offsetof(Instance, transform) }
+      { "instance.transform", ConstantBufferElement::Matrix4, offsetof(Instance, transform) }
     , { NULL }
 };
 

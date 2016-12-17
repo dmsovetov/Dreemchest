@@ -62,7 +62,7 @@ namespace Renderer
         IndexBuffer_                            requestIndexBuffer( const void* data, s32 size );
         
         //! Queues a constant buffer instance for creation and returns it's index.
-        ConstantBuffer_                         requestConstantBuffer( const void* data, s32 size, const ConstantBufferLayout* layout );
+        ConstantBuffer_                         requestConstantBuffer( const void* data, s32 size, const ConstantBufferElement* layout );
         
         //! Queues a texture instance for creation and returns it's index.
         Texture_                                requestTexture( const void* data, u16 width, u16 height, PixelFormat format );

@@ -53,7 +53,7 @@ namespace Scene
         //! A constant buffer types
         struct CBuffer
         {
-            typedef Renderer::ConstantBufferLayout BufferLayout;
+            typedef Renderer::ConstantBufferElement BufferLayout;
             struct Scene
             {
                 static BufferLayout Layout[];

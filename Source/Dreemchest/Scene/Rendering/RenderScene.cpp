@@ -50,69 +50,69 @@ struct Debug_Structure_To_Track_Data_Size_Used_By_Node_Types
 // ** RenderScene::CBuffer::Scene::Layout
 RenderScene::CBuffer::BufferLayout RenderScene::CBuffer::Scene::Layout[] =
 {
-      { "Scene.ambient", Renderer::ConstantBufferLayout::Vec4, offsetof( RenderScene::CBuffer::Scene, ambient ) }
+      { "Scene.ambient", Renderer::ConstantBufferElement::Vec4, offsetof( RenderScene::CBuffer::Scene, ambient ) }
     , { NULL }
 };
 
 // ** RenderScene::CBuffer::Light::Layout
 RenderScene::CBuffer::BufferLayout RenderScene::CBuffer::Light::Layout[] =
 {
-      { "Light.position",  Renderer::ConstantBufferLayout::Vec3,  offsetof( CBuffer::Light, position  ), }
-    , { "Light.range",     Renderer::ConstantBufferLayout::Float, offsetof( CBuffer::Light, range     ), }
-    , { "Light.color",     Renderer::ConstantBufferLayout::Vec3,  offsetof( CBuffer::Light, color     ), }
-    , { "Light.intensity", Renderer::ConstantBufferLayout::Float, offsetof( CBuffer::Light, intensity ), }
-    , { "Light.direction", Renderer::ConstantBufferLayout::Vec3,  offsetof( CBuffer::Light, direction ), }
-    , { "Light.cutoff",    Renderer::ConstantBufferLayout::Float, offsetof( CBuffer::Light, cutoff    ), }
+      { "Light.position",  Renderer::ConstantBufferElement::Vec3,  offsetof( CBuffer::Light, position  ), }
+    , { "Light.range",     Renderer::ConstantBufferElement::Float, offsetof( CBuffer::Light, range     ), }
+    , { "Light.color",     Renderer::ConstantBufferElement::Vec3,  offsetof( CBuffer::Light, color     ), }
+    , { "Light.intensity", Renderer::ConstantBufferElement::Float, offsetof( CBuffer::Light, intensity ), }
+    , { "Light.direction", Renderer::ConstantBufferElement::Vec3,  offsetof( CBuffer::Light, direction ), }
+    , { "Light.cutoff",    Renderer::ConstantBufferElement::Float, offsetof( CBuffer::Light, cutoff    ), }
     , { NULL }
 };
 
 // ** RenderScene::CBuffer::Shadow::Layout
 RenderScene::CBuffer::BufferLayout RenderScene::CBuffer::Shadow::Layout[] =
 {
-      { "Shadow.transform", Renderer::ConstantBufferLayout::Matrix4, offsetof( CBuffer::Shadow, transform ), }
-    , { "Shadow.invSize",   Renderer::ConstantBufferLayout::Float,   offsetof( CBuffer::Shadow, invSize   ), }
+      { "Shadow.transform", Renderer::ConstantBufferElement::Matrix4, offsetof( CBuffer::Shadow, transform ), }
+    , { "Shadow.invSize",   Renderer::ConstantBufferElement::Float,   offsetof( CBuffer::Shadow, invSize   ), }
     , { NULL }
 };
 
 // ** RenderScene::CBuffer::View::Layout
 RenderScene::CBuffer::BufferLayout RenderScene::CBuffer::View::Layout[] =
 {
-      { "View.transform", Renderer::ConstantBufferLayout::Matrix4, offsetof( CBuffer::View, transform ), }
-    , { "View.near",      Renderer::ConstantBufferLayout::Float,   offsetof( CBuffer::View, near      ), }
-    , { "View.far",       Renderer::ConstantBufferLayout::Float,   offsetof( CBuffer::View, far       ), }
-    , { "View.position",  Renderer::ConstantBufferLayout::Vec3,    offsetof( CBuffer::View, position  ), }
+      { "View.transform", Renderer::ConstantBufferElement::Matrix4, offsetof( CBuffer::View, transform ), }
+    , { "View.near",      Renderer::ConstantBufferElement::Float,   offsetof( CBuffer::View, near      ), }
+    , { "View.far",       Renderer::ConstantBufferElement::Float,   offsetof( CBuffer::View, far       ), }
+    , { "View.position",  Renderer::ConstantBufferElement::Vec3,    offsetof( CBuffer::View, position  ), }
     , { NULL }
 };
 
 // ** RenderScene::CBuffer::Instance::Layout
 RenderScene::CBuffer::BufferLayout RenderScene::CBuffer::Instance::Layout[] =
 {
-      { "Instance.transform", Renderer::ConstantBufferLayout::Matrix4, offsetof( CBuffer::Instance, transform ), }
+      { "Instance.transform", Renderer::ConstantBufferElement::Matrix4, offsetof( CBuffer::Instance, transform ), }
     , { NULL }
 };
 
 // ** RenderScene::CBuffer::Material::Layout
 RenderScene::CBuffer::BufferLayout RenderScene::CBuffer::Material::Layout[] =
 {
-      { "Material.diffuse",    Renderer::ConstantBufferLayout::Vec4,  offsetof( CBuffer::Material, diffuse    ), }
-    , { "Material.specular",   Renderer::ConstantBufferLayout::Vec4,  offsetof( CBuffer::Material, specular   ), }
-    , { "Material.emission",   Renderer::ConstantBufferLayout::Vec4,  offsetof( CBuffer::Material, emission   ), }
-    , { "Material.rim.color",  Renderer::ConstantBufferLayout::Vec3,  offsetof( CBuffer::Material, rim.color  ), }
-    , { "Material.rim.factor", Renderer::ConstantBufferLayout::Float, offsetof( CBuffer::Material, rim.factor ), }
-    , { "Material.rim.start",  Renderer::ConstantBufferLayout::Float, offsetof( CBuffer::Material, rim.start  ), }
-    , { "Material.rim.end",    Renderer::ConstantBufferLayout::Float, offsetof( CBuffer::Material, rim.end    ), }
+      { "Material.diffuse",    Renderer::ConstantBufferElement::Vec4,  offsetof( CBuffer::Material, diffuse    ), }
+    , { "Material.specular",   Renderer::ConstantBufferElement::Vec4,  offsetof( CBuffer::Material, specular   ), }
+    , { "Material.emission",   Renderer::ConstantBufferElement::Vec4,  offsetof( CBuffer::Material, emission   ), }
+    , { "Material.rim.color",  Renderer::ConstantBufferElement::Vec3,  offsetof( CBuffer::Material, rim.color  ), }
+    , { "Material.rim.factor", Renderer::ConstantBufferElement::Float, offsetof( CBuffer::Material, rim.factor ), }
+    , { "Material.rim.start",  Renderer::ConstantBufferElement::Float, offsetof( CBuffer::Material, rim.start  ), }
+    , { "Material.rim.end",    Renderer::ConstantBufferElement::Float, offsetof( CBuffer::Material, rim.end    ), }
     , { NULL }
 };
 
 // ** RenderScene::CBuffer::ClipPlanes::Layout
 RenderScene::CBuffer::BufferLayout RenderScene::CBuffer::ClipPlanes::Layout[] =
 {
-      { "ClipPlanes.equation[0]", Renderer::ConstantBufferLayout::Vec4, offsetof( CBuffer::ClipPlanes, equation[0] ), }
-    , { "ClipPlanes.equation[1]", Renderer::ConstantBufferLayout::Vec4, offsetof( CBuffer::ClipPlanes, equation[1] ), }
-    , { "ClipPlanes.equation[2]", Renderer::ConstantBufferLayout::Vec4, offsetof( CBuffer::ClipPlanes, equation[2] ), }
-    , { "ClipPlanes.equation[3]", Renderer::ConstantBufferLayout::Vec4, offsetof( CBuffer::ClipPlanes, equation[3] ), }
-    , { "ClipPlanes.equation[4]", Renderer::ConstantBufferLayout::Vec4, offsetof( CBuffer::ClipPlanes, equation[4] ), }
-    , { "ClipPlanes.equation[5]", Renderer::ConstantBufferLayout::Vec4, offsetof( CBuffer::ClipPlanes, equation[5] ), }
+      { "ClipPlanes.equation[0]", Renderer::ConstantBufferElement::Vec4, offsetof( CBuffer::ClipPlanes, equation[0] ), }
+    , { "ClipPlanes.equation[1]", Renderer::ConstantBufferElement::Vec4, offsetof( CBuffer::ClipPlanes, equation[1] ), }
+    , { "ClipPlanes.equation[2]", Renderer::ConstantBufferElement::Vec4, offsetof( CBuffer::ClipPlanes, equation[2] ), }
+    , { "ClipPlanes.equation[3]", Renderer::ConstantBufferElement::Vec4, offsetof( CBuffer::ClipPlanes, equation[3] ), }
+    , { "ClipPlanes.equation[4]", Renderer::ConstantBufferElement::Vec4, offsetof( CBuffer::ClipPlanes, equation[4] ), }
+    , { "ClipPlanes.equation[5]", Renderer::ConstantBufferElement::Vec4, offsetof( CBuffer::ClipPlanes, equation[5] ), }
     , { NULL }
 };
 

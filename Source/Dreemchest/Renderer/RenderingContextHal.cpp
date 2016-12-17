@@ -129,7 +129,7 @@ void RenderingContextHal::executeCommandBuffer( const RenderFrame& frame, const 
         case CommandBuffer::OpCode::CreateVertexBuffer:     commandCreateVertexBuffer(opCode.createBuffer.id, opCode.createBuffer.data, opCode.createBuffer.size);
                                                             break;
         case CommandBuffer::OpCode::CreateConstantBuffer:   {
-                                                                const ConstantBufferLayout* layout = reinterpret_cast<const ConstantBufferLayout*>(opCode.createBuffer.userData);
+                                                                const ConstantBufferElement* layout = reinterpret_cast<const ConstantBufferElement*>(opCode.createBuffer.userData);
                                                                 commandCreateConstantBuffer(opCode.createBuffer.id, opCode.createBuffer.data, opCode.createBuffer.size, layout);
                                                             }
                                                             break;
@@ -258,7 +258,7 @@ void RenderingContextHal::commandCreateIndexBuffer(IndexBuffer_ id, const void* 
 }
 
 // ** RenderingContextHal::commandCreateConstantBuffer
-void RenderingContextHal::commandCreateConstantBuffer(ConstantBuffer_ id, const void* data, s32 size, const ConstantBufferLayout* layout)
+void RenderingContextHal::commandCreateConstantBuffer(ConstantBuffer_ id, const void* data, s32 size, const ConstantBufferElement* layout)
 {
     //NIMBLE_BREAK_IF( m_constantBuffers[id].valid(), "resource was already constructed" );
         

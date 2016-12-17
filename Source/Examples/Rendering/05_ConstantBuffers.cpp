@@ -62,10 +62,10 @@ struct Material
 } s_material;
 
 // Every constant buffer should have an associated layout
-static ConstantBufferLayout s_bufferLayout[] =
+static ConstantBufferElement s_bufferLayout[] =
 {
-      { "material.color",      ConstantBufferLayout::Vec4,  offsetof(Material, color)       }
-    , { "material.brightness", ConstantBufferLayout::Float, offsetof(Material, brightness)  }
+      { "material.color",      ConstantBufferElement::Vec4,  offsetof(Material, color)       }
+    , { "material.brightness", ConstantBufferElement::Float, offsetof(Material, brightness)  }
     , { NULL }
 };
 

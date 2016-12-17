@@ -33,14 +33,13 @@ DC_BEGIN_DREEMCHEST
 
 namespace Renderer {
 
-#if DEV_RENDERER_SOFTWARE_CBUFFERS
     //! A constant buffer internal layout used to emulate constant buffers on platforms that do not have a native support of them.
-    struct ConstantBufferLayout
+    struct ConstantBufferElement
     {
         //! Constant type.
         enum Type
         {
-            Integer   //!< Integer constant value.
+              Integer   //!< Integer constant value.
             , Float     //!< Float constant value.
             , Vec2      //!< Vec2 constant value.
             , Vec3      //!< Vec3 constant value.
@@ -52,7 +51,6 @@ namespace Renderer {
         Type        type;       //!< Uniform type.
         u32         offset;     //!< Uniform offset.
     };
-#endif  /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
 
 #if DEV_DEPRECATED_HAL
     
@@ -156,7 +154,7 @@ namespace Renderer {
          \param GPU     Determines a location where to store a constant buffer data (RAM or GPU).
          \return        ConstantBuffer instance.
          */
-        virtual ConstantBufferPtr    createConstantBuffer( u32 size, const ConstantBufferLayout* layout );
+        virtual ConstantBufferPtr    createConstantBuffer( u32 size, const ConstantBufferElement* layout );
 
         //! Binds a shader.
         virtual void    setShader( const ShaderPtr& shader );
@@ -564,12 +562,12 @@ namespace Renderer {
     public:
 
                                     //! Constructs a ConstantBuffer instance.
-                                    ConstantBuffer( u32 size, const ConstantBufferLayout* layout );
+                                    ConstantBuffer( u32 size, const ConstantBufferElement* layout );
         virtual                        ~ConstantBuffer( void );
 
     #if DEV_RENDERER_SOFTWARE_CBUFFERS
         //! Returns a constant buffer layout.
-        const ConstantBufferLayout* layout( void ) const;
+        const ConstantBufferElement* layout( void ) const;
 
         //! Returns a constant buffer data pointer.
         const u8*                   data( void ) const;
@@ -593,7 +591,7 @@ namespace Renderer {
         u32                         m_size;     //!< Constant buffer size.
     #if DEV_RENDERER_SOFTWARE_CBUFFERS
         u8*                         m_data;     //!< Constant buffer data.
-        const ConstantBufferLayout* m_layout;   //!< An array of constants that are stored inside a buffer.
+        const ConstantBufferElement* m_layout;   //!< An array of constants that are stored inside a buffer.
     #endif  /*  #if DEV_RENDERER_SOFTWARE_CBUFFERS  */
     };
 
