@@ -475,6 +475,7 @@ namespace Renderer {
         PrimTriangles,      //!< Render triangles.
         PrimTriangleStrip,  //!< Render triangle strip.
         PrimTriangleFan,    //!< Render triangle fan.
+        PrimQuads,          //!< Render quads.
         PrimPoints,         //!< Render points.
 
         TotalPrimitiveTypes    //!< Total primitive types available.

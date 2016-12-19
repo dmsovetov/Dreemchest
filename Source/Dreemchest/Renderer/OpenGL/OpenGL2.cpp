@@ -478,6 +478,7 @@ void OpenGL2::drawElements(PrimitiveType primType, GLenum type, u32 firstIndex, 
         , GL_TRIANGLES
         , GL_TRIANGLE_STRIP
         , GL_TRIANGLE_FAN
+        , GL_QUADS
         , GL_POINTS
     };
 
@@ -496,6 +497,7 @@ void OpenGL2::drawArrays(PrimitiveType primType, u32 offset, u32 count)
         , GL_TRIANGLES
         , GL_TRIANGLE_STRIP
         , GL_TRIANGLE_FAN
+        , GL_QUADS
         , GL_POINTS
     };
     
