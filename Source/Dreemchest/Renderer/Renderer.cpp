@@ -128,17 +128,6 @@ Descriptor tgaFromFile(const String& fileName)
         image.format = PixelLuminance8;
         image.pixels.resize(image.width * image.height);
         fread(&image.pixels[0], 1, image.width * image.height, file);
-        
-       /* for (s32 i = 0; i < image.width * image.height; i++)
-        {
-            u8 pixel;
-            fread(&pixel, 1, 1, file);
-            
-            image.pixels[i * 4 + 0] = pixel;
-            //image.pixels[i * 4 + 1] = pixel;
-            //image.pixels[i * 4 + 2] = pixel;
-            //image.pixels[i * 4 + 3] = 255;
-        }*/
     }
     else
     {

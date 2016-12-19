@@ -305,7 +305,6 @@ void OpenGL2::Texture::bind(GLenum target, GLuint id, GLuint sampler)
 {
     DC_CHECK_GL;
     glActiveTexture(GL_TEXTURE0 + sampler);
-    glEnable(GL_TEXTURE_2D);
     glBindTexture(target, id);
 }
 
