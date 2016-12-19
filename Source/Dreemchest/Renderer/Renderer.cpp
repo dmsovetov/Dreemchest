@@ -26,6 +26,9 @@
 
 #include "Renderer.h"
 #include "RenderingContext.h"
+#include "VertexFormat.h"
+
+#include <fstream>
 
 DC_BEGIN_DREEMCHEST
 
@@ -62,7 +65,7 @@ void RenderingApplicationDelegate::handleWindowUpdate(const Platform::Window::Up
     handleRenderFrame(e);
 }
     
-// ----------------------------------------------------------------------------------------------------------------------------------------------------- //
+// ------------------------------------------------------------------------- ImageLoader ------------------------------------------------------------------------ //
 
 namespace ImageLoader
 {
@@ -143,7 +146,121 @@ Descriptor tgaFromFile(const String& fileName)
     return image;
 }
     
-} // namespace Image
+} // namespace ImageLoader
+    
+// ------------------------------------------------------------------------- MeshLoader ------------------------------------------------------------------------ //
+
+namespace MeshLoader
+{
+    
+// ** objFromFile
+Descriptor objFromFile(const String& fileName)
+{
+    std::ifstream in(fileName);
+    
+    if (!in.is_open())
+    {
+        return Descriptor();
+    }
+    
+    String line;
+    Descriptor mesh;
+    
+    Array<Vec3> vertices, normals;
+    Array<Vec2> uvs;
+
+    while (!in.eof())
+    {
+        getline(in, line);
+        
+        switch (line[0])
+        {
+            case 'v':
+                switch (line[1])
+                {
+                    case 't':
+                        uvs.push_back(Vec2());
+                        sscanf(line.c_str(), "vt %f %f", &uvs.back().x, &uvs.back().y);
+                        break;
+                    case 'n':
+                        normals.push_back(Vec3());
+                        sscanf(line.c_str(), "vn %f %f %f", &normals.back().x, &normals.back().y, &normals.back().z);
+                        break;
+                    default:
+                        vertices.push_back(Vec3());
+                        sscanf(line.c_str(), "v %f %f %f", &vertices.back().x, &vertices.back().y, &vertices.back().z);
+                        break;
+                }
+                break;
+            case 'f':
+            {
+                s32 vi[3], ti[3], ni[3];
+                
+                if (sscanf(line.c_str(), "f %i %i %i", &vi[0], &vi[1], &vi[2]) == 3)
+                {
+                    mesh.format = VertexFormat::Position;
+                    
+                    for (s32 i = 0; i < 3; i++)
+                    {
+                        Vertex v;
+                        v.position = vertices[vi[i] - 1];
+                        mesh.vertices.push_back(v);
+                    }
+                }
+                else if(sscanf(line.c_str(), "f %i/%i %i/%i %i/%i", &vi[0], &ti[0], &vi[1], &ti[1], &vi[2], &ti[2]) == 6)
+                {
+                    mesh.format = VertexFormat::Position | VertexFormat::TexCoord0;
+                    
+                    for (s32 i = 0; i < 3; i++)
+                    {
+                        Vertex v;
+                        v.position = vertices[vi[i] - 1];
+                        v.uv = uvs[ti[i] - 1];
+                        mesh.vertices.push_back(v);
+                    }
+                }
+                else if(sscanf(line.c_str(), "f %i//%i %i//%i %i//%i", &vi[0], &ni[0], &vi[1], &ni[1], &vi[2], &ni[2]) == 6)
+                {
+                    mesh.format = VertexFormat::Position | VertexFormat::Normal;
+                    
+                    for (s32 i = 0; i < 3; i++)
+                    {
+                        Vertex v;
+                        v.position = vertices[vi[i] - 1];
+                        v.normal = normals[ni[i] - 1];
+                        mesh.vertices.push_back(v);
+                    }
+                }
+                else if(sscanf(line.c_str(), "f %i/%i/%i %i/%i/%i %i/%i/%i", &vi[0], &ti[0], &ni[0], &vi[1], &ti[1], &ni[1], &vi[2], &ti[2], &ni[2]) == 9)
+                {
+                    mesh.format = VertexFormat::Position | VertexFormat::Normal | VertexFormat::TexCoord0;
+                    
+                    for (s32 i = 0; i < 3; i++)
+                    {
+                        Vertex v;
+                        v.position = vertices[vi[i] - 1];
+                        v.uv = uvs[ti[i] - 1];
+                        v.normal = normals[ni[i] - 1];
+                        mesh.vertices.push_back(v);
+                    }
+                }
+                else
+                {
+                    LogWarning("obj", "%s", "unhandled vertex format\n");
+                    return Descriptor();
+                }
+            }
+                break;
+        }
+    }
+    in.close();
+    
+    mesh.format = VertexFormat::Position | VertexFormat::Normal | VertexFormat::TexCoord0;
+
+    return mesh;
+}
+    
+} // namespace MeshLoader
     
 } // namespace Renderer
 

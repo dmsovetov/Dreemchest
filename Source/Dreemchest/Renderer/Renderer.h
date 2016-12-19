@@ -511,7 +511,7 @@ namespace Renderer {
         RenderingContextPtr     m_renderingContext; //!< A rendering context instance.
     };
     
-    //! Image loading routines used mostly for debugging purposes.
+    //! Image loading routines used for debugging purposes.
     namespace ImageLoader
     {
         //! A loaded image descriptor.
@@ -530,6 +530,31 @@ namespace Renderer {
         //! Loads a TGA image from a file.
         Descriptor tgaFromFile(const String& fileName);
     } // namespace Image
+    
+    //! Mesh loading routines used for debugging purposes.
+    namespace MeshLoader
+    {
+        //! Vertex data type.
+        struct Vertex
+        {
+            Vec3        position;
+            Vec3        normal;
+            Vec2        uv;
+        };
+        
+        //! A loaded mesh descriptor.
+        struct Descriptor
+        {
+            Array<u16>      indices;    //!< An index buffer.
+            Array<Vertex>   vertices;   //!< A vertex buffer.
+            u8              format;     //!< Mesh vertex format.
+            
+            operator bool() const { return vertices.size() > 0; }
+        };
+        
+        //! Loads an OBJ mesh from a file.
+        Descriptor objFromFile(const String& fileName);
+    }
 
 } // namespace Renderer
 
