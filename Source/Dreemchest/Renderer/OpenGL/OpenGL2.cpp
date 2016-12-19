@@ -573,6 +573,25 @@ GLenum OpenGL2::convertCompareFunction(Compare value)
 
     return 0;
 }
+    
+// ** OpenGL2::convertStencilAction
+GLenum OpenGL2::convertStencilAction(StencilAction value)
+{
+    switch (value)
+    {
+        case StencilDecSaturate:    return GL_DECR_WRAP;
+        case StencilDecWrap:        return GL_DECR;
+        case StencilIncSaturate:    return GL_INCR_WRAP;
+        case StencilIncWrap:        return GL_INCR_WRAP;
+        case StencilInvert:         return GL_INVERT;
+        case StencilKeep:           return GL_KEEP;
+        case StencilReplace:        return GL_REPLACE;
+        case StencilZero:           return GL_ZERO;
+        default:                    NIMBLE_NOT_IMPLEMENTED;
+    }
+
+    return 0;
+}
 
 // ** OpenGL2::textureInternalFormat
 GLenum OpenGL2::textureInternalFormat(PixelFormat pixelFormat)

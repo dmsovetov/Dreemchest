@@ -298,7 +298,7 @@ OpenGL2RenderingContext::RequestedState OpenGL2RenderingContext::applyStates(con
             case State::DepthState:
                 glDepthMask(state.data.depthWrite ? GL_TRUE : GL_FALSE);
                 glEnable(GL_DEPTH_TEST);
-                glDepthFunc(OpenGL2::convertCompareFunction(static_cast<Compare>(state.compareFunction)));
+                glDepthFunc(OpenGL2::convertCompareFunction(state.function()));
                 break;
                 
             case State::AlphaTest:
@@ -309,7 +309,7 @@ OpenGL2RenderingContext::RequestedState OpenGL2RenderingContext::applyStates(con
                 else
                 {
                     glEnable(GL_ALPHA_TEST);
-                    glAlphaFunc(OpenGL2::convertCompareFunction(static_cast<Compare>(state.compareFunction)), state.alphaReference());
+                    glAlphaFunc(OpenGL2::convertCompareFunction(state.function()), state.alphaReference());
                 }
                 break;
                 
@@ -345,6 +345,30 @@ OpenGL2RenderingContext::RequestedState OpenGL2RenderingContext::applyStates(con
                 }
                 break;
                 
+            case State::StencilOp:
+                glStencilOp(OpenGL2::convertStencilAction(state.stencilFail()), OpenGL2::convertStencilAction(state.depthFail()), OpenGL2::convertStencilAction(state.depthStencilPass()));
+                break;
+                
+            case State::StencilFunc:
+                if (state.stencilFunction.op == CompareDisabled)
+                {
+                    glDisable(GL_STENCIL_TEST);
+                }
+                else
+                {
+                    glEnable(GL_STENCIL_TEST);
+                    glStencilFunc(OpenGL2::convertCompareFunction(static_cast<Compare>(state.stencilFunction.op)), state.data.ref, state.stencilFunction.mask);
+                }
+                break;
+                
+            case State::StencilMask:
+                NIMBLE_NOT_IMPLEMENTED;
+                break;
+                
+            case State::ColorMask:
+                glColorMask(state.mask & ColorMaskRed, state.mask & ColorMaskGreen, state.mask & ColorMaskBlue, state.mask & ColorMaskAlpha);
+                break;
+
             default:
                 NIMBLE_NOT_IMPLEMENTED
         }

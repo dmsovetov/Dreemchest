@@ -791,7 +791,7 @@ GLenum OpenGLHal::stencilOp( u32 action )
     case StencilIncWrap:        return GL_INCR_WRAP;
     case StencilInvert:         return GL_INVERT;
     case StencilKeep:           return GL_KEEP;
-    case StencilSet:            return GL_SET;
+    case StencilReplace:        return GL_REPLACE;
     case StencilZero:           return GL_ZERO;
     }
 

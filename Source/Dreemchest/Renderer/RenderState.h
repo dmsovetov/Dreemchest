@@ -62,8 +62,12 @@ namespace Renderer
             , AlphaTest         = DepthState        + 1                     //!< Sets an alpha test function and a reference value.
             , CullFace          = AlphaTest         + 1                     //!< Sets a cull face mode.
             , Texture           = CullFace          + 1                     //!< Binds a texture to a sampler #(Type.Texture + index).
-            , Rasterization     = Texture           + 1                     //!< Sets a polygon rasterization mode.
-            , TotalStates       = Rasterization     + MaxTextureSamplers    //!< A total number of available render states.
+            , Rasterization     = Texture           + MaxTextureSamplers    //!< Sets a polygon rasterization mode.
+            , StencilOp         = Rasterization     + 1                     //!< Sets stencil test actions.
+            , StencilFunc       = StencilOp         + 1                     //!< Sets function and reference value for stencil testing.
+            , StencilMask       = StencilFunc       + 1                     //!< Control the writing of individual bits in the stencil planes.
+            , ColorMask         = StencilMask       + 1                     //!< Sets a color buffer write mask.
+            , TotalStates                                                   //!< A total number of available render states.
         };
 
                                         //! Constructs an empty State instance.
@@ -75,6 +79,12 @@ namespace Renderer
                                         //! Constructs a cull face render state instance.
                                         State( TriangleFace face );
         
+                                        //! Constructs a stencil op render state instance.
+                                        State(StencilAction sfail, StencilAction dpfail, StencilAction dppass);
+        
+                                        //! Constructs a stencil function render state instance.
+                                        State(Compare function, u8 ref, u8 mask);
+        
                                         //! Constructs a polygon mode state instance.
                                         State( PolygonMode mode );
 
@@ -82,7 +92,7 @@ namespace Renderer
                                         State( Compare function, bool write );
 
                                         //! Constructs an alpha test render state instance.
-                                        State( Renderer::Compare function, f32 reference );
+                                        State( Compare function, f32 reference );
 
                                         //! Constructs a constant buffer binding state.
                                         State( ConstantBuffer_ id, u8 index );
@@ -117,17 +127,40 @@ namespace Renderer
         //! Returns a stored polygon mode.
         PolygonMode                     polygonMode() const;
         
+        //! Returns a rendering state compare function.
+        Compare                         function() const;
+        
+        //! Returns a depth fail stencil action.
+        StencilAction                   depthFail() const;
+        
+        //! Returns a stencil fail stencil action.
+        StencilAction                   stencilFail() const;
+        
+        //! Returns a depth and stencil pass action.
+        StencilAction                   depthStencilPass() const;
+        
         union
         {
             PersistentResourceId        resourceId;         //!< Resource identifier to be bound to a pipeline.
             u16                         compareFunction;    //!< A compare function value.
             u16                         cullFace;           //!< A face value.
             u16                         rasterization;      //!< A polygon rasterization mode.
+            u16                         mask;               //!< A color buffer write mask.
             struct
             {
                 s8                      factor;             //!< A polygon offset factor.
                 s8                      units;              //!< A polygon offset units.
             } polygonOffset;
+            struct
+            {
+                u8                      op;                 //!< A stencil compare function.
+                u8                      mask;               //!< A stencil mask value.
+            } stencilFunction;
+            struct
+            {
+                u8                      sfail;              //!< A stencil test fail operation.
+                u8                      dpfail;             //!< A depth test fail operation.
+            } stencilOp;
         };
 
         union
@@ -135,7 +168,8 @@ namespace Renderer
             u8                          blend;              //!< Source blend factor in high bits and destination blend factor in low bits.
             u8                          index;              //!< A constant buffer binding slot or sampler index.
             bool                        depthWrite;         //!< Enables or disables writing to a depth buffer.
-            u8                          alphaReference;     //!< An alpha test function reference value.
+            u8                          ref;                //!< An alpha test function or stencil op reference value.
+            u8                          dppass;             //!< Both depth and stencil test pass operation.
         } data;
 
         u8                              type;               //!< Render state type.
@@ -196,6 +230,21 @@ namespace Renderer
         
         //! Sets a polygon rasterization mode.
         void                            setPolygonMode(PolygonMode value);
+        
+        //! Sets a color buffer write mask.
+        void                            setColorMask(u8 value);
+        
+        //! Sets a stencil operation state.
+        void                            setStencilOp(StencilAction sfail, StencilAction dfail, StencilAction dppass);
+        
+        //! Sets a stencil mask value.
+        void                            setStencilMask(u8 value);
+    
+        //! Sets a stencil mask value.
+        void                            setStencilFunction(Compare function, u8 ref, u8 value = 0xFF);
+        
+        //! Disables a stencil buffer test.
+        void                            disableStencilTest( void );
 
         //! Sets an alpha test function.
         void                            setAlphaTest(Compare function, f32 reference);

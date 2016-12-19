@@ -170,6 +170,9 @@ namespace Renderer
         //! Converts a comparation function constant to an OpenGL value.
         static GLenum   convertCompareFunction(Compare value);
         
+        //! Converts a stencil operation constant to an OpenGL value.
+        static GLenum   convertStencilAction(StencilAction value);
+        
         //! Returns a texture internal format from a pixel format.
         static GLenum   textureInternalFormat(PixelFormat pixelFormat);
         

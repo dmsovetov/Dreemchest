@@ -72,8 +72,8 @@ State::State(Compare function, bool write)
 State::State(Compare function, f32 reference)
     : type(AlphaTest)
 {
-    compareFunction     = function;
-    data.alphaReference = static_cast<u8>( reference * 255 );
+    compareFunction = function;
+    data.ref        = static_cast<u8>(reference * 255);
 }
 
 // ** State::State
@@ -115,6 +115,24 @@ State::State(f32 factor, f32 units)
     polygonOffset.units  = units * 128.0f;
 }
 
+// ** State::State
+State::State(StencilAction sfail, StencilAction dpfail, StencilAction dppass)
+    : type(StencilOp)
+{
+    stencilOp.sfail  = sfail;
+    stencilOp.dpfail = dpfail;
+    data.dppass      = dppass;
+}
+
+// ** State::State
+State::State(Compare function, u8 ref, u8 mask)
+    : type(StencilFunc)
+{
+    stencilFunction.op   = function;
+    stencilFunction.mask = mask;
+    data.ref             = ref;
+}
+
 // ** State::sourceBlendFactor
 BlendFactor State::sourceBlendFactor() const
 {
@@ -130,7 +148,7 @@ BlendFactor State::destBlendFactor() const
 // ** State::alphaReference
 f32 State::alphaReference() const
 {
-    return data.alphaReference / 255.0f;
+    return data.ref / 255.0f;
 }
     
 // ** State::polygonOffsetFactor
@@ -149,6 +167,32 @@ f32 State::polygonOffsetUnits() const
 PolygonMode State::polygonMode() const
 {
     return static_cast<PolygonMode>(rasterization);
+}
+    
+// ** State::function
+Compare State::function() const
+{
+    return static_cast<Compare>(compareFunction);
+}
+    
+// ** State::depthFail
+StencilAction State::depthFail() const
+{
+    return static_cast<StencilAction>(stencilOp.dpfail);
+}
+
+
+// ** State::stencilFail
+StencilAction State::stencilFail() const
+{
+    return static_cast<StencilAction>(stencilOp.sfail);
+}
+
+
+// ** State::depthStencilPass
+StencilAction State::depthStencilPass() const
+{
+    return static_cast<StencilAction>(data.dppass);
 }
 
 // -------------------------------------------------------------------------- StateBlock -------------------------------------------------------------------------- //
@@ -252,6 +296,42 @@ void StateBlock::setPolygonMode(PolygonMode value)
     pushState(State(value), State::Rasterization);
 }
 
+// ** StateBlock::setStencilOp
+void StateBlock::setStencilOp(StencilAction sfail, StencilAction dfail, StencilAction dppass)
+{
+    pushState(State(sfail, dfail, dppass), State::StencilOp);
+}
+
+// ** StateBlock::setStencilMask
+void StateBlock::setStencilMask(u8 value)
+{
+    State state;
+    state.type = State::StencilMask;
+    state.stencilFunction.mask = value;
+    pushState(state, State::StencilMask);
+}
+
+// ** StateBlock::setStencilFunction
+void StateBlock::setStencilFunction(Compare function, u8 ref, u8 value)
+{
+    pushState(State(function, ref, value), State::StencilFunc);
+}
+    
+// ** StateBlock::disableStencilTest
+void StateBlock::disableStencilTest( void )
+{
+    setStencilFunction(CompareDisabled, 0, 0);
+}
+
+// ** StateBlock::setColorMask
+void StateBlock::setColorMask(u8 value)
+{
+    State state;
+    state.type = State::ColorMask;
+    state.mask = value;
+    pushState(state, State::ColorMask);
+}
+
 // ** StateBlock::setAlphaTest
 void StateBlock::setAlphaTest(Compare function, f32 reference)
 {
@@ -267,7 +347,7 @@ void StateBlock::setCullFace(TriangleFace face)
 // ** StateBlock::disableBlending
 void StateBlock::disableAlphaTest( void )
 {
-    setAlphaTest( Renderer::CompareDisabled, 0.0f );
+    setAlphaTest(CompareDisabled, 0.0f);
 }
 
 // ** StateBlock::disableBlending
@@ -280,7 +360,7 @@ void StateBlock::disableBlending( void )
 void StateBlock::pushState(const State& state, u32 stateBit)
 {
     NIMBLE_BREAK_IF( m_mask & BIT( stateBit ), "a state setting could not be overriden" );
-    NIMBLE_ABORT_IF( m_count + 1 >= MaxStates, "state block overflow" );
+    NIMBLE_ABORT_IF( m_count + 1 > MaxStates, "state block overflow" );
 
     // Push a state to a state block
     m_states[m_count] = state;

@@ -229,6 +229,10 @@ RenderingContext::RenderingContext(RenderViewPtr view)
     : m_view(view)
     , m_shaderLibrary(*this)
 {
+    LogDebug("renderingContext", "rendering state size is %d bytes\n", sizeof(State));
+    LogDebug("renderingContext", "rendering state block size is %d bytes\n", sizeof(StateBlock));
+    LogDebug("renderingContext", "opcode size is %d bytes\n", sizeof(CommandBuffer::OpCode));
+
     // Create a construction command buffer instance
     m_constructionCommandBuffer = DC_NEW ConstructionCommandBuffer;
     
@@ -252,6 +256,7 @@ RenderingContext::RenderingContext(RenderViewPtr view)
     m_defaultStateBlock.setCullFace(TriangleFaceBack);
     m_defaultStateBlock.setDepthState(LessEqual, true);
     m_defaultStateBlock.disableAlphaTest();
+    m_defaultStateBlock.setColorMask(ColorMaskAll);
     //m_defaultStateBlock.setPolygonMode(PolygonFill);
     //m_defaultStateBlock.bindProgram(0);
     //m_defaultStateBlock.bindVertexBuffer(0);

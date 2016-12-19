@@ -384,7 +384,7 @@ ShaderPtr RenderingContextHal::compileShaderPermutation(Program program, Pipelin
 // ** RenderingContextHal::switchAlphaTest
 void RenderingContextHal::switchAlphaTest( const RenderFrame& frame, const State& state )
 {
-    m_hal->setAlphaTest( static_cast<Renderer::Compare>( state.compareFunction ), state.data.alphaReference / 255.0f );
+    m_hal->setAlphaTest(state.function(), state.data.ref / 255.0f );
 }
 
 // ** RenderingContextHal::switchDepthState

@@ -335,14 +335,15 @@ namespace Renderer {
     };
 
     // ** enum StencilAction
-    enum StencilAction {
+    enum StencilAction
+    {
         StencilDecSaturate,
         StencilDecWrap,
         StencilIncSaturate,
         StencilIncWrap,
         StencilInvert,
         StencilKeep,
-        StencilSet,
+        StencilReplace,
         StencilZero,
     };
 
