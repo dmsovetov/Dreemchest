@@ -119,7 +119,7 @@ class Textures : public RenderingApplicationDelegate
         // Configure pass constant buffer
         {
             s_pass.projection = Matrix4::perspective(60.0f, m_window->aspectRatio(), 0.1f, 100.0f);
-            s_pass.view       = Matrix4::lookAt(Vec3(0.0f, 5.0f, -5.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
+            s_pass.view       = Matrix4::lookAt(Vec3(0.0f, 15.0f, -15.0f), Vec3(0.0f, 7.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
             UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Pass", Pass::s_layout);
             ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&s_pass, sizeof(s_pass), uniformLayout);
             m_renderStates.bindConstantBuffer(constantBuffer, 0);
