@@ -260,9 +260,9 @@ bool UniformBufferPreprocessor::preprocess(const RenderingContext& renderingCont
 
         // Generate a cbuffer definition
         String definition = generateBufferDefinition(renderingContext, type, name, atoi(slot.c_str()));
-
+        
         // And replace it.
-        source.replace(start, offset - start, definition);
+        source.replace(start, offset - start + 1, definition);
 
         // Search for a next one
         offset = source.find(s_cbuffer, start + definition.length());
