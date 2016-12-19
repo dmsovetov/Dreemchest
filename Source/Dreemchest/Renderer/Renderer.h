@@ -535,20 +535,16 @@ namespace Renderer {
     //! Mesh loading routines used for debugging purposes.
     namespace MeshLoader
     {
-        //! Vertex data type.
-        struct Vertex
-        {
-            Vec3        position;
-            Vec3        normal;
-            Vec2        uv;
-        };
-        
         //! A loaded mesh descriptor.
         struct Descriptor
         {
-            Array<u16>      indices;    //!< An index buffer.
-            Array<Vertex>   vertices;   //!< A vertex buffer.
-            u8              format;     //!< Mesh vertex format.
+            Array<u16>      indices;        //!< An index buffer.
+            Array<u8>       vertices;       //!< A vertex buffer.
+            u8              vertexFormat;   //!< Mesh vertex format.
+            PrimitiveType   primitives;     //!< A primitive type used by a mesh.
+            
+                            Descriptor()
+                                : primitives(TotalPrimitiveTypes) {}
             
             operator bool() const { return vertices.size() > 0; }
         };

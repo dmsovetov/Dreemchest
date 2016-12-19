@@ -163,11 +163,28 @@ Descriptor objFromFile(const String& fileName)
         return Descriptor();
     }
     
+    struct Face
+    {
+        s32      v[4];
+        s32      vn[4];
+        s32      vt[4];
+        
+        Face()
+        {
+            memset(v, 0, sizeof(v));
+            memset(vn, 0, sizeof(vn));
+            memset(vt, 0, sizeof(vt));
+        }
+    };
+    
     String line;
     Descriptor mesh;
     
-    Array<Vec3> vertices, normals;
-    Array<Vec2> uvs;
+    Array<Vec3>  vertices, normals;
+    Array<Vec2>  uvs;
+    Array<Face>  faces;
+    VertexFormat vertexFormat(0);
+    s32          verticesPerFace = 0;
 
     while (!in.eof())
     {
@@ -194,68 +211,108 @@ Descriptor objFromFile(const String& fileName)
                 break;
             case 'f':
             {
-                s32 vi[3], ti[3], ni[3];
+                // Detect a primitive type
+                if (verticesPerFace == 0)
+                {
+                    for (size_t i = 0, length = line.length(); i < length; i++)
+                    {
+                        if (line[i] == ' ')
+                        {
+                            verticesPerFace++;
+                            
+                            while (line[i] == ' ')
+                            {
+                                i++;
+                            }
+                        }
+                    }
+                }
                 
-                if (sscanf(line.c_str(), "f %i %i %i", &vi[0], &vi[1], &vi[2]) == 3)
+                Face f;
+
+                if (verticesPerFace == 3)
                 {
-                    mesh.format = VertexFormat::Position;
-                    
-                    for (s32 i = 0; i < 3; i++)
+                    if (sscanf(line.c_str(), "f %i %i %i", &f.v[0], &f.v[1], &f.v[2]) == 3)
                     {
-                        Vertex v;
-                        v.position = vertices[vi[i] - 1];
-                        mesh.vertices.push_back(v);
+                        vertexFormat = VertexFormat::Position;
+                    }
+                    else if(sscanf(line.c_str(), "f %i/%i %i/%i %i/%i", &f.v[0], &f.vt[0], &f.v[1], &f.vt[1], &f.v[2], &f.vt[2]) == 6)
+                    {
+                        vertexFormat = VertexFormat::Position | VertexFormat::TexCoord0;
+                    }
+                    else if(sscanf(line.c_str(), "f %i//%i %i//%i %i//%i", &f.v[0], &f.vn[0], &f.v[1], &f.vn[1], &f.v[2], &f.vn[2]) == 6)
+                    {
+                        vertexFormat = VertexFormat::Position | VertexFormat::Normal;
+                    }
+                    else if(sscanf(line.c_str(), "f %i/%i/%i %i/%i/%i %i/%i/%i", &f.v[0], &f.vt[0], &f.vn[0], &f.v[1], &f.vt[1], &f.vn[1], &f.v[2], &f.vt[2], &f.vn[2]) == 9)
+                    {
+                        vertexFormat = VertexFormat::Position | VertexFormat::Normal | VertexFormat::TexCoord0;
+                    }
+                    else
+                    {
+                        LogWarning("obj", "unhandled vertex format in line '%s'\n", line.c_str());
+                        continue;
                     }
                 }
-                else if(sscanf(line.c_str(), "f %i/%i %i/%i %i/%i", &vi[0], &ti[0], &vi[1], &ti[1], &vi[2], &ti[2]) == 6)
+                else if(verticesPerFace == 4)
                 {
-                    mesh.format = VertexFormat::Position | VertexFormat::TexCoord0;
-                    
-                    for (s32 i = 0; i < 3; i++)
+                    if (sscanf(line.c_str(), "f %i %i %i %i", &f.v[0], &f.v[1], &f.v[2], &f.v[3]) == 4)
                     {
-                        Vertex v;
-                        v.position = vertices[vi[i] - 1];
-                        v.uv = uvs[ti[i] - 1];
-                        mesh.vertices.push_back(v);
+                        vertexFormat = VertexFormat::Position;
                     }
-                }
-                else if(sscanf(line.c_str(), "f %i//%i %i//%i %i//%i", &vi[0], &ni[0], &vi[1], &ni[1], &vi[2], &ni[2]) == 6)
-                {
-                    mesh.format = VertexFormat::Position | VertexFormat::Normal;
-                    
-                    for (s32 i = 0; i < 3; i++)
+                    else if(sscanf(line.c_str(), "f %i/%i %i/%i %i/%i %i/%i", &f.v[0], &f.vt[0], &f.v[1], &f.vt[1], &f.v[2], &f.vt[2], &f.v[3], &f.vt[3]) == 8)
                     {
-                        Vertex v;
-                        v.position = vertices[vi[i] - 1];
-                        v.normal = normals[ni[i] - 1];
-                        mesh.vertices.push_back(v);
+                        vertexFormat = VertexFormat::Position | VertexFormat::TexCoord0;
                     }
-                }
-                else if(sscanf(line.c_str(), "f %i/%i/%i %i/%i/%i %i/%i/%i", &vi[0], &ti[0], &ni[0], &vi[1], &ti[1], &ni[1], &vi[2], &ti[2], &ni[2]) == 9)
-                {
-                    mesh.format = VertexFormat::Position | VertexFormat::Normal | VertexFormat::TexCoord0;
-                    
-                    for (s32 i = 0; i < 3; i++)
+                    else if(sscanf(line.c_str(), "f %i//%i %i//%i %i//%i %i//%i", &f.v[0], &f.vn[0], &f.v[1], &f.vn[1], &f.v[2], &f.vn[2], &f.v[3], &f.vn[3]) == 8)
                     {
-                        Vertex v;
-                        v.position = vertices[vi[i] - 1];
-                        v.uv = uvs[ti[i] - 1];
-                        v.normal = normals[ni[i] - 1];
-                        mesh.vertices.push_back(v);
+                        vertexFormat = VertexFormat::Position | VertexFormat::Normal;
+                    }
+                    else if(sscanf(line.c_str(), "f %i/%i/%i %i/%i/%i %i/%i/%i %i/%i/%i", &f.v[0], &f.vt[0], &f.vn[0], &f.v[1], &f.vt[1], &f.vn[1], &f.v[2], &f.vt[2], &f.vn[2], &f.v[3], &f.vt[3], &f.vn[3]) == 12)
+                    {
+                        vertexFormat = VertexFormat::Position | VertexFormat::Normal | VertexFormat::TexCoord0;
+                    }
+                    else
+                    {
+                        LogWarning("obj", "unhandled vertex format in line '%s'\n", line.c_str());
+                        continue;
                     }
                 }
                 else
                 {
-                    LogWarning("obj", "%s", "unhandled vertex format\n");
+                    LogWarning("obj", "unsupported face size '%d'\n", verticesPerFace);
                     return Descriptor();
                 }
+                faces.push_back(f);
             }
                 break;
         }
     }
     in.close();
+
+    // Build final mesh
+    mesh.vertexFormat = vertexFormat;
+    mesh.primitives   = verticesPerFace == 3 ? PrimTriangles : PrimQuads;
+    mesh.vertices.resize(faces.size() * verticesPerFace * vertexFormat.vertexSize());
     
-    mesh.format = VertexFormat::Position | VertexFormat::Normal | VertexFormat::TexCoord0;
+    for (size_t f = 0, n = faces.size(); f < n; f++)
+    {
+        const Face& face = faces[f];
+        
+        for (s32 v = 0; v < verticesPerFace; v++)
+        {
+            vertexFormat.setVertexAttribute(VertexFormat::Position, vertices[face.v[v] - 1], &mesh.vertices[0], f * verticesPerFace + v);
+            
+            if (vertexFormat & VertexFormat::Normal)
+            {
+                vertexFormat.setVertexAttribute(VertexFormat::Normal, normals[face.vn[v] - 1], &mesh.vertices[0], f * verticesPerFace + v);
+            }
+            if (vertexFormat & VertexFormat::TexCoord0)
+            {
+                vertexFormat.setVertexAttribute(VertexFormat::TexCoord0, uvs[face.vt[v] - 1], &mesh.vertices[0], f * verticesPerFace + v);
+            }
+        }
+    }
 
     return mesh;
 }
