@@ -34,7 +34,9 @@ namespace Platform {
 extern IWindow* createWindow( u32 width, u32 height );
 
 // ** Window::Window
-Window::Window( IWindow* impl ) : m_impl( impl )
+Window::Window( IWindow* impl )
+    : m_impl( impl )
+    , m_lastUpdateTime(-1)
 {
     if( m_impl ) m_impl->setOwner( this );
     else         LogWarning( "window", "%s", "not available on current platform\n" );
@@ -136,7 +138,16 @@ void* Window::handle( void ) const
 // ** Window::notifyUpdate
 void Window::notifyUpdate( void )
 {
-    notify<Update>( Update( this ) );
+    s32 dt   = 0;
+    s32 time = currentTime();
+    
+    if (m_lastUpdateTime != -1)
+    {
+        dt = time - m_lastUpdateTime;
+    }
+    m_lastUpdateTime = time;
+    
+    notify<Update>(Update( this, dt));
 }
 
 // ** Window::notifyMouseUp

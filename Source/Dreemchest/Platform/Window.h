@@ -131,8 +131,9 @@ namespace Platform {
         //! This event is emitted each frame.
         struct Update : public Event {
                         //! Constructs Update instance.
-                        Update( WindowWPtr window )
-                            : Event( window ) {}
+                        Update(WindowWPtr window, s32 dt)
+                            : Event( window ), dt(dt) {}
+            s32         dt; //!< Time since last update in milliseconds.
         };
 
         //! Base class for all touch events.
@@ -194,8 +195,8 @@ namespace Platform {
 
     private:
 
-        //! Platform-spefific implementation.
-        IWindow*                m_impl;
+        IWindow*                m_impl;             //!< Platform-spefific implementation.
+        s32                     m_lastUpdateTime;   //!< A timestamp of a last frame.
     };
 
 } // namespace Platform
