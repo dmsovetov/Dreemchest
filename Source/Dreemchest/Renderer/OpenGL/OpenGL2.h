@@ -139,6 +139,21 @@ namespace Renderer
             //! Binds a shader program.
             static void     use(GLuint program);
         };
+        
+        //! An internal class that contains all texture related functions.
+        class Texture
+        {
+        public:
+            
+            //! Creates a texture object with a specified type and returns it's identifier.
+            static GLuint   create(GLenum target, const void* data, u16 width, u16 height, PixelFormat pixelFormat);
+            
+            //! Binds a texture object to a pipeline.
+            static void     bind(GLenum target, GLuint id, GLuint sampler);
+            
+            //! Deletes a texture object by an id.
+            static void     destroy(GLuint id);
+        };
 
         //! Initializes an OpenGL 2 wrapper.
         static bool     initialize();
@@ -154,6 +169,18 @@ namespace Renderer
         
         //! Converts a comparation function constant to an OpenGL value.
         static GLenum   convertCompareFunction(Compare value);
+        
+        //! Returns a texture internal format from a pixel format.
+        static GLenum   textureInternalFormat(PixelFormat pixelFormat);
+        
+        //! Returns a texture type from a pixel format.
+        static GLenum   textureType(PixelFormat pixelFormat);
+        
+        //! Returns a texture format from a pixel format.
+        static GLenum   textureFormat(PixelFormat pixelFormat);
+        
+        //! Returns a texture image align from a pixel format.
+        static GLenum   textureAlign(PixelFormat pixelFormat);
         
         //! Renders an indexed batch of primitives.
         static void     drawElements(PrimitiveType primType, GLenum type, u32 firstIndex, u32 count);

@@ -39,7 +39,7 @@ namespace Renderer
 
 // --------------------------------------------------------------------------------------------------------------------------------------- //
 
-#ifdef DC_PLATFORM_WINDOWS
+#if defined(DC_PLATFORM_WINDOWS)
 
 // GL_ARB_multitexture
 static PFNGLACTIVETEXTUREARBPROC        glActiveTexture         = NULL;
@@ -77,8 +77,11 @@ static PFNGLUNIFORM2FVARBPROC           glUniform2fv            = NULL;
 static PFNGLUNIFORM3FVARBPROC           glUniform3fv            = NULL;
 static PFNGLUNIFORM4FVARBPROC           glUniform4fv            = NULL;
 static PFNGLUNIFORMMATRIX4FVARBPROC     glUniformMatrix4fv      = NULL;
-
-#endif  //  #ifdef DC_PLATFORM_WINDOWS
+#elif defined(DC_PLATFORM_MACOS)
+    #define GL_RGBA16F  GL_RGBA16F_ARB
+    #define GL_RGBA32F  GL_RGBA32F_ARB
+    #define GL_RGB32F   GL_RGB32F_ARB
+#endif  //  #if defined(DC_PLATFORM_WINDOWS)
     
 // ----------------------------------------------------------- OpenGL2::Buffer ----------------------------------------------------------- //
 
@@ -271,6 +274,46 @@ void OpenGL2::Program::uniform4f(GLint location, const f32 value[4])
 void OpenGL2::Program::use(GLuint program)
 {
     glUseProgram(program);
+}
+    
+// ----------------------------------------------------------- OpenGL2::Texture ---------------------------------------------------------- //
+    
+// ** OpenGL2::Texture::create
+GLuint OpenGL2::Texture::create(GLenum target, const void* data, u16 width, u16 height, PixelFormat pixelFormat)
+{
+    DC_CHECK_GL;
+    GLuint id;
+    GLenum internalFormat = textureInternalFormat(pixelFormat);
+    GLenum format         = textureFormat(pixelFormat);
+    GLenum type           = textureType(pixelFormat);
+    GLint  align          = textureAlign(pixelFormat);
+    
+    glGenTextures(1, &id);
+    glBindTexture(target, id);
+    glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    //glCompressedTexImage2D( GL_TEXTURE_2D, level, internalFormat, width, height, 0, bytesPerMip( width, height ), data );
+    glPixelStorei(GL_UNPACK_ALIGNMENT, align);
+    glTexImage2D(target, 0, internalFormat, width, height, 0, format, type, data);
+    glBindTexture(target, 0);
+
+    return id;
+}
+
+// ** OpenGL2::Texture::bind
+void OpenGL2::Texture::bind(GLenum target, GLuint id, GLuint sampler)
+{
+    DC_CHECK_GL;
+    glActiveTexture(GL_TEXTURE0 + sampler);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(target, id);
+}
+
+// ** OpenGL2::Texture::destroy
+void OpenGL2::Texture::destroy(GLuint id)
+{
+    DC_CHECK_GL;
+    glDeleteTextures(1, &id);
 }
 
 // --------------------------------------------------------------- OpenGL2 --------------------------------------------------------------- //
@@ -513,6 +556,101 @@ GLenum OpenGL2::convertCompareFunction(Compare value)
     }
 
     return 0;
+}
+
+// ** OpenGL2::textureInternalFormat
+GLenum OpenGL2::textureInternalFormat(PixelFormat pixelFormat)
+{
+    switch (pixelFormat)
+    {
+        case PixelLuminance8:   return GL_LUMINANCE8;
+        case PixelRgb8:         return GL_RGB;  // ** OpenGL ES doesnt accept GL_RGB8
+        case PixelRgba8:        return GL_RGBA; // ** OpenGL ES doesnt accept GL_RGBA8
+    #if !defined( DC_PLATFORM_IOS ) && !defined( DC_PLATFORM_ANDROID ) && !defined( DC_PLATFORM_HTML5 )
+        case PixelDxtc1:        return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+        case PixelDxtc3:        return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+        case PixelDxtc5:        return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+    #endif
+    #if defined( DC_PLATFORM_IOS ) || defined( DC_PLATFORM_ANDROID )
+        case PixelPvrtc2:       return GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
+        case PixelPvrtc4:       return GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
+    #endif
+    #if !defined( DC_PLATFORM_ANDROID ) && !defined( DC_PLATFORM_HTML5 )
+        case PixelR16F:         return GL_R16F;
+        case PixelR32F:         return GL_R32F;
+        case PixelRgba16F:      return GL_RGBA16F;
+        case PixelRgba32F:      return GL_RGBA32F;
+        case PixelRgb32F:       return GL_RGB32F;
+    #endif
+        case PixelD24X8:        return GL_DEPTH_COMPONENT24;
+        default:                NIMBLE_BREAK_IF( "Image format not implemented" );
+    }
+    
+    return 0;
+}
+
+// ** OpenGL2::textureType
+GLenum OpenGL2::textureType(PixelFormat pixelFormat)
+{
+    switch (pixelFormat)
+    {
+        case PixelLuminance8:   return GL_UNSIGNED_BYTE;
+        case PixelRgb8:         return GL_UNSIGNED_BYTE;
+        case PixelRgba8:        return GL_UNSIGNED_BYTE;
+        case PixelDxtc1:        return 0;
+        case PixelDxtc3:        return 0;
+        case PixelDxtc5:        return 0;
+        case PixelPvrtc2:       return 0;
+        case PixelPvrtc4:       return 0;
+        case PixelR16F:
+        case PixelRgba16F:      return GL_HALF_FLOAT;
+        case PixelR32F:
+        case PixelRgb32F:
+        case PixelRgba32F:      return GL_FLOAT;
+        case PixelD24S8:
+        case PixelD24X8:        return GL_FLOAT;
+        default:                NIMBLE_BREAK_IF( "Image format not implemented" );
+    }
+    
+    return 0;
+}
+
+// ** OpenGL2::textureFormat
+GLenum OpenGL2::textureFormat(PixelFormat pixelFormat)
+{
+    switch (pixelFormat)
+    {
+        case PixelLuminance8:   return GL_LUMINANCE;
+        case PixelRgb8:         return GL_RGB;
+        case PixelRgba8:        return GL_RGBA;
+        case PixelDxtc1:        return GL_RGB;
+        case PixelDxtc3:        return GL_RGBA;
+        case PixelDxtc5:        return GL_RGBA;
+        case PixelPvrtc2:       return GL_RGBA;
+        case PixelPvrtc4:       return GL_RGBA;
+        case PixelRgb32F:       return GL_RGB;
+        case PixelRgba16F:      return GL_RGBA;
+        case PixelRgba32F:      return GL_RGBA;
+        case PixelR32F:
+        case PixelR16F:         return GL_RED;
+        case PixelD24S8:
+        case PixelD24X8:        return GL_DEPTH_COMPONENT;
+        default:                NIMBLE_BREAK_IF( "Image format not implemented" );
+    }
+    
+    return 0;
+}
+    
+// ** OpenGL2::textureAlign
+GLenum OpenGL2::textureAlign(PixelFormat pixelFormat)
+{
+    switch (pixelFormat)
+    {
+        case PixelRgb8: return 1;
+        default:        return 4;
+    }
+    
+    return 4;
 }
 
 } // namespace Renderer

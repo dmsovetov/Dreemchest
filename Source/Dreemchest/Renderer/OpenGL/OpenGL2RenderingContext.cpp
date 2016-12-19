@@ -140,7 +140,8 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 break;
                 
             case CommandBuffer::OpCode::CreateTexture:
-                NIMBLE_NOT_IMPLEMENTED
+                id = OpenGL2::Texture::create(GL_TEXTURE_2D, opCode.createTexture.data, opCode.createTexture.width, opCode.createTexture.height, opCode.createTexture.format);
+                m_textures.emplace(opCode.createTexture.id, id);
                 break;
                 
             case CommandBuffer::OpCode::CreateIndexBuffer:
@@ -325,7 +326,8 @@ OpenGL2RenderingContext::RequestedState OpenGL2RenderingContext::applyStates(con
                 break;
                 
             case State::Texture:
-                NIMBLE_NOT_IMPLEMENTED
+                requestedState.texture[state.data.index].set(state.resourceId);
+                m_pipeline.activateSampler(state.data.index);
                 break;
                 
             default:
@@ -355,6 +357,17 @@ void OpenGL2RenderingContext::compilePipelineState(RequestedState requested)
     if (requested.vertexBuffer != m_activeState.vertexBuffer)
     {
         OpenGL2::Buffer::bind(GL_ARRAY_BUFFER, m_vertexBuffers[requested.vertexBuffer]);
+    }
+    
+    // Bind texture samplers
+    for (s32 i = 0; i < State::MaxTextureSamplers; i++)
+    {
+        if (requested.texture[i] == m_activeState.texture[i])
+        {
+            continue;
+        }
+        
+        OpenGL2::Texture::bind(GL_TEXTURE_2D, m_textures[requested.texture[i]], i);
     }
     
     // Switch the input layout

@@ -51,6 +51,7 @@ namespace Renderer
             FeatureLayout           featureLayout;                              //!< A feature layout that should be set.
             Program                 program;                                    //!< A shader program that should be set.
             ConstantBuffer_         constantBuffer[State::MaxConstantBuffers];  //!< An array of bound constant buffers.
+            Texture_                texture[State::MaxTextureSamplers];         //!< An array of bound textures.
             PipelineFeatures        features;                                   //!< A bitmask of user-defined pipeline features.
             
                                     RequestedState() : features(0) {}
