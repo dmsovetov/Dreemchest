@@ -46,7 +46,8 @@ static String s_vertexShader =
     ;
 
 static String s_fragmentShader =
-    "cbuffer Material material : 0;                             \n"
+    "cbuffer Material material : 0;                             \n" // This line declares a constant buffer of type 'Material' that is bound to unit 0
+    "                                                           \n"
     "void main()                                                \n"
     "{                                                          \n"
     "   gl_FragColor = material.color * material.brightness;    \n"
@@ -90,8 +91,11 @@ class ConstantBuffers : public RenderingApplicationDelegate
         s_material.color = Vec4(1.0f, 0.5f, 0.25f, 1.0f);
         s_material.brightness = 0.75f;
         
-        // Create a constant buffer
+        // Construct the material uniform layout from an array of UniformElement items
+        // and register it with an identifier 'Material'.
         UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Material", s_bufferLayout);
+        
+        // Create the constant buffer.
         ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&s_material, sizeof(s_material), uniformLayout);
         
         m_renderStates.bindVertexBuffer(vertexBuffer);

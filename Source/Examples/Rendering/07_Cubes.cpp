@@ -74,7 +74,7 @@ static String s_vertexShader =
     "void main()                                    \n"
     "{                                              \n"
     "    v_color     = gl_Color;                    \n"
-    "    gl_Position = pass.projection * pass.view * instance.transform * gl_Vertex;                   \n"
+    "    gl_Position = pass.projection * pass.view * instance.transform * gl_Vertex;    \n"
     "}                                              \n"
     ;
 
