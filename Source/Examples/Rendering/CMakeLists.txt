@@ -22,6 +22,9 @@ target_link_libraries(07_Cubes Dreemchest)
 add_executable(08_Textures WIN32 MACOSX_BUNDLE 08_Textures.cpp)
 target_link_libraries(08_Textures Dreemchest)
 
+add_executable(09_Meshes WIN32 MACOSX_BUNDLE 09_Meshes.cpp)
+target_link_libraries(09_Meshes Dreemchest)
+
 # Add solution folders
 set_property(TARGET 01_RendererInitialization PROPERTY FOLDER "Examples")
 set_property(TARGET 02_FirstTriangle PROPERTY FOLDER "Examples")
@@ -31,3 +34,4 @@ set_property(TARGET 05_ConstantBuffers PROPERTY FOLDER "Examples")
 set_property(TARGET 06_FirstUbershader PROPERTY FOLDER "Examples")
 set_property(TARGET 07_Cubes PROPERTY FOLDER "Examples")
 set_property(TARGET 08_Textures PROPERTY FOLDER "Examples")
+set_property(TARGET 09_Meshes PROPERTY FOLDER "Examples")
