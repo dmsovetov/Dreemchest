@@ -330,6 +330,20 @@ OpenGL2RenderingContext::RequestedState OpenGL2RenderingContext::applyStates(con
                 m_pipeline.activateSampler(state.data.index);
                 break;
                 
+            case State::Rasterization:
+                switch (state.rasterization)
+                {
+                    case PolygonFill:
+                        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                        break;
+                    case PolygonWire:
+                        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                        break;
+                    default:
+                        NIMBLE_NOT_IMPLEMENTED
+                }
+                break;
+                
             default:
                 NIMBLE_NOT_IMPLEMENTED
         }

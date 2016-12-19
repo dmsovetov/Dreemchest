@@ -54,6 +54,13 @@ State::State(TriangleFace face)
 }
 
 // ** State::State
+State::State(PolygonMode mode)
+    : type(Rasterization)
+{
+    rasterization = mode;
+}
+
+// ** State::State
 State::State(Compare function, bool write)
     : type(DepthState)
 {
@@ -136,6 +143,12 @@ f32 State::polygonOffsetFactor() const
 f32 State::polygonOffsetUnits() const
 {
     return polygonOffset.units / 128.0f;
+}
+    
+// ** State::polygonMode
+PolygonMode State::polygonMode() const
+{
+    return static_cast<PolygonMode>(rasterization);
 }
 
 // -------------------------------------------------------------------------- StateBlock -------------------------------------------------------------------------- //
@@ -231,6 +244,12 @@ void StateBlock::setPolygonOffset(f32 factor, f32 units)
 void StateBlock::disablePolygonOffset( void )
 {
     setPolygonOffset( 0.0f, 0.0f );
+}
+    
+// ** StateBlock::setPolygonMode
+void StateBlock::setPolygonMode(PolygonMode value)
+{
+    pushState(State(value), State::Rasterization);
 }
 
 // ** StateBlock::setAlphaTest

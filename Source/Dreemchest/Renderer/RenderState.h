@@ -62,7 +62,8 @@ namespace Renderer
             , AlphaTest         = DepthState        + 1                     //!< Sets an alpha test function and a reference value.
             , CullFace          = AlphaTest         + 1                     //!< Sets a cull face mode.
             , Texture           = CullFace          + 1                     //!< Binds a texture to a sampler #(Type.Texture + index).
-            , TotalStates       = Texture           + MaxTextureSamplers    //!< A total number of available render states.
+            , Rasterization     = Texture           + 1                     //!< Sets a polygon rasterization mode.
+            , TotalStates       = Rasterization     + MaxTextureSamplers    //!< A total number of available render states.
         };
 
                                         //! Constructs an empty State instance.
@@ -73,6 +74,9 @@ namespace Renderer
 
                                         //! Constructs a cull face render state instance.
                                         State( TriangleFace face );
+        
+                                        //! Constructs a polygon mode state instance.
+                                        State( PolygonMode mode );
 
                                         //! Constructs a depth render state instance.
                                         State( Compare function, bool write );
@@ -110,11 +114,15 @@ namespace Renderer
         //! Returns a polygon offset units value.
         f32                             polygonOffsetUnits() const;
         
+        //! Returns a stored polygon mode.
+        PolygonMode                     polygonMode() const;
+        
         union
         {
             PersistentResourceId        resourceId;         //!< Resource identifier to be bound to a pipeline.
             u16                         compareFunction;    //!< A compare function value.
             u16                         cullFace;           //!< A face value.
+            u16                         rasterization;      //!< A polygon rasterization mode.
             struct
             {
                 s8                      factor;             //!< A polygon offset factor.
@@ -185,6 +193,9 @@ namespace Renderer
 
         //! Disables a polygon offset.
         void                            disablePolygonOffset( void );
+        
+        //! Sets a polygon rasterization mode.
+        void                            setPolygonMode(PolygonMode value);
 
         //! Sets an alpha test function.
         void                            setAlphaTest(Compare function, f32 reference);
