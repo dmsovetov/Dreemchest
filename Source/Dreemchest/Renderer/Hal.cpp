@@ -568,16 +568,16 @@ u32 Texture::bytesPerBlock( void ) const
 u32 Texture::bytesPerPixel( void ) const
 {
     switch( m_pixelFormat ) {
-    case PixelAlpha8:   return 1;
-    case PixelRgb8:     return 3;
-    case PixelRgba8:    return 4;
-    case PixelR16F:     return 2;
-    case PixelRg16F:    return 4;
-    case PixelRgba16F:  return 8;
-    case PixelR32F:     return 4;
-    case PixelRg32F:    return 8;
-    case PixelRgba32F:  return 16;
-    default:            NIMBLE_BREAK_IF( "Image format is not implemented" );
+    case PixelLuminance8:   return 1;
+    case PixelRgb8:         return 3;
+    case PixelRgba8:        return 4;
+    case PixelR16F:         return 2;
+    case PixelRg16F:        return 4;
+    case PixelRgba16F:      return 8;
+    case PixelR32F:         return 4;
+    case PixelRg32F:        return 8;
+    case PixelRgba32F:      return 16;
+    default:                NIMBLE_BREAK_IF( "Image format is not implemented" );
     }
     
     return 0;

@@ -859,27 +859,27 @@ GLuint OpenGLHal::textureID( const Texture *texture )
 GLenum OpenGLHal::internalImageFormat( u32 pixelFormat )
 {
     switch( pixelFormat ) {
-    case PixelAlpha8:   return GL_ALPHA;
-    case PixelRgb8:     return GL_RGB;  // ** OpenGL ES doesnt accept GL_RGB8
-    case PixelRgba8:    return GL_RGBA; // ** OpenGL ES doesnt accept GL_RGBA8
+    case PixelLuminance8:   return GL_ALPHA;
+    case PixelRgb8:         return GL_RGB;  // ** OpenGL ES doesnt accept GL_RGB8
+    case PixelRgba8:        return GL_RGBA; // ** OpenGL ES doesnt accept GL_RGBA8
 #if !defined( DC_PLATFORM_IOS ) && !defined( DC_PLATFORM_ANDROID ) && !defined( DC_PLATFORM_HTML5 )
-    case PixelDxtc1:    return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
-    case PixelDxtc3:    return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
-    case PixelDxtc5:    return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+    case PixelDxtc1:        return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+    case PixelDxtc3:        return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+    case PixelDxtc5:        return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
 #endif
 #if defined( DC_PLATFORM_IOS ) || defined( DC_PLATFORM_ANDROID )
-    case PixelPvrtc2:   return GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
-    case PixelPvrtc4:   return GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
+    case PixelPvrtc2:       return GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
+    case PixelPvrtc4:       return GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
 #endif
 #if !defined( DC_PLATFORM_ANDROID ) && !defined( DC_PLATFORM_HTML5 )
-    case PixelR16F:     return GL_R16F;
-    case PixelR32F:     return GL_R32F;
-    case PixelRgba16F:  return GL_RGBA16F;
-    case PixelRgba32F:  return GL_RGBA32F;
-    case PixelRgb32F:   return GL_RGB32F;
+    case PixelR16F:         return GL_R16F;
+    case PixelR32F:         return GL_R32F;
+    case PixelRgba16F:      return GL_RGBA16F;
+    case PixelRgba32F:      return GL_RGBA32F;
+    case PixelRgb32F:       return GL_RGB32F;
 #endif
-    case PixelD24X8:    return GL_DEPTH_COMPONENT24;
-    default:            NIMBLE_BREAK_IF( "Image format not implemented" );
+    case PixelD24X8:        return GL_DEPTH_COMPONENT24;
+    default:                NIMBLE_BREAK_IF( "Image format not implemented" );
     }
 
     return 0;
@@ -889,22 +889,22 @@ GLenum OpenGLHal::internalImageFormat( u32 pixelFormat )
 GLenum OpenGLHal::imageFormat( u32 pixelFormat )
 {
     switch( pixelFormat ) {
-    case PixelAlpha8:   return GL_ALPHA;
-    case PixelRgb8:     return GL_RGB;
-    case PixelRgba8:    return GL_RGBA;
-    case PixelDxtc1:    return GL_RGB;
-    case PixelDxtc3:    return GL_RGBA;
-    case PixelDxtc5:    return GL_RGBA;
-    case PixelPvrtc2:   return GL_RGBA;
-    case PixelPvrtc4:   return GL_RGBA;
-    case PixelRgb32F:   return GL_RGB;
-    case PixelRgba16F:  return GL_RGBA;
-    case PixelRgba32F:  return GL_RGBA;
+    case PixelLuminance8:   return GL_ALPHA;
+    case PixelRgb8:         return GL_RGB;
+    case PixelRgba8:        return GL_RGBA;
+    case PixelDxtc1:        return GL_RGB;
+    case PixelDxtc3:        return GL_RGBA;
+    case PixelDxtc5:        return GL_RGBA;
+    case PixelPvrtc2:       return GL_RGBA;
+    case PixelPvrtc4:       return GL_RGBA;
+    case PixelRgb32F:       return GL_RGB;
+    case PixelRgba16F:      return GL_RGBA;
+    case PixelRgba32F:      return GL_RGBA;
     case PixelR32F:
-    case PixelR16F:     return GL_RED;
+    case PixelR16F:         return GL_RED;
     case PixelD24S8:
-    case PixelD24X8:    return GL_DEPTH_COMPONENT;
-    default:            NIMBLE_BREAK_IF( "Image format not implemented" );
+    case PixelD24X8:        return GL_DEPTH_COMPONENT;
+    default:                NIMBLE_BREAK_IF( "Image format not implemented" );
     }
     
     return 0;
@@ -914,22 +914,22 @@ GLenum OpenGLHal::imageFormat( u32 pixelFormat )
 GLenum OpenGLHal::imageDataType( u32 pixelFormat )
 {
     switch( pixelFormat ) {
-    case PixelAlpha8:   return GL_UNSIGNED_BYTE;
-    case PixelRgb8:     return GL_UNSIGNED_BYTE;
-    case PixelRgba8:    return GL_UNSIGNED_BYTE;
-    case PixelDxtc1:    return 0;
-    case PixelDxtc3:    return 0;
-    case PixelDxtc5:    return 0;
-    case PixelPvrtc2:   return 0;
-    case PixelPvrtc4:   return 0;
+    case PixelLuminance8:   return GL_UNSIGNED_BYTE;
+    case PixelRgb8:         return GL_UNSIGNED_BYTE;
+    case PixelRgba8:        return GL_UNSIGNED_BYTE;
+    case PixelDxtc1:        return 0;
+    case PixelDxtc3:        return 0;
+    case PixelDxtc5:        return 0;
+    case PixelPvrtc2:       return 0;
+    case PixelPvrtc4:       return 0;
     case PixelR16F:
-    case PixelRgba16F:  return GL_HALF_FLOAT;
+    case PixelRgba16F:      return GL_HALF_FLOAT;
     case PixelR32F:
     case PixelRgb32F:
-    case PixelRgba32F:  return GL_FLOAT;
+    case PixelRgba32F:      return GL_FLOAT;
     case PixelD24S8:
-    case PixelD24X8:    return GL_FLOAT;
-    default:            NIMBLE_BREAK_IF( "Image format not implemented" );
+    case PixelD24X8:        return GL_FLOAT;
+    default:                NIMBLE_BREAK_IF( "Image format not implemented" );
     }
     
     return 0;

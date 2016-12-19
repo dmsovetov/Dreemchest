@@ -438,10 +438,11 @@ namespace Renderer {
     };
 
     //! Supported pixel format for textures and render targets.
-    enum PixelFormat {
-        PixelAlpha8,    //!< 8-bit alpha.
-        PixelRgb8,      //!< 8-bit RGB color.
-        PixelRgba8,     //!< 8-bit RGBA color.
+    enum PixelFormat
+    {
+        PixelLuminance8,    //!< 8-bit luminance.
+        PixelRgb8,          //!< 8-bit RGB color.
+        PixelRgba8,         //!< 8-bit RGBA color.
 
         // ** Compressed
         // ** TODO: add ETC/ATITC/S3TC formats
