@@ -510,6 +510,26 @@ namespace Renderer {
         
         RenderingContextPtr     m_renderingContext; //!< A rendering context instance.
     };
+    
+    //! Image loading routines used mostly for debugging purposes.
+    namespace ImageLoader
+    {
+        //! A loaded image descriptor.
+        struct Descriptor
+        {
+            u16         width;      //!< An image width.
+            u16         height;     //!< An image height.
+            PixelFormat format;     //!< An image pixel format.
+            Array<u8>   pixels;     //!< Loaded image pixels.
+            
+                        Descriptor( void )
+                            : width(0), height(0) {}
+            operator bool() const { return pixels.size() > 0; }
+        };
+        
+        //! Loads a TGA image from a file.
+        Descriptor tgaFromFile(const String& fileName);
+    } // namespace Image
 
 } // namespace Renderer
 
