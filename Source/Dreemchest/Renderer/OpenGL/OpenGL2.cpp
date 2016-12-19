@@ -364,6 +364,8 @@ void OpenGL2::clear(const GLclampf* color, u8 mask, GLclampd depth, GLint stenci
     DC_CHECK_GL;
     
     GLbitfield flags = 0;
+    GLboolean  activeDepthMask;
+    bool       shouldResetDepthMask = false;
     
     if(mask & ClearColor)
     {
@@ -372,6 +374,14 @@ void OpenGL2::clear(const GLclampf* color, u8 mask, GLclampd depth, GLint stenci
     if(mask & ClearDepth)
     {
         flags |= GL_DEPTH_BUFFER_BIT;
+        glGetBooleanv(GL_DEPTH_WRITEMASK, &activeDepthMask);
+        
+        // This forces OpenGL to clear a depth buffer even if a depth mask is FALSE
+        if (activeDepthMask != GL_TRUE)
+        {
+            glDepthMask(GL_TRUE);
+            shouldResetDepthMask = true;
+        }
     }
     if(mask & ClearStencil)
     {
@@ -382,6 +392,11 @@ void OpenGL2::clear(const GLclampf* color, u8 mask, GLclampd depth, GLint stenci
     glClearDepth(depth);
     glClearStencil(stencil);
     glClear(flags);
+    
+    if (shouldResetDepthMask)
+    {
+        glDepthMask(activeDepthMask);
+    }
 }
     
 // ** OpenGL2::enableInputLayout
