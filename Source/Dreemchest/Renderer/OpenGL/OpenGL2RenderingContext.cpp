@@ -297,6 +297,7 @@ OpenGL2RenderingContext::RequestedState OpenGL2RenderingContext::applyStates(con
                 
             case State::DepthState:
                 glDepthMask(state.data.depthWrite ? GL_TRUE : GL_FALSE);
+                glEnable(GL_DEPTH_TEST);
                 glDepthFunc(OpenGL2::convertCompareFunction(static_cast<Compare>(state.compareFunction)));
                 break;
                 
@@ -419,7 +420,7 @@ void OpenGL2RenderingContext::compilePipelineState(RequestedState requested)
         // Accept these changes
         m_pipeline.acceptChanges();
     }
-    
+
     // Update all uniforms
     updateUniforms(requested, features, program);
     
