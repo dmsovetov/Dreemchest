@@ -285,7 +285,7 @@ namespace Renderer {
         virtual void                setRasterizerState( RasterizerState* state );
 
         // ?? Fixed pipeline
-        virtual void                setTransform( Transform transform, const float* matrix );
+        //virtual void                setTransform( Transform transform, const float* matrix );
         virtual void                setColorModulation( f32 r, f32 g, f32 b, f32 a );
         virtual void                setFog( FogMode mode, f32 density = 1.0f, const Rgba& color = Rgba( 0.0f, 0.0f, 0.0f, 1.0f ), f32 linearStart = 0.0f, f32 linearEnd = 1.0f );
 

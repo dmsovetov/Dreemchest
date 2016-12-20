@@ -683,7 +683,7 @@ void OpenGLHal::setStencilValue( u32 value, u32 mask )
 }
 
 // ** OpenGLHal::setTransform
-void OpenGLHal::setTransform( Transform transform, const float* matrix )
+/*void OpenGLHal::setTransform( Transform transform, const float* matrix )
 {
     DC_CHECK_GL;
 
@@ -705,7 +705,7 @@ void OpenGLHal::setTransform( Transform transform, const float* matrix )
     glLoadMatrixf( matrix );
 
 //    glLoadMatrixf( transform == TransformProjection ? T.m : (m_modelTransform * m_viewTransform).m );
-}
+}*/
 
 // ** OpenGLHal::setColorModulation
 void OpenGLHal::setColorModulation( f32 r, f32 g, f32 b, f32 a )

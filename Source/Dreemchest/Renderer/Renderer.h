@@ -430,13 +430,13 @@ namespace Renderer {
     };
 
     // ** enum Transform
-    enum Transform {
+    /*enum Transform {
         TransformModel,
         TransformView,
         TransformProjection,
 
         TransformTotal
-    };
+    };*/
 
     //! Supported pixel format for textures and render targets.
     enum PixelFormat
