@@ -75,6 +75,12 @@ namespace Renderer
         //! Update uniforms from active constant buffers.
         void                        updateUniforms(const RequestedState& state, PipelineFeatures features, Program program);
         
+        //! Acquires an intermediate render target.
+        TransientRenderTarget       acquireRenderTarget(u16 width, u16 height, PixelFormat format);
+        
+        //! Releases an intermediate render target.
+        void                        releaseRenderTarget(TransientRenderTarget id);
+        
     private:
         
         //! A software-emulated constant buffer

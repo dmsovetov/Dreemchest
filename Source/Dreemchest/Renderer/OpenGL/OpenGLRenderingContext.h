@@ -68,23 +68,28 @@ namespace Renderer
         struct RenderTarget
         {
             GLuint              id;                                         //!< A framebuffer object id.
-            GLuint              textures[RenderTargetAttachment::Total];    //!< An array of attached textures.
+            GLuint              depth;                                      //!< An attached depth buffer.
+            Texture_            textures[RenderTargetAttachment::Total];    //!< An array of attached textures.
+            u16                 width;                                      //!< Render target width.
+            u16                 height;                                     //!< Render target height.
+            PixelFormat         pixelFormat;                                //!< Render target pixel format.
+            
                                 RenderTarget()
-                                    : id(0)
+                                    : id(0), width(0), height(0)
                                 {
-                                    memset(textures, 0, sizeof(textures));
                                 }
         };
     
         //! A container type to store program permutations.
         typedef HashMap<PipelineFeatures, Permutation> ProgramPermutations;
         
-        FixedArray<GLuint>                      m_vertexBuffers;    //!< Allocated vertex buffers.
-        FixedArray<GLuint>                      m_indexBuffers;     //!< Allocated index buffers.
-        FixedArray<GLuint>                      m_constantBuffers;  //!< Allocated constant buffers.
-        FixedArray<GLuint>                      m_textures;         //!< Allocated textures.
-        FixedArray<RenderTarget>                m_renderTargets;    //!< Allocated render targets.
-        mutable FixedArray<ProgramPermutations> m_permutations;     //!< Available program permutations.
+        FixedArray<GLuint>                      m_vertexBuffers;        //!< Allocated vertex buffers.
+        FixedArray<GLuint>                      m_indexBuffers;         //!< Allocated index buffers.
+        FixedArray<GLuint>                      m_constantBuffers;      //!< Allocated constant buffers.
+        FixedArray<GLuint>                      m_textures;             //!< Allocated textures.
+        FixedArray<RenderTarget>                m_renderTargets;        //!< Allocated render targets.
+        List<TransientRenderTarget>             m_freeRenderTargets;    //!< A list of free render targets.
+        mutable FixedArray<ProgramPermutations> m_permutations;         //!< Available program permutations.
     };
     
 } // namespace Renderer

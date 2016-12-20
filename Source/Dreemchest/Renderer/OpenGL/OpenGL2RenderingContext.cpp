@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "OpenGL2RenderingContext.h"
+#include "../VertexBufferLayout.h"
 #include "../VertexFormat.h"
 #include "../CommandBuffer.h"
 
@@ -99,6 +100,63 @@ PipelineFeatures OpenGL2RenderingContext::applyStateBlock(const RenderFrame& fra
     const StateBlock* blocks[] = { &stateBlock };
     return applyStates(frame, blocks, 1).features;
 }
+    
+// ** OpenGL2RenderingContext::acquireRenderTarget
+TransientRenderTarget OpenGL2RenderingContext::acquireRenderTarget(u16 width, u16 height, PixelFormat format)
+{
+    // First search for a free render target
+    for (List<TransientRenderTarget>::const_iterator i = m_freeRenderTargets.begin(), end = m_freeRenderTargets.end(); i != end; ++i)
+    {
+        // Get a render target by an id
+        const RenderTarget& renderTarget = m_renderTargets[*i];
+        
+        // Does the render target format match the requested one?
+        if (renderTarget.width == width && renderTarget.height == height && renderTarget.pixelFormat == format)
+        {
+            return *i;
+        }
+    }
+    
+    LogVerbose("renderingContext", "allocating a transient render target of size %dx%d\n", width, height);
+    
+    // Nothing found - so we have to create a new one
+    
+    // Allocate the resource identifier
+    TransientRenderTarget id;
+    id.set(allocateTransientIdentifier(RenderResourceType::RenderTarget));
+
+    // Now setup a render target
+    RenderTarget renderTarget;
+    renderTarget.width = width;
+    renderTarget.height = height;
+    renderTarget.pixelFormat = format;
+    
+    // Create target texture
+    {
+        Texture_ texture = allocatePersistentIdentifier<Texture_>();
+        GLuint id = OpenGL2::Texture::create(GL_TEXTURE_2D, NULL, width, height, format);
+        m_textures.emplace(texture, id);
+        renderTarget.textures[0] = texture;
+    }
+    
+    // Create framebuffer object
+    GLuint textures[] = { m_textures[renderTarget.textures[0]] };
+    renderTarget.id = OpenGL2::Framebuffer::create(textures, 1);
+    
+    // And attach a depth renderbuffer
+    renderTarget.depth = OpenGL2::Framebuffer::renderbuffer(renderTarget.id, width, height, GL_DEPTH_ATTACHMENT, OpenGL2::textureInternalFormat(PixelD24X8));
+    NIMBLE_ABORT_IF(!OpenGL2::Framebuffer::check(renderTarget.id), "failed to create a framebuffer object");
+    
+    m_renderTargets.emplace(id, renderTarget);
+    
+    return id;
+}
+
+// ** OpenGL2RenderingContext::releaseRenderTarget
+void OpenGL2RenderingContext::releaseRenderTarget(TransientRenderTarget id)
+{
+    m_freeRenderTargets.push_back(id);
+}
 
 // ** OpenGL2RenderingContext::executeCommandBuffer
 void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, const CommandBuffer& commands)
@@ -168,20 +226,56 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 break;
                 
             case CommandBuffer::OpCode::RenderTarget:
-                NIMBLE_NOT_IMPLEMENTED
+            {
+                // Get a transient resource id by a slot
+                TransientRenderTarget id = transientTarget(opCode.renderTarget.id);
+                NIMBLE_ABORT_IF(!id, "invalid transient identifier");
+                
+                // Get a render target by an id.
+                const RenderTarget& renderTarget = m_renderTargets[id];
+                
+                // Save current viewport
+                GLint prevViewport[4];
+                glGetIntegerv(GL_VIEWPORT, prevViewport);
+                
+                // Save the bound framebuffer
+                GLint prevFramebuffer;
+                glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prevFramebuffer);
+                
+                // Bind a framebuffer object
+                OpenGL2::Framebuffer::bind(renderTarget.id);
+                
+                // Set a viewport before executing an attached command buffer
+                const NormalizedViewport& viewport = opCode.renderTarget.viewport;
+                glViewport(viewport.x * renderTarget.width, viewport.y * renderTarget.height, viewport.width * renderTarget.width, viewport.height * renderTarget.height);
+                
+                // Execute an attached command buffer
+                execute(frame, *opCode.renderTarget.commands);
+                
+                // Disable the framebuffer
+                OpenGL2::Framebuffer::bind(prevFramebuffer);
+                
+                // Restore the previous viewport
+                glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
+            }
                 break;
                 
             case CommandBuffer::OpCode::AcquireRenderTarget:
-                NIMBLE_NOT_IMPLEMENTED
-                //TransientRenderTarget id = acquireRenderTarget(opCode.intermediateRenderTarget.width, opCode.intermediateRenderTarget.height, opCode.intermediateRenderTarget.format);
-                //loadTransientTarget(opCode.intermediateRenderTarget.id, id);
+            {
+                u16         width  = opCode.intermediateRenderTarget.width;
+                u16         height = opCode.intermediateRenderTarget.height;
+                PixelFormat format = opCode.intermediateRenderTarget.format;
+                TransientRenderTarget id = acquireRenderTarget(width, height, format);
+                loadTransientTarget(opCode.intermediateRenderTarget.id, id);
+            }
                 break;
                 
             case CommandBuffer::OpCode::ReleaseRenderTarget:
-                NIMBLE_NOT_IMPLEMENTED
-                //TransientRenderTarget id = intermediateTarget(opCode.intermediateRenderTarget.id);
-                //releaseRenderTarget(id);
-                //unloadTransientTarget(opCode.intermediateRenderTarget.id);
+            {
+                TransientRenderTarget id = transientTarget(opCode.intermediateRenderTarget.id);
+                releaseRenderTarget(id);
+                unloadTransientTarget(opCode.intermediateRenderTarget.id);
+            }
                 break;
                 
             case CommandBuffer::OpCode::DrawIndexed:
@@ -243,6 +337,7 @@ OpenGL2RenderingContext::RequestedState OpenGL2RenderingContext::applyStates(con
                 
             case State::InputLayout:
                 requestedState.inputLayout.set(state.resourceId);
+                m_pipeline.activateVertexAttributes(m_inputLayouts[state.resourceId]->features());
                 break;
                 
             case State::FeatureLayout:
@@ -327,8 +422,29 @@ OpenGL2RenderingContext::RequestedState OpenGL2RenderingContext::applyStates(con
                 break;
                 
             case State::Texture:
-                requestedState.texture[state.data.index].set(state.resourceId);
-                m_pipeline.activateSampler(state.data.index);
+            {
+                // Convert a resource id to a signed integer
+                s32 id = static_cast<s16>( state.resourceId );
+                
+                // Get a sampler index
+                u8 samplerIndex = state.samplerIndex();
+                
+                // Bind a texture to sampler
+                if (id >= 0)
+                {
+                    requestedState.texture[samplerIndex].set(state.resourceId);
+                }
+                else
+                {
+                    NIMBLE_BREAK_IF(abs(id) > 255, "invalid identifier");
+                    s32 attachmentIndex = state.attachmentIndex();
+                    TransientRenderTarget renderTargetId = transientTarget(-id);
+                    requestedState.texture[samplerIndex] = m_renderTargets[renderTargetId].textures[attachmentIndex];
+                }
+                
+                // Update resource features
+                m_pipeline.activateSampler(samplerIndex);
+            }
                 break;
                 
             case State::Rasterization:
@@ -505,7 +621,7 @@ void OpenGL2RenderingContext::updateUniforms(const RequestedState& state, Pipeli
             // Not found - skip
             if (location == 0)
             {
-                LogWarning("opengl2", "a uniform location '%s' for constant buffer %d could not be found\n", constant->name.value(), i);
+            //    LogWarning("opengl2", "a uniform location '%s' for constant buffer %d could not be found\n", constant->name.value(), i);
                 continue;
             }
             

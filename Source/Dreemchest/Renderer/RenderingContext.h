@@ -126,8 +126,6 @@ namespace Renderer
         //! Finishes a process of pipeline state configration.
         PipelineFeatures                        finishPipelineConfiguration(PipelineFeatures userDefined);
         
-    private:
-        
         //! Allocates a new persistent identifier of specified type.
         PersistentResourceId                    allocatePersistentIdentifier(RenderResourceType::Enum type);
         
