@@ -472,7 +472,7 @@ void RenderingContextHal::switchTexture( const RenderFrame& frame, const State& 
     else
     {
         NIMBLE_BREAK_IF( abs( id ) > 255, "invalid identifier" );
-        Renderer::Texture2DPtr texture = intermediateRenderTarget(intermediateTarget( -id ))->attachment( static_cast<Renderer::RenderTargetAttachment>( state.data.index >> 4 ) );
+        Renderer::Texture2DPtr texture = intermediateRenderTarget(intermediateTarget( -id ))->attachment(state.data.index >> 4);
         NIMBLE_BREAK_IF( !texture.valid(), "invalid render target attachment" );
         m_hal->setTexture( samplerIndex, texture.get() );
     }
@@ -634,11 +634,11 @@ TransientRenderTarget RenderingContextHal::acquireRenderTarget( u16 width, u16 h
     intermediate.renderTarget   = m_hal->createRenderTarget( width, height );
     if( format == Renderer::PixelD24S8 || format == Renderer::PixelD24X8 )
     {
-        intermediate.renderTarget->setAttachment( format, Renderer::RenderTargetDepth );
+        intermediate.renderTarget->setAttachment( format, RenderTargetAttachment::Depth );
     }
     else
     {
-        intermediate.renderTarget->setAttachment( format, Renderer::RenderTargetColor0 );
+        intermediate.renderTarget->setAttachment( format, RenderTargetAttachment::Color0 );
     }
     intermediate.renderTarget->setDepth( Renderer::PixelD24X8 );
     m_renderTargets.push_back( intermediate );

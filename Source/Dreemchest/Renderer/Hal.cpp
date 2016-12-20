@@ -697,7 +697,7 @@ u32 RenderTarget::height( void ) const
 }
 
 // ** RenderTarget::setAttachment
-bool RenderTarget::setAttachment( PixelFormat format, RenderTargetAttachment attachment )
+bool RenderTarget::setAttachment( PixelFormat format, s32 attachment )
 {
     return false;
 }
@@ -709,7 +709,7 @@ bool RenderTarget::setDepth( PixelFormat format )
 }
 
 // ** RenderTarget:attachment
-Texture2DPtr RenderTarget::attachment( RenderTargetAttachment attachment ) const
+Texture2DPtr RenderTarget::attachment( s32 attachment ) const
 {
     return m_attachments[attachment];
 }

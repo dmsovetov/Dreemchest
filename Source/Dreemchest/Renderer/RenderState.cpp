@@ -100,7 +100,7 @@ State::State(Texture_ id, u8 sampler)
 }
     
 // ** State::State
-State::State(TransientRenderTarget id, u8 sampler, RenderTargetAttachment attachment)
+State::State(TransientRenderTarget id, u8 sampler, u8 attachment)
     : type(Texture)
 {
     resourceId = -static_cast<s32>(id);
@@ -249,7 +249,7 @@ void StateBlock::bindTexture(Texture_ id, u8 sampler)
 }
 
 // ** StateBlock::bindRenderedTexture
-void StateBlock::bindRenderedTexture(TransientRenderTarget renderTarget, u8 sampler, RenderTargetAttachment attachment)
+void StateBlock::bindRenderedTexture(TransientRenderTarget renderTarget, u8 sampler, u8 attachment)
 {
     pushState(State(renderTarget, sampler, attachment), State::Texture + sampler);
 }

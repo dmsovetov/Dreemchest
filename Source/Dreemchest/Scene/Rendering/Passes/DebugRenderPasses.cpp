@@ -107,7 +107,7 @@ DebugRenderTarget::DebugRenderTarget( RenderingContext& context, RenderScene& re
 }
     
 // ** DebugRenderTarget::render
-void DebugRenderTarget::render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Viewport& viewport, TransientRenderTarget slot, Renderer::RenderTargetAttachment attachment, s32 size, s32 x, s32 y )
+void DebugRenderTarget::render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Viewport& viewport, TransientRenderTarget slot, u8 attachment, s32 size, s32 x, s32 y )
 {
     // Begin a render pass
     begin( frame, commands, stateStack );

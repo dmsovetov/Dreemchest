@@ -101,7 +101,7 @@ namespace Renderer
                                         State( BlendFactor src, BlendFactor dst );
 
                                         //! Constructs a rendered texture binding state.
-                                        State( TransientRenderTarget id, u8 sampler, RenderTargetAttachment attachment );
+                                        State( TransientRenderTarget id, u8 sampler, u8 attachment );
         
                                         //! Constructs a rendered texture binding state.
                                         State( Texture_ id, u8 sampler );
@@ -208,7 +208,7 @@ namespace Renderer
         void                            bindTexture(Texture_ id, u8 sampler);
 
         //! Binds a rendered texture to a specified sampler.
-        void                            bindRenderedTexture(TransientRenderTarget renderTarget, u8 sampler, RenderTargetAttachment attachment = RenderTargetColor0);
+        void                            bindRenderedTexture(TransientRenderTarget renderTarget, u8 sampler, u8 attachment = RenderTargetAttachment::Color0);
 
         //! Sets a blend function.
         void                            setBlend(BlendFactor src, BlendFactor dst);

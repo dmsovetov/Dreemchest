@@ -1079,7 +1079,7 @@ bool OpenGLRenderTarget::check( void ) const
 }
 
 // ** OpenGLRenderTarget::setAttachment
-bool OpenGLRenderTarget::setAttachment( PixelFormat format, RenderTargetAttachment attachment )
+bool OpenGLRenderTarget::setAttachment( PixelFormat format, s32 attachment )
 {
     DC_CHECK_GL;
     DC_CHECK_GL_CONTEXT;
@@ -1098,12 +1098,12 @@ bool OpenGLRenderTarget::setAttachment( PixelFormat format, RenderTargetAttachme
     glBindTexture( GL_TEXTURE_2D, 0 );
     
     glBindFramebuffer( GL_FRAMEBUFFER, m_id );
-    if( attachment == RenderTargetDepth ) {
+    if( attachment == RenderTargetAttachment::Depth ) {
         glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture->id(), 0 );
         glDrawBuffer( GL_NONE );
         glReadBuffer( GL_NONE );
     } else {
-        glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + (attachment - 1), GL_TEXTURE_2D, texture->id(), 0 );
+        glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachment, GL_TEXTURE_2D, texture->id(), 0 );
     }
     glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 

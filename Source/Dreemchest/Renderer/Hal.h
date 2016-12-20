@@ -445,13 +445,13 @@ namespace Renderer {
                                     RenderTarget( u32 width, u32 height );
 
         //! Setups the color renderbuffer.
-        virtual bool                setAttachment( PixelFormat format, RenderTargetAttachment attachment );
+        virtual bool                setAttachment( PixelFormat format, s32 attachment );
 
         //! Setups the depth renderbuffer.
         virtual bool                setDepth( PixelFormat format );
 
         //! Returns the color attachment by index.
-        Texture2DPtr                attachment( RenderTargetAttachment attachment ) const;
+        Texture2DPtr                attachment( s32 attachment ) const;
 
         //! Returns render target width.
         u32                            width( void ) const;
@@ -461,7 +461,7 @@ namespace Renderer {
 
     protected:
 
-        Texture2DPtr                    m_attachments[TotalRenderTargetAttachments];    //!< Texture attachments.
+        Texture2DPtr                    m_attachments[RenderTargetAttachment::Total];    //!< Texture attachments.
         u32                            m_width;                            //!< Render target width.
         u32                            m_height;                            //!< Render target height.
     };

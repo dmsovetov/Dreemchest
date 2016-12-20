@@ -483,13 +483,17 @@ namespace Renderer {
     };
     
     //! Available texture attachments
-    enum RenderTargetAttachment {
-          RenderTargetDepth             //!< A depth texture attachment.
-        , RenderTargetColor0            //!< A #1 color texture attachment.
-        , RenderTargetColor1            //!< A #2 color texture attachment.
-        , RenderTargetColor2            //!< A #3 color texture attachment.
-        , RenderTargetColor3            //!< A #4 color texture attachment.
-        , TotalRenderTargetAttachments  //!< A total number of available texture attachments.
+    struct RenderTargetAttachment
+    {
+        enum
+        {
+              Color0            //!< A #1 color texture attachment.
+            , Color1            //!< A #2 color texture attachment.
+            , Color2            //!< A #3 color texture attachment.
+            , Color3            //!< A #4 color texture attachment.
+            , Depth             //!< A depth texture attachment.
+            , Total             //!< A total number of available texture attachments.
+        };
     };
     
     //! Base class for windowed applications.
