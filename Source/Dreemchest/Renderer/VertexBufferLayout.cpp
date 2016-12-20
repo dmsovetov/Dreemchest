@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "VertexBufferLayout.h"
+#include "PipelineFeatureLayout.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -41,28 +42,10 @@ VertexBufferLayout::VertexBufferLayout( s32 vertexSize )
 // ** VertexBufferLayout::attributeLocation
 void VertexBufferLayout::attributeLocation(VertexAttribute attribute, s32 count, s32 offset)
 {
-    static PipelineFeatures kAttributeMask[MaxVertexAttributes] =
-    {
-        0,
-        BIT( 0 ),
-        BIT( 1 ),
-        BIT( 2 ),
-        BIT( 3 ),
-        BIT( 4 ),
-        BIT( 5 ),
-        BIT( 6 ),
-        BIT( 7 ),
-        BIT( 8 ),
-        BIT( 9 ),
-        BIT( 10 ),
-        BIT( 11 ),
-        BIT( 12 ),
-    };
-    
     m_attributes[attribute].count  = count;
     m_attributes[attribute].offset = offset;
     
-    m_features = m_features | kAttributeMask[attribute];
+    m_features = m_features | PipelineFeature::vertexAttribute(attribute);
 }
 
 // ** VertexBufferLayout::features

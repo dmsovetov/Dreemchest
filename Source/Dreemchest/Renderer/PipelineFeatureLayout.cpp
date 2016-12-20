@@ -66,7 +66,8 @@ PipelineFeatures PipelineFeature::constantBuffer(u8 index)
 // ** PipelineFeature::vertexAttribute
 PipelineFeatures PipelineFeature::vertexAttribute(VertexAttribute vertexAttribute)
 {
-    return static_cast<PipelineFeatures>(1) << vertexAttribute;
+    s32 bit = vertexAttribute - 1; // Skip VertexPosition attribute
+    return static_cast<PipelineFeatures>(1) << bit;
 }
 
 // ** PipelineFeature::sampler
