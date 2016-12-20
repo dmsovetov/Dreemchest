@@ -53,7 +53,7 @@ namespace Renderer
         RenderTargetWPtr            intermediateRenderTarget( TransientRenderTarget id ) const;
 
         //! Binds a render target with specified viewport and executes a command buffer.
-        void                        renderToTarget( const RenderFrame& frame, u8 renderTarget, const f32* viewport, const CommandBuffer& commands );
+        void                        renderToTarget( const RenderFrame& frame, u8 renderTarget, const NormalizedViewport* viewport, const CommandBuffer& commands );
 
         //! Unrolls a state stack an applies all state changes, returns an up-to-date pipeline feature mask.
         PipelineFeatures            applyStates( const RenderFrame& frame, const StateBlock* const * stateBlocks, s32 count );
@@ -150,8 +150,7 @@ namespace Renderer
 
         StateSwitch                         m_stateSwitches[State::TotalStates];    //!< Function callbacks to switch states.
         ShaderPtr                           m_activeProgram;                        //!< An active program permutation.
-        Stack<const f32*>                   m_viewportStack;                        //!< A viewport stack.
-        
+
         //! A helper struct that hold info about an intermediate render target.
         struct TransientRenderTarget_
         {

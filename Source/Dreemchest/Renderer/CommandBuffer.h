@@ -84,7 +84,7 @@ namespace Renderer
                 struct
                 {
                     TransientResourceId         id;                         //!< A render target resource to be activated.
-                    f32                         viewport[4];                //!< A viewport value to be set.
+                    NormalizedViewport          viewport;                   //!< A viewport value to be set.
                     const CommandBuffer*        commands;                   //!< A command buffer to be executed after setting a viewport.
                 } renderTarget;
 

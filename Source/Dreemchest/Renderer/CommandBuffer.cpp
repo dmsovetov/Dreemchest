@@ -78,10 +78,10 @@ CommandBuffer& CommandBuffer::renderToTarget( RenderFrame& frame, TransientRende
     opCode.sorting = 0;
     opCode.renderTarget.commands = &commands;
     opCode.renderTarget.id = id;
-    opCode.renderTarget.viewport[0] = viewport.min().x;
-    opCode.renderTarget.viewport[1] = viewport.min().y;
-    opCode.renderTarget.viewport[2] = viewport.width();
-    opCode.renderTarget.viewport[3] = viewport.height();
+    opCode.renderTarget.viewport.x = viewport.min().x;
+    opCode.renderTarget.viewport.y = viewport.min().y;
+    opCode.renderTarget.viewport.width = viewport.width();
+    opCode.renderTarget.viewport.height = viewport.height();
     push( opCode );
 
     return commands;

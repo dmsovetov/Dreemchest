@@ -66,22 +66,23 @@ RenderingContextHal::RenderingContextHal(RenderViewPtr view, HalPtr hal)
 }
 
 // ** RenderingContextHal::renderToTarget
-void RenderingContextHal::renderToTarget( const RenderFrame& frame, u8 renderTarget, const f32* viewport, const CommandBuffer& commands )
+void RenderingContextHal::renderToTarget( const RenderFrame& frame, u8 renderTarget, const NormalizedViewport* viewport, const CommandBuffer& commands )
 {
+    Rect prevViewport;
+    m_hal->getViewport(prevViewport);
+    
     // Push a render target state
     if( renderTarget )
     {
-        const Renderer::RenderTargetWPtr rt = intermediateRenderTarget(intermediateTarget( renderTarget ));
+        const Renderer::RenderTargetWPtr rt = intermediateRenderTarget(transientTarget( renderTarget ));
         m_hal->setRenderTarget( rt );
-        m_hal->setViewport( viewport[0] * rt->width(), viewport[1] * rt->height(), viewport[2] * rt->width(), viewport[3] * rt->height() );
+        m_hal->setViewport( viewport->x * rt->width(), viewport->y * rt->height(), viewport->width * rt->width(), viewport->height * rt->height() );
     }
     else
     {
-        m_hal->setViewport( viewport[0], viewport[1], viewport[2], viewport[3] );
+        //!! denormalize the viewport here
+        m_hal->setViewport(viewport->x, viewport->y, viewport->width, viewport->height);
     }
-
-    // Set a viewport before executing an attached command buffer
-    m_viewportStack.push( viewport );
 
     // Execute an attached command buffer
     execute( frame, commands );
@@ -93,13 +94,7 @@ void RenderingContextHal::renderToTarget( const RenderFrame& frame, u8 renderTar
     }
 
     // Pop a viewport
-    m_viewportStack.pop();
-
-    if( m_viewportStack.size() )
-    {
-        const f32* prev = m_viewportStack.top();
-        m_hal->setViewport( prev[0], prev[1], prev[2], prev[3] );
-    }
+    m_hal->setViewport(prevViewport);
 }
 
 // ** RenderingContextHal::executeCommandBuffer
@@ -132,7 +127,7 @@ void RenderingContextHal::executeCommandBuffer( const RenderFrame& frame, const 
                                                                 commandCreateConstantBuffer(opCode.createBuffer.id, opCode.createBuffer.data, opCode.createBuffer.size, opCode.createBuffer.layout);
                                                             }
                                                             break;
-        case CommandBuffer::OpCode::RenderTarget:           renderToTarget( frame, opCode.renderTarget.id, opCode.renderTarget.viewport, *opCode.renderTarget.commands );
+        case CommandBuffer::OpCode::RenderTarget:           renderToTarget( frame, opCode.renderTarget.id, &opCode.renderTarget.viewport, *opCode.renderTarget.commands );
                                                             break;
         case CommandBuffer::OpCode::AcquireRenderTarget:    {
                                                                 TransientRenderTarget id = acquireRenderTarget(opCode.intermediateRenderTarget.width, opCode.intermediateRenderTarget.height, opCode.intermediateRenderTarget.format);
@@ -461,7 +456,7 @@ void RenderingContextHal::switchTexture( const RenderFrame& frame, const State& 
     s32 id = static_cast<s16>( state.resourceId );
 
     // Get a sampler index
-    u8 samplerIndex = state.data.index & 0xF;
+    u8 samplerIndex = state.samplerIndex();
 
     // Bind a texture to sampler
     if( id >= 0 )

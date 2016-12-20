@@ -500,6 +500,15 @@ namespace Renderer {
             , Total             //!< A total number of available texture attachments.
         };
     };
+
+    //! A normalized viewport coordinates.
+    struct NormalizedViewport
+    {
+        f32     x;              //!< A coordinate of a left side of a viewport rectangle.
+        f32     y;              //!< A coordinate of a lower side of the viewport rectangle.
+        f32     width;          //!< Width of the viewport.
+        f32     height;         //!< Height of the viewport.
+    };
     
     //! Base class for windowed applications.
     class RenderingApplicationDelegate : public Platform::WindowedApplicationDelegate
