@@ -114,6 +114,81 @@ void OpenGL2::Buffer::bind(GLenum type, GLuint id)
     glBindBuffer(type, id);
 }
     
+// ---------------------------------------------------------- OpenGL2::Framebuffer ------------------------------------------------------- //
+
+// ** OpenGL2::Framebuffer::bind
+void OpenGL2::Framebuffer::bind(GLuint id)
+{
+    DC_CHECK_GL_CONTEXT;
+    DC_CHECK_GL;
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, id);
+}
+    
+// ** OpenGL2::Framebuffer::create
+GLuint OpenGL2::Framebuffer::create(GLuint *attachments, GLuint count)
+{
+    DC_CHECK_GL_CONTEXT;
+    DC_CHECK_GL;
+    
+    GLuint id;
+    glGenFramebuffers(1, &id);
+    glBindFramebuffer(GL_FRAMEBUFFER, id);
+    
+    for (GLuint i = 0; i < count; i++)
+    {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, attachments[i], 0);
+    }
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    
+    return id;
+}
+    
+// ** OpenGL2::Framebuffer::renderbuffer
+GLuint OpenGL2::Framebuffer::renderbuffer(GLuint id, GLsizei width, GLsizei height, GLenum attachment, GLenum internalFormat)
+{
+    DC_CHECK_GL_CONTEXT;
+    DC_CHECK_GL;
+    
+    GLuint rid;
+    
+    glGenRenderbuffers(1, &rid);
+    glBindRenderbuffer(GL_RENDERBUFFER, rid);
+    glRenderbufferStorage(GL_RENDERBUFFER, internalFormat, width, height);
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, id);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, rid);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0 );
+    
+    return rid;
+}
+    
+// ** OpenGL2::Framebuffer::check
+bool OpenGL2::Framebuffer::check(GLuint id)
+{
+    DC_CHECK_GL_CONTEXT;
+    DC_CHECK_GL;
+        
+    glBindFramebuffer(GL_FRAMEBUFFER, id);
+    GLenum status = glCheckFramebufferStatus( GL_FRAMEBUFFER );
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    return status == GL_FRAMEBUFFER_COMPLETE;
+}
+
+// ** OpenGL2::Framebuffer::destroyRenderBuffer
+void OpenGL2::Framebuffer::destroyRenderBuffer(GLuint id)
+{
+    glDeleteRenderbuffers(1, &id);
+}
+
+// ** OpenGL2::Framebuffer::destroy
+void OpenGL2::Framebuffer::destroy(GLuint id)
+{
+    glDeleteFramebuffers(1, &id);
+}
+
 // ----------------------------------------------------------- OpenGL2::Program ---------------------------------------------------------- //
 
 // ** OpenGL2::Program::deleteProgram

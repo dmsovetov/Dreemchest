@@ -154,6 +154,30 @@ namespace Renderer
             //! Deletes a texture object by an id.
             static void     destroy(GLuint id);
         };
+        
+        //! An internal class that contains all framebuffer related functions.
+        class Framebuffer
+        {
+        public:
+            
+            //! Creates a framebuffer object.
+            static GLuint   create(GLuint *attachments, GLuint count);
+            
+            //! Attaches a renderbuffer to a framebuffer.
+            static GLuint   renderbuffer(GLuint id, GLsizei width, GLsizei height, GLenum attachment, GLenum internalFormat);
+            
+            //! Binds a framebuffer object to a pipeline.
+            static void     bind(GLuint id);
+            
+            //! Checks the framebuffer status.
+            static bool     check(GLuint id);
+            
+            //! Destroys a renderbuffer object.
+            static void     destroyRenderBuffer(GLuint id);
+            
+            //! Destroys a framebuffer object.
+            static void     destroy(GLuint id);
+        };
 
         //! Initializes an OpenGL 2 wrapper.
         static bool     initialize();
