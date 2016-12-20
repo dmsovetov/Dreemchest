@@ -139,6 +139,12 @@ namespace Renderer
         //! Returns a depth and stencil pass action.
         StencilAction                   depthStencilPass() const;
         
+        //! Returns a sampler index.
+        s32                             samplerIndex() const;
+        
+        //! Returns a render target attachment index.
+        s32                             attachmentIndex() const;
+        
         union
         {
             PersistentResourceId        resourceId;         //!< Resource identifier to be bound to a pipeline.

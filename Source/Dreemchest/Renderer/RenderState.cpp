@@ -194,6 +194,18 @@ StencilAction State::depthStencilPass() const
 {
     return static_cast<StencilAction>(data.dppass);
 }
+    
+// ** State::samplerIndex
+s32 State::samplerIndex() const
+{
+    return data.index & 0xF;
+}
+    
+// ** State::attachmentIndex
+s32 State::attachmentIndex() const
+{
+    return data.index >> 4;
+}
 
 // -------------------------------------------------------------------------- StateBlock -------------------------------------------------------------------------- //
 
