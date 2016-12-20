@@ -131,6 +131,10 @@ namespace Renderer
         //! Allocates a new persistent identifier of specified type.
         PersistentResourceId                    allocatePersistentIdentifier(RenderResourceType::Enum type);
         
+        //! Allocates a persistent identifier of specified type.
+        template<typename TResourceIdentifier>
+        TResourceIdentifier                     allocatePersistentIdentifier();
+        
         //! Releases an allocated persistent identifier of specified type.
         void                                    releasePersistentIdentifier(RenderResourceType::Enum type, PersistentResourceId id);
         
@@ -170,6 +174,13 @@ namespace Renderer
         PipelineState                           m_pipeline;                                             //!< An active pipeline state.
         ShaderLibrary                           m_shaderLibrary;                                        //!< A shader library.
     };
+    
+    // ** RenderingContext::allocatePersistentIdentifier
+    template<typename TResourceIdentifier>
+    TResourceIdentifier RenderingContext::allocatePersistentIdentifier()
+    {
+        return allocatePersistentIdentifier(static_cast<RenderResourceType::Enum>(TResourceIdentifier::ResourceType));
+    }
     
     //! Creates a rendering context that uses a deprecated rendering HAL interface.
     RenderingContextPtr createDeprecatedRenderingContext(RenderViewPtr view, HalPtr hal);

@@ -148,6 +148,8 @@ namespace Renderer {
     friend class RenderingContextHal;
     public:
         
+        enum { ResourceType = TResource };
+        
                                     //! Constructs an invalid render resource identifier.
                                     ResourceIdentifier( void );
         
