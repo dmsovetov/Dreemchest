@@ -108,14 +108,14 @@ namespace Renderer
         //! Executes a specified command buffer inside an intermediate render stack frame.
         void                                    execute( const RenderFrame& frame, const CommandBuffer& commands );
         
-        //! Loads an intermediate render target to a specified slot.
+        //! Loads an transient render target to a specified slot.
         void                                    loadTransientTarget(u8 index, TransientRenderTarget id);
         
-        //! Unloads an intermediate render target from a specified slot.
+        //! Unloads an transient render target from a specified slot.
         void                                    unloadTransientTarget(u8 index);
         
-        //! Returns an intermediate render target at specified slot.
-        TransientRenderTarget                   intermediateTarget(u8 index);
+        //! Returns an transient render target at specified slot.
+        TransientRenderTarget                   transientTarget(u8 index);
         
         //! Creates a vertex buffer layout instance from a flexible vertex format.
         VertexBufferLayoutUPtr                  createVertexBufferLayout(VertexFormat vertexFormat) const;

@@ -140,7 +140,7 @@ void RenderingContextHal::executeCommandBuffer( const RenderFrame& frame, const 
                                                             }
                                                             break;
         case CommandBuffer::OpCode::ReleaseRenderTarget:    {
-                                                                TransientRenderTarget id = intermediateTarget(opCode.intermediateRenderTarget.id);
+                                                                TransientRenderTarget id = transientTarget(opCode.intermediateRenderTarget.id);
                                                                 releaseRenderTarget(id);
                                                                 unloadTransientTarget(opCode.intermediateRenderTarget.id);
                                                             }
@@ -472,7 +472,7 @@ void RenderingContextHal::switchTexture( const RenderFrame& frame, const State& 
     else
     {
         NIMBLE_BREAK_IF( abs( id ) > 255, "invalid identifier" );
-        Renderer::Texture2DPtr texture = intermediateRenderTarget(intermediateTarget( -id ))->attachment(state.data.index >> 4);
+        Renderer::Texture2DPtr texture = intermediateRenderTarget(transientTarget( -id ))->attachment(state.attachmentIndex());
         NIMBLE_BREAK_IF( !texture.valid(), "invalid render target attachment" );
         m_hal->setTexture( samplerIndex, texture.get() );
     }

@@ -342,8 +342,8 @@ void RenderingContext::unloadTransientTarget(u8 index)
     m_intermediateTargets->unload(index);
 }
     
-// ** RenderingContext::intermediateTarget
-TransientRenderTarget RenderingContext::intermediateTarget(u8 index)
+// ** RenderingContext::transientTarget
+TransientRenderTarget RenderingContext::transientTarget(u8 index)
 {
     return m_intermediateTargets->get(index);
 }
