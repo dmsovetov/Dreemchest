@@ -216,6 +216,8 @@ namespace Renderer {
 
         //! Sets a rendering viewport.
         virtual void    setViewport( const Rect& rect );
+        
+        virtual void    getViewport(Rect& rect) {}
 
         //! Sets a rendering color mask.
         /*!

@@ -167,6 +167,7 @@ namespace Renderer {
         virtual void                setInputLayout( const VertexBufferLayout* inputLayout );
         virtual void                setConstantBuffer( const ConstantBufferPtr& constantBuffer, s32 location );
         virtual void                setViewport( u32 x, u32 y, u32 width, u32 height );
+        virtual void                getViewport(Rect& rect);
         virtual void                setColorMask( u32 value );
         virtual void                setBlendFactors( BlendFactor source, BlendFactor destination );
         virtual void                setAlphaTest( Compare compare, f32 value );

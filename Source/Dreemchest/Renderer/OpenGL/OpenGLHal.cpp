@@ -635,6 +635,19 @@ void OpenGLHal::setViewport( u32 x, u32 y, u32 width, u32 height )
     
     glViewport( x, y, width, height );
 }
+    
+
+// ** OpenGLHal::getViewport
+void OpenGLHal::getViewport(Rect& rect)
+{
+    DC_CHECK_GL;
+    
+    GLint viewport[4];
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    
+    rect = Rect(Vec2(viewport[0], viewport[1]), Vec2(viewport[0] + viewport[2], viewport[1] + viewport[3]));
+}
+
 
 // ** OpenGLHal::setScissorTest
 void OpenGLHal::setScissorTest( bool enabled, u32 x, u32 y, u32 width, u32 height )
