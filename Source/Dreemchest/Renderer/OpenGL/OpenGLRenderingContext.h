@@ -63,6 +63,18 @@ namespace Renderer
         GLint                                   findUniformLocation(Program program, PipelineFeatures features, const FixedString& name);
         
     protected:
+        
+        //! A render target object used for offscreen rendering.
+        struct RenderTarget
+        {
+            GLuint              id;                                         //!< A framebuffer object id.
+            GLuint              textures[RenderTargetAttachment::Total];    //!< An array of attached textures.
+                                RenderTarget()
+                                    : id(0)
+                                {
+                                    memset(textures, 0, sizeof(textures));
+                                }
+        };
     
         //! A container type to store program permutations.
         typedef HashMap<PipelineFeatures, Permutation> ProgramPermutations;
@@ -71,6 +83,7 @@ namespace Renderer
         FixedArray<GLuint>                      m_indexBuffers;     //!< Allocated index buffers.
         FixedArray<GLuint>                      m_constantBuffers;  //!< Allocated constant buffers.
         FixedArray<GLuint>                      m_textures;         //!< Allocated textures.
+        FixedArray<RenderTarget>                m_renderTargets;    //!< Allocated render targets.
         mutable FixedArray<ProgramPermutations> m_permutations;     //!< Available program permutations.
     };
     

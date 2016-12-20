@@ -229,6 +229,7 @@ RenderingContext::RenderingContext(RenderViewPtr view)
     : m_view(view)
     , m_shaderLibrary(*this)
 {
+    LogDebug("renderingContext", "rendering context size is %d bytes\n", sizeof(RenderingContext));
     LogDebug("renderingContext", "rendering state size is %d bytes\n", sizeof(State));
     LogDebug("renderingContext", "rendering state block size is %d bytes\n", sizeof(StateBlock));
     LogDebug("renderingContext", "opcode size is %d bytes\n", sizeof(CommandBuffer::OpCode));
@@ -245,11 +246,13 @@ RenderingContext::RenderingContext(RenderViewPtr view)
     // Resize all resource index managers
     for (s32 i = 0; i < RenderResourceType::TotalTypes; i++)
     {
-        // Allocate space for 32 resource identifiers
-        m_resourceIdentifiers[i].resize(32);
+        // Allocate space for 32 persistent identifiers and reserve the zero id.
+        m_persistentIdentifiers[i].resize(32);
+        m_persistentIdentifiers[i].acquire();
         
-        // And reserve the zero id.
-        m_resourceIdentifiers[i].acquire();
+        // Do the same with transient identifiers.
+        m_transientIdentifiers[i].resize(32);
+        m_transientIdentifiers[i].acquire();
     }
     
     // Initialize a default state block
@@ -345,13 +348,32 @@ TransientRenderTarget RenderingContext::intermediateTarget(u8 index)
     return m_intermediateTargets->get(index);
 }
 
-// ** RenderingContext::allocateResourceIdentifier
-u16 RenderingContext::allocateResourceIdentifier(RenderResourceType::Enum type)
+// ** RenderingContext::allocatePersistentIdentifier
+PersistentResourceId RenderingContext::allocatePersistentIdentifier(RenderResourceType::Enum type)
 {
-    NIMBLE_ABORT_IF(!m_resourceIdentifiers[type].hasFreeIndices(), "too much resource indices allocated");
-    return m_resourceIdentifiers[type].acquire();
+    NIMBLE_ABORT_IF(!m_persistentIdentifiers[type].hasFreeIndices(), "too much persistent identifiers allocated");
+    return m_persistentIdentifiers[type].acquire();
 }
-    
+
+// ** RenderingContext::releasePersistentIdentifier
+void RenderingContext::releasePersistentIdentifier(RenderResourceType::Enum type, PersistentResourceId id)
+{
+    m_persistentIdentifiers[type].release(id);
+}
+
+// ** RenderingContext::allocateTransientIdentifier
+TransientResourceId RenderingContext::allocateTransientIdentifier(RenderResourceType::Enum type)
+{
+    NIMBLE_ABORT_IF(!m_transientIdentifiers[type].hasFreeIndices(), "too much persistent identifiers allocated");
+    return m_transientIdentifiers[type].acquire();
+}
+
+// ** RenderingContext::releaseTransientIdentifier
+void RenderingContext::releaseTransientIdentifier(RenderResourceType::Enum type, TransientResourceId id)
+{
+    m_transientIdentifiers[type].release(id);
+}
+
 // ** RenderingContext::requestInputLayout
 InputLayout RenderingContext::requestInputLayout( const VertexFormat& format )
 {
@@ -364,7 +386,7 @@ InputLayout RenderingContext::requestInputLayout( const VertexFormat& format )
     }
     
     // Allocate an input layout identifier
-    id = allocateResourceIdentifier(RenderResourceType::InputLayout);
+    id = allocatePersistentIdentifier(RenderResourceType::InputLayout);
     
     // Nothing found - construct a new one
     id = m_constructionCommandBuffer->createInputLayout(id, format);
@@ -379,7 +401,7 @@ InputLayout RenderingContext::requestInputLayout( const VertexFormat& format )
 UniformLayout RenderingContext::requestUniformLayout(const String& name, const UniformElement* elements)
 {
     // Allocate next uniform layout id.
-    UniformLayout id = allocateResourceIdentifier(RenderResourceType::UniformLayout);
+    UniformLayout id = allocatePersistentIdentifier(RenderResourceType::UniformLayout);
 
     // Construct a uniform instance
     m_uniformLayouts.emplace(id, UniformBufferLayout());
@@ -423,7 +445,7 @@ FeatureLayout RenderingContext::requestPipelineFeatureLayout(const PipelineFeatu
     }
     
     // Allocate an input layout identifier
-    FeatureLayout id = allocateResourceIdentifier(RenderResourceType::FeatureLayout);
+    FeatureLayout id = allocatePersistentIdentifier(RenderResourceType::FeatureLayout);
     
     // Put this layout instance to a pool
     m_pipelineFeatureLayouts.emplace(id, layout);
@@ -434,28 +456,28 @@ FeatureLayout RenderingContext::requestPipelineFeatureLayout(const PipelineFeatu
 // ** RenderingContext::requestVertexBuffer
 VertexBuffer_ RenderingContext::requestVertexBuffer( const void* data, s32 size )
 {
-    VertexBuffer_ id = allocateResourceIdentifier(RenderResourceType::VertexBuffer);
+    VertexBuffer_ id = allocatePersistentIdentifier(RenderResourceType::VertexBuffer);
     return m_constructionCommandBuffer->createVertexBuffer(id, data, size);
 }
 
 // ** RenderingContext::requestIndexBuffer
 IndexBuffer_ RenderingContext::requestIndexBuffer( const void* data, s32 size )
 {
-    IndexBuffer_ id = allocateResourceIdentifier(RenderResourceType::IndexBuffer);
+    IndexBuffer_ id = allocatePersistentIdentifier(RenderResourceType::IndexBuffer);
     return m_constructionCommandBuffer->createIndexBuffer(id, data, size);
 }
 
 // ** RenderingContext::requestConstantBuffer
 ConstantBuffer_ RenderingContext::requestConstantBuffer(const void* data, s32 size, UniformLayout layout)
 {
-    ConstantBuffer_ id = allocateResourceIdentifier(RenderResourceType::ConstantBuffer);
+    ConstantBuffer_ id = allocatePersistentIdentifier(RenderResourceType::ConstantBuffer);
     return m_constructionCommandBuffer->createConstantBuffer(id, data, size, layout);
 }
 
 // ** RenderingContext::requestConstantBuffer
-Texture_ RenderingContext::requestTexture( const void* data, u16 width, u16 height, PixelFormat format )
+Texture_ RenderingContext::requestTexture(const void* data, u16 width, u16 height, PixelFormat format)
 {
-    Texture_ id = allocateResourceIdentifier(RenderResourceType::Texture);
+    Texture_ id = allocatePersistentIdentifier(RenderResourceType::Texture);
     return m_constructionCommandBuffer->createTexture(id, data, width, height, format);
 }
     
@@ -463,7 +485,7 @@ Texture_ RenderingContext::requestTexture( const void* data, u16 width, u16 heig
 Program RenderingContext::requestProgram(const ShaderProgramDescriptor& descriptor)
 {
     // Allocate a program identifier
-    Program id = allocateResourceIdentifier(RenderResourceType::Program);
+    Program id = allocatePersistentIdentifier(RenderResourceType::Program);
     
     // Put this program to a pool
     m_programs.emplace(id, descriptor);
@@ -697,7 +719,7 @@ Program RenderingContext::requestShader(const String& vertex, const String& frag
                        "
                        );
     
-    Program id = allocateResourceIdentifier(RenderResourceType::Program);
+    Program id = allocatePersistentIdentifier(RenderResourceType::Program);
     
     // Put this shader to a pool
     m_shaders.emplace(id, shader);

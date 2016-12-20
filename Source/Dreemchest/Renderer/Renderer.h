@@ -88,6 +88,9 @@ namespace Renderer {
     //! A container type to manage persistent resource identifiers.
     typedef IndexManager<PersistentResourceId>  PersistentResourceIdentifiers;
     
+    //! A container type to manage transient resource identifiers.
+    typedef IndexManager<TransientResourceId>   TransientResourceIdentifiers;
+    
     //! A unique pointer type for a vertex buffer layout instance.
     typedef UPtr<class VertexBufferLayout>      VertexBufferLayoutUPtr;
     

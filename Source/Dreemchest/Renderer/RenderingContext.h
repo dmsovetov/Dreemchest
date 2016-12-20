@@ -128,8 +128,17 @@ namespace Renderer
         
     private:
         
-        //! Allocates a new render resource identifier of specified type.
-        u16                                     allocateResourceIdentifier(RenderResourceType::Enum type);
+        //! Allocates a new persistent identifier of specified type.
+        PersistentResourceId                    allocatePersistentIdentifier(RenderResourceType::Enum type);
+        
+        //! Releases an allocated persistent identifier of specified type.
+        void                                    releasePersistentIdentifier(RenderResourceType::Enum type, PersistentResourceId id);
+        
+        //! Allocates a new transient identifier of specified type.
+        TransientResourceId                     allocateTransientIdentifier(RenderResourceType::Enum type);
+        
+        //! Releases an allocated persistent identifier of specified type.
+        void                                    releaseTransientIdentifier(RenderResourceType::Enum type, TransientResourceId id);
         
     protected:
         
@@ -146,7 +155,8 @@ namespace Renderer
         enum { MaxStateChanges = 16 };
         
         RenderViewPtr                           m_view;                                                 //!< A rendering viewport.
-        PersistentResourceIdentifiers           m_resourceIdentifiers[RenderResourceType::TotalTypes];  //!< An array of resource identifier managers.
+        PersistentResourceIdentifiers           m_persistentIdentifiers[RenderResourceType::TotalTypes];//!< An array of persistent identifier managers.
+        TransientResourceIdentifiers            m_transientIdentifiers[RenderResourceType::TotalTypes]; //!< An array of transient identifier managers.
         FixedArray<PipelineFeatureLayoutUPtr>   m_pipelineFeatureLayouts;                               //!< An array of constructed pipeline feature layouts.
         FixedArray<VertexBufferLayoutUPtr>      m_inputLayouts;                                         //!< Allocated input layouts.
         FixedArray<ShaderProgramDescriptor>     m_programs;                                             //!< Allocated shader programs.
