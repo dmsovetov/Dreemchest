@@ -34,6 +34,9 @@ target_link_libraries(11_PointLights Dreemchest)
 add_executable(12_RenderingToTexture WIN32 MACOSX_BUNDLE 12_RenderingToTexture.cpp)
 target_link_libraries(12_RenderingToTexture Dreemchest)
 
+add_executable(13_IBL WIN32 MACOSX_BUNDLE 13_IBL.cpp)
+target_link_libraries(13_IBL Dreemchest)
+
 # Add solution folders
 set_property(TARGET 01_RendererInitialization PROPERTY FOLDER "Examples")
 set_property(TARGET 02_FirstTriangle PROPERTY FOLDER "Examples")
@@ -47,3 +50,4 @@ set_property(TARGET 09_Meshes PROPERTY FOLDER "Examples")
 set_property(TARGET 10_StencilBuffer PROPERTY FOLDER "Examples")
 set_property(TARGET 11_PointLights PROPERTY FOLDER "Examples")
 set_property(TARGET 12_RenderingToTexture PROPERTY FOLDER "Examples")
+set_property(TARGET 13_IBL PROPERTY FOLDER "Examples")
