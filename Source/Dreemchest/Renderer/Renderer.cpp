@@ -30,6 +30,8 @@
 
 #include <fstream>
 
+#define MAKEFOURCC(a, b, c, d) ((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
+
 DC_BEGIN_DREEMCHEST
 
 namespace Renderer {
@@ -67,6 +69,85 @@ void RenderingApplicationDelegate::handleWindowUpdate(const Platform::Window::Up
     
 // ------------------------------------------------------------------------- ImageLoader ------------------------------------------------------------------------ //
 
+// ** bytesPerBlock
+u32 bytesPerBlock(PixelFormat format)
+{
+    switch (format)
+    {
+        case PixelDxtc1:    return 8;
+        case PixelDxtc3:    return 16;
+        case PixelDxtc5:    return 16;
+        case PixelPvrtc2:   return 32;
+        case PixelPvrtc4:   return 16;
+        default:            NIMBLE_NOT_IMPLEMENTED
+    }
+    
+    return 0;
+}
+
+// ** bytesPerPixel
+u32 bytesPerPixel(PixelFormat format)
+{
+    switch (format)
+    {
+        case PixelLuminance8:   return 1;
+        case PixelRgb8:         return 3;
+        case PixelRgba8:        return 4;
+        case PixelR16F:         return 2;
+        case PixelRg16F:        return 4;
+        case PixelRgba16F:      return 8;
+        case PixelR32F:         return 4;
+        case PixelRg32F:        return 8;
+        case PixelRgba32F:      return 16;
+        default:                NIMBLE_NOT_IMPLEMENTED
+    }
+    
+    return 0;
+}
+
+// ** bytesPerMip
+u32 bytesPerMip(PixelFormat format, u16 width, u16 height)
+{
+    u32 size = 0;
+    
+    switch (format)
+    {
+        case PixelDxtc1:
+        case PixelDxtc3:
+        case PixelDxtc5:
+            size = ((width + 3) >> 2) * ((height + 3) >> 2) * bytesPerBlock(format);
+            break;
+            
+        case PixelPvrtc2:
+            size = (width / 8) * (height / 4) * ((bytesPerBlock(format) * 4) / 8);
+            break;
+            
+        case PixelPvrtc4:
+            size = (width / 4) * (height / 4) * ((bytesPerBlock(format) * 4) / 8);
+            break;
+            
+        default:
+            size = width * height * bytesPerPixel(format);
+    }
+    
+    return size;
+}
+
+// ** bytesPerMipChain
+u32 bytesPerMipChain(PixelFormat format, u16 width, u16 height, u16 mipLevels)
+{
+    u32 size = 0;
+    
+    for (s32 i = 0; i < mipLevels; i++)
+    {
+        size += bytesPerMip(format, width, height);
+        width = width >> 1;
+        height = height >> 1;
+    }
+    
+    return size;
+}
+    
 namespace ImageLoader
 {
     
@@ -79,6 +160,34 @@ void convertBgrToRgb(Array<u8>& image, s32 channels)
         image[i]     = image[i + 2];
         image[i + 2] = temp;
     }
+}
+    
+// ** calculateImageSize
+u32 calculateImageSize(u16 width, u16 height, s32 totalMipLevels, PixelFormat format)
+{
+    u32 size = 0;
+    
+    switch (format)
+    {
+        case PixelDxtc1:
+        case PixelDxtc3:
+        case PixelDxtc5:
+            size = ((width + 3) >> 2) * ((height + 3) >> 2) * bytesPerBlock(format);
+            break;
+            
+        case PixelPvrtc2:
+            size = (width / 8) * (height / 4) * ((bytesPerBlock(format) * 4) / 8);
+            break;
+            
+        case PixelPvrtc4:
+            size = (width / 4) * (height / 4) * ((bytesPerBlock(format) * 4) / 8);
+            break;
+            
+        default:
+            size = width * height * bytesPerPixel(format);
+    }
+    
+    return size;
 }
 
 // ** tgaFromFile
@@ -144,6 +253,230 @@ Descriptor tgaFromFile(const String& fileName)
     fclose(file);
     
     return image;
+}
+    
+// ** cubeFromDds
+CubeMap cubeFromDds(const String& fileName)
+{
+    enum
+    {
+        // Bit flags for header
+        DDS_CAPS	    = 0x00000001,
+        DDS_HEIGHT	    = 0x00000002,
+        DDS_WIDTH	    = 0x00000004,
+        DDS_PITCH	    = 0x00000008,
+        DDS_PIXELFORMAT = 0x00001000,
+        DDS_MIPMAPCOUNT = 0x00020000,
+        DDS_LINEARSIZE  = 0x00080000,
+        DDS_DEPTH	    = 0x00800000,
+        
+        // Flags for pixel formats
+        DDS_ALPHA_PIXELS = 0x00000001,
+        DDS_ALPHA        = 0x00000002,
+        DDS_FOURCC	     = 0x00000004,
+        DDS_RGB	         = 0x00000040,
+        DDS_RGBA         = 0x00000041,
+        
+        // Flags for complex caps
+        DDS_COMPLEX	   = 0x00000008,
+        DDS_TEXTURE	   = 0x00001000,
+        DDS_MIPMAP	   = 0x00400000,
+        
+        // Flags for cubemaps
+        DDS_CUBEMAP	          = 0x00000200,
+        DDS_CUBEMAP_POSITIVEX = 0x00000400,
+        DDS_CUBEMAP_NEGATIVEX = 0x00000800,
+        DDS_CUBEMAP_POSITIVEY = 0x00001000,
+        DDS_CUBEMAP_NEGATIVEY = 0x00002000,
+        DDS_CUBEMAP_POSITIVEZ = 0x00004000,
+        DDS_CUBEMAP_NEGATIVEZ = 0x00008000,
+        DDS_VOLUME		      = 0x00200000
+    };
+
+    struct DdsPixelFormat
+    {
+        s32 dwSize;
+        s32 dwFlags;
+        s32 dwFourCC;
+        s32 dwRGBBitCount;
+        s32 dwRBitMask;
+        s32 dwGBitMask;
+        s32 dwBBitMask;
+        s32 dwABitMask;
+    };
+    
+    struct DdsHeader
+    {
+        s32            dwSize;
+        s32            dwFlags;
+        s32            dwHeight;
+        s32            dwWidth;
+        s32            dwPitchOrLinearSize;
+        s32            dwDepth;
+        s32            dwMipMapCount;
+        s32            dwReserved1[11];
+        DdsPixelFormat ddspf;
+        s32            dwCaps;
+        s32            dwCaps2;
+        s32            dwCaps3;
+        s32            dwCaps4;
+        s32            dwReserved2;
+    };
+    
+    DdsHeader		ddsd;
+    char				header[4];
+    uint				mipFactor;
+    //uint				imageSize, bufferSize;
+    int					sides[6] = {
+        DDS_CUBEMAP_POSITIVEX, DDS_CUBEMAP_NEGATIVEX,
+        DDS_CUBEMAP_POSITIVEY, DDS_CUBEMAP_NEGATIVEY,
+        DDS_CUBEMAP_POSITIVEZ, DDS_CUBEMAP_NEGATIVEZ
+    };
+    
+    FILE* file = fopen(fileName.c_str(), "rb");
+    if (!file)
+    {
+        return CubeMap();
+    }
+    
+    fread(header, 1, 4, file);
+    
+    if (strncmp(header, "DDS ", 4))
+    {
+        return CubeMap();
+    }
+    
+    fread(&ddsd, 1, sizeof(ddsd), file);
+    
+  //  CheckCaps( ddsd );
+    
+    //int numBlocks = ((ddsd.dwWidth + 3)/4) * ((ddsd.dwHeight + 3)/4);   // number of 4*4 texel blocks
+    int blockSize = 0;
+    
+    CubeMap cubeMap;
+    s32 channels = 0;
+    
+    if ((ddsd.dwFlags & DDS_FOURCC) && ddsd.ddspf.dwFourCC)
+    {
+        switch (ddsd.ddspf.dwFourCC)
+        {
+            case MAKEFOURCC('D', 'X', 'T', '1'):
+                cubeMap.format		= PixelDxtc1;
+                mipFactor	= 2;
+                blockSize	= 8;
+                break;
+                
+            case MAKEFOURCC('D', 'X', 'T', '3'):
+                cubeMap.format		= PixelDxtc3;
+                mipFactor	= 4;
+                blockSize	= 16;
+                break;
+                
+            case MAKEFOURCC('D', 'X', 'T', '5'):
+                cubeMap.format		= PixelDxtc5;
+                mipFactor	= 4;
+                blockSize	= 16;
+                break;
+                
+            //case MAKEFOURCC('A', 'T', 'I', '1'):
+            //    format = F_ATI1N;
+            //    break;
+            //case MAKEFOURCC('A', 'T', 'I', '2'):
+            //    format = F_ATI2N;
+            //    break;
+                
+            /*case 34:			format = PixelRG16F;
+                channels	= 2;
+                blockSize	= 4;
+                break;
+            case 36:			format = PixelRgba16F;
+                channels	= 4;
+                blockSize	= 8;
+                break;
+            case 111:			format = PixelR16F;
+                channels	= 1;
+                blockSize	= 8;
+                break;
+            case 112:			format = F_RG16F;
+                channels	= 2;
+                blockSize	= 2;
+                break;
+            case 113:			format = F_RGBA16F;
+                channels	= 4;
+                blockSize	= 8;
+                break;
+            case 114:			format = F_R32F;
+                channels	= 1;
+                blockSize	= 4;
+                break;
+            case 115:			format = F_RG32F;
+                channels	= 2;
+                blockSize	= 8;
+                break;
+            case 116:			format = F_RGBA32F;
+                channels	= 4;
+                blockSize	= 16;
+                break;
+            default:			cException::Error( "cDDSTextureCubeLoader::LoadTextureCube : unhandled FOURCC" );
+                break;*/
+            default:
+                NIMBLE_NOT_IMPLEMENTED
+        }
+    }
+    else
+    {
+        //	compression = TC_NONE;
+        
+        if (ddsd.dwFlags & DDS_RGBA && ddsd.ddspf.dwRGBBitCount == 32)
+        {
+            channels	= 4;
+            blockSize	= 4;
+            cubeMap.format		= PixelRgba8;
+        }
+        /*else if (ddsd.dwFlags & DDS_RGB && ddsd.ddspf.dwRGBBitCount == 32)
+        {
+            channels	= 4;
+            blockSize	= 4;
+            format		= F_X8R8G8B8;
+        }*/
+        else if(ddsd.dwFlags & DDS_RGB && ddsd.ddspf.dwRGBBitCount == 24)
+        {
+            channels	= 3;
+            blockSize	= 3;
+            cubeMap.format		= PixelRgb8;
+        }
+        else
+        {
+            NIMBLE_NOT_IMPLEMENTED;
+        }
+    }
+    
+    NIMBLE_ABORT_IF(ddsd.dwWidth != ddsd.dwHeight, "width and height should be equal for cubemaps");
+    //	_ASSERTE( ddsd.dwLinearSize != 0 );
+    //_ASSERTE( ddsd.dwWidth == ddsd.dwHeight );
+    
+    if (channels == 0)
+    {
+        channels = ( ddsd.ddspf.dwFlags & DDS_ALPHA_PIXELS ) ? 4 : 3;
+    }
+    
+    cubeMap.size = ddsd.dwWidth;
+    cubeMap.mipLevels = max2(1, ddsd.dwMipMapCount);
+    
+    u32 imageSize = bytesPerMipChain(cubeMap.format, cubeMap.size, cubeMap.size, cubeMap.mipLevels);
+    cubeMap.pixels.resize(imageSize * 6);
+    
+    for (s32 i = 0; i < 6; i++ )
+    {
+        if ((ddsd.dwCaps2 & sides[i]) == 0)
+        {
+            continue;
+        }
+        
+        fread(&cubeMap.pixels[i * imageSize], 1, imageSize, file);
+    }
+    
+    return cubeMap;
 }
     
 } // namespace ImageLoader

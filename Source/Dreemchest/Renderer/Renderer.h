@@ -534,21 +534,34 @@ namespace Renderer {
     //! Image loading routines used for debugging purposes.
     namespace ImageLoader
     {
+        typedef Array<u8> Surface;
+        
         //! A loaded image descriptor.
         struct Descriptor
         {
             u16         width;      //!< An image width.
             u16         height;     //!< An image height.
             PixelFormat format;     //!< An image pixel format.
-            Array<u8>   pixels;     //!< Loaded image pixels.
+            Surface     pixels;     //!< Loaded image pixels.
             
                         Descriptor( void )
                             : width(0), height(0) {}
             operator bool() const { return pixels.size() > 0; }
         };
         
+        struct CubeMap
+        {
+            u16         size;       //!< A cube map size.
+            s32         mipLevels;  //!< A total number of mip levels.
+            PixelFormat format;     //!< A stored image pixel format
+            Surface     pixels;     //!< Six sides of a cube map.
+        };
+        
         //! Loads a TGA image from a file.
         Descriptor tgaFromFile(const String& fileName);
+        
+        //! Loads a cube map from a DDS file.
+        CubeMap cubeFromDds(const String& fileName);
     } // namespace Image
     
     //! Mesh loading routines used for debugging purposes.
