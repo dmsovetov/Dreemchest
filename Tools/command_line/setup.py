@@ -27,7 +27,7 @@
 from setuptools import setup, find_packages
 
 setup(name='dreemchest',
-      version='0.37',
+      version='0.38',
       description='Dreemchest engine command line tool.',
       url='https://github.com/dmsovetov/Dreemchest',
       author='Dmitry Sovetov',
