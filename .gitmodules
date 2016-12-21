@@ -40,3 +40,6 @@
 [submodule "Externals/GAF"]
 	path = Externals/GAF
 	url = https://github.com/CatalystApps/Cocos2dxGAFPlayer
+[submodule "Externals/nvtt"]
+	path = Externals/nvtt
+	url = https://github.com/castano/nvidia-texture-tools
