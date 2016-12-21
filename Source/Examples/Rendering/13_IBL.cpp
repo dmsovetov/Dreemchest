@@ -71,11 +71,14 @@ static String s_fragmentShader =
     "    return vec2(diff, spec);                                               \n"
     "}                                                                          \n"
     "                                                                           \n"
-    "float fresnel(float ndotl, float bias, float pow)                          \n"
+    "float fresnel(float ndotl, float reflectance, float pow)                   \n"
     "{                                                                          \n"
     "    float facing = (1.0 - ndotl);                                          \n"
-    "    return max(bias + (1.0 - bias) * pow(facing, pow), 0.0);               \n"
+    "    return max(reflectance + (1.0 - reflectance) * pow(facing, pow), 0.0); \n"
     "}                                                                          \n"
+    "                                                                           \n"
+    "const float Eta = 0.66; // Ratio of indices of refraction                  \n"
+    "const float F = ((1.0-Eta) * (1.0-Eta)) / ((1.0+Eta) * (1.0+Eta));         \n"
     "                                                                           \n"
     "void main()                                                                \n"
     "{                                                                          \n"
@@ -86,7 +89,7 @@ static String s_fragmentShader =
     "   vec2  bln   = blinn(ldir, norm, cdir);                                  \n"
     "   vec2  lc    = lit(bln.x, bln.y, 0.95);                                  \n"
     "   float fs    = fresnel(bln.x, 0.2, 5.0);                                 \n"
-    "   float fe    = fresnel(dot(-cdir, norm), 0.2, 5.0);                       \n"
+    "   float fe    = fresnel(dot(-cdir, norm), F, 2.0);                        \n"
     "   float spec  = fs * pow(lc.y, 64.0);                                     \n"
     "   vec3  final = light.color * light.intensity * (lc.x + pow(lc.y, 64.0)); \n"
     "   gl_FragColor = vec4(mix(final, env, fe), 1.0);                          \n"
@@ -161,7 +164,7 @@ class PointLights : public RenderingApplicationDelegate
     {
         Logger::setStandardLogger();
 
-        if (!initialize(800 / 3, 600 / 3))
+        if (!initialize(800, 600))
         {
             application->quit(-1);
         }
