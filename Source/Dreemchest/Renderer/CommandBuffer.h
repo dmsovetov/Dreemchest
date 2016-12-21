@@ -128,7 +128,9 @@ namespace Renderer
                     const void*                 data;                       //!< A texture data that should be uploaded after construction.
                     u16                         width;                      //!< A texture width.
                     u16                         height;                     //!< A texture height.
+                    u8                          mipLevels;                  //!< A total number of mip levels stored in a data buffer.
                     PixelFormat                 format;                     //!< A texture format.
+                    u8                          type;                       //!< A texture type to be created.
                 } createTexture;
             };
         };

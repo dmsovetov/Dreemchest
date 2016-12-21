@@ -83,6 +83,8 @@ static PFNGLUNIFORMMATRIX4FVARBPROC     glUniformMatrix4fv      = NULL;
     #define GL_RGB32F   GL_RGB32F_ARB
 #endif  //  #if defined(DC_PLATFORM_WINDOWS)
     
+extern u32 bytesPerMip(PixelFormat format, u16 width, u16 height);
+    
 // ----------------------------------------------------------- OpenGL2::Buffer ----------------------------------------------------------- //
 
 // ** OpenGL2::Buffer::create
@@ -180,12 +182,16 @@ bool OpenGL2::Framebuffer::check(GLuint id)
 // ** OpenGL2::Framebuffer::destroyRenderBuffer
 void OpenGL2::Framebuffer::destroyRenderBuffer(GLuint id)
 {
+    DC_CHECK_GL_CONTEXT;
+    DC_CHECK_GL;
     glDeleteRenderbuffers(1, &id);
 }
 
 // ** OpenGL2::Framebuffer::destroy
 void OpenGL2::Framebuffer::destroy(GLuint id)
 {
+    DC_CHECK_GL_CONTEXT;
+    DC_CHECK_GL;
     glDeleteFramebuffers(1, &id);
 }
 
@@ -353,28 +359,93 @@ void OpenGL2::Program::use(GLuint program)
     
 // ----------------------------------------------------------- OpenGL2::Texture ---------------------------------------------------------- //
     
-// ** OpenGL2::Texture::create
-GLuint OpenGL2::Texture::create(GLenum target, const void* data, u16 width, u16 height, PixelFormat pixelFormat)
+// ** OpenGL2::Texture::create2D
+GLuint OpenGL2::Texture::create2D(const void* data, u16 width, u16 height, PixelFormat pixelFormat)
 {
     DC_CHECK_GL;
     GLuint id;
-    GLenum internalFormat = textureInternalFormat(pixelFormat);
-    GLenum format         = textureFormat(pixelFormat);
-    GLenum type           = textureType(pixelFormat);
-    GLint  align          = textureAlign(pixelFormat);
+    GLint  align = textureAlign(pixelFormat);
     
     glGenTextures(1, &id);
-    glBindTexture(target, id);
-    glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    //glCompressedTexImage2D( GL_TEXTURE_2D, level, internalFormat, width, height, 0, bytesPerMip( width, height ), data );
+    glBindTexture(GL_TEXTURE_2D, id);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glPixelStorei(GL_UNPACK_ALIGNMENT, align);
-    glTexImage2D(target, 0, internalFormat, width, height, 0, format, type, data);
-    glBindTexture(target, 0);
+    texImage(GL_TEXTURE_2D, reinterpret_cast<const GLbyte*>(data), width, height, 1, pixelFormat);
+    //glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, data);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     return id;
 }
+    
+// ** OpenGL2::Texture::createCube
+GLuint OpenGL2::Texture::createCube(const void* data, u16 size, u16 mipLevels, PixelFormat pixelFormat)
+{
+    DC_CHECK_GL;
+    GLuint id;
+    GLint  align = textureAlign(pixelFormat);
+    
+    glGenTextures(1, &id);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, id);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, mipLevels > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, mipLevels > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, align);
+    
+    const GLbyte* pixels = reinterpret_cast<const GLbyte*>(data);
+    for (s32 i = 0; i < 6; i++)
+    {
+        pixels += texImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, pixels, size, size, mipLevels, pixelFormat);
+    }
 
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    
+    return id;
+}
+    
+// ** OpenGL2::Texture::texImage
+GLsizei OpenGL2::Texture::texImage(GLenum target, const GLbyte* data, u16 width, u16 height, s32 mipLevels, PixelFormat pixelFormat)
+{
+    DC_CHECK_GL_CONTEXT;
+    DC_CHECK_GL;
+    
+    // Get texture parameters from a pixel format
+    GLenum internalFormat = textureInternalFormat(pixelFormat);
+    GLenum format         = textureFormat(pixelFormat);
+    GLenum type           = textureType(pixelFormat);
+    
+    // A variable to store a total number of bytes consumed
+    GLsizei bytesConsumed = 0;
+    
+    for (s32 i = 0; i < mipLevels; i++)
+    {
+        // Calculate mip level size
+        s32 mipLevelSize = bytesPerMip(pixelFormat, width, height);
+        
+        // Upload a mip level
+        switch (pixelFormat)
+        {
+            case PixelDxtc1:
+            case PixelDxtc3:
+            case PixelDxtc5:
+                glCompressedTexImage2D(target, i, internalFormat, width, height, 0, mipLevelSize, data);
+                break;
+                
+            default:
+                glTexImage2D(GL_TEXTURE_2D, i, internalFormat, width, height, 0, format, type, data);
+        }
+        
+        // Calculate next mip level size
+        width = width >> 1;
+        height = height >> 1;
+        
+        // Go to a next mip
+        data += mipLevelSize;
+        bytesConsumed += mipLevelSize;
+    }
+    
+    return bytesConsumed;
+}
+    
 // ** OpenGL2::Texture::bind
 void OpenGL2::Texture::bind(GLenum target, GLuint id, GLuint sampler)
 {
@@ -756,8 +827,11 @@ GLenum OpenGL2::textureAlign(PixelFormat pixelFormat)
 {
     switch (pixelFormat)
     {
-        case PixelRgb8: return 1;
-        default:        return 4;
+        case PixelDxtc1:
+        case PixelDxtc3:
+        case PixelDxtc5:
+        case PixelRgb8:     return 1;
+        default:            return 4;
     }
     
     return 4;

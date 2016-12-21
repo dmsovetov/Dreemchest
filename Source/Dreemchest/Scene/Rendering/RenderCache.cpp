@@ -217,7 +217,7 @@ Texture_ TestRenderCache::requestTexture( const ImageHandle& image )
     }
 
     const Image& data = *image;
-    Texture_ id = m_context->requestTexture( &data.mipLevel( 0 )[0], data.width(), data.height(), data.bytesPerPixel() == 3 ? Renderer::PixelRgb8 : Renderer::PixelRgba8 );
+    Texture_ id = m_context->requestTexture2D( &data.mipLevel( 0 )[0], data.width(), data.height(), data.bytesPerPixel() == 3 ? Renderer::PixelRgb8 : Renderer::PixelRgba8 );
     m_textures[image.asset().uniqueId()] = id;
 
     LogVerbose( "renderCache", "texture created for '%s'\n", image.asset().name().c_str() );

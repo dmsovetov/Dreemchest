@@ -70,8 +70,11 @@ namespace Renderer
         //! Queues a constant buffer instance for creation and returns it's index.
         ConstantBuffer_                         deprecatedRequestConstantBuffer(const void* data, s32 size, const UniformElement* elements);
         
-        //! Queues a texture instance for creation and returns it's index.
-        Texture_                                requestTexture(const void* data, u16 width, u16 height, PixelFormat format);
+        //! Queues a 2D texture instance for creation and returns it's index.
+        Texture_                                requestTexture2D(const void* data, u16 width, u16 height, PixelFormat format);
+        
+        //! Queues a cube texture instance for creation and returns it's index.
+        Texture_                                requestTextureCube(const void* data, u16 size, u16 mipLevels, PixelFormat format);
         
         //! Queues a pipeline feature layout instance for creation and returns it's index.
         FeatureLayout                           requestPipelineFeatureLayout(const PipelineFeature* features);

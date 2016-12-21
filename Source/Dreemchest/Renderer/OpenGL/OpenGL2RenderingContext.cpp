@@ -134,13 +134,13 @@ TransientRenderTarget OpenGL2RenderingContext::acquireRenderTarget(u16 width, u1
     // Create target texture
     {
         Texture_ texture = allocatePersistentIdentifier<Texture_>();
-        GLuint id = OpenGL2::Texture::create(GL_TEXTURE_2D, NULL, width, height, format);
-        m_textures.emplace(texture, id);
+        GLuint id = OpenGL2::Texture::create2D(NULL, width, height, format);
+        m_textures.emplace(texture, Texture(id, GL_TEXTURE_2D));
         renderTarget.textures[0] = texture;
     }
     
     // Create framebuffer object
-    GLuint textures[] = { m_textures[renderTarget.textures[0]] };
+    GLuint textures[] = { m_textures[renderTarget.textures[0]].id };
     renderTarget.id = OpenGL2::Framebuffer::create(textures, 1);
     
     // And attach a depth renderbuffer
@@ -163,7 +163,8 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
 {
     RequestedState              requestedState;
     TransientRenderTarget       transientRenderTarget;
-    GLenum                      id;
+    GLuint                      id;
+    GLenum                      target;
     
     for (s32 i = 0, n = commands.size(); i < n; i++)
     {
@@ -198,8 +199,25 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 break;
                 
             case CommandBuffer::OpCode::CreateTexture:
-                id = OpenGL2::Texture::create(GL_TEXTURE_2D, opCode.createTexture.data, opCode.createTexture.width, opCode.createTexture.height, opCode.createTexture.format);
-                m_textures.emplace(opCode.createTexture.id, id);
+                // Create a texture instance according to a type.
+                switch (opCode.createTexture.type)
+                {
+                    case TextureType2D:
+                        id = OpenGL2::Texture::create2D(opCode.createTexture.data, opCode.createTexture.width, opCode.createTexture.height, opCode.createTexture.format);
+                        target = GL_TEXTURE_2D;
+                        break;
+                        
+                    case TextureTypeCube:
+                        id = OpenGL2::Texture::createCube(opCode.createTexture.data, opCode.createTexture.width, opCode.createTexture.mipLevels, opCode.createTexture.format);
+                        target = GL_TEXTURE_CUBE_MAP;
+                        break;
+                        
+                    default:
+                        NIMBLE_NOT_IMPLEMENTED
+                }
+                
+                // Save a created texture identifier
+                m_textures.emplace(opCode.createTexture.id, Texture(id, target));
                 break;
                 
             case CommandBuffer::OpCode::CreateIndexBuffer:
@@ -522,7 +540,8 @@ void OpenGL2RenderingContext::compilePipelineState(RequestedState requested)
             continue;
         }
         
-        OpenGL2::Texture::bind(GL_TEXTURE_2D, m_textures[requested.texture[i]], i);
+        const Texture& texture = m_textures[requested.texture[i]];
+        OpenGL2::Texture::bind(texture.type, texture.id, i);
     }
     
     // Switch the input layout

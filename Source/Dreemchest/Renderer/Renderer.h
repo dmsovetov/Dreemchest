@@ -117,6 +117,16 @@ namespace Renderer {
         , MaxVertexAttributes
     };
     
+    //! Available texture types.
+    enum TextureType
+    {
+          TextureType1D         //!< A one-dimensional texture.
+        , TextureType2D         //!< A two-dimensional texture.
+        , TextureType3D         //!< A three-dimensional texture.
+        , TextureTypeCube       //!< A cube texture.
+        , TotalTextureTypes //!< A total number of texture types.
+    };
+    
     //! Available resource type tags used to distinguish handles that point to different types of resources.
     struct RenderResourceType
     {

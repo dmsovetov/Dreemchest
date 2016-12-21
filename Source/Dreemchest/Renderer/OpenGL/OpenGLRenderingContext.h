@@ -79,6 +79,21 @@ namespace Renderer
                                 {
                                 }
         };
+        
+        //! A texture instance descriptor.
+        struct Texture
+        {
+            GLuint              id;             //!< A texture OpenGL id.
+            GLenum              type;           //!< A texture type (1D, 2D, 3D, Cube).
+            
+                                //! Constructs an instance of texture
+                                Texture()
+                                    : id(0), type(0) {}
+            
+                                //! Constructs an instance of texture
+                                Texture(GLuint id, GLenum type)
+                                    : id(id), type(type) {}
+        };
     
         //! A container type to store program permutations.
         typedef HashMap<PipelineFeatures, Permutation> ProgramPermutations;
@@ -86,7 +101,7 @@ namespace Renderer
         FixedArray<GLuint>                      m_vertexBuffers;        //!< Allocated vertex buffers.
         FixedArray<GLuint>                      m_indexBuffers;         //!< Allocated index buffers.
         FixedArray<GLuint>                      m_constantBuffers;      //!< Allocated constant buffers.
-        FixedArray<GLuint>                      m_textures;             //!< Allocated textures.
+        FixedArray<Texture>                     m_textures;             //!< Allocated textures.
         FixedArray<RenderTarget>                m_renderTargets;        //!< Allocated render targets.
         List<TransientRenderTarget>             m_freeRenderTargets;    //!< A list of free render targets.
         mutable FixedArray<ProgramPermutations> m_permutations;         //!< Available program permutations.

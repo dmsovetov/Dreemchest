@@ -145,8 +145,14 @@ namespace Renderer
         {
         public:
             
-            //! Creates a texture object with a specified type and returns it's identifier.
-            static GLuint   create(GLenum target, const void* data, u16 width, u16 height, PixelFormat pixelFormat);
+            //! Creates a 2D texture object with a specified type and returns it's identifier.
+            static GLuint   create2D(const void* data, u16 width, u16 height, PixelFormat pixelFormat);
+            
+            //! Creates a cube texture object with a specified type and returns it's identifier.
+            static GLuint   createCube(const void* data, u16 size, u16 mipLevels, PixelFormat pixelFormat);
+            
+            //! Uploads a image data to a texture.
+            static GLsizei  texImage(GLenum target, const GLbyte* data, u16 width, u16 height, s32 mipLevels, PixelFormat pixelFormat);
             
             //! Binds a texture object to a pipeline.
             static void     bind(GLenum target, GLuint id, GLuint sampler);
