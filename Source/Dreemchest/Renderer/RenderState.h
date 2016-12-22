@@ -74,7 +74,7 @@ namespace Renderer
                                         State( void );
 
                                         //! Constructs a State instance of specified type.
-                                        State( Type type, PersistentResourceId id );
+                                        State( Type type, ResourceId id );
 
                                         //! Constructs a cull face render state instance.
                                         State( TriangleFace face );
@@ -100,8 +100,8 @@ namespace Renderer
                                         //! Constructs a blend function render state.
                                         State( BlendFactor src, BlendFactor dst );
 
-                                        //! Constructs a rendered texture binding state.
-                                        State( TransientRenderTarget id, u8 sampler, u8 attachment );
+                                        //! Constructs a transient texture binding state.
+                                        State(TransientTexture id, u8 sampler);
         
                                         //! Constructs a rendered texture binding state.
                                         State( Texture_ id, u8 sampler );
@@ -142,12 +142,9 @@ namespace Renderer
         //! Returns a sampler index.
         s32                             samplerIndex() const;
         
-        //! Returns a render target attachment index.
-        s32                             attachmentIndex() const;
-        
         union
         {
-            PersistentResourceId        resourceId;         //!< Resource identifier to be bound to a pipeline.
+            ResourceId                  resourceId;         //!< Resource identifier to be bound to a pipeline.
             u16                         compareFunction;    //!< A compare function value.
             u16                         cullFace;           //!< A face value.
             u16                         rasterization;      //!< A polygon rasterization mode.
@@ -213,8 +210,8 @@ namespace Renderer
         //! Binds a texture to a specified sampler.
         void                            bindTexture(Texture_ id, u8 sampler);
 
-        //! Binds a rendered texture to a specified sampler.
-        void                            bindRenderedTexture(TransientRenderTarget renderTarget, u8 sampler, u8 attachment = RenderTargetAttachment::Color0);
+        //! Binds a transient texture to a specified sampler.
+        void                            bindTexture(TransientTexture id, u8 sampler);
 
         //! Sets a blend function.
         void                            setBlend(BlendFactor src, BlendFactor dst);

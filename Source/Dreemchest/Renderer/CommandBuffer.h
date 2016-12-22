@@ -52,8 +52,8 @@ namespace Renderer
                 , RenderTarget          //!< Begins rendering to a viewport.
                 , UploadConstantBuffer  //!< Uploads data to a constant buffer.
                 , UploadVertexBuffer    //!< Uploads data to a vertex buffer.
-                , AcquireRenderTarget   //!< Acquires an intermediate render target.
-                , ReleaseRenderTarget   //!< Releases an intermediate render target.
+                , AcquireTexture        //!< Acquires a transient texture instance.
+                , ReleaseTexture        //!< Releases a transient texture instance.
                 , CreateInputLayout     //!< Creates a new input layout from a vertex declaration.
                 , CreateVertexBuffer    //!< Creates a new vertex buffer object.
                 , CreateIndexBuffer     //!< Creates a new index buffer object.
@@ -87,14 +87,15 @@ namespace Renderer
                     NormalizedViewport          viewport;                   //!< A viewport value to be set.
                     const CommandBuffer*        commands;                   //!< A command buffer to be executed after setting a viewport.
                 } renderTarget;
-
+                
                 struct
                 {
-                    TransientResourceId         id;                         //!< An intermediate render target handle.
-                    s32                         width;                      //!< A requested render target width.
-                    s32                         height;                     //!< A requested render target height.
-                    PixelFormat                 format;                     //!< A requested render target format.
-                } intermediateRenderTarget;
+                    TransientResourceId         id;
+                    u16                         width;
+                    u16                         height;
+                    PixelFormat                 format;
+                    u8                          type;
+                } transientTexture;
 
                 struct
                 {
@@ -103,28 +104,28 @@ namespace Renderer
 
                 struct
                 {
-                    PersistentResourceId        id;                         //!< A target buffer handle.
+                    ResourceId                  id;                         //!< A target buffer handle.
                     const void*                 data;                       //!< A source data point.
                     s32                         size;                       //!< A total number of bytes to upload.
                 } upload;
                 
                 struct
                 {
-                    PersistentResourceId        id;                         //!< Handle to an input layout being constructed.
+                    ResourceId                  id;                         //!< Handle to an input layout being constructed.
                     u8                          format;                     //!< Vertex format used by an input layout constructor.
                 } createInputLayout;
                 
                 struct
                 {
-                    PersistentResourceId        id;                         //!< Handle to a buffer object being constructed.
+                    ResourceId                  id;                         //!< Handle to a buffer object being constructed.
                     const void*                 data;                       //!< Data that should be uploaded to a buffer after construction.
                     s32                         size;                       //!< A buffer size.
-                    PersistentResourceId        layout;                     //!< Used by a constant buffer constructor.
+                    ResourceId                  layout;                     //!< Used by a constant buffer constructor.
                 } createBuffer;
                 
                 struct
                 {
-                    PersistentResourceId        id;                         //!< Handle to a texture being constructed.
+                    ResourceId                  id;                         //!< Handle to a texture being constructed.
                     const void*                 data;                       //!< A texture data that should be uploaded after construction.
                     u16                         width;                      //!< A texture width.
                     u16                         height;                     //!< A texture height.
@@ -149,15 +150,15 @@ namespace Renderer
 
         //! Emits a command buffer execution command.
         void                        execute( const CommandBuffer& commands );
-
-        //! Emits an acquire intermediate render target command.
-        TransientRenderTarget       acquireRenderTarget( s32 width, s32 height, PixelFormat format );
-
-        //! Emits a release an intermediate render target command.
-        void                        releaseRenderTarget( TransientRenderTarget id );
+        
+        //! Emits an acquire transient texture command.
+        TransientTexture            acquireTexture(u16 width, u16 height, PixelFormat format);
+        
+        //! Emits a release an transient render target command.
+        void                        releaseTexture(TransientTexture id);
 
         //! Emits a rendering to a viewport of a specified render target command.
-        CommandBuffer&              renderToTarget( RenderFrame& frame, TransientRenderTarget id, const Rect& viewport = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) );
+        CommandBuffer&              renderToTexture(RenderFrame& frame, TransientTexture id, const Rect& viewport = Rect(0.0f, 0.0f, 1.0f, 1.0f));
         
         //! Emits a rendering to a viewport.
         CommandBuffer&              renderToTarget( RenderFrame& frame, const Rect& viewport = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) );
@@ -193,8 +194,8 @@ namespace Renderer
 
     private:
 
-        Array<OpCode>               m_commands;             //!< An array of recorded commands.
-        u8                          m_renderTargetIndex;    //!< An intermediate render target index relative to a current stack offset.
+        Array<OpCode>               m_commands;                 //!< An array of recorded commands.
+        u8                          m_transientResourceIndex;   //!< A transient resource index relative to a current stack offset.
     };
 
     // ** CommandBuffer::size

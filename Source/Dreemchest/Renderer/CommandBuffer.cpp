@@ -34,7 +34,7 @@ namespace Renderer
 
 // ** CommandBuffer::CommandBuffer
 CommandBuffer::CommandBuffer( void )
-    : m_renderTargetIndex( 0 )
+    : m_transientResourceIndex(0)
 {
 }
     
@@ -68,8 +68,8 @@ void CommandBuffer::execute( const CommandBuffer& commands )
     push( opCode );
 }
 
-// ** CommandBuffer::renderToTarget
-CommandBuffer& CommandBuffer::renderToTarget( RenderFrame& frame, TransientRenderTarget id, const Rect& viewport )
+// ** CommandBuffer::renderToTexture
+CommandBuffer& CommandBuffer::renderToTexture(RenderFrame& frame, TransientTexture id, const Rect& viewport)
 {
     CommandBuffer& commands = frame.createCommandBuffer();
 
@@ -90,32 +90,35 @@ CommandBuffer& CommandBuffer::renderToTarget( RenderFrame& frame, TransientRende
 // ** CommandBuffer::renderToTarget
 CommandBuffer& CommandBuffer::renderToTarget( RenderFrame& frame, const Rect& viewport )
 {
-    return renderToTarget(frame, TransientRenderTarget(), viewport);
+    return renderToTexture(frame, TransientTexture(), viewport);
 }
 
-// ** CommandBuffer::acquireRenderTarget
-TransientRenderTarget CommandBuffer::acquireRenderTarget( s32 width, s32 height, PixelFormat format )
+// ** CommandBuffer::acquireTexture
+TransientTexture CommandBuffer::acquireTexture(u16 width, u16 height, PixelFormat format)
 {
-    NIMBLE_ABORT_IF( m_renderTargetIndex + 1 >= 255, "too much render targets used" );
-
+    NIMBLE_ABORT_IF( m_transientResourceIndex + 1 >= 255, "too transient resources used" );
+    
+    TransientTexture id = TransientTexture::create(++m_transientResourceIndex);
+    
     OpCode opCode;
-    opCode.type = OpCode::AcquireRenderTarget;
+    opCode.type = OpCode::AcquireTexture;
     opCode.sorting = 0;
-    opCode.intermediateRenderTarget.id     = ++m_renderTargetIndex;
-    opCode.intermediateRenderTarget.width  = width;
-    opCode.intermediateRenderTarget.height = height;
-    opCode.intermediateRenderTarget.format = format;
+    opCode.transientTexture.id     = id;
+    opCode.transientTexture.width  = width;
+    opCode.transientTexture.height = height;
+    opCode.transientTexture.format = format;
+    opCode.transientTexture.type = TextureType2D;
     push( opCode );
-
-    return TransientRenderTarget::create(opCode.intermediateRenderTarget.id);
+    
+    return id;
 }
 
-// ** CommandBuffer::releaseRenderTarget
-void CommandBuffer::releaseRenderTarget( TransientRenderTarget id )
+// ** CommandBuffer::releaseTexture
+void CommandBuffer::releaseTexture(TransientTexture id)
 {
     OpCode opCode;
-    opCode.type = OpCode::ReleaseRenderTarget;
-    opCode.intermediateRenderTarget.id = id;
+    opCode.type = OpCode::ReleaseTexture;
+    opCode.transientTexture.id = id;
     opCode.sorting = 0;
     push( opCode );
 }

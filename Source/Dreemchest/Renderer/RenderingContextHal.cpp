@@ -68,6 +68,7 @@ RenderingContextHal::RenderingContextHal(RenderViewPtr view, HalPtr hal)
 // ** RenderingContextHal::renderToTarget
 void RenderingContextHal::renderToTarget( const RenderFrame& frame, u8 renderTarget, const NormalizedViewport* viewport, const CommandBuffer& commands )
 {
+#if 0
     Rect prevViewport;
     m_hal->getViewport(prevViewport);
     
@@ -95,6 +96,7 @@ void RenderingContextHal::renderToTarget( const RenderFrame& frame, u8 renderTar
 
     // Pop a viewport
     m_hal->setViewport(prevViewport);
+#endif  //  #if 0
 }
 
 // ** RenderingContextHal::executeCommandBuffer
@@ -128,17 +130,6 @@ void RenderingContextHal::executeCommandBuffer( const RenderFrame& frame, const 
                                                             }
                                                             break;
         case CommandBuffer::OpCode::RenderTarget:           renderToTarget( frame, opCode.renderTarget.id, &opCode.renderTarget.viewport, *opCode.renderTarget.commands );
-                                                            break;
-        case CommandBuffer::OpCode::AcquireRenderTarget:    {
-                                                                TransientRenderTarget id = acquireRenderTarget(opCode.intermediateRenderTarget.width, opCode.intermediateRenderTarget.height, opCode.intermediateRenderTarget.format);
-                                                                loadTransientTarget(opCode.intermediateRenderTarget.id, id);
-                                                            }
-                                                            break;
-        case CommandBuffer::OpCode::ReleaseRenderTarget:    {
-                                                                TransientRenderTarget id = transientTarget(opCode.intermediateRenderTarget.id);
-                                                                releaseRenderTarget(id);
-                                                                unloadTransientTarget(opCode.intermediateRenderTarget.id);
-                                                            }
                                                             break;
         case CommandBuffer::OpCode::DrawIndexed:            {
                                                                 // Apply rendering states from a stack
@@ -466,10 +457,12 @@ void RenderingContextHal::switchTexture( const RenderFrame& frame, const State& 
     }
     else
     {
+    #if 0
         NIMBLE_BREAK_IF( abs( id ) > 255, "invalid identifier" );
         Renderer::Texture2DPtr texture = intermediateRenderTarget(transientTarget( -id ))->attachment(state.attachmentIndex());
         NIMBLE_BREAK_IF( !texture.valid(), "invalid render target attachment" );
         m_hal->setTexture( samplerIndex, texture.get() );
+    #endif  //  #if 0
     }
 
     // Update resource features
@@ -605,6 +598,7 @@ void RenderingContextHal::switchPolygonOffset( const RenderFrame& frame, const S
     return shader;
 }*/
 
+#if 0
 // ** RenderingContextHal::acquireRenderTarget
 TransientRenderTarget RenderingContextHal::acquireRenderTarget( u16 width, u16 height, PixelFormat format )
 {
@@ -654,6 +648,7 @@ RenderTargetWPtr RenderingContextHal::intermediateRenderTarget( TransientRenderT
 {
     return m_renderTargets[static_cast<s32>(id) - 1].renderTarget;
 }
+#endif  //  #if 0
 
 } // namespace Renderer
 

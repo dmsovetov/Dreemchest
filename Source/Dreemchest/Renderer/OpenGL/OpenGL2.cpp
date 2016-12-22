@@ -128,22 +128,13 @@ void OpenGL2::Framebuffer::bind(GLuint id)
 }
     
 // ** OpenGL2::Framebuffer::create
-GLuint OpenGL2::Framebuffer::create(GLuint *attachments, GLuint count)
+GLuint OpenGL2::Framebuffer::create()
 {
     DC_CHECK_GL_CONTEXT;
     DC_CHECK_GL;
     
     GLuint id;
     glGenFramebuffers(1, &id);
-    glBindFramebuffer(GL_FRAMEBUFFER, id);
-    
-    for (GLuint i = 0; i < count; i++)
-    {
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, attachments[i], 0);
-    }
-    
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    
     return id;
 }
     
@@ -161,9 +152,15 @@ GLuint OpenGL2::Framebuffer::renderbuffer(GLuint id, GLsizei width, GLsizei heig
     
     glBindFramebuffer(GL_FRAMEBUFFER, id);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, rid);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0 );
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     
     return rid;
+}
+    
+// ** OpenGL2::Framebuffer::texture2D
+void OpenGL2::Framebuffer::texture2D(GLuint id, GLenum attachment, GLenum target, GLint level)
+{
+    glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, target, id, level);
 }
     
 // ** OpenGL2::Framebuffer::check

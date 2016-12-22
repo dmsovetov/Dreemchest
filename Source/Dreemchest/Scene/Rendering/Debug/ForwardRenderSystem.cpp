@@ -72,8 +72,8 @@ void ForwardRenderSystem::emitRenderOperations( RenderFrame& frame, CommandBuffe
 // ** ForwardRenderSystem::renderSpotLight
 void ForwardRenderSystem::renderSpotLight( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const ForwardRenderer& forwardRenderer, const RenderScene::LightNode& light )
 {
-    TransientRenderTarget shadowTexture;
-    ShadowParameters         shadowParameters;
+    TransientTexture shadowTexture;
+    ShadowParameters shadowParameters;
 
     // Construct a view-projection matrix for this spot light
     Matrix4 viewProjection = Matrix4::perspective( light.light->cutoff() * 2.0f, 1.0f, 0.1f, light.light->range() * 2.0f ) * light.matrix->inversed();
@@ -91,7 +91,7 @@ void ForwardRenderSystem::renderSpotLight( RenderFrame& frame, CommandBuffer& co
 
     // Release an intermediate shadow render target
     if( shadowTexture ) {
-        commands.releaseRenderTarget( shadowTexture );
+        commands.releaseTexture(shadowTexture);
     }
 }
 
@@ -129,7 +129,7 @@ void ForwardRenderSystem::renderDirectionalLight( RenderFrame& frame, CommandBuf
         parameters.invSize   = 1.0f / shadowSize;
         parameters.transform = cascade.transform;
 
-        TransientRenderTarget shadows = m_shadows.render( frame, commands, stateStack, parameters );
+        TransientTexture shadows = m_shadows.render( frame, commands, stateStack, parameters );
 
         RenderScene::CBuffer::ClipPlanes clip = RenderScene::CBuffer::ClipPlanes::fromNearAndFar( cameraTransform.axisZ(), cameraTransform.worldSpacePosition(), cascade.near, cascade.far );
 
@@ -138,11 +138,11 @@ void ForwardRenderSystem::renderDirectionalLight( RenderFrame& frame, CommandBuf
         // Render a debug shadow texture
         if( forwardRenderer.isDebugCascadeShadows() )
         {
-            m_debugRenderTarget.render( frame, commands, stateStack, viewport, shadows, RenderTargetAttachment::Depth, 128, j * 130, 0 );
+            m_debugRenderTarget.render( frame, commands, stateStack, viewport, shadows, 128, j * 130, 0 );
         }
 
         // Release an intermediate shadow render target
-        commands.releaseRenderTarget( shadows );
+        commands.releaseTexture(shadows);
     }
 
     // Render a debug info for a shadow cascades
@@ -152,7 +152,7 @@ void ForwardRenderSystem::renderDirectionalLight( RenderFrame& frame, CommandBuf
 }
 
 // ** ForwardRenderSystem::renderLight
-void ForwardRenderSystem::renderLight( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const RenderScene::LightNode& light, const RenderScene::CBuffer::ClipPlanes* clip, TransientRenderTarget shadows )
+void ForwardRenderSystem::renderLight( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const RenderScene::LightNode& light, const RenderScene::CBuffer::ClipPlanes* clip, TransientTexture shadows )
 {
     // A light type feature bits
     PipelineFeatures lightType[] = { ShaderPointLight, ShaderSpotLight, ShaderDirectionalLight };
@@ -177,7 +177,7 @@ void ForwardRenderSystem::renderLight( RenderFrame& frame, CommandBuffer& comman
     // Bind a rendered shadowmap
     if( shadows )
     {
-        state->bindRenderedTexture( shadows, TextureSampler::Shadow, RenderTargetAttachment::Depth );
+        state->bindTexture(shadows, TextureSampler::Shadow);
         state->bindConstantBuffer( m_shadows.cbuffer(), Constants::Shadow );
     }
 

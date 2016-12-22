@@ -98,12 +98,12 @@ const String& ShaderLibrary::computeShader(ComputeShader id) const
 }
  
 // ** ShaderLibrary::allocateShader
-PersistentResourceId ShaderLibrary::allocateShader(const String& name, const String& code, ShaderType type)
+ResourceId ShaderLibrary::allocateShader(const String& name, const String& code, ShaderType type)
 {
     NIMBLE_ABORT_IF(!m_identifiers[type].hasFreeIndices(), "too much shaders allocated");
     
     // Acquire a next resource identifier
-    PersistentResourceId id = m_identifiers[type].acquire();
+    ResourceId id = m_identifiers[type].acquire();
     
     // Create shader
     Shader shader;

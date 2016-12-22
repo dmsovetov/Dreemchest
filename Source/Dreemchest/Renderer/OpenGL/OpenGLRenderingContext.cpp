@@ -35,6 +35,7 @@ namespace Renderer
 OpenGLRenderingContext::OpenGLRenderingContext(RenderViewPtr view)
     : RenderingContext(view)
 {
+    m_framebuffers.push(Framebuffer());
 }
 
 // ** OpenGLRenderingContext::lookupPermutation
@@ -85,6 +86,39 @@ GLint OpenGLRenderingContext::findUniformLocation(Program program, PipelineFeatu
     uniforms[name.hash()] = location;
     
     return location;
+}
+
+// ** OpenGLRenderingContext::acquireFramebuffer
+s32 OpenGLRenderingContext::acquireFramebuffer(u16 width, u16 height)
+{
+    for (s32 i = 0, n = m_framebuffers.count(); i < n; i++)
+    {
+        if (m_framebuffers[i].width == width && m_framebuffers[i].height == height)
+        {
+            m_framebuffers[i].acquired = true;
+            return i;
+        }
+    }
+    
+    return 0;
+}
+    
+// ** OpenGLRenderingContext::releaseFramebuffer
+void OpenGLRenderingContext::releaseFramebuffer(s32 index)
+{
+    m_framebuffers[index].acquired = false;
+}
+
+// ** OpenGLRenderingContext::allocateFramebuffer
+s32 OpenGLRenderingContext::allocateFramebuffer(GLuint id, GLuint depth, u16 width, u16 height)
+{
+    Framebuffer framebuffer;
+    framebuffer.id = id;
+    framebuffer.depth = depth;
+    framebuffer.width = width;
+    framebuffer.height = height;
+    framebuffer.acquired = true;
+    return m_framebuffers.push(framebuffer);
 }
     
 } // namespace Renderer

@@ -463,7 +463,7 @@ namespace Renderer {
 
     protected:
 
-        Texture2DPtr                    m_attachments[RenderTargetAttachment::Total];    //!< Texture attachments.
+        Texture2DPtr                   m_attachments[8];    //!< Texture attachments.
         u32                            m_width;                            //!< Render target width.
         u32                            m_height;                            //!< Render target height.
     };

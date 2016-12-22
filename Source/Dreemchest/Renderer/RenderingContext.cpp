@@ -38,13 +38,13 @@ DC_BEGIN_DREEMCHEST
 namespace Renderer
 {
 
-// -------------------------------------------------------------------- RenderingContext::TransientTargetStack ------------------------------------------------------------------- //
+// ------------------------------------------------------------------ RenderingContext::TransientResourceStack ----------------------------------------------------------------- //
 
 /*!
  Transient target stack is used to convert local indices that are
- stored in commands to a global index of an intermediate render target.
+ stored in commands to a global index of an transient resources.
  */
-class RenderingContext::TransientTargetStack
+class RenderingContext::TransientResourceStack
 {
 public:
     
@@ -57,49 +57,46 @@ public:
     //! A total size of an intermediate stack size.
     enum { MaxStackSize = MaxStackFrames * StackFrameSize };
     
-    //! An intermediate render target slot index type.
-    typedef u8 Index;
-    
-                                //! Constructs an TransientTargetStack instance.
-                                TransientTargetStack( void );
+                                //! Constructs an TransientResourceStack instance.
+                                TransientResourceStack();
     
     //! Pushes a new stack frame.
-    void                        pushFrame( void );
+    void                        pushFrame();
     
     //! Pops an active stack frame.
-    void                        popFrame( void );
+    void                        popFrame();
     
-    //! Returns a render target by a local index.
-    TransientRenderTarget       get( Index index ) const;
+    //! Returns a persistent resource by a transient one.
+    ResourceId                  get(TransientResourceId index) const;
     
-    //! Loads an acquired intermediate render target to a specified local slot.
-    void                        load( Index index, TransientRenderTarget id );
+    //! Loads an acquired transient resource to a specified local slot.
+    void                        load(TransientResourceId index, ResourceId id);
     
-    //! Unloads an intermediate render target from a specified local slot.
-    void                        unload( Index index );
+    //! Unloads a transient resource from a specified local slot.
+    void                        unload(TransientResourceId index);
     
 private:
     
-    TransientRenderTarget*   m_stackFrame;                   //!< An active render target stack frame.
-    TransientRenderTarget    m_identifiers[MaxStackSize];    //!< An array of intermediate render target handles.
+    ResourceId*                 m_stackFrame;                   //!< An active render target stack frame.
+    ResourceId                  m_identifiers[MaxStackSize];    //!< An array of intermediate render target handles.
 };
 
-// ** RenderingContext::TransientTargetStack::TransientTargetStack
-RenderingContext::TransientTargetStack::TransientTargetStack( void )
+// ** RenderingContext::TransientResourceStack::TransientResourceStack
+RenderingContext::TransientResourceStack::TransientResourceStack( void )
     : m_stackFrame( m_identifiers )
 {
     memset( m_identifiers, 0, sizeof m_identifiers );
 }
 
-// ** RenderingContext::TransientTargetStack::pushFrame
-void RenderingContext::TransientTargetStack::pushFrame( void )
+// ** RenderingContext::TransientResourceStack::pushFrame
+void RenderingContext::TransientResourceStack::pushFrame( void )
 {
     NIMBLE_ABORT_IF( (m_stackFrame + StackFrameSize) > (m_identifiers + MaxStackSize), "frame stack overflow" );
     m_stackFrame += StackFrameSize;
 }
 
-// ** RenderingContext::TransientTargetStack::popFrame
-void RenderingContext::TransientTargetStack::popFrame( void )
+// ** RenderingContext::TransientResourceStack::popFrame
+void RenderingContext::TransientResourceStack::popFrame( void )
 {
     NIMBLE_ABORT_IF( m_stackFrame == m_identifiers, "stack underflow" );
     
@@ -116,22 +113,22 @@ void RenderingContext::TransientTargetStack::popFrame( void )
     m_stackFrame -= StackFrameSize;
 }
 
-// ** RenderingContext::TransientTargetStack::get
-TransientRenderTarget RenderingContext::TransientTargetStack::get( Index index ) const
+// ** RenderingContext::TransientResourceStack::get
+ResourceId RenderingContext::TransientResourceStack::get(TransientResourceId index) const
 {
     NIMBLE_ABORT_IF( index == 0, "invalid render target index" );
     return m_stackFrame[index - 1];
 }
 
-// ** RenderingContext::TransientTargetStack::load
-void RenderingContext::TransientTargetStack::load( Index index, TransientRenderTarget id )
+// ** RenderingContext::TransientResourceStack::load
+void RenderingContext::TransientResourceStack::load(TransientResourceId index, ResourceId id)
 {
     NIMBLE_ABORT_IF( index == 0, "invalid render target index" );
     m_stackFrame[index - 1] = id;
 }
 
-// ** RenderingContext::TransientTargetStack::unload
-void RenderingContext::TransientTargetStack::unload( Index index )
+// ** RenderingContext::TransientResourceStack::unload
+void RenderingContext::TransientResourceStack::unload(TransientResourceId index)
 {
     NIMBLE_ABORT_IF( index == 0, "invalid render target index" );
     m_stackFrame[index - 1] = 0;
@@ -259,7 +256,7 @@ RenderingContext::RenderingContext(RenderViewPtr view)
     m_constructionCommandBuffer = DC_NEW ConstructionCommandBuffer;
     
     // Create an intermediate target stack
-    m_intermediateTargets = DC_NEW TransientTargetStack;
+    m_transientResources = DC_NEW TransientResourceStack;
     
     // Reset input layout cache
     memset( m_inputLayoutCache, 0, sizeof( m_inputLayoutCache ) );
@@ -267,13 +264,8 @@ RenderingContext::RenderingContext(RenderViewPtr view)
     // Resize all resource index managers
     for (s32 i = 0; i < RenderResourceType::TotalTypes; i++)
     {
-        // Allocate space for 32 persistent identifiers and reserve the zero id.
-        m_persistentIdentifiers[i].resize(32);
-        m_persistentIdentifiers[i].acquire();
-        
-        // Do the same with transient identifiers.
-        m_transientIdentifiers[i].resize(32);
-        m_transientIdentifiers[i].acquire();
+        m_identifiers[i].resize(32);
+        m_identifiers[i].acquire();
     }
     
     // Initialize a default state block
@@ -342,61 +334,48 @@ void RenderingContext::display( RenderFrame& frame )
 void RenderingContext::execute( const RenderFrame& frame, const CommandBuffer& commands )
 {
     // Push a new frame to an intermediate target stack
-    m_intermediateTargets->pushFrame();
+    m_transientResources->pushFrame();
     
     // Execute a command buffer
     executeCommandBuffer(frame, commands);
     
     // Pop a stack frame
-    m_intermediateTargets->popFrame();
+    m_transientResources->popFrame();
 }
     
-// ** RenderingContext::loadTransientTarget
-void RenderingContext::loadTransientTarget(u8 index, TransientRenderTarget id)
+// ** RenderingContext::loadTransientResource
+void RenderingContext::loadTransientResource(TransientResourceId transient, ResourceId id)
 {
-    m_intermediateTargets->load(index, id);
+    m_transientResources->load(transient, id);
 }
 
-// ** RenderingContext::unloadTransientTarget
-void RenderingContext::unloadTransientTarget(u8 index)
+// ** RenderingContext::unloadTransientResource
+void RenderingContext::unloadTransientResource(TransientResourceId transient)
 {
-    m_intermediateTargets->unload(index);
+    m_transientResources->unload(transient);
 }
     
 // ** RenderingContext::transientTarget
-TransientRenderTarget RenderingContext::transientTarget(u8 index)
+ResourceId RenderingContext::transientResource(TransientResourceId transient)
 {
-    return m_intermediateTargets->get(index);
+    return m_transientResources->get(transient);
 }
 
-// ** RenderingContext::allocatePersistentIdentifier
-PersistentResourceId RenderingContext::allocatePersistentIdentifier(RenderResourceType::Enum type)
+// ** RenderingContext::allocateIdentifier
+ResourceId RenderingContext::allocateIdentifier(RenderResourceType::Enum type)
 {
-    NIMBLE_ABORT_IF(!m_persistentIdentifiers[type].hasFreeIndices(), "too much persistent identifiers allocated");
-    return m_persistentIdentifiers[type].acquire();
+    NIMBLE_ABORT_IF(!m_identifiers[type].hasFreeIndices(), "too much persistent identifiers allocated");
+    return m_identifiers[type].acquire();
 }
 
-// ** RenderingContext::releasePersistentIdentifier
-void RenderingContext::releasePersistentIdentifier(RenderResourceType::Enum type, PersistentResourceId id)
+// ** RenderingContext::releaseIdentifier
+void RenderingContext::releaseIdentifier(RenderResourceType::Enum type, ResourceId id)
 {
-    m_persistentIdentifiers[type].release(id);
-}
-
-// ** RenderingContext::allocateTransientIdentifier
-TransientResourceId RenderingContext::allocateTransientIdentifier(RenderResourceType::Enum type)
-{
-    NIMBLE_ABORT_IF(!m_transientIdentifiers[type].hasFreeIndices(), "too much persistent identifiers allocated");
-    return m_transientIdentifiers[type].acquire();
-}
-
-// ** RenderingContext::releaseTransientIdentifier
-void RenderingContext::releaseTransientIdentifier(RenderResourceType::Enum type, TransientResourceId id)
-{
-    m_transientIdentifiers[type].release(id);
+    m_identifiers[type].release(id);
 }
 
 // ** RenderingContext::requestInputLayout
-InputLayout RenderingContext::requestInputLayout( const VertexFormat& format )
+InputLayout RenderingContext::requestInputLayout(const VertexFormat& format)
 {
     // First lookup a previously constucted input layout
     InputLayout id = m_inputLayoutCache[format];
@@ -407,7 +386,7 @@ InputLayout RenderingContext::requestInputLayout( const VertexFormat& format )
     }
     
     // Allocate an input layout identifier
-    id = allocatePersistentIdentifier(RenderResourceType::InputLayout);
+    id = allocateIdentifier(RenderResourceType::InputLayout);
     
     // Nothing found - construct a new one
     id = m_constructionCommandBuffer->createInputLayout(id, format);
@@ -422,7 +401,7 @@ InputLayout RenderingContext::requestInputLayout( const VertexFormat& format )
 UniformLayout RenderingContext::requestUniformLayout(const String& name, const UniformElement* elements)
 {
     // Allocate next uniform layout id.
-    UniformLayout id = allocatePersistentIdentifier(RenderResourceType::UniformLayout);
+    UniformLayout id = allocateIdentifier(RenderResourceType::UniformLayout);
 
     // Construct a uniform instance
     m_uniformLayouts.emplace(id, UniformBufferLayout());
@@ -466,7 +445,7 @@ FeatureLayout RenderingContext::requestPipelineFeatureLayout(const PipelineFeatu
     }
     
     // Allocate an input layout identifier
-    FeatureLayout id = allocatePersistentIdentifier(RenderResourceType::FeatureLayout);
+    FeatureLayout id = allocateIdentifier(RenderResourceType::FeatureLayout);
     
     // Put this layout instance to a pool
     m_pipelineFeatureLayouts.emplace(id, layout);
@@ -477,35 +456,35 @@ FeatureLayout RenderingContext::requestPipelineFeatureLayout(const PipelineFeatu
 // ** RenderingContext::requestVertexBuffer
 VertexBuffer_ RenderingContext::requestVertexBuffer( const void* data, s32 size )
 {
-    VertexBuffer_ id = allocatePersistentIdentifier(RenderResourceType::VertexBuffer);
+    VertexBuffer_ id = allocateIdentifier(RenderResourceType::VertexBuffer);
     return m_constructionCommandBuffer->createVertexBuffer(id, data, size);
 }
 
 // ** RenderingContext::requestIndexBuffer
 IndexBuffer_ RenderingContext::requestIndexBuffer( const void* data, s32 size )
 {
-    IndexBuffer_ id = allocatePersistentIdentifier(RenderResourceType::IndexBuffer);
+    IndexBuffer_ id = allocateIdentifier(RenderResourceType::IndexBuffer);
     return m_constructionCommandBuffer->createIndexBuffer(id, data, size);
 }
 
 // ** RenderingContext::requestConstantBuffer
 ConstantBuffer_ RenderingContext::requestConstantBuffer(const void* data, s32 size, UniformLayout layout)
 {
-    ConstantBuffer_ id = allocatePersistentIdentifier(RenderResourceType::ConstantBuffer);
+    ConstantBuffer_ id = allocateIdentifier(RenderResourceType::ConstantBuffer);
     return m_constructionCommandBuffer->createConstantBuffer(id, data, size, layout);
 }
 
 // ** RenderingContext::requestTexture2D
 Texture_ RenderingContext::requestTexture2D(const void* data, u16 width, u16 height, PixelFormat format)
 {
-    Texture_ id = allocatePersistentIdentifier(RenderResourceType::Texture);
+    Texture_ id = allocateIdentifier(RenderResourceType::Texture);
     return m_constructionCommandBuffer->createTexture2D(id, data, width, height, format);
 }
     
 // ** RenderingContext::requestTextureCube
 Texture_ RenderingContext::requestTextureCube(const void* data, u16 size, u16 mipLevels, PixelFormat format)
 {
-    Texture_ id = allocatePersistentIdentifier(RenderResourceType::Texture);
+    Texture_ id = allocateIdentifier(RenderResourceType::Texture);
     return m_constructionCommandBuffer->createTextureCube(id, data, size, mipLevels, format);
 }
     
@@ -513,7 +492,7 @@ Texture_ RenderingContext::requestTextureCube(const void* data, u16 size, u16 mi
 Program RenderingContext::requestProgram(const ShaderProgramDescriptor& descriptor)
 {
     // Allocate a program identifier
-    Program id = allocatePersistentIdentifier(RenderResourceType::Program);
+    Program id = allocateIdentifier(RenderResourceType::Program);
     
     // Put this program to a pool
     m_programs.emplace(id, descriptor);
@@ -713,47 +692,6 @@ Program RenderingContext::deprecatedRequestShader(const String& fileName)
     
     return requestProgram(vertexShader, fragmentShader);
 }
-    
-/*
-// ** RenderingContext::requestShader
-Program RenderingContext::requestShader(const String& vertex, const String& fragment)
-{
-    // Create a shader instance
-    UbershaderPtr shader = DC_NEW Ubershader;
-    
-    // Set vertex and fragment shader code
-    shader->setVertex(vertex);
-    shader->setFragment(fragment);
-    
-    // ----------------------------------------------------
-    shader->addInclude(
-                       "                                                       \n\
-                       struct CBufferScene    { vec4 ambient; };           \n\
-                       struct CBufferView     { mat4 transform; float near; float far; vec3 position; };         \n\
-                       struct CBufferInstance { mat4 transform; };         \n\
-                       struct CBufferMaterial { vec4 diffuse; vec4 specular; vec4 emission; struct { vec3 color; float factor; float start; float end; } rim; };   \n\
-                       struct CBufferLight    { vec3 position; float range; vec3 color; float intensity; vec3 direction; float cutoff; };         \n\
-                       struct CBufferShadow   { mat4 transform; float invSize; };         \n\
-                       struct CBufferClipPlanes { vec4 equation[6]; };         \n\
-                       uniform CBufferScene    Scene;                      \n\
-                       uniform CBufferView     View;                       \n\
-                       uniform CBufferInstance Instance;                   \n\
-                       uniform CBufferMaterial Material;                   \n\
-                       uniform CBufferLight    Light;                      \n\
-                       uniform CBufferShadow   Shadow;                     \n\
-                       uniform CBufferClipPlanes ClipPlanes;               \n\
-                       #define u_DiffuseTexture Texture0                   \n\
-                       #define u_ShadowTexture  Texture1                   \n\
-                       "
-                       );
-    
-    Program id = allocatePersistentIdentifier(RenderResourceType::Program);
-    
-    // Put this shader to a pool
-    m_shaders.emplace(id, shader);
-
-    return id;
-}*/
     
 } // namespace Renderer
 

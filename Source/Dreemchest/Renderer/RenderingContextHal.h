@@ -49,8 +49,10 @@ namespace Renderer
         //! Executes a specified command buffer.
         virtual void                executeCommandBuffer(const RenderFrame& frame, const CommandBuffer& commands) NIMBLE_OVERRIDE;
         
+    #if 0
         //! Returns an intermediate render target.
         RenderTargetWPtr            intermediateRenderTarget( TransientRenderTarget id ) const;
+    #endif  //  #if 0
 
         //! Binds a render target with specified viewport and executes a command buffer.
         void                        renderToTarget( const RenderFrame& frame, u8 renderTarget, const NormalizedViewport* viewport, const CommandBuffer& commands );
@@ -121,11 +123,13 @@ namespace Renderer
         //! Handles a texture creation command.
         void                        commandCreateTexture(Texture_ id, u16 width, u16 height, const void* data, PixelFormat format);
         
+    #if 0
         //! Acquires an intermediate render target.
         TransientRenderTarget       acquireRenderTarget( u16 width, u16 height, PixelFormat format );
         
         //! Releases an intermediate render target.
         void                        releaseRenderTarget( TransientRenderTarget id );
+    #endif  //  #if 0
         
         //! Activates a shader permuation that best matches active pipeline state.
         void                        activateShaderPermutation( PipelineFeatures features );

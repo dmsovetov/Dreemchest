@@ -111,14 +111,14 @@ namespace Renderer
         //! Executes a specified command buffer inside an intermediate render stack frame.
         void                                    execute( const RenderFrame& frame, const CommandBuffer& commands );
         
-        //! Loads an transient render target to a specified slot.
-        void                                    loadTransientTarget(u8 index, TransientRenderTarget id);
+        //! Loads an transient resource to a specified slot.
+        void                                    loadTransientResource(TransientResourceId index, ResourceId id);
         
-        //! Unloads an transient render target from a specified slot.
-        void                                    unloadTransientTarget(u8 index);
+        //! Unloads an transient resource from a specified slot.
+        void                                    unloadTransientResource(TransientResourceId index);
         
-        //! Returns an transient render target at specified slot.
-        TransientRenderTarget                   transientTarget(u8 index);
+        //! Returns an transient resource at specified slot.
+        ResourceId                              transientResource(TransientResourceId index);
         
         //! Creates a vertex buffer layout instance from a flexible vertex format.
         VertexBufferLayoutUPtr                  createVertexBufferLayout(VertexFormat vertexFormat) const;
@@ -130,20 +130,14 @@ namespace Renderer
         PipelineFeatures                        finishPipelineConfiguration(PipelineFeatures userDefined);
         
         //! Allocates a new persistent identifier of specified type.
-        PersistentResourceId                    allocatePersistentIdentifier(RenderResourceType::Enum type);
+        ResourceId                              allocateIdentifier(RenderResourceType::Enum type);
         
         //! Allocates a persistent identifier of specified type.
         template<typename TResourceIdentifier>
-        TResourceIdentifier                     allocatePersistentIdentifier();
+        TResourceIdentifier                     allocateIdentifier();
         
         //! Releases an allocated persistent identifier of specified type.
-        void                                    releasePersistentIdentifier(RenderResourceType::Enum type, PersistentResourceId id);
-        
-        //! Allocates a new transient identifier of specified type.
-        TransientResourceId                     allocateTransientIdentifier(RenderResourceType::Enum type);
-        
-        //! Releases an allocated persistent identifier of specified type.
-        void                                    releaseTransientIdentifier(RenderResourceType::Enum type, TransientResourceId id);
+        void                                    releaseIdentifier(RenderResourceType::Enum type, ResourceId id);
         
     protected:
         
@@ -151,7 +145,7 @@ namespace Renderer
         class ConstructionCommandBuffer;
         
         //! A forward declaration of a stack type to store intermediate render targets.
-        class TransientTargetStack;
+        class TransientResourceStack;
         
         //! A maximum number of input layout types
         enum { MaxInputLayouts = 255 };
@@ -160,8 +154,7 @@ namespace Renderer
         enum { MaxStateChanges = 16 };
         
         RenderViewPtr                           m_view;                                                 //!< A rendering viewport.
-        PersistentResourceIdentifiers           m_persistentIdentifiers[RenderResourceType::TotalTypes];//!< An array of persistent identifier managers.
-        TransientResourceIdentifiers            m_transientIdentifiers[RenderResourceType::TotalTypes]; //!< An array of transient identifier managers.
+        ResourceIdentifiers                     m_identifiers[RenderResourceType::TotalTypes];          //!< An array of persistent identifier managers.
         FixedArray<PipelineFeatureLayoutUPtr>   m_pipelineFeatureLayouts;                               //!< An array of constructed pipeline feature layouts.
         FixedArray<VertexBufferLayoutUPtr>      m_inputLayouts;                                         //!< Allocated input layouts.
         FixedArray<ShaderProgramDescriptor>     m_programs;                                             //!< Allocated shader programs.
@@ -169,18 +162,18 @@ namespace Renderer
         Map<String, UniformLayout>              m_uniformLayoutByName;                                  //!< Maps from a name to a uniform layout id.
         InputLayout                             m_inputLayoutCache[MaxInputLayouts];                    //!< A lookup table for input layout types.
         ConstructionCommandBuffer*              m_constructionCommandBuffer;                            //!< A command buffer that is used for resource construction commands.
-        TransientTargetStack*                   m_intermediateTargets;                                  //!< An intermediate render target stack.
+        TransientResourceStack*                 m_transientResources;                                   //!< A transient resource stack.
         StateBlock                              m_defaultStateBlock;                                    //!< A default state block is applied after all commands were executed.
         Program                                 m_defaultProgram;                                       //!< A default program to be used.
         PipelineState                           m_pipeline;                                             //!< An active pipeline state.
         ShaderLibrary                           m_shaderLibrary;                                        //!< A shader library.
     };
     
-    // ** RenderingContext::allocatePersistentIdentifier
+    // ** RenderingContext::allocateIdentifier
     template<typename TResourceIdentifier>
-    TResourceIdentifier RenderingContext::allocatePersistentIdentifier()
+    TResourceIdentifier RenderingContext::allocateIdentifier()
     {
-        return allocatePersistentIdentifier(static_cast<RenderResourceType::Enum>(TResourceIdentifier::ResourceType));
+        return allocateIdentifier(static_cast<RenderResourceType::Enum>(TResourceIdentifier::ResourceType));
     }
     
     //! Creates a rendering context that uses a deprecated rendering HAL interface.

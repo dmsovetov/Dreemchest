@@ -1111,7 +1111,7 @@ bool OpenGLRenderTarget::setAttachment( PixelFormat format, s32 attachment )
     glBindTexture( GL_TEXTURE_2D, 0 );
     
     glBindFramebuffer( GL_FRAMEBUFFER, m_id );
-    if( attachment == RenderTargetAttachment::Depth ) {
+    if( attachment == 0 ) {
         glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture->id(), 0 );
         glDrawBuffer( GL_NONE );
         glReadBuffer( GL_NONE );

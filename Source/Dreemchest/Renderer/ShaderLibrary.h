@@ -103,12 +103,12 @@ namespace Renderer
         };
         
         //! Allocates a new shader and returns it's identifier.
-        PersistentResourceId            allocateShader(const String& name, const String& code, ShaderType type);
+        ResourceId                      allocateShader(const String& name, const String& code, ShaderType type);
         
     private:
 
         const RenderingContext&         m_renderingContext;                 //!< Parent rendering context instance.
-        PersistentResourceIdentifiers   m_identifiers[TotalShaderTypes];    //!< An array of shader resource identifiers.
+        ResourceIdentifiers             m_identifiers[TotalShaderTypes];    //!< An array of shader resource identifiers.
         FixedArray<Shader>              m_shaders[TotalShaderTypes];        //!< An array of shader containers.
         List<ShaderPreprocessorUPtr>    m_preprocessors;                    //!< A list of shader preprocessors that are consequently invoked.
     };

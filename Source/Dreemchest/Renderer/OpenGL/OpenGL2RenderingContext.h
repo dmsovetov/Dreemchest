@@ -74,12 +74,15 @@ namespace Renderer
         
         //! Update uniforms from active constant buffers.
         void                        updateUniforms(const RequestedState& state, PipelineFeatures features, Program program);
+
+        //! Acquires a transient texture.
+        ResourceId                  acquireTexture(u16 width, u16 height, PixelFormat format);
         
-        //! Acquires an intermediate render target.
-        TransientRenderTarget       acquireRenderTarget(u16 width, u16 height, PixelFormat format);
+        //! Releases a transient texture.
+        void                        releaseTexture(ResourceId id);
         
-        //! Releases an intermediate render target.
-        void                        releaseRenderTarget(TransientRenderTarget id);
+        //! Allocates a new texture of specified type.
+        ResourceId                  allocateTexture(u8 type, const void* data, u16 width, u16 height, u16 mipLevels, u16 pixelFormat, ResourceId id = 0);
         
     private:
         

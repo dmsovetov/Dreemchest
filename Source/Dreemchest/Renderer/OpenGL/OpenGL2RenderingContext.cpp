@@ -101,70 +101,79 @@ PipelineFeatures OpenGL2RenderingContext::applyStateBlock(const RenderFrame& fra
     return applyStates(frame, blocks, 1).features;
 }
     
-// ** OpenGL2RenderingContext::acquireRenderTarget
-TransientRenderTarget OpenGL2RenderingContext::acquireRenderTarget(u16 width, u16 height, PixelFormat format)
+// ** OpenGL2RenderingContext::acquireTexture
+ResourceId OpenGL2RenderingContext::acquireTexture(u16 width, u16 height, PixelFormat format)
 {
     // First search for a free render target
-    for (List<TransientRenderTarget>::const_iterator i = m_freeRenderTargets.begin(), end = m_freeRenderTargets.end(); i != end; ++i)
+    for (List<Texture_>::const_iterator i = m_transientTextures.begin(), end = m_transientTextures.end(); i != end; ++i)
     {
-        // Get a render target by an id
-        const RenderTarget& renderTarget = m_renderTargets[*i];
+        // Get a texture info by id
+        const TextureInfo& info = m_textureInfo[*i];
         
         // Does the render target format match the requested one?
-        if (renderTarget.width == width && renderTarget.height == height && renderTarget.pixelFormat == format)
+        if (info.width == width && info.height == height && info.pixelFormat == format)
         {
             return *i;
         }
     }
     
-    LogVerbose("renderingContext", "allocating a transient render target of size %dx%d\n", width, height);
-    
-    // Nothing found - so we have to create a new one
-    
-    // Allocate the resource identifier
-    TransientRenderTarget id;
-    id.set(allocateTransientIdentifier(RenderResourceType::RenderTarget));
-
-    // Now setup a render target
-    RenderTarget renderTarget;
-    renderTarget.width = width;
-    renderTarget.height = height;
-    renderTarget.pixelFormat = format;
-    
-    // Create target texture
-    {
-        Texture_ texture = allocatePersistentIdentifier<Texture_>();
-        GLuint id = OpenGL2::Texture::create2D(NULL, width, height, format);
-        m_textures.emplace(texture, Texture(id, GL_TEXTURE_2D));
-        renderTarget.textures[0] = texture;
-    }
-    
-    // Create framebuffer object
-    GLuint textures[] = { m_textures[renderTarget.textures[0]].id };
-    renderTarget.id = OpenGL2::Framebuffer::create(textures, 1);
-    
-    // And attach a depth renderbuffer
-    renderTarget.depth = OpenGL2::Framebuffer::renderbuffer(renderTarget.id, width, height, GL_DEPTH_ATTACHMENT, OpenGL2::textureInternalFormat(PixelD24X8));
-    NIMBLE_ABORT_IF(!OpenGL2::Framebuffer::check(renderTarget.id), "failed to create a framebuffer object");
-    
-    m_renderTargets.emplace(id, renderTarget);
-    
-    return id;
+    LogVerbose("renderingContext", "allocating a transient texture of size %dx%d\n", width, height);
+    return allocateTexture(TextureType2D, NULL, width, height, 1, format);
 }
 
-// ** OpenGL2RenderingContext::releaseRenderTarget
-void OpenGL2RenderingContext::releaseRenderTarget(TransientRenderTarget id)
+// ** OpenGL2RenderingContext::releaseTexture
+void OpenGL2RenderingContext::releaseTexture(ResourceId id)
 {
-    m_freeRenderTargets.push_back(id);
+    m_transientTextures.push_back(Texture_::create(id));
+}
+    
+// ** OpenGL2RenderingContext::allocateTexture
+ResourceId OpenGL2RenderingContext::allocateTexture(u8 type, const void* data, u16 width, u16 height, u16 mipLevels, u16 pixelFormat, ResourceId id)
+{
+    // Allocate a resource identifier if it was not passed
+    if (!id)
+    {
+        id = allocateIdentifier<Texture_>();
+    }
+    
+    Texture texture;
+    PixelFormat format = static_cast<PixelFormat>(pixelFormat);
+    
+    // Create a texture instance according to a type.
+    switch (type)
+    {
+        case TextureType2D:
+            texture.id   = OpenGL2::Texture::create2D(data, width, width, format);
+            texture.type = GL_TEXTURE_2D;
+            break;
+            
+        case TextureTypeCube:
+            texture.id   = OpenGL2::Texture::createCube(data, width, mipLevels, format);
+            texture.type = GL_TEXTURE_CUBE_MAP;
+            break;
+            
+        default:
+            NIMBLE_NOT_IMPLEMENTED
+    }
+    
+    // Construct a texture info
+    TextureInfo textureInfo;
+    textureInfo.width       = width;
+    textureInfo.height      = height;
+    textureInfo.pixelFormat = format;
+    
+    // Save a created texture identifier and a texture info
+    m_textures.emplace(id, texture);
+    m_textureInfo.emplace(id, textureInfo);
+    
+    return id;
 }
 
 // ** OpenGL2RenderingContext::executeCommandBuffer
 void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, const CommandBuffer& commands)
 {
-    RequestedState              requestedState;
-    TransientRenderTarget       transientRenderTarget;
-    GLuint                      id;
-    GLenum                      target;
+    RequestedState requestedState;
+    GLuint         id;
     
     for (s32 i = 0, n = commands.size(); i < n; i++)
     {
@@ -199,25 +208,13 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 break;
                 
             case CommandBuffer::OpCode::CreateTexture:
-                // Create a texture instance according to a type.
-                switch (opCode.createTexture.type)
-                {
-                    case TextureType2D:
-                        id = OpenGL2::Texture::create2D(opCode.createTexture.data, opCode.createTexture.width, opCode.createTexture.height, opCode.createTexture.format);
-                        target = GL_TEXTURE_2D;
-                        break;
-                        
-                    case TextureTypeCube:
-                        id = OpenGL2::Texture::createCube(opCode.createTexture.data, opCode.createTexture.width, opCode.createTexture.mipLevels, opCode.createTexture.format);
-                        target = GL_TEXTURE_CUBE_MAP;
-                        break;
-                        
-                    default:
-                        NIMBLE_NOT_IMPLEMENTED
-                }
-                
-                // Save a created texture identifier
-                m_textures.emplace(opCode.createTexture.id, Texture(id, target));
+                allocateTexture(  opCode.createTexture.type
+                                , opCode.createTexture.data
+                                , opCode.createTexture.width
+                                , opCode.createTexture.height
+                                , opCode.createTexture.mipLevels
+                                , opCode.createTexture.format
+                                , opCode.createTexture.id);
                 break;
                 
             case CommandBuffer::OpCode::CreateIndexBuffer:
@@ -243,14 +240,33 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
             }
                 break;
                 
+            case CommandBuffer::OpCode::AcquireTexture:
+            {
+                ResourceId id = acquireTexture(opCode.transientTexture.width, opCode.transientTexture.height, opCode.transientTexture.format);
+                loadTransientResource(opCode.transientTexture.id, id);
+            }
+                break;
+                
+            case CommandBuffer::OpCode::ReleaseTexture:
+            {
+                ResourceId id = transientResource(opCode.transientTexture.id);
+                releaseTexture(id);
+                unloadTransientResource(opCode.transientTexture.id);
+            }
+                break;
+                
             case CommandBuffer::OpCode::RenderTarget:
             {
+                DC_CHECK_GL_CONTEXT;
+                DC_CHECK_GL;
+                
                 // Get a transient resource id by a slot
-                TransientRenderTarget id = transientTarget(opCode.renderTarget.id);
+                ResourceId id = transientResource(opCode.renderTarget.id);
                 NIMBLE_ABORT_IF(!id, "invalid transient identifier");
                 
                 // Get a render target by an id.
-                const RenderTarget& renderTarget = m_renderTargets[id];
+                const Texture&     texture = m_textures[id];
+                const TextureInfo& info    = m_textureInfo[id];
                 
                 // Save current viewport
                 GLint prevViewport[4];
@@ -260,15 +276,29 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 GLint prevFramebuffer;
                 glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prevFramebuffer);
                 
-                // Bind a framebuffer object
-                OpenGL2::Framebuffer::bind(renderTarget.id);
+                // Acquire the framebuffer
+                s32 framebufferIndex = acquireFramebuffer(info.width, info.height);
                 
+                if (!framebufferIndex)
+                {
+                    LogVerbose("opengl2", "allocating a framebuffer of size %dx%d\n", info.width, info.height);
+                    GLuint id = OpenGL2::Framebuffer::create();
+                    GLuint depth = OpenGL2::Framebuffer::renderbuffer(id, info.width, info.height, GL_DEPTH_ATTACHMENT, OpenGL2::textureInternalFormat(PixelD24X8));
+                    framebufferIndex = allocateFramebuffer(id, depth, info.width, info.height);
+                }
+
+                OpenGL2::Framebuffer::bind(m_framebuffers[framebufferIndex].id);
+                OpenGL2::Framebuffer::texture2D(texture.id, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0);
+
                 // Set a viewport before executing an attached command buffer
                 const NormalizedViewport& viewport = opCode.renderTarget.viewport;
-                glViewport(viewport.x * renderTarget.width, viewport.y * renderTarget.height, viewport.width * renderTarget.width, viewport.height * renderTarget.height);
+                glViewport(viewport.x * info.width, viewport.y * info.height, viewport.width * info.width, viewport.height * info.height);
                 
                 // Execute an attached command buffer
                 execute(frame, *opCode.renderTarget.commands);
+                
+                // Release an acquired framebuffer
+                //releaseFramebuffer(framebufferIndex);
                 
                 // Disable the framebuffer
                 OpenGL2::Framebuffer::bind(prevFramebuffer);
@@ -277,25 +307,7 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
             }
                 break;
-                
-            case CommandBuffer::OpCode::AcquireRenderTarget:
-            {
-                u16         width  = opCode.intermediateRenderTarget.width;
-                u16         height = opCode.intermediateRenderTarget.height;
-                PixelFormat format = opCode.intermediateRenderTarget.format;
-                TransientRenderTarget id = acquireRenderTarget(width, height, format);
-                loadTransientTarget(opCode.intermediateRenderTarget.id, id);
-            }
-                break;
-                
-            case CommandBuffer::OpCode::ReleaseRenderTarget:
-            {
-                TransientRenderTarget id = transientTarget(opCode.intermediateRenderTarget.id);
-                releaseRenderTarget(id);
-                unloadTransientTarget(opCode.intermediateRenderTarget.id);
-            }
-                break;
-                
+
             case CommandBuffer::OpCode::DrawIndexed:
                 // Apply rendering states from a stack
                 requestedState = applyStates(frame, opCode.drawCall.states, MaxStateStackDepth);
@@ -454,10 +466,9 @@ OpenGL2RenderingContext::RequestedState OpenGL2RenderingContext::applyStates(con
                 }
                 else
                 {
-                    NIMBLE_BREAK_IF(abs(id) > 255, "invalid identifier");
-                    s32 attachmentIndex = state.attachmentIndex();
-                    TransientRenderTarget renderTargetId = transientTarget(-id);
-                    requestedState.texture[samplerIndex] = m_renderTargets[renderTargetId].textures[attachmentIndex];
+                    Texture_ tid;
+                    tid.set(transientResource(-id));
+                    requestedState.texture[samplerIndex].set(tid);
                 }
                 
                 // Update resource features

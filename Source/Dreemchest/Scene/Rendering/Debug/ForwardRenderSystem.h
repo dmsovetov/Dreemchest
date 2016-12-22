@@ -51,7 +51,7 @@ namespace Scene {
         virtual void                    emitRenderOperations( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const ForwardRenderer& forwardRenderer ) NIMBLE_OVERRIDE;
 
         //! Generate commands to render a light pass for a single light source.
-        void                            renderLight( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const RenderScene::LightNode& light, const RenderScene::CBuffer::ClipPlanes* clip, TransientRenderTarget shadows = TransientRenderTarget() );
+        void                            renderLight( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const RenderScene::LightNode& light, const RenderScene::CBuffer::ClipPlanes* clip, TransientTexture shadows = TransientTexture() );
 
         //! Emits operations to render a spot light pass.
         void                            renderSpotLight( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const ForwardRenderer& forwardRenderer, const RenderScene::LightNode& light );

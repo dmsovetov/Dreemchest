@@ -57,7 +57,7 @@ namespace Scene {
                                     ShadowPass( RenderingContext& context, RenderScene& renderScene );
 
         //! Emits render operations to output a depth to a texture.
-        TransientRenderTarget    render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const RenderScene::CBuffer::Shadow& parameters );
+        TransientTexture            render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const RenderScene::CBuffer::Shadow& parameters );
 
         //! Returns a constant buffer that is used for shadow parameters.
         ConstantBuffer_             cbuffer( void ) const;

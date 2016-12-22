@@ -166,8 +166,11 @@ namespace Renderer
         {
         public:
             
-            //! Creates a framebuffer object.
-            static GLuint   create(GLuint *attachments, GLuint count);
+            //! Creates a framebuffer.
+            static GLuint   create();
+            
+            //! Attaches a texture target to a framebuffer.
+            static void     texture2D(GLuint id, GLenum attachment, GLenum target, GLint level);
             
             //! Attaches a renderbuffer to a framebuffer.
             static GLuint   renderbuffer(GLuint id, GLsizei width, GLsizei height, GLenum attachment, GLenum internalFormat);

@@ -31,6 +31,9 @@ DC_BEGIN_DREEMCHEST
 namespace Renderer
 {
 
+// Make sure that we have a corresponding bit for each rendering state.
+NIMBLE_STATIC_ASSERT(State::TotalStates < sizeof(u32) * 8, "rendering state bit mask overflow");
+    
 // ---------------------------------------------------------------------------- State ---------------------------------------------------------------------------- //
 
 // ** State::State
@@ -40,7 +43,7 @@ State::State( void )
 }
 
 // ** State::State
-State::State(Type type, PersistentResourceId id)
+State::State(Type type, ResourceId id)
     : resourceId(id)
     , type(type)
 {
@@ -100,11 +103,11 @@ State::State(Texture_ id, u8 sampler)
 }
     
 // ** State::State
-State::State(TransientRenderTarget id, u8 sampler, u8 attachment)
+State::State(TransientTexture id, u8 sampler)
     : type(Texture)
 {
     resourceId = -static_cast<s32>(id);
-    data.index = sampler | (attachment << 4);
+    data.index = sampler;
 }
 
 // ** State::State
@@ -200,12 +203,6 @@ s32 State::samplerIndex() const
 {
     return data.index & 0xF;
 }
-    
-// ** State::attachmentIndex
-s32 State::attachmentIndex() const
-{
-    return data.index >> 4;
-}
 
 // -------------------------------------------------------------------------- StateBlock -------------------------------------------------------------------------- //
 
@@ -260,10 +257,10 @@ void StateBlock::bindTexture(Texture_ id, u8 sampler)
     pushState(State(id, sampler), State::Texture + sampler);
 }
 
-// ** StateBlock::bindRenderedTexture
-void StateBlock::bindRenderedTexture(TransientRenderTarget renderTarget, u8 sampler, u8 attachment)
+// ** StateBlock::bindTexture
+void StateBlock::bindTexture(TransientTexture renderTarget, u8 sampler)
 {
-    pushState(State(renderTarget, sampler, attachment), State::Texture + sampler);
+    pushState(State(renderTarget, sampler), State::Texture + sampler);
 }
 
 // ** StateBlock::setBlend

@@ -62,23 +62,16 @@ namespace Renderer
         //! Searches a uniform location by a name.
         GLint                                   findUniformLocation(Program program, PipelineFeatures features, const FixedString& name);
         
-    protected:
+        //! Searches for a framebuffer and marks it a used.
+        s32                                     acquireFramebuffer(u16 width, u16 height);
         
-        //! A render target object used for offscreen rendering.
-        struct RenderTarget
-        {
-            GLuint              id;                                         //!< A framebuffer object id.
-            GLuint              depth;                                      //!< An attached depth buffer.
-            Texture_            textures[RenderTargetAttachment::Total];    //!< An array of attached textures.
-            u16                 width;                                      //!< Render target width.
-            u16                 height;                                     //!< Render target height.
-            PixelFormat         pixelFormat;                                //!< Render target pixel format.
-            
-                                RenderTarget()
-                                    : id(0), width(0), height(0)
-                                {
-                                }
-        };
+        //! Releases a framebuffer.
+        void                                    releaseFramebuffer(s32 index);
+        
+        //! Adds a new framebuffer.
+        s32                                     allocateFramebuffer(GLuint id, GLuint depth, u16 width, u16 height);
+        
+    protected:
         
         //! A texture instance descriptor.
         struct Texture
@@ -94,6 +87,24 @@ namespace Renderer
                                 Texture(GLuint id, GLenum type)
                                     : id(id), type(type) {}
         };
+        
+        //! A texture instance info.
+        struct TextureInfo
+        {
+            u16                 width;          //!< A texture width.
+            u16                 height;         //!< A texture height.
+            PixelFormat         pixelFormat;    //!< A pixel format.
+        };
+        
+        //! A framebuffer descriptor.
+        struct Framebuffer
+        {
+            GLuint              id;             //!< A framebuffer id.
+            GLuint              depth;          //!< An attached depth renderbuffer.
+            u16                 width;          //!< A framebuffer width.
+            u16                 height;         //!< A framebuffer height.
+            bool                acquired;       //!< Indicates that a framebuffer is in use now.
+        };
     
         //! A container type to store program permutations.
         typedef HashMap<PipelineFeatures, Permutation> ProgramPermutations;
@@ -102,8 +113,9 @@ namespace Renderer
         FixedArray<GLuint>                      m_indexBuffers;         //!< Allocated index buffers.
         FixedArray<GLuint>                      m_constantBuffers;      //!< Allocated constant buffers.
         FixedArray<Texture>                     m_textures;             //!< Allocated textures.
-        FixedArray<RenderTarget>                m_renderTargets;        //!< Allocated render targets.
-        List<TransientRenderTarget>             m_freeRenderTargets;    //!< A list of free render targets.
+        FixedArray<TextureInfo>                 m_textureInfo;          //!< A corresponding texture info array.
+        List<Texture_>                          m_transientTextures;    //!< A list of free textures.
+        FixedArray<Framebuffer>                 m_framebuffers;         //!< An array of allocated framebuffers.
         mutable FixedArray<ProgramPermutations> m_permutations;         //!< Available program permutations.
     };
     

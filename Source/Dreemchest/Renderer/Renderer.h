@@ -83,13 +83,10 @@ namespace Renderer {
     typedef u8 TransientResourceId;
     
     //! A persistent resource identifer type alias.
-    typedef u16 PersistentResourceId;
+    typedef u16 ResourceId;
     
     //! A container type to manage persistent resource identifiers.
-    typedef IndexManager<PersistentResourceId>  PersistentResourceIdentifiers;
-    
-    //! A container type to manage transient resource identifiers.
-    typedef IndexManager<TransientResourceId>   TransientResourceIdentifiers;
+    typedef IndexManager<ResourceId>            ResourceIdentifiers;
     
     //! A unique pointer type for a vertex buffer layout instance.
     typedef UPtr<class VertexBufferLayout>      VertexBufferLayoutUPtr;
@@ -137,7 +134,6 @@ namespace Renderer {
             , IndexBuffer
             , ConstantBuffer
             , UniformLayout
-            , RenderTarget
             , Program
             , Texture
             , FeatureLayout
@@ -259,21 +255,20 @@ namespace Renderer {
     }
 
     //! Declare all render resource types.
-    typedef ResourceIdentifier<RenderResourceType::InputLayout, PersistentResourceId> InputLayout;
-    typedef ResourceIdentifier<RenderResourceType::VertexBuffer, PersistentResourceId> VertexBuffer_;
-    typedef ResourceIdentifier<RenderResourceType::IndexBuffer, PersistentResourceId> IndexBuffer_;
-    typedef ResourceIdentifier<RenderResourceType::ConstantBuffer, PersistentResourceId> ConstantBuffer_;
-    typedef ResourceIdentifier<RenderResourceType::UniformLayout, PersistentResourceId> UniformLayout;
-    typedef ResourceIdentifier<RenderResourceType::RenderTarget, PersistentResourceId> RenderTarget_;
-    typedef ResourceIdentifier<RenderResourceType::Program, PersistentResourceId> Program;
-    typedef ResourceIdentifier<RenderResourceType::Texture, PersistentResourceId> Texture_;
-    typedef ResourceIdentifier<RenderResourceType::FeatureLayout, PersistentResourceId> FeatureLayout;
-    typedef ResourceIdentifier<RenderResourceType::VertexShader, PersistentResourceId> VertexShader;
-    typedef ResourceIdentifier<RenderResourceType::GeometryShader, PersistentResourceId> GeometryShader;
-    typedef ResourceIdentifier<RenderResourceType::FragmentShader, PersistentResourceId> FragmentShader;
-    typedef ResourceIdentifier<RenderResourceType::ComputeShader, PersistentResourceId> ComputeShader;
+    typedef ResourceIdentifier<RenderResourceType::InputLayout, ResourceId> InputLayout;
+    typedef ResourceIdentifier<RenderResourceType::VertexBuffer, ResourceId> VertexBuffer_;
+    typedef ResourceIdentifier<RenderResourceType::IndexBuffer, ResourceId> IndexBuffer_;
+    typedef ResourceIdentifier<RenderResourceType::ConstantBuffer, ResourceId> ConstantBuffer_;
+    typedef ResourceIdentifier<RenderResourceType::UniformLayout, ResourceId> UniformLayout;
+    typedef ResourceIdentifier<RenderResourceType::Program, ResourceId> Program;
+    typedef ResourceIdentifier<RenderResourceType::Texture, ResourceId> Texture_;
+    typedef ResourceIdentifier<RenderResourceType::FeatureLayout, ResourceId> FeatureLayout;
+    typedef ResourceIdentifier<RenderResourceType::VertexShader, ResourceId> VertexShader;
+    typedef ResourceIdentifier<RenderResourceType::GeometryShader, ResourceId> GeometryShader;
+    typedef ResourceIdentifier<RenderResourceType::FragmentShader, ResourceId> FragmentShader;
+    typedef ResourceIdentifier<RenderResourceType::ComputeShader, ResourceId> ComputeShader;
 
-    typedef ResourceIdentifier<RenderResourceType::RenderTarget, TransientResourceId> TransientRenderTarget;
+    typedef ResourceIdentifier<RenderResourceType::Texture, TransientResourceId> TransientTexture;
     
     //! Available shader types.
     enum ShaderType
@@ -497,20 +492,6 @@ namespace Renderer {
         TotalPrimitiveTypes    //!< Total primitive types available.
     };
     
-    //! Available texture attachments
-    struct RenderTargetAttachment
-    {
-        enum
-        {
-              Color0            //!< A #1 color texture attachment.
-            , Color1            //!< A #2 color texture attachment.
-            , Color2            //!< A #3 color texture attachment.
-            , Color3            //!< A #4 color texture attachment.
-            , Depth             //!< A depth texture attachment.
-            , Total             //!< A total number of available texture attachments.
-        };
-    };
-
     //! A normalized viewport coordinates.
     struct NormalizedViewport
     {

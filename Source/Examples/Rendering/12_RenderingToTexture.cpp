@@ -154,7 +154,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
     {
         Logger::setStandardLogger();
 
-        if (!initialize(800, 600))
+        if (!initialize(800/4, 600/4))
         {
             application->quit(-1);
         }
@@ -206,16 +206,16 @@ class RenderingToTexture : public RenderingApplicationDelegate
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
         
         // Acquire a transient render target
-        TransientRenderTarget renderTarget = commands.acquireRenderTarget(256, 256, PixelRgb8);
-        
+        TransientTexture renderTarget = commands.acquireTexture(256, 256, PixelRgb8);
+
         // Now render an object to a texture target
         {
             // Construct a nested command buffer to render to texture
-            CommandBuffer& renderToTarget = commands.renderToTarget(m_renderFrame, renderTarget);
+            CommandBuffer& renderToTarget = commands.renderToTexture(m_renderFrame, renderTarget);
 
             StateScope instanceStates = stateStack.push(&m_meshStates);
             s_transform.instance = Matrix4::rotateXY(0.0f, currentTime() * 0.001f);
-            renderToTarget.clear(Rgba(0.0f, 0.0f, 0.0f), ClearAll);
+            renderToTarget.clear(Rgba(0.0f, 1.0f, 0.0f), ClearAll);
             renderToTarget.uploadConstantBuffer(m_transformCBuffer, &s_transform, sizeof(s_transform));
             renderToTarget.drawPrimitives(0, m_mesh.primitives, 0, m_mesh.vertices.size(), stateStack);
         }
@@ -223,12 +223,12 @@ class RenderingToTexture : public RenderingApplicationDelegate
         // Render a 2D quad with a rendered texture
         {
             StateScope quadStates = stateStack.newScope();
-            quadStates->bindRenderedTexture(renderTarget, 0);
+            quadStates->bindTexture(renderTarget, 0);
             commands.drawIndexed(0, Renderer::PrimTriangles, 0, 6, stateStack);
         }
         
         // Always release transient render targets
-        commands.releaseRenderTarget(renderTarget);
+        commands.releaseTexture(renderTarget);
     
         m_renderingContext->display(m_renderFrame);
     }

@@ -107,7 +107,7 @@ DebugRenderTarget::DebugRenderTarget( RenderingContext& context, RenderScene& re
 }
     
 // ** DebugRenderTarget::render
-void DebugRenderTarget::render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Viewport& viewport, TransientRenderTarget slot, u8 attachment, s32 size, s32 x, s32 y )
+void DebugRenderTarget::render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Viewport& viewport, TransientTexture texture, s32 size, s32 x, s32 y )
 {
     // Begin a render pass
     begin( frame, commands, stateStack );
@@ -119,7 +119,7 @@ void DebugRenderTarget::render( RenderFrame& frame, CommandBuffer& commands, Sta
     // Push a rendering state
     StateScope pass = stateStack.newScope();
     pass->bindProgram( m_shader );
-    pass->bindRenderedTexture( slot, TextureSampler::Diffuse, attachment );
+    pass->bindTexture( texture, TextureSampler::Diffuse );
     pass->bindConstantBuffer( m_cbuffer, Constants::Pass );
     pass->setCullFace( Renderer::TriangleFaceBack );
 
