@@ -206,7 +206,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
         
         // Acquire a transient render target
-        TransientTexture renderTarget = commands.acquireTexture(256, 256, PixelRgb8);
+        TransientTexture renderTarget = commands.acquireTexture2D(256, 256, PixelRgb8);
 
         // Now render an object to a texture target
         {
