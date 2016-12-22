@@ -32,6 +32,130 @@ DC_BEGIN_DREEMCHEST
 namespace Renderer
 {
 
+// ----------------------------------------------------------------- SharedFunctionPreprocessor ----------------------------------------------------------------- //
+
+//! Performs shared function preprocessing
+class ShaderLibrary::SharedFunctionPreprocessor : public ShaderPreprocessor
+{
+public:
+    
+                            //! Constructs an SharedFunctionPreprocessor instance.
+                            SharedFunctionPreprocessor(const ShaderLibrary& shaderLibrary);
+    
+    //! Imports all used shared functions.
+    virtual bool            preprocess(const RenderingContext& renderingContext, String& source) const NIMBLE_OVERRIDE;
+    
+private:
+    
+    const ShaderLibrary&    m_shaderLibrary;    //!< A parent shader library.
+};
+    
+// ** ShaderLibrary::SharedFunctionPreprocessor::SharedFunctionPreprocessor
+ShaderLibrary::SharedFunctionPreprocessor::SharedFunctionPreprocessor(const ShaderLibrary& shaderLibrary)
+    : m_shaderLibrary(shaderLibrary)
+{
+    
+}
+
+// ** ShaderLibrary::SharedFunctionPreprocessor::preprocess
+bool ShaderLibrary::SharedFunctionPreprocessor::preprocess(const RenderingContext& renderingContext, String& source) const
+{
+    const ShaderLibrary::SharedFunctions& sharedFunctions = m_shaderLibrary.sharedFunctions();
+    
+    for (ShaderLibrary::SharedFunctions::const_iterator i = sharedFunctions.begin(), end = sharedFunctions.end(); i != end; ++i)
+    {
+        if (source.find(i->first) == String::npos)
+        {
+            continue;
+        }
+        
+        LogVerbose("shaderLibrary", "imporing shared function '%s'\n", i->first.c_str());
+        
+        source = i->second + source;
+    }
+    
+    return true;
+}
+    
+// ----------------------------------------------------------------- IncludePreprocessor ----------------------------------------------------------------- //
+
+//! Performs include directive preprocessing
+class ShaderLibrary::IncludePreprocessor : public ShaderPreprocessor
+{
+public:
+ 
+                            //! Constructs an IncludePreprocessor instance.
+                            IncludePreprocessor(const ShaderLibrary& shaderLibrary);
+    
+    //! Replaces all #include entries
+    virtual bool            preprocess(const RenderingContext& renderingContext, String& source) const NIMBLE_OVERRIDE;
+    
+private:
+    
+    const ShaderLibrary&    m_shaderLibrary;    //!< A parent shader library.
+};
+    
+// ** ShaderLibrary::IncludePreprocessor::IncludePreprocessor
+ShaderLibrary::IncludePreprocessor::IncludePreprocessor(const ShaderLibrary& shaderLibrary)
+    : m_shaderLibrary(shaderLibrary)
+{
+    
+}
+    
+// ** ShaderLibrary::IncludePreprocessor::preprocess
+bool ShaderLibrary::IncludePreprocessor::preprocess(const RenderingContext& renderingContext, String& source) const
+{
+    static const String s_include    = "#include";
+    static const String s_whitespace = " \t\n";
+    
+    size_t offset = source.find(s_include);
+    
+    while (offset != String::npos)
+    {
+        // Save the start of a cbuffer expression
+        size_t start = offset;
+        
+        // Skip a 'cbuffer' token
+        offset += s_include.length();
+        
+        // Now skip spaces
+        offset = source.find_first_not_of(s_whitespace, offset);
+        NIMBLE_ABORT_IF(offset == String::npos, "shader parsing error");
+        
+        // Parse include file name
+        String fileName;
+        
+        NIMBLE_BREAK_IF(source[offset] != '\'' && source[offset] != '"', "shader parsing error");
+        offset++;
+        
+        while (source[offset] != '\'' && source[offset] != '"')
+        {
+            fileName += source[offset++];
+        }
+        
+        // Get a shader code by name
+        String include;
+        
+        if (!m_shaderLibrary.findSharedSource(fileName, include))
+        {
+            LogWarning("shaderLibrary", "an include file '%s' could not be found\n", fileName.c_str());
+        }
+        else
+        {
+            m_shaderLibrary.preprocessShader(include);
+        }
+        
+        source.replace(start, offset - start + 1, include);
+        
+        // Search for a next one
+        offset = source.find(s_include, start + include.length());
+    }
+    
+    return true;
+}
+    
+// -------------------------------------------------------------------- ShaderLibrary -------------------------------------------------------------------- //
+
 // ** ShaderLibrary::ShaderLibrary
 ShaderLibrary::ShaderLibrary(const RenderingContext& renderingContext)
     : m_renderingContext(renderingContext)
@@ -47,6 +171,9 @@ ShaderLibrary::ShaderLibrary(const RenderingContext& renderingContext)
     addFragmentShader("void main() { gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0); }");
     addGeometryShader("");
     addComputeShader("");
+    
+    addPreprocessor(DC_NEW IncludePreprocessor(*this));
+    addPreprocessor(DC_NEW SharedFunctionPreprocessor(*this));
 }
     
 // ** ShaderLibrary::addVertexShader
@@ -58,7 +185,7 @@ VertexShader ShaderLibrary::addVertexShader(const String& code, const String& na
 // ** ShaderLibrary::vertexShader
 const String& ShaderLibrary::vertexShader(VertexShader id) const
 {
-    return m_shaders[VertexShaderType][id].code;
+    return m_shaders[VertexShaderType][id];
 }
 
 // ** ShaderLibrary::addGeometryShader
@@ -70,7 +197,7 @@ GeometryShader ShaderLibrary::addGeometryShader(const String& code, const String
 // ** ShaderLibrary::geometryShader
 const String& ShaderLibrary::geometryShader(GeometryShader id) const
 {
-    return m_shaders[GeometryShaderType][id].code;
+    return m_shaders[GeometryShaderType][id];
 }
 
 // ** ShaderLibrary::addFragmentShader
@@ -82,7 +209,7 @@ FragmentShader ShaderLibrary::addFragmentShader(const String& code, const String
 // ** ShaderLibrary::fragmentShader
 const String& ShaderLibrary::fragmentShader(FragmentShader id) const
 {
-    return m_shaders[FragmentShaderType][id].code;
+    return m_shaders[FragmentShaderType][id];
 }
 
 // ** ShaderLibrary::addComputeShader
@@ -94,7 +221,7 @@ ComputeShader ShaderLibrary::addComputeShader(const String& code, const String& 
 // ** ShaderLibrary::computeShader
 const String& ShaderLibrary::computeShader(ComputeShader id) const
 {
-    return m_shaders[ComputeShaderType][id].code;
+    return m_shaders[ComputeShaderType][id];
 }
  
 // ** ShaderLibrary::allocateShader
@@ -104,14 +231,9 @@ ResourceId ShaderLibrary::allocateShader(const String& name, const String& code,
     
     // Acquire a next resource identifier
     ResourceId id = m_identifiers[type].acquire();
-    
-    // Create shader
-    Shader shader;
-    shader.name = name;
-    shader.code = code;
-    
+
     // Emplace a shader instance with this identifier
-    m_shaders[type].emplace(id, shader);
+    m_shaders[type].emplace(id, code);
     
     return id;
 }
@@ -145,15 +267,12 @@ bool ShaderLibrary::generateShaderCode(const ShaderProgramDescriptor& program, P
 
     for (s32 i = 0; i < TotalShaderTypes; i++)
     {
-        if (result[i].length())
-        {
-            preprocess(result[i]);
-        }
+        preprocessShader(result[i]);
     }
 
     return true;
 }
-
+    
 // ** ShaderLibrary::generateOptionsString
 String ShaderLibrary::generateOptionsString(PipelineFeatures features, const PipelineFeatureLayout* featureLayout) const
 {
@@ -184,9 +303,14 @@ String ShaderLibrary::generateOptionsString(PipelineFeatures features, const Pip
     return macro;
 }
 
-// ** ShaderLibrary::preprocess
-void ShaderLibrary::preprocess(String& shader) const
+// ** ShaderLibrary::preprocessShader
+void ShaderLibrary::preprocessShader(String& shader) const
 {
+    if (shader.empty())
+    {
+        return;
+    }
+    
     for (List<ShaderPreprocessorUPtr>::const_iterator i = m_preprocessors.begin(); i != m_preprocessors.end(); ++i)
     {
         (*i)->preprocess(m_renderingContext, shader);
@@ -197,6 +321,40 @@ void ShaderLibrary::preprocess(String& shader) const
 void ShaderLibrary::addPreprocessor(ShaderPreprocessorUPtr preprocessor)
 {
     m_preprocessors.push_back(preprocessor);
+}
+    
+// ** ShaderLibrary::findSharedSource
+bool ShaderLibrary::findSharedSource(const String& name, String& source) const
+{
+    Map<String, String>::const_iterator i = m_sharedSources.find(name);
+    
+    if (i == m_sharedSources.end())
+    {
+        return false;
+    }
+    
+    source = i->second;
+    return true;
+}
+    
+// ** ShaderLibrary::addSharedSource
+void ShaderLibrary::addSharedSource(const String& name, const String& source)
+{
+    NIMBLE_ABORT_IF(m_sharedSources.count(name) != 0, "a shader library already contains a shared source with the same name");
+    m_sharedSources[name] = source;
+}
+    
+// ** ShaderLibrary::addSharedFunction
+void ShaderLibrary::addSharedFunction(const String& name, const String& source)
+{
+    NIMBLE_ABORT_IF(m_sharedFunctions.count(name) != 0, "a shader library already contains a shared function with the same name");
+    m_sharedFunctions[name] = source;
+}
+
+// ** ShaderLibrary::sharedFunctions
+const ShaderLibrary::SharedFunctions& ShaderLibrary::sharedFunctions() const
+{
+    return m_sharedFunctions;
 }
 
 // --------------------------------------------------- UniformBufferPreprocessor --------------------------------------------------- //

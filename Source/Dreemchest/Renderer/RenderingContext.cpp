@@ -37,7 +37,7 @@ DC_BEGIN_DREEMCHEST
 
 namespace Renderer
 {
-
+    
 // ------------------------------------------------------------------ RenderingContext::TransientResourceStack ----------------------------------------------------------------- //
 
 /*!
@@ -284,6 +284,58 @@ RenderingContext::RenderingContext(RenderViewPtr view)
     // Create a default program
     Program defaultProgram = requestProgram(ShaderProgramDescriptor());
     setDefaultProgram(defaultProgram);
+    
+    // Add shared functions
+    m_shaderLibrary.addSharedFunction("f_schlick", NIMBLE_STRINGIFY(float f_schlick(float dp, float f0, float pow)
+                                                                    {
+                                                                        float facing = (1.0 - dp);
+                                                                        return max(f0 + (1.0 - f0) * pow(facing, pow), 0.0);
+                                                                    }
+                                                                    ));
+    
+    m_shaderLibrary.addSharedFunction("f_cookTorrance", NIMBLE_STRINGIFY(float f_cookTorrance(float dp, float f0)
+                                                                         {
+                                                                             float n = (1.0 + sqrt(f0)) / (1.0 - sqrt(f0));
+                                                                             float g = sqrt(n * n + dp * dp - 1.0);
+
+                                                                             float part1 = (g - dp)/(g + dp);
+                                                                             float part2 = ((g + dp) * dp - 1.0)/((g - dp) * dp + 1.0);
+
+                                                                             return 0.5 * part1 * part1 * (1.0 + part2 * part2);
+                                                                         }
+                                                                         ));
+    
+    m_shaderLibrary.addSharedFunction("d_blinn", NIMBLE_STRINGIFY(vec2 d_blinn(vec4 products)
+                                                                  {
+                                                                      float diff = max(0.0, products.x);
+                                                                      float spec = step(0.0, products.x) * max(0.0, products.z);
+                                                                      return vec2(diff, spec);
+                                                                  }
+                                                                  ));
+    
+    m_shaderLibrary.addSharedFunction("pbrBlinnPhong", NIMBLE_STRINGIFY(vec2 d_blinnPhong(vec4 products, float roughness)
+                                                                        {
+                                                                            float a = max(0.001, roughness * roughness);
+                                                                            return vec2((1.0 / ((3.1415926535897932384626433832795) * a * a)) * pow(products.z, 2.0 / (a * a) - 2.0), 0.0);
+                                                                        }
+                                                                        ));
+
+    m_shaderLibrary.addSharedFunction("l_products", NIMBLE_STRINGIFY(vec4 l_products(vec3 n, vec3 v, vec3 l, vec3 r)
+                                                                     {
+                                                                         float ndotl = dot(n, l);
+                                                                         float ndotv = dot(n, v);
+                                                                         float ndotr = dot(n, r);
+                                                                         return vec4(ndotl, ndotv, ndotr, 1.0);
+                                                                     }
+                                                                     ));
+    
+    m_shaderLibrary.addSharedFunction("f_reflectance", NIMBLE_STRINGIFY(float f_reflectance(float eta)
+                                                                        {
+                                                                            float one_minus_eta = 1.0 - eta;
+                                                                            float one_plus_eta  = 1.0 + eta;
+                                                                            return (one_minus_eta * one_minus_eta) / (one_plus_eta * one_plus_eta);
+                                                                        }
+                                                                        ));
 }
     
 // ** RenderingContext::~RenderingContext

@@ -51,6 +51,9 @@ namespace Renderer
 
         //! A shader preprocessor unique pointer type.
         typedef UPtr<ShaderPreprocessor> ShaderPreprocessorUPtr;
+
+        //! A container type to store all shared functions.
+        typedef Map<String, String>     SharedFunctions;
         
                                         //! Constructs a ShaderLibrary instance.
                                         ShaderLibrary(const RenderingContext& renderingContext);
@@ -84,32 +87,45 @@ namespace Renderer
         
         //! Adds a new shader preprocessor to this library.
         void                            addPreprocessor(ShaderPreprocessorUPtr preprocessor);
+        
+        //! Performs a shader preprocessing.
+        void                            preprocessShader(String& source) const;
+        
+        //! Returns a shared source by an identifier.
+        bool                            findSharedSource(const String& name, String& source) const;
+        
+        //! Adds a new shared source.
+        void                            addSharedSource(const String& name, const String& value);
+        
+        //! Adds a new shared function.
+        void                            addSharedFunction(const String& name, const String& source);
+        
+        //! Returns an array of shared functions.
+        const SharedFunctions&          sharedFunctions() const;
 
     private:
 
         //! Generates a string of definitions from a pipeline feature mask.
         String                          generateOptionsString(PipelineFeatures features, const PipelineFeatureLayout* featureLayout) const;
 
-        //! Performs a shader preprocessing.
-        void                            preprocess(String& shader) const;
-
     private:
-        
-        //! An internal structure to contain all info associated with a shader.
-        struct Shader
-        {
-            String      name;       //!< A shader identifier.
-            String      code;       //!< A shader source code.
-        };
         
         //! Allocates a new shader and returns it's identifier.
         ResourceId                      allocateShader(const String& name, const String& code, ShaderType type);
         
     private:
+        
+        //! Replaces an include directives with a shader code.
+        class IncludePreprocessor;
+        
+        //! Searches for a shared function ussage and imports their code automatically.
+        class SharedFunctionPreprocessor;
 
         const RenderingContext&         m_renderingContext;                 //!< Parent rendering context instance.
         ResourceIdentifiers             m_identifiers[TotalShaderTypes];    //!< An array of shader resource identifiers.
-        FixedArray<Shader>              m_shaders[TotalShaderTypes];        //!< An array of shader containers.
+        FixedArray<String>              m_shaders[TotalShaderTypes];        //!< An array of shader containers.
+        SharedFunctions                 m_sharedFunctions;                  //!< An container of shared functions.
+        Map<String, String>             m_sharedSources;                    //!< A container to map from a shader name to a shared source code.
         List<ShaderPreprocessorUPtr>    m_preprocessors;                    //!< A list of shader preprocessors that are consequently invoked.
     };
 
