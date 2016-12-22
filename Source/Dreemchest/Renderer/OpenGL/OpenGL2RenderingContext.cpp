@@ -102,7 +102,7 @@ PipelineFeatures OpenGL2RenderingContext::applyStateBlock(const RenderFrame& fra
 }
     
 // ** OpenGL2RenderingContext::acquireTexture
-ResourceId OpenGL2RenderingContext::acquireTexture(u16 width, u16 height, PixelFormat format)
+ResourceId OpenGL2RenderingContext::acquireTexture(u8 type, u16 width, u16 height, PixelFormat format)
 {
     // First search for a free render target
     for (List<Texture_>::const_iterator i = m_transientTextures.begin(), end = m_transientTextures.end(); i != end; ++i)
@@ -111,14 +111,19 @@ ResourceId OpenGL2RenderingContext::acquireTexture(u16 width, u16 height, PixelF
         const TextureInfo& info = m_textureInfo[*i];
         
         // Does the render target format match the requested one?
-        if (info.width == width && info.height == height && info.pixelFormat == format)
+        if (type == info.type && info.width == width && info.height == height && info.pixelFormat == format)
         {
             return *i;
         }
     }
     
-    LogVerbose("renderingContext", "allocating a transient texture of size %dx%d\n", width, height);
-    return allocateTexture(TextureType2D, NULL, width, height, 1, format);
+    static CString s_textureType[] =
+    {
+        "1D", "2D", "3D", "cube"
+    };
+    
+    LogVerbose("renderingContext", "allocating a transient %s texture of size %dx%d\n", s_textureType[type], width, height);
+    return allocateTexture(type, NULL, width, height, 1, format);
 }
 
 // ** OpenGL2RenderingContext::releaseTexture
@@ -143,13 +148,13 @@ ResourceId OpenGL2RenderingContext::allocateTexture(u8 type, const void* data, u
     switch (type)
     {
         case TextureType2D:
-            texture.id   = OpenGL2::Texture::create2D(data, width, width, format);
-            texture.type = GL_TEXTURE_2D;
+            texture.id     = OpenGL2::Texture::create2D(data, width, width, format);
+            texture.target = GL_TEXTURE_2D;
             break;
             
         case TextureTypeCube:
-            texture.id   = OpenGL2::Texture::createCube(data, width, mipLevels, format);
-            texture.type = GL_TEXTURE_CUBE_MAP;
+            texture.id     = OpenGL2::Texture::createCube(data, width, mipLevels, format);
+            texture.target = GL_TEXTURE_CUBE_MAP;
             break;
             
         default:
@@ -161,6 +166,7 @@ ResourceId OpenGL2RenderingContext::allocateTexture(u8 type, const void* data, u
     textureInfo.width       = width;
     textureInfo.height      = height;
     textureInfo.pixelFormat = format;
+    textureInfo.type        = static_cast<TextureType>(type);
     
     // Save a created texture identifier and a texture info
     m_textures.emplace(id, texture);
@@ -242,7 +248,7 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 
             case CommandBuffer::OpCode::AcquireTexture:
             {
-                ResourceId id = acquireTexture(opCode.transientTexture.width, opCode.transientTexture.height, opCode.transientTexture.format);
+                ResourceId id = acquireTexture(opCode.transientTexture.type, opCode.transientTexture.width, opCode.transientTexture.height, opCode.transientTexture.format);
                 loadTransientResource(opCode.transientTexture.id, id);
             }
                 break;
@@ -261,7 +267,7 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 DC_CHECK_GL;
                 
                 // Get a transient resource id by a slot
-                ResourceId id = transientResource(opCode.renderTarget.id);
+                ResourceId id = transientResource(opCode.renderToTextures.id);
                 NIMBLE_ABORT_IF(!id, "invalid transient identifier");
                 
                 // Get a render target by an id.
@@ -288,14 +294,22 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 }
 
                 OpenGL2::Framebuffer::bind(m_framebuffers[framebufferIndex].id);
-                OpenGL2::Framebuffer::texture2D(texture.id, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0);
+                
+                if (opCode.renderToTextures.side == 255)
+                {
+                    OpenGL2::Framebuffer::texture2D(texture.id, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0);
+                }
+                else
+                {
+                    OpenGL2::Framebuffer::texture2D(texture.id, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + opCode.renderToTextures.side, 0);
+                }
 
                 // Set a viewport before executing an attached command buffer
-                const NormalizedViewport& viewport = opCode.renderTarget.viewport;
+                const NormalizedViewport& viewport = opCode.renderToTextures.viewport;
                 glViewport(viewport.x * info.width, viewport.y * info.height, viewport.width * info.width, viewport.height * info.height);
                 
                 // Execute an attached command buffer
-                execute(frame, *opCode.renderTarget.commands);
+                execute(frame, *opCode.renderToTextures.commands);
                 
                 // Release an acquired framebuffer
                 releaseFramebuffer(framebufferIndex);
@@ -544,7 +558,7 @@ void OpenGL2RenderingContext::compilePipelineState(RequestedState requested)
         }
         
         const Texture& texture = m_textures[requested.texture[i]];
-        OpenGL2::Texture::bind(texture.type, texture.id, i);
+        OpenGL2::Texture::bind(texture.target, texture.id, i);
     }
     
     // Switch the input layout

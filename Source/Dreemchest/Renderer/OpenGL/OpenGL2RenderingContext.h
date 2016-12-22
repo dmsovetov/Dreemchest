@@ -76,7 +76,7 @@ namespace Renderer
         void                        updateUniforms(const RequestedState& state, PipelineFeatures features, Program program);
 
         //! Acquires a transient texture.
-        ResourceId                  acquireTexture(u16 width, u16 height, PixelFormat format);
+        ResourceId                  acquireTexture(u8 type, u16 width, u16 height, PixelFormat format);
         
         //! Releases a transient texture.
         void                        releaseTexture(ResourceId id);

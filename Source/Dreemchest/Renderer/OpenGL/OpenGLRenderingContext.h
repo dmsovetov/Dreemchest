@@ -77,15 +77,15 @@ namespace Renderer
         struct Texture
         {
             GLuint              id;             //!< A texture OpenGL id.
-            GLenum              type;           //!< A texture type (1D, 2D, 3D, Cube).
+            GLenum              target;         //!< A texture target (1D, 2D, 3D, Cube).
             
                                 //! Constructs an instance of texture
                                 Texture()
-                                    : id(0), type(0) {}
+                                    : id(0), target(0) {}
             
                                 //! Constructs an instance of texture
-                                Texture(GLuint id, GLenum type)
-                                    : id(id), type(type) {}
+                                Texture(GLuint id, GLenum target)
+                                    : id(id), target(target) {}
         };
         
         //! A texture instance info.
@@ -94,6 +94,7 @@ namespace Renderer
             u16                 width;          //!< A texture width.
             u16                 height;         //!< A texture height.
             PixelFormat         pixelFormat;    //!< A pixel format.
+            TextureType         type;           //!< A texture type.
         };
         
         //! A framebuffer descriptor.

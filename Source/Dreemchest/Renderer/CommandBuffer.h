@@ -85,8 +85,9 @@ namespace Renderer
                 {
                     TransientResourceId         id;                         //!< A render target resource to be activated.
                     NormalizedViewport          viewport;                   //!< A viewport value to be set.
+                    u8                          side;                       //!< A side of a cube map to render to.
                     const CommandBuffer*        commands;                   //!< A command buffer to be executed after setting a viewport.
-                } renderTarget;
+                } renderToTextures;
                 
                 struct
                 {
@@ -151,14 +152,20 @@ namespace Renderer
         //! Emits a command buffer execution command.
         void                        execute( const CommandBuffer& commands );
         
-        //! Emits an acquire transient texture command.
-        TransientTexture            acquireTexture(u16 width, u16 height, PixelFormat format);
+        //! Emits an acquire transient texture 2D command.
+        TransientTexture            acquireTexture2D(u16 width, u16 height, PixelFormat format);
+        
+        //! Emits an acquire transient cube texture command.
+        TransientTexture            acquireTextureCube(u16 size, PixelFormat format);
         
         //! Emits a release an transient render target command.
         void                        releaseTexture(TransientTexture id);
 
         //! Emits a rendering to a viewport of a specified render target command.
         CommandBuffer&              renderToTexture(RenderFrame& frame, TransientTexture id, const Rect& viewport = Rect(0.0f, 0.0f, 1.0f, 1.0f));
+        
+        //! Emits a command to start rendering to a viewport of a specified cube map side.
+        CommandBuffer&              renderToCubeMap(RenderFrame& frame, TransientTexture id, u8 side, const Rect& viewport = Rect(0.0f, 0.0f, 1.0f, 1.0f));
         
         //! Emits a rendering to a viewport.
         CommandBuffer&              renderToTarget( RenderFrame& frame, const Rect& viewport = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) );

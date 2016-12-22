@@ -289,6 +289,17 @@ namespace Renderer {
         ComputeShader       computeShader;  //!< A compute shader to be attached to a program.
     };
     
+    //! A cube map side enumeration.
+    enum CubeMapSide
+    {
+          CubeMapPositiveX
+        , CubeMapNegativeX
+        , CubeMapPositiveY
+        , CubeMapNegativeY
+        , CubeMapPositiveZ
+        , CubeMapNegativeZ
+    };
+    
     //! An array of uniform elements defines a uniform buffer layout.
     struct UniformElement
     {
