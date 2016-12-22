@@ -70,6 +70,25 @@ int MacOSApplication::launch( Application* application )
 
     return 0;
 }
+    
+// ** MacOSApplication::resourcePath
+const String& MacOSApplication::resourcePath( void ) const
+{
+    static const String s_prefix = "file://";
+    
+    if (m_resourcePath.empty())
+    {
+        m_resourcePath = [[[[NSBundle mainBundle] resourceURL] absoluteString] UTF8String];
+        size_t prefix = m_resourcePath.find(s_prefix);
+        
+        if (prefix != String::npos)
+        {
+            m_resourcePath.replace(prefix, s_prefix.length(), "");
+        }
+    }
+    
+    return m_resourcePath;
+}
 
 } // namespace Platform
 

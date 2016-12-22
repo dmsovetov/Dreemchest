@@ -38,8 +38,13 @@ namespace Platform {
     public:
 
         // ** IApplication
-        virtual void        quit( u32 exitCode );
-        virtual int         launch( Application* application );
+        virtual void            quit( u32 exitCode );
+        virtual int             launch( Application* application );
+        virtual const String&   resourcePath( void ) const;
+        
+    private:
+        
+        mutable String          m_resourcePath;
     };
 
 } // namespace Platform

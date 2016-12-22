@@ -46,6 +46,9 @@ namespace Platform {
 
         //! Launches application with a callback.
         virtual int             launch( Application* application )  = 0;
+        
+        //! Returns a resource path.
+        virtual const String&   resourcePath( void ) const = 0;
     };
 
     //! ApplicationDelegate is used to handle events raised by application.
@@ -127,6 +130,15 @@ namespace Platform {
 
         //! Returns application arguments passed on launch.
         const Arguments&        args( void ) const;
+        
+        //! Returns a current working directory.
+        const String&           currentDirectory( void ) const;
+        
+        //! Returns a resource path.
+        const String&           resourcePath( void ) const;
+        
+        //! Returns a full path for a resource.
+        String                  pathForResource(const String& fileName) const;
 
         //! Creates a new Application instance.
         static Application*     create( const Arguments& args );
@@ -141,10 +153,11 @@ namespace Platform {
 
     private:
 
-        static Application*     s_application;    //!< Shared application instance.
-        IApplication*           m_impl;            //!< Platform specific application implementation.
-        ApplicationDelegate*    m_delegate;        //!< Application delegate instance.
-        Arguments                m_arguments;    //!< Passed arguments.
+        static Application*     s_application;      //!< Shared application instance.
+        IApplication*           m_impl;             //!< Platform specific application implementation.
+        ApplicationDelegate*    m_delegate;         //!< Application delegate instance.
+        mutable String          m_currentDirectory; //!< A current directory.
+        Arguments               m_arguments;        //!< Passed arguments.
     };
 
     //! Service application

@@ -26,6 +26,13 @@
 
 #include "Application.h"
 
+#ifdef DC_PLATFORM_WINDOWS
+    #include <direct.h>
+    #define getcwd _getcwd
+#else
+    #include <unistd.h>
+#endif
+
 DC_BEGIN_DREEMCHEST
 
 namespace Platform {
@@ -64,6 +71,44 @@ const Arguments& Application::args( void ) const
 Application* Application::sharedInstance( void )
 {
     return s_application;
+}
+    
+// ** Application::currentDirectory
+const String& Application::currentDirectory( void ) const
+{
+    if (m_currentDirectory.empty())
+    {
+        s8 buffer[256];
+        getcwd(buffer, sizeof(buffer));
+        m_currentDirectory = buffer;
+    }
+    
+    return m_currentDirectory;
+}
+    
+// ** Application::resourcePath
+const String& Application::resourcePath( void ) const
+{
+    if (!m_impl)
+    {
+        return currentDirectory();
+    }
+    
+    return m_impl->resourcePath();
+}
+    
+// ** Application::pathForResource
+String Application::pathForResource(const String& fileName) const
+{
+    String resources = resourcePath();
+    
+    if (resources.empty())
+    {
+        return fileName;
+    }
+    
+    NIMBLE_ABORT_IF(resources[resources.length() - 1] != '/', "a non-empty resource path should contain a trailing slash");
+    return resources + fileName;
 }
 
 // ** Application::create
@@ -118,6 +163,8 @@ void Application::notifyLaunched( void )
     }
 
     m_delegate->handleLaunched( this );
+    LogDebug("application", "working directory %s\n", currentDirectory().c_str());
+    LogDebug("application", "resource path %s\n", resourcePath().c_str());
 }
 
 // ** Application::notifyUpdate
