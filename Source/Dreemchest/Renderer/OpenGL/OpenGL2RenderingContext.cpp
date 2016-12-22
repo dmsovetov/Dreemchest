@@ -298,7 +298,7 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 execute(frame, *opCode.renderTarget.commands);
                 
                 // Release an acquired framebuffer
-                //releaseFramebuffer(framebufferIndex);
+                releaseFramebuffer(framebufferIndex);
                 
                 // Disable the framebuffer
                 OpenGL2::Framebuffer::bind(prevFramebuffer);
@@ -357,30 +357,30 @@ OpenGL2RenderingContext::RequestedState OpenGL2RenderingContext::applyStates(con
         // And now apply it
         switch (state.type)
         {
-            case State::VertexBuffer:
+            case State::BindVertexBuffer:
                 requestedState.vertexBuffer.set(state.resourceId);
                 break;
                 
-            case State::IndexBuffer:
+            case State::BindIndexBuffer:
                 requestedState.indexBuffer.set(state.resourceId);
                 break;
                 
-            case State::InputLayout:
+            case State::SetInputLayout:
                 requestedState.inputLayout.set(state.resourceId);
                 m_pipeline.activateVertexAttributes(m_inputLayouts[state.resourceId]->features());
                 break;
                 
-            case State::FeatureLayout:
+            case State::SetFeatureLayout:
                 requestedState.featureLayout.set(state.resourceId);
                 m_pipeline.setFeatureLayout(m_pipelineFeatureLayouts[state.resourceId].get());
                 break;
                 
-            case State::ConstantBuffer:
+            case State::BindConstantBuffer:
                 requestedState.constantBuffer[state.data.index].set(state.resourceId);
                 m_pipeline.activateConstantBuffer(state.data.index);
                 break;
                 
-            case State::Shader:
+            case State::BindProgram:
                 requestedState.program.set(state.resourceId);
                 m_pipeline.setProgram(requestedState.program);
                 break;
@@ -451,27 +451,19 @@ OpenGL2RenderingContext::RequestedState OpenGL2RenderingContext::applyStates(con
                 }
                 break;
                 
-            case State::Texture:
+            case State::BindTexture:
             {
-                // Convert a resource id to a signed integer
-                s32 id = static_cast<s16>( state.resourceId );
+                s32 samplerIndex = state.samplerIndex();
+                requestedState.texture[samplerIndex].set(state.resourceId);
+                m_pipeline.activateSampler(samplerIndex);
+            }
+                break;
                 
-                // Get a sampler index
-                u8 samplerIndex = state.samplerIndex();
-                
-                // Bind a texture to sampler
-                if (id >= 0)
-                {
-                    requestedState.texture[samplerIndex].set(state.resourceId);
-                }
-                else
-                {
-                    Texture_ tid;
-                    tid.set(transientResource(-id));
-                    requestedState.texture[samplerIndex].set(tid);
-                }
-                
-                // Update resource features
+            case State::BindTransientTexture:
+            {
+                s32 samplerIndex = state.samplerIndex();
+                ResourceId id = transientResource(state.resourceId);
+                requestedState.texture[samplerIndex].set(id);
                 m_pipeline.activateSampler(samplerIndex);
             }
                 break;

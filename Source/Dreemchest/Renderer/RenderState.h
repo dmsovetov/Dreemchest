@@ -28,7 +28,6 @@
 #define __DC_Renderer_RenderState_H__
 
 #include "Renderer.h"
-#include "Hal.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -50,34 +49,47 @@ namespace Renderer
         //! Available render state types.
         enum Type
         {
-              VertexBuffer      = 0                                         //!< Binds an input vertex buffer.
-            , IndexBuffer       = VertexBuffer      + 1                     //!< Binds an input index buffer.
-            , InputLayout       = IndexBuffer       + 1                     //!< Binds an input layout.
-            , FeatureLayout     = InputLayout       + 1                     //!< Activates a pipeline feature layout.
-            , ConstantBuffer    = FeatureLayout     + 1                     //!< Binds a constant buffer.
-            , Shader            = ConstantBuffer    + MaxConstantBuffers    //!< Binds a program instance.
-            , Blending          = Shader            + 1                     //!< Sets a blend function.
-            , PolygonOffset     = Blending          + 1                     //!< Sets a polygon offset fill.
-            , DepthState        = PolygonOffset     + 1                     //!< Sets a depth test function and a reference value.
-            , AlphaTest         = DepthState        + 1                     //!< Sets an alpha test function and a reference value.
-            , CullFace          = AlphaTest         + 1                     //!< Sets a cull face mode.
-            , Texture           = CullFace          + 1                     //!< Binds a texture to a sampler #(Type.Texture + index).
-            , Rasterization     = Texture           + MaxTextureSamplers    //!< Sets a polygon rasterization mode.
-            , StencilOp         = Rasterization     + 1                     //!< Sets stencil test actions.
-            , StencilFunc       = StencilOp         + 1                     //!< Sets function and reference value for stencil testing.
-            , StencilMask       = StencilFunc       + 1                     //!< Control the writing of individual bits in the stencil planes.
-            , ColorMask         = StencilMask       + 1                     //!< Sets a color buffer write mask.
-            , TotalStates                                                   //!< A total number of available render states.
+              BindVertexBuffer      //!< Binds an input vertex buffer.
+            , BindIndexBuffer       //!< Binds an input index buffer.
+            , SetInputLayout        //!< Binds an input layout.
+            , SetFeatureLayout      //!< Activates a pipeline feature layout.
+            , BindProgram           //!< Binds a program instance.
+            , Blending              //!< Sets a blend function.
+            , PolygonOffset         //!< Sets a polygon offset fill.
+            , DepthState            //!< Sets a depth test function and a reference value.
+            , AlphaTest             //!< Sets an alpha test function and a reference value.
+            , CullFace              //!< Sets a cull face mode.
+            , Rasterization         //!< Sets a polygon rasterization mode.
+            , StencilOp             //!< Sets stencil test actions.
+            , StencilFunc           //!< Sets function and reference value for stencil testing.
+            , StencilMask           //!< Control the writing of individual bits in the stencil planes
+            , ColorMask             //!< Sets a color buffer write mask.
+            , BindConstantBuffer    //!< Binds a constant buffer.
+            , BindTexture           //!< Binds a persistent texture to a sampler.
+            , BindTransientTexture  //!< Binds a transient texture to a sampler.
+            , TotalStates
         };
 
                                         //! Constructs an empty State instance.
                                         State( void );
 
-                                        //! Constructs a State instance of specified type.
-                                        State( Type type, ResourceId id );
+                                        //! Constructs a vertex buffer state instance.
+                                        State(VertexBuffer_ id);
+        
+                                        //! Constructs an index buffer state instance.
+                                        State(IndexBuffer_ id);
+        
+                                        //! Constructs an input layout state instance.
+                                        State(InputLayout id);
+                                        
+                                        //! Constructs a feature layout state instance.
+                                        State(FeatureLayout id);
+        
+                                        //! Constructs a program state instance.
+                                        State(Program id);
 
                                         //! Constructs a cull face render state instance.
-                                        State( TriangleFace face );
+                                        State(TriangleFace face);
         
                                         //! Constructs a stencil op render state instance.
                                         State(StencilAction sfail, StencilAction dpfail, StencilAction dppass);
@@ -141,6 +153,9 @@ namespace Renderer
         
         //! Returns a sampler index.
         s32                             samplerIndex() const;
+        
+        //! Returns a rendering state bit index.
+        static u32                      bit(Type type);
         
         union
         {

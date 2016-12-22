@@ -33,26 +33,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace Renderer {
 
-    //! An array of uniform elements defines a uniform buffer layout.
-    struct UniformElement
-    {
-        //! Constant type.
-        enum Type
-        {
-              Integer   //!< Integer constant value.
-            , Float     //!< Float constant value.
-            , Vec2      //!< Vec2 constant value.
-            , Vec3      //!< Vec3 constant value.
-            , Vec4      //!< Vec4 constant value.
-            , Matrix4   //!< 4x4 matrix constant value.
-        };
-        
-        FixedString name;       //!< Uniform name.
-        Type        type;       //!< Uniform type.
-        u32         offset;     //!< Uniform offset.
-    };
-
-    typedef Array<UniformElement> UniformBufferLayout;
 #if DEV_DEPRECATED_HAL
     
     // ** class Hal

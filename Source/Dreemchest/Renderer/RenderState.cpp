@@ -31,9 +31,6 @@ DC_BEGIN_DREEMCHEST
 namespace Renderer
 {
 
-// Make sure that we have a corresponding bit for each rendering state.
-NIMBLE_STATIC_ASSERT(State::TotalStates < sizeof(u32) * 8, "rendering state bit mask overflow");
-    
 // ---------------------------------------------------------------------------- State ---------------------------------------------------------------------------- //
 
 // ** State::State
@@ -43,9 +40,37 @@ State::State( void )
 }
 
 // ** State::State
-State::State(Type type, ResourceId id)
+State::State(VertexBuffer_ id)
     : resourceId(id)
-    , type(type)
+    , type(BindVertexBuffer)
+{
+}
+
+// ** State::State
+State::State(IndexBuffer_ id)
+    : resourceId(id)
+    , type(BindIndexBuffer)
+{
+}
+
+// ** State::State
+State::State(FeatureLayout id)
+    : resourceId(id)
+    , type(SetFeatureLayout)
+{
+}
+
+// ** State::State
+State::State(Program id)
+    : resourceId(id)
+    , type(BindProgram)
+{
+}
+
+// ** State::State
+State::State(InputLayout id)
+    : resourceId(id)
+    , type(SetInputLayout)
 {
 }
 
@@ -81,7 +106,7 @@ State::State(Compare function, f32 reference)
 
 // ** State::State
 State::State(ConstantBuffer_ id, u8 index)
-    : type(ConstantBuffer)
+    : type(BindConstantBuffer)
 {
     resourceId = id;
     data.index = index;
@@ -96,7 +121,7 @@ State::State(BlendFactor src, BlendFactor dst)
 
 // ** State::State
 State::State(Texture_ id, u8 sampler)
-    : type(Texture)
+    : type(BindTexture)
 {
     resourceId = id;
     data.index = sampler;
@@ -104,9 +129,9 @@ State::State(Texture_ id, u8 sampler)
     
 // ** State::State
 State::State(TransientTexture id, u8 sampler)
-    : type(Texture)
+    : type(BindTransientTexture)
 {
-    resourceId = -static_cast<s32>(id);
+    resourceId = static_cast<u8>(id);
     data.index = sampler;
 }
 
@@ -203,6 +228,21 @@ s32 State::samplerIndex() const
 {
     return data.index & 0xF;
 }
+    
+// ** State::bit
+u32 State::bit(Type type)
+{
+    switch (type)
+    {
+        case BindConstantBuffer:
+            return type;
+        case BindTexture:
+        case BindTransientTexture:
+            return type + MaxConstantBuffers;
+    }
+    
+    return type;
+}
 
 // -------------------------------------------------------------------------- StateBlock -------------------------------------------------------------------------- //
 
@@ -218,61 +258,61 @@ StateBlock::StateBlock( void )
 // ** StateBlock::bindVertexBuffer
 void StateBlock::bindVertexBuffer(VertexBuffer_ id)
 {
-    pushState( State( State::VertexBuffer, id ), State::VertexBuffer );
+    pushState(State(id), State::bit(State::BindVertexBuffer));
 }
 
 // ** StateBlock::bindIndexBuffer
 void StateBlock::bindIndexBuffer(IndexBuffer_ id)
 {
-    pushState( State( State::IndexBuffer, id ), State::IndexBuffer );
+    pushState(State(id), State::bit(State::BindIndexBuffer));
 }
 
 // ** StateBlock::bindInputLayout
 void StateBlock::bindInputLayout(InputLayout id)
 {
-    pushState( State( State::InputLayout, id ), State::InputLayout );
+    pushState(State(id), State::bit(State::SetInputLayout));
 }
     
 // ** StateBlock::bindFeatureLayout
 void StateBlock::bindFeatureLayout(FeatureLayout id)
 {
-    pushState( State( State::FeatureLayout, id ), State::FeatureLayout );
+    pushState(State(id), State::bit(State::SetFeatureLayout));
 }
 
 // ** StateBlock::bindConstantBuffer
 void StateBlock::bindConstantBuffer(ConstantBuffer_ id, u8 index)
 {
-    pushState(State(id, index), State::ConstantBuffer + index);
+    pushState(State(id, index), State::bit(State::BindConstantBuffer) + index);
 }
 
 // ** StateBlock::bindProgram
 void StateBlock::bindProgram(Program id)
 {
-    pushState( State( State::Shader, id ), State::Shader );
+    pushState(State(id), State::bit(State::BindProgram));
 }
 
 // ** StateBlock::bindTexture
 void StateBlock::bindTexture(Texture_ id, u8 sampler)
 {
-    pushState(State(id, sampler), State::Texture + sampler);
+    pushState(State(id, sampler), State::bit(State::BindTexture) + sampler);
 }
 
 // ** StateBlock::bindTexture
-void StateBlock::bindTexture(TransientTexture renderTarget, u8 sampler)
+void StateBlock::bindTexture(TransientTexture id, u8 sampler)
 {
-    pushState(State(renderTarget, sampler), State::Texture + sampler);
+    pushState(State(id, sampler), State::bit(State::BindTexture) + sampler);
 }
 
 // ** StateBlock::setBlend
 void StateBlock::setBlend(BlendFactor src, BlendFactor dst)
 {
-    pushState( State( src, dst ), State::Blending );
+    pushState(State(src, dst), State::bit(State::Blending));
 }
 
 // ** StateBlock::setDepthState
 void StateBlock::setDepthState(Compare function, bool write)
 {
-    pushState( State( function, write ), State::DepthState );
+    pushState(State(function, write), State::bit(State::DepthState));
 }
 
 // ** StateBlock::enableFeatures
@@ -290,25 +330,25 @@ void StateBlock::disableFeatures(PipelineFeatures mask)
 // ** StateBlock::setPolygonOffset
 void StateBlock::setPolygonOffset(f32 factor, f32 units)
 {
-    pushState( State( factor, units ), State::PolygonOffset );
+    pushState(State(factor, units), State::bit(State::PolygonOffset));
 }
 
 // ** StateBlock::disablePolygonOffset
 void StateBlock::disablePolygonOffset( void )
 {
-    setPolygonOffset( 0.0f, 0.0f );
+    setPolygonOffset(0.0f, 0.0f);
 }
     
 // ** StateBlock::setPolygonMode
 void StateBlock::setPolygonMode(PolygonMode value)
 {
-    pushState(State(value), State::Rasterization);
+    pushState(State(value), State::bit(State::Rasterization));
 }
 
 // ** StateBlock::setStencilOp
 void StateBlock::setStencilOp(StencilAction sfail, StencilAction dfail, StencilAction dppass)
 {
-    pushState(State(sfail, dfail, dppass), State::StencilOp);
+    pushState(State(sfail, dfail, dppass), State::bit(State::StencilOp));
 }
 
 // ** StateBlock::setStencilMask
@@ -317,13 +357,13 @@ void StateBlock::setStencilMask(u8 value)
     State state;
     state.type = State::StencilMask;
     state.stencilFunction.mask = value;
-    pushState(state, State::StencilMask);
+    pushState(state, State::bit(State::StencilMask));
 }
 
 // ** StateBlock::setStencilFunction
 void StateBlock::setStencilFunction(Compare function, u8 ref, u8 value)
 {
-    pushState(State(function, ref, value), State::StencilFunc);
+    pushState(State(function, ref, value), State::bit(State::StencilFunc));
 }
     
 // ** StateBlock::disableStencilTest
@@ -338,19 +378,19 @@ void StateBlock::setColorMask(u8 value)
     State state;
     state.type = State::ColorMask;
     state.mask = value;
-    pushState(state, State::ColorMask);
+    pushState(state, State::bit(State::ColorMask));
 }
 
 // ** StateBlock::setAlphaTest
 void StateBlock::setAlphaTest(Compare function, f32 reference)
 {
-    pushState( State( function, reference ), State::AlphaTest );
+    pushState(State(function, reference), State::bit(State::AlphaTest));
 }
 
 // ** StateBlock::setCullFace
 void StateBlock::setCullFace(TriangleFace face)
 {
-    pushState( State( face ), State::CullFace );
+    pushState(State(face), State::bit(State::CullFace));
 }
 
 // ** StateBlock::disableBlending
@@ -369,6 +409,7 @@ void StateBlock::disableBlending( void )
 void StateBlock::pushState(const State& state, u32 stateBit)
 {
     NIMBLE_BREAK_IF( m_mask & BIT( stateBit ), "a state setting could not be overriden" );
+    NIMBLE_BREAK_IF(stateBit >= sizeof(m_stateBits[0]) * 8, "state bit overflow");
     NIMBLE_ABORT_IF( m_count + 1 > MaxStates, "state block overflow" );
 
     // Push a state to a state block

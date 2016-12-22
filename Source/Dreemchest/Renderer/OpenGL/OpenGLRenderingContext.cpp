@@ -93,7 +93,7 @@ s32 OpenGLRenderingContext::acquireFramebuffer(u16 width, u16 height)
 {
     for (s32 i = 0, n = m_framebuffers.count(); i < n; i++)
     {
-        if (m_framebuffers[i].width == width && m_framebuffers[i].height == height)
+        if (!m_framebuffers[i].acquired && m_framebuffers[i].width == width && m_framebuffers[i].height == height)
         {
             m_framebuffers[i].acquired = true;
             return i;

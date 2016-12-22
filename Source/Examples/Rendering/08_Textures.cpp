@@ -99,7 +99,7 @@ class Textures : public RenderingApplicationDelegate
         }
         
         // Now create a texture...
-        Texture_ texture = m_renderingContext->requestTexture(&image.pixels[0], image.width, image.height, image.format);
+        Texture_ texture = m_renderingContext->requestTexture2D(&image.pixels[0], image.width, image.height, image.format);
         
         // ...and bind it to a first texture slot
         m_renderStates.bindTexture(texture, 0);

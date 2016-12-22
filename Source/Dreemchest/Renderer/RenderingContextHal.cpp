@@ -30,6 +30,7 @@
 #include "RenderingContext.h"
 #include "VertexFormat.h"
 #include "VertexBufferLayout.h"
+#include "Hal.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -51,18 +52,18 @@ RenderingContextHal::RenderingContextHal(RenderViewPtr view, HalPtr hal)
     memset( m_stateSwitches, 0, sizeof( m_stateSwitches ) );
 
     // Setup render state switchers
-    m_stateSwitches[State::AlphaTest]         = &RenderingContextHal::switchAlphaTest;
-    m_stateSwitches[State::DepthState]        = &RenderingContextHal::switchDepthState;
-    m_stateSwitches[State::Blending]          = &RenderingContextHal::switchBlending;
-    m_stateSwitches[State::Shader]            = &RenderingContextHal::switchShader;
-    m_stateSwitches[State::ConstantBuffer]    = &RenderingContextHal::switchConstantBuffer;
-    m_stateSwitches[State::VertexBuffer]      = &RenderingContextHal::switchVertexBuffer;
-    m_stateSwitches[State::IndexBuffer]       = &RenderingContextHal::switchIndexBuffer;
-    m_stateSwitches[State::InputLayout]       = &RenderingContextHal::switchInputLayout;
-    m_stateSwitches[State::FeatureLayout]     = &RenderingContextHal::switchPipelineFeatureLayout;
-    m_stateSwitches[State::Texture]           = &RenderingContextHal::switchTexture;
-    m_stateSwitches[State::CullFace]          = &RenderingContextHal::switchCullFace;
-    m_stateSwitches[State::PolygonOffset]     = &RenderingContextHal::switchPolygonOffset;
+    m_stateSwitches[State::AlphaTest]           = &RenderingContextHal::switchAlphaTest;
+    m_stateSwitches[State::DepthState]          = &RenderingContextHal::switchDepthState;
+    m_stateSwitches[State::Blending]            = &RenderingContextHal::switchBlending;
+    m_stateSwitches[State::BindProgram]         = &RenderingContextHal::switchShader;
+    m_stateSwitches[State::BindConstantBuffer]  = &RenderingContextHal::switchConstantBuffer;
+    m_stateSwitches[State::BindVertexBuffer]    = &RenderingContextHal::switchVertexBuffer;
+    m_stateSwitches[State::BindIndexBuffer]     = &RenderingContextHal::switchIndexBuffer;
+    m_stateSwitches[State::SetInputLayout]      = &RenderingContextHal::switchInputLayout;
+    m_stateSwitches[State::SetFeatureLayout]    = &RenderingContextHal::switchPipelineFeatureLayout;
+    m_stateSwitches[State::BindTexture]         = &RenderingContextHal::switchTexture;
+    m_stateSwitches[State::CullFace]            = &RenderingContextHal::switchCullFace;
+    m_stateSwitches[State::PolygonOffset]       = &RenderingContextHal::switchPolygonOffset;
 }
 
 // ** RenderingContextHal::renderToTarget
