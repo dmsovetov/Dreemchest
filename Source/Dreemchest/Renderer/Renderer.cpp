@@ -27,6 +27,7 @@
 #include "Renderer.h"
 #include "RenderingContext.h"
 #include "VertexFormat.h"
+#include "../Platform/Application.h"
 
 #include <fstream>
 
@@ -194,7 +195,7 @@ u32 calculateImageSize(u16 width, u16 height, s32 totalMipLevels, PixelFormat fo
 Descriptor tgaFromFile(const String& fileName)
 {
     // Open the file
-    FILE* file = fopen(fileName.c_str(), "rb");
+    FILE* file = fopen(Platform::Application::sharedInstance()->pathForResource(fileName).c_str(), "rb");
     NIMBLE_BREAK_IF(!file, "failed to open file");
     
     if(!file)
@@ -333,7 +334,7 @@ CubeMap cubeFromDds(const String& fileName)
         DDS_CUBEMAP_POSITIVEZ, DDS_CUBEMAP_NEGATIVEZ
     };
     
-    FILE* file = fopen(fileName.c_str(), "rb");
+    FILE* file = fopen(Platform::Application::sharedInstance()->pathForResource(fileName).c_str(), "rb");
     if (!file)
     {
         return CubeMap();
@@ -489,7 +490,7 @@ namespace MeshLoader
 // ** objFromFile
 Descriptor objFromFile(const String& fileName)
 {
-    std::ifstream in(fileName);
+    std::ifstream in(Platform::Application::sharedInstance()->pathForResource(fileName));
     
     if (!in.is_open())
     {
