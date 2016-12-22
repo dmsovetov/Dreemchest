@@ -416,7 +416,7 @@ GLsizei OpenGL2::Texture::texImage(GLenum target, const GLbyte* data, u16 width,
     for (s32 i = 0; i < mipLevels; i++)
     {
         // Calculate mip level size
-        s32 mipLevelSize = bytesPerMip(pixelFormat, width, height);
+        s32 mipLevelSize = data ? bytesPerMip(pixelFormat, width, height) : 0;
         
         // Upload a mip level
         switch (pixelFormat)
@@ -428,7 +428,7 @@ GLsizei OpenGL2::Texture::texImage(GLenum target, const GLbyte* data, u16 width,
                 break;
                 
             default:
-                glTexImage2D(GL_TEXTURE_2D, i, internalFormat, width, height, 0, format, type, data);
+                glTexImage2D(target, i, internalFormat, width, height, 0, format, type, data);
         }
         
         // Calculate next mip level size
