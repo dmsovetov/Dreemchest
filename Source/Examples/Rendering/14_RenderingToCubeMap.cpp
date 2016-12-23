@@ -25,14 +25,13 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
+#include "Examples.h"
 
 DC_USE_DREEMCHEST
 
 using namespace Platform;
 using namespace Renderer;
 
-// Now let's define a vertex ubershader with F_Transform, F_TexCoord and
-// F_NormalAsColor feature options.
 static String s_vertexShader =
     "cbuffer Transform transform : 0;                           \n"
     "                                                           \n"
@@ -46,7 +45,6 @@ static String s_vertexShader =
     "}                                                          \n"
     ;
 
-// And the same for a fragment shader
 static String s_fragmentShader =
     "uniform samplerCube Texture0;                              \n"
     "                                                           \n"
@@ -74,26 +72,76 @@ UniformElement Transform::s_layout[] =
     , { NULL }
 };
 
+struct Viewport
+{
+    f32 width;
+    f32 height;
+    static UniformElement s_layout[];
+} s_viewport;
+
+UniformElement Viewport::s_layout[] =
+{
+      { "width",  UniformElement::Float, offsetof(Viewport, width)  }
+    , { "height", UniformElement::Float, offsetof(Viewport, height) }
+    , { NULL }
+};
+
+static Vec3 s_vertices[] =
+{
+      Vec3(-1.0f, -1.0f, 0.0f)
+    , Vec3( 1.0f, -1.0f, 0.0f)
+    , Vec3( 1.0f,  1.0f, 0.0f)
+    , Vec3(-1.0f,  1.0f, 0.0f)
+};
+
+static String s_vertexDownsample =
+    "void main()                      \n"
+    "{                                \n"
+    "   gl_Position = gl_Vertex;      \n"
+    "}                                \n"
+    ;
+
+static String s_fragmentDownsample =
+    "cbuffer Viewport viewport : 0;         \n"
+
+    "uniform samplerCube Texture0;          \n"
+
+    "void main()                                                                        \n"
+    "{                                                                                  \n"
+    "   vec2 vp        = vec2(viewport.width, viewport.height);                         \n"
+    "   vec3 ray       = vec3(gl_FragCoord.xy / vp * 2.0 - 1.0, -gl_FragCoord.z * 2.0); \n"
+    "   vec3 direction = normalize(ray);                                                \n"
+    "   gl_FragColor   = textureCube(Texture0, direction);                              \n"
+    "}\n"
+    ;
+
 class RenderingToTexture : public RenderingApplicationDelegate
 {
     StateBlock m_renderStates;
+    StateBlock  m_fullscreenQuadStates;
     RenderFrame m_renderFrame;
-    MeshLoader::Descriptor m_mesh;
+    Examples::Mesh m_mesh;
     StateBlock m_meshStates;
     ConstantBuffer_ m_transformCBuffer;
+    ConstantBuffer_ m_viewportCBuffer;
+    Texture_ m_envmap;
+    Program m_downsampleProgram;
     
     virtual void handleLaunched(Application* application) NIMBLE_OVERRIDE
     {
         Logger::setStandardLogger();
 
-        if (!initialize(800/4, 600/4))
+        if (!initialize(800, 600))
         {
             application->quit(-1);
         }
 
         // Load mesh from a file
-        m_mesh = MeshLoader::objFromFile("Assets/Meshes/bunny_decimated.obj");
+        m_mesh = Examples::objFromFile("Assets/Meshes/bunny_decimated.obj");
         NIMBLE_ABORT_IF(!m_mesh, "failed to load mesh");
+        
+        static Examples::CubeMap cubeMap = Examples::cubeFromDds("Assets/Textures/coast2.dds");
+        m_envmap = m_renderingContext->requestTextureCube(&cubeMap.pixels[0], cubeMap.size, cubeMap.mipLevels, cubeMap.format);
         
         {
             s_transform.projection = Matrix4::perspective(60.0f, m_window->aspectRatio(), 0.1f, 100.0f);
@@ -109,9 +157,25 @@ class RenderingToTexture : public RenderingApplicationDelegate
             m_meshStates.bindConstantBuffer(m_transformCBuffer, 0);
         }
         
+        {
+            UniformLayout layout = m_renderingContext->requestUniformLayout("Viewport", Viewport::s_layout);
+            m_viewportCBuffer = m_renderingContext->requestConstantBuffer(&s_viewport, sizeof(s_viewport), layout);
+        }
+        
+        // Cobfigure quad rendering state block
+        {
+            InputLayout   il = m_renderingContext->requestInputLayout(0);
+            VertexBuffer_ vb = m_renderingContext->requestVertexBuffer(s_vertices, sizeof(s_vertices));
+            m_fullscreenQuadStates.bindVertexBuffer(vb);
+            m_fullscreenQuadStates.bindInputLayout(il);
+            m_fullscreenQuadStates.setDepthState(LessEqual, false);
+        }
+        
         // Create a program that consists from a vertex and fragment shaders.
         Program program = m_renderingContext->requestProgram(s_vertexShader, s_fragmentShader);
         m_renderStates.bindProgram(program);
+        
+        m_downsampleProgram = m_renderingContext->requestProgram(s_vertexDownsample, s_fragmentDownsample);
     }
  
     virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
@@ -126,34 +190,54 @@ class RenderingToTexture : public RenderingApplicationDelegate
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
         
         // Allocate a transient cube map texture
-        TransientTexture env = commands.acquireTextureCube(256, PixelRgb8);
+        const s32 envTextureSize = 128;
+        TransientTexture env = commands.acquireTextureCube(envTextureSize, PixelRgb8);
         
         // Now render to a cube map
         {
-            Rgba colors[] =
+            static Rgba s_colors[] =
             {
                   Rgba(1.0f, 0.0f, 0.0f)
                 , Rgba(0.0f, 1.0f, 0.0f)
                 , Rgba(0.0f, 0.0f, 1.0f)
+                , Rgba(1.0f, 1.0f, 0.0f)
                 , Rgba(0.0f, 1.0f, 1.0f)
                 , Rgba(1.0f, 0.0f, 1.0f)
-                , Rgba(1.0f, 1.0f, 0.0f)
             };
+            
+            StateScope fullscreenQuadScope = stateStack.push(&m_fullscreenQuadStates);
+            
+            StateScope downsampleScope = stateStack.newScope();
+            downsampleScope->bindTexture(m_envmap, 0);
+            downsampleScope->bindProgram(m_downsampleProgram);
+            downsampleScope->bindConstantBuffer(m_viewportCBuffer, 0);
+            
+            s_viewport.width = envTextureSize;
+            s_viewport.height = envTextureSize;
+            commands.uploadConstantBuffer(m_viewportCBuffer, &s_viewport, sizeof(s_viewport));
             
             for (s32 i = 0; i < 6; i++)
             {
                 CommandBuffer& renderToCubeMap = commands.renderToCubeMap(m_renderFrame, env, i);
-                renderToCubeMap.clear(colors[i], ClearAll);
+                renderToCubeMap.clear(s_colors[i], ClearAll);
+                //renderToCubeMap.drawPrimitives(0, PrimQuads, 0, 4, stateStack);
             }
         }
-
-        StateScope instanceStates = stateStack.push(&m_meshStates);
-        s_transform.instance = Matrix4::rotateXY(0.0f, currentTime() * 0.001f);
-        StateScope envStates = stateStack.newScope();
-        envStates->bindTexture(env, 0);
-        commands.uploadConstantBuffer(m_transformCBuffer, &s_transform, sizeof(s_transform));
-        commands.drawPrimitives(0, m_mesh.primitives, 0, m_mesh.vertices.size(), stateStack);
         
+        // Render quad
+        {
+            StateScope quadScope = stateStack.push(&m_fullscreenQuadStates);
+            StateScope scope = stateStack.newScope();
+            scope->bindTexture(env, 0);
+            scope->bindProgram(m_downsampleProgram);
+            scope->bindConstantBuffer(m_transformCBuffer, 0);
+            
+            s_viewport.width = m_window->width();
+            s_viewport.height = m_window->height();
+            commands.uploadConstantBuffer(m_viewportCBuffer, &s_viewport, sizeof(s_viewport));
+            commands.drawPrimitives(0, PrimQuads, 0, 4, stateStack);
+        }
+
         commands.releaseTexture(env);
 
         m_renderingContext->display(m_renderFrame);

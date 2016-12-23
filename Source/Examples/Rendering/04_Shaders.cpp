@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
+#include "Examples.h"
 
 DC_USE_DREEMCHEST
 
@@ -61,10 +62,10 @@ class Shaders : public RenderingApplicationDelegate
             application->quit(-1);
         }
 
-        Renderer::InputLayout   inputLayout  = m_renderingContext->requestInputLayout(VertexFormat::Position);
+        Renderer::InputLayout inputLayout = m_renderingContext->requestInputLayout(VertexFormat::Position);
         
-        // This time we will use a vertex buffer preset to render a triangle
-        Renderer::VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(Presets::VertexBuffers::Triangle, sizeof(Presets::VertexBuffers::Triangle));
+        // This time we will use a predefined vertex buffer to make this example shorter
+        Renderer::VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(Examples::Triangle, sizeof(Examples::Triangle));
         
         // Create a program that consists from a vertex and fragment shaders.
         Renderer::Program program = m_renderingContext->requestProgram(s_vertexShader, s_fragmentShader);
@@ -79,7 +80,7 @@ class Shaders : public RenderingApplicationDelegate
 
     virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
     {
-        // Note, that a shader program was bound to a rendering states block,
+        // Note, that a shader program was bound to a rendering states block
         // upon initialization, so this method stays same as in a
         // 'First Triangle' exmple.
         

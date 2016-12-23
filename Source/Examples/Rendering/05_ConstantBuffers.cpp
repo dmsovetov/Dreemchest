@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
+#include "Examples.h"
 
 DC_USE_DREEMCHEST
 
@@ -33,25 +34,25 @@ using namespace Renderer;
 
 // A fragment shader that takes data from a passed constant buffer
 static String s_fragmentShader =
-    "cbuffer Material material : 0;                             \n" // This line declares a constant buffer of type 'Material' that is bound to unit 0
-    "                                                           \n"
-    "void main()                                                \n"
-    "{                                                          \n"
-    "   gl_FragColor = material.color * material.brightness;    \n"
-    "}                                                          \n"
+    "cbuffer Material material : 0;                                     \n" // This line declares a constant buffer of type 'Material' that is bound to unit 0
+    "                                                                   \n"
+    "void main()                                                        \n"
+    "{                                                                  \n"
+    "   gl_FragColor = vec4(material.color * material.brightness, 1.0); \n"
+    "}                                                                  \n"
     ;
 
 // Declare a C structure of our constant buffer
 struct Material
 {
-    Vec4    color;
+    Vec3    color;
     f32     brightness;
 } s_material;
 
 // Every constant buffer should have an associated layout
 static UniformElement s_bufferLayout[] =
 {
-      { "color",      UniformElement::Vec4,  offsetof(Material, color)       }
+      { "color",      UniformElement::Vec3,  offsetof(Material, color)       }
     , { "brightness", UniformElement::Float, offsetof(Material, brightness)  }
     , { NULL }
 };
@@ -73,11 +74,11 @@ class ConstantBuffers : public RenderingApplicationDelegate
         InputLayout inputLayout  = m_renderingContext->requestInputLayout(VertexFormat::Position);
         
         // Initialize a vertex buffer from a preset data.
-        VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(Presets::VertexBuffers::Triangle, sizeof(Presets::VertexBuffers::Triangle));
+        VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(Examples::Triangle, sizeof(Examples::Triangle));
         
-        // To not bother with vertex shader we are using an vertex identity
+        // To not bother with vertex shader we are using an identity vertex shader
         // preset here, that just passes an input to an ouput.
-        Program program = m_renderingContext->requestProgram(Presets::Shaders::VertexIdentity, s_fragmentShader);
+        Program program = m_renderingContext->requestProgram(Examples::VertexIdentity, s_fragmentShader);
         
         // Initialize a material constant buffer
         s_material.color = Vec4(1.0f, 0.5f, 0.25f, 1.0f);

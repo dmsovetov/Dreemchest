@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
+#include "Examples.h"
 
 DC_USE_DREEMCHEST
 
@@ -146,7 +147,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
 {
     StateBlock m_renderStates;
     RenderFrame m_renderFrame;
-    MeshLoader::Descriptor m_mesh;
+    Examples::Mesh m_mesh;
     StateBlock m_meshStates;
     ConstantBuffer_ m_transformCBuffer;
     
@@ -154,13 +155,13 @@ class RenderingToTexture : public RenderingApplicationDelegate
     {
         Logger::setStandardLogger();
 
-        if (!initialize(800/4, 600/4))
+        if (!initialize(800, 600))
         {
             application->quit(-1);
         }
 
         // Load mesh from a file
-        m_mesh = MeshLoader::objFromFile("Assets/Meshes/bunny_decimated.obj");
+        m_mesh = Examples::objFromFile("Assets/Meshes/bunny_decimated.obj");
         NIMBLE_ABORT_IF(!m_mesh, "failed to load mesh");
         
         {

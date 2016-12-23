@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
+#include "Examples.h"
 
 DC_USE_DREEMCHEST
 
@@ -69,7 +70,7 @@ class Textures : public RenderingApplicationDelegate
         }
         
         // First load an image from a file
-        static ImageLoader::Descriptor image = ImageLoader::tgaFromFile("Assets/Textures/checker.tga");
+        static Examples::Image image = Examples::tgaFromFile("Assets/Textures/checker.tga");
         
         if (!image)
         {
@@ -90,8 +91,8 @@ class Textures : public RenderingApplicationDelegate
         InputLayout inputLayout = m_renderingContext->requestInputLayout(VertexFormat::Position | VertexFormat::TexCoord0);
         
         // Create vertex and index buffer from a textured quad preset
-        VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(Presets::VertexBuffers::TexturedQuad, sizeof(Presets::VertexBuffers::TexturedQuad));
-        IndexBuffer_ indexBuffer = m_renderingContext->requestIndexBuffer(Presets::IndexBuffers::TriangulatedQuad, sizeof(Presets::IndexBuffers::TriangulatedQuad));
+        VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(Examples::TexturedQuad, sizeof(Examples::TexturedQuad));
+        IndexBuffer_ indexBuffer = m_renderingContext->requestIndexBuffer(Examples::TriangulatedQuadIndices, sizeof(Examples::TriangulatedQuadIndices));
 
         m_renderStates.bindVertexBuffer(vertexBuffer);
         m_renderStates.bindIndexBuffer(indexBuffer);

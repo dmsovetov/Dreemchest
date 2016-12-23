@@ -31,8 +31,7 @@ DC_USE_DREEMCHEST
 using namespace Platform;
 using namespace Renderer;
 
-// A STATIC array of vertex coordinates to make sure that vertex
-// pointer it still valid upon vertex buffer construction.
+// An array of vertex coordinates.
 static f32 s_vertices[] =
 {
     -1.0f, -1.0f, 0.0f,
@@ -66,10 +65,10 @@ class FirstTriangle : public RenderingApplicationDelegate
         }
 
         // Here we create an input layout from a flexible vertex format with just a position inside.
-        Renderer::InputLayout inputLayout = m_renderingContext->requestInputLayout(VertexFormat::Position);
+        InputLayout inputLayout = m_renderingContext->requestInputLayout(VertexFormat::Position);
         
         // Now request a vertex buffer handle.
-        Renderer::VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(s_vertices, sizeof(s_vertices));
+        VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(s_vertices, sizeof(s_vertices));
         
         // Finally configure a render state block that will be used during rendering
         m_renderStates.bindVertexBuffer(vertexBuffer);

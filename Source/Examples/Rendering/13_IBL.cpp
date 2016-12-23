@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
+#include "Examples.h"
 
 DC_USE_DREEMCHEST
 
@@ -133,8 +134,8 @@ class IBL : public RenderingApplicationDelegate
 {
     struct Object
     {
-        MeshLoader::Descriptor  mesh;
-        StateBlock              states;
+        Examples::Mesh  mesh;
+        StateBlock      states;
     };
     
     StateBlock  m_renderStates;
@@ -188,7 +189,7 @@ class IBL : public RenderingApplicationDelegate
             m_lightConstantBuffer = m_renderingContext->requestConstantBuffer(&s_light, sizeof(s_light), uniformLayout);
         }
         
-        static ImageLoader::CubeMap cubeMap = ImageLoader::cubeFromDds("Assets/Textures/coast2.dds");
+        static Examples::CubeMap cubeMap = Examples::cubeFromDds("Assets/Textures/coast2.dds");
         Texture_ envmap = m_renderingContext->requestTextureCube(&cubeMap.pixels[0], cubeMap.size, cubeMap.mipLevels, cubeMap.format);
         {
             m_bunny.states.bindTexture(envmap, 0);
@@ -252,7 +253,7 @@ class IBL : public RenderingApplicationDelegate
     
     void initializeObjectFromMesh(const String& fileName, Object& object)
     {
-        object.mesh = MeshLoader::objFromFile(fileName);
+        object.mesh = Examples::objFromFile(fileName);
         
         VertexFormat vertexFormat  = object.mesh.vertexFormat;
         InputLayout inputLayout    = m_renderingContext->requestInputLayout(vertexFormat);

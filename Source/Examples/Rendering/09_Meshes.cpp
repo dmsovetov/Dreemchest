@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
+#include "Examples.h"
 
 DC_USE_DREEMCHEST
 
@@ -61,15 +62,15 @@ static String s_fragmentShader =
 
 // Construct required constant buffers from presets.
 // See the 'Constant Buffers' example for detailed explanation how constant buffers work.
-static Presets::CBuffer::Projection s_projection;
-static Presets::CBuffer::Camera     s_camera     = Presets::CBuffer::Camera::lookAt(Vec3(0.0f, 2.0f, -2.0f), Vec3(0.0f, 0.6f, 0.0f));
-static Presets::CBuffer::Instance   s_instance;
+static Examples::Projection s_projection;
+static Examples::Camera     s_camera     = Examples::Camera::lookAt(Vec3(0.0f, 2.0f, -2.0f), Vec3(0.0f, 0.6f, 0.0f));
+static Examples::Instance   s_instance;
 
-class Textures : public RenderingApplicationDelegate
+class Meshes : public RenderingApplicationDelegate
 {
     StateBlock m_renderStates;
     RenderFrame m_renderFrame;
-    MeshLoader::Descriptor mesh;
+    Examples::Mesh mesh;
     ConstantBuffer_ m_instanceConstantBuffer;
     
     virtual void handleLaunched(Application* application) NIMBLE_OVERRIDE
@@ -82,7 +83,7 @@ class Textures : public RenderingApplicationDelegate
         }
         
         // First load a mesh from a file
-        mesh = MeshLoader::objFromFile("Assets/Meshes/platform.obj");
+        mesh = Examples::objFromFile("Assets/Meshes/platform.obj");
         
         if (!mesh)
         {
@@ -105,23 +106,23 @@ class Textures : public RenderingApplicationDelegate
         
         // Configure projection constant buffer
         {
-            s_projection = Presets::CBuffer::Projection::perspective(60.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
+            s_projection = Examples::Projection::perspective(60.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
             
-            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Projection", Presets::CBuffer::Projection::Layout);
+            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Projection", Examples::Projection::Layout);
             ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&s_projection, sizeof(s_projection), uniformLayout);
             m_renderStates.bindConstantBuffer(constantBuffer, 0);
         }
         
         // Configure camera constant buffer
         {
-            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Camera", Presets::CBuffer::Camera::Layout);
+            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Camera", Examples::Camera::Layout);
             ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&s_camera, sizeof(s_camera), uniformLayout);
             m_renderStates.bindConstantBuffer(constantBuffer, 1);
         }
         
         // Configure instance constant buffer
         {
-            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Instance", Presets::CBuffer::Instance::Layout);
+            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Instance", Examples::Instance::Layout);
             m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(&s_instance, sizeof(s_instance), uniformLayout);
             m_renderStates.bindConstantBuffer(m_instanceConstantBuffer, 2);
         }
@@ -141,7 +142,7 @@ class Textures : public RenderingApplicationDelegate
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
         
         // Update an instance constant buffer
-        s_instance = Presets::CBuffer::Instance::fromTransform(Matrix4::rotateXY(0.0f, currentTime() * 0.001f));
+        s_instance = Examples::Instance::fromTransform(Matrix4::rotateXY(0.0f, currentTime() * 0.001f));
         commands.uploadConstantBuffer(m_instanceConstantBuffer, &s_instance, sizeof(s_instance));
         
         // Render the mesh
@@ -151,4 +152,4 @@ class Textures : public RenderingApplicationDelegate
     }
 };
 
-dcDeclareApplication(new Textures)
+dcDeclareApplication(new Meshes)

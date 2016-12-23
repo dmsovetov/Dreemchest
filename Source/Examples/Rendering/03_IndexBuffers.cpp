@@ -40,7 +40,6 @@ static f32 s_vertices[] =
 };
 
 // This time we will also declare an index buffer to render a rectangle.
-// It should be STATIC too.
 static u16 s_indices[] =
 {
     0, 1, 2, // First triangle

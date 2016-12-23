@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
+#include "Examples.h"
 
 DC_USE_DREEMCHEST
 
@@ -142,8 +143,8 @@ class PointLights : public RenderingApplicationDelegate
 {
     struct Object
     {
-        MeshLoader::Descriptor  mesh;
-        StateBlock              states;
+        Examples::Mesh mesh;
+        StateBlock     states;
     };
     
     StateBlock  m_renderStates;
@@ -255,7 +256,7 @@ class PointLights : public RenderingApplicationDelegate
     
     void initializeObjectFromMesh(const String& fileName, Object& object)
     {
-        object.mesh = MeshLoader::objFromFile(fileName);
+        object.mesh = Examples::objFromFile(fileName);
         
         VertexFormat vertexFormat  = object.mesh.vertexFormat;
         InputLayout inputLayout    = m_renderingContext->requestInputLayout(vertexFormat);
