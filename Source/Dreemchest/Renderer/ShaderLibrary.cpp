@@ -243,7 +243,7 @@ bool ShaderLibrary::generateShaderCode(const ShaderProgramDescriptor& program, P
 {
     // Generate an options string
     String options = generateOptionsString(features, featureLayout);
-    NIMBLE_BREAK_IF(!program.vertexShader, "a shader program should contain a vertex shader");
+    //NIMBLE_BREAK_IF(!program.vertexShader, "a shader program should contain a vertex shader");
     
     if (program.vertexShader)
     {
