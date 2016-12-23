@@ -653,6 +653,125 @@ Descriptor objFromFile(const String& fileName)
     
 } // namespace MeshLoader
     
+namespace Presets
+{
+
+namespace CBuffer {
+    
+// ** Projection::Layout
+const UniformElement Projection::Layout[] =
+{
+      { "transform", UniformElement::Matrix4, offsetof(Projection, transform) }
+    , { "viewport",  UniformElement::Vec4,    offsetof(Projection, viewport)  }
+    , { NULL }
+};
+    
+// ** Projection::ortho
+Projection Projection::ortho(s32 left, s32 right, s32 bottom, s32 top, f32 zNear, f32 zFar)
+{
+    Projection projection;
+    projection.transform = Matrix4::ortho(left, right, bottom, top, zNear, zFar);
+    projection.viewport  = Vec4(left, bottom, right - left, top - bottom);
+    return projection;
+}
+
+// ** Projection::perspective
+Projection Projection::perspective(f32 fov, s32 width, s32 height, f32 zNear, f32 zFar)
+{
+    Projection projection;
+    projection.transform = Matrix4::perspective(fov, static_cast<f32>(width) / height, zNear, zFar);
+    projection.viewport  = Vec4(0, 0, width, height);
+    return projection;
+}
+    
+// ** Camera::Layout
+const UniformElement Camera::Layout[] =
+{
+      { "transform", UniformElement::Matrix4, offsetof(Camera, transform) }
+    , { "position",  UniformElement::Vec3,    offsetof(Camera, position)  }
+    , { NULL }
+};
+    
+// ** Camera::lookAt
+Camera Camera::lookAt(const Vec3& position, const Vec3& target)
+{
+    Camera camera;
+    camera.position = position;
+    camera.transform = Matrix4::lookAt(position, target, Vec3::axisY());
+    return camera;
+}
+
+// ** Instance::Layout
+const UniformElement Instance::Layout[] =
+{
+      { "transform",        UniformElement::Matrix4, offsetof(Instance, transform)        }
+    , { "inverseTranspose", UniformElement::Matrix4, offsetof(Instance, inverseTranspose) }
+    , { NULL }
+};
+
+// ** Instance::fromTransform
+Instance Instance::fromTransform(const Matrix4& transform)
+{
+    Instance instance;
+    instance.transform = transform;
+    instance.inverseTranspose = transform.inversed().transposed();
+    return instance;
+}
+    
+} // namespace CBuffer
+    
+// ** Shaders::VertexIdentity
+const String Shaders::VertexIdentity =
+    "void main()                    \n"
+    "{                              \n"
+    "   gl_Position = gl_Vertex;    \n"
+    "}                              \n"
+    ;
+
+// ** VertexBuffers::Triangle
+const f32 VertexBuffers::Triangle[9] =
+{
+    -1.0f, -1.0f, 0.0f,
+     1.0f, -1.0f, 0.0f,
+     0.0f,  1.0f, 0.0f,
+};
+
+// ** VertexBuffers::FullScreenQuad
+const f32 VertexBuffers::FullScreenQuad[12] =
+{
+    -1.0f, -1.0f, 0.0f,
+     1.0f, -1.0f, 0.0f,
+     1.0f,  1.0f, 0.0f,
+    -1.0f,  1.0f, 0.0f,
+};
+
+// ** VertexBuffers::QuatterScreenQuad
+const f32 VertexBuffers::QuatterScreenQuad[12] =
+{
+    -0.5f, -0.5f, 0.0f,
+     0.5f, -0.5f, 0.0f,
+     0.5f,  0.5f, 0.0f,
+    -0.5f,  0.5f, 0.0f,
+};
+    
+// ** VertexBuffers::TexturedQuad
+const f32 VertexBuffers::TexturedQuad[20] =
+{
+    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f,
+     0.5f, -0.5f, 0.0f,   1.0f, 0.0f,
+     0.5f,  0.5f, 0.0f,   1.0f, 1.0f,
+    -0.5f,  0.5f, 0.0f,   0.0f, 1.0f,
+};
+
+// ** IndexBuffers::TriangulatedQuad
+const u16 IndexBuffers::TriangulatedQuad[6] =
+{
+    0, 1, 2,
+    0, 2, 3,
+};
+    
+} // namespace Presets
+    
 } // namespace Renderer
 
 DC_END_DREEMCHEST

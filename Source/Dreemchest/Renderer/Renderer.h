@@ -338,6 +338,78 @@ namespace Renderer {
         virtual void                endFrame( void ) {}
     };
     
+    //! A namespace that contains declarations for commonly used constant buffer, shader and vertex buffer types.
+    namespace Presets
+    {
+        //! Variuos constant buffers presets
+        namespace CBuffer
+        {
+            //! A constant buffer definition that contains a projection info.
+            struct Projection
+            {
+                Matrix4                     transform;  //!< A pass projection matrix.
+                Vec4                        viewport;   //!< A viewport info.
+                
+                static const UniformElement Layout[];   //!< A constant buffer layout.
+                
+                //! Creates a Projection constant buffer with ortho projection.
+                static Projection           ortho(s32 left, s32 right, s32 bottom, s32 top, f32 zNear, f32 zFar);
+                
+                //! Creates a Projection constant buffer with perpsective projection.
+                static Projection           perspective(f32 fov, s32 width, s32 height, f32 zNear, f32 zFar);
+            };
+            
+            //! A constant buffer definition that contains camera info.
+            struct Camera
+            {
+                Matrix4                     transform;  //!< A camera view matrix.
+                Vec3                        position;   //!< A camera position.
+                
+                static const UniformElement Layout[];   //!< A constant buffer layout.
+                
+                //! Creates a Camera constant buffer with a camera looking at the specified target.
+                static Camera               lookAt(const Vec3& position, const Vec3& target);
+            };
+            
+            //! A constant buffer definition that contains instance info.
+            struct Instance
+            {
+                Matrix4                     transform;          //!< An instance transformation matrix.
+                Matrix4                     inverseTranspose;   //!< An inverse transpose matrix.
+                
+                static const UniformElement Layout[];           //!< A constant buffer layout.
+                
+                //! Creates an Instance constant buffer with a specified affine transform.
+                static Instance              fromTransform(const Matrix4& transform);
+            };
+            
+        } // namespace CBuffer
+        
+        //! A struct that wraps a shader preset declarations.
+        struct Shaders
+        {
+            //! A simple shader that just passes a vertex input to an output.
+            static const String VertexIdentity;
+        };
+        
+        //! A vertex buffer presets
+        struct VertexBuffers
+        {
+            static const f32 Triangle[9];           //!< A triangle mesh.
+            static const f32 FullScreenQuad[12];    //!< A fullscreen quad mesh.
+            static const f32 QuatterScreenQuad[12]; //!< A quad that occupes a quatter of a screen area.
+            static const f32 TexturedQuad[20];      //!< A textured quad.
+        };
+        
+        //! An index buffer presets.
+        struct IndexBuffers
+        {
+            static const u16 TriangulatedQuad[6];   //!< Indices to render a quad from triangles.
+        };
+        
+    }   // namespace Presets
+    
+    
 #if DEV_DEPRECATED_HAL
     // ** class RenderResource
     //! RenderResource is a base class for all render resources.
