@@ -31,24 +31,9 @@ DC_USE_DREEMCHEST
 using namespace Platform;
 using namespace Renderer;
 
-static f32 s_vertices[] =
-{
-    -1.0f, -1.0f, 0.0f,
-     1.0f, -1.0f, 0.0f,
-     0.0f,  1.0f, 0.0f,
-};
-
 // A ubershader is a regular shader with a set of options that dictate
 // what features should be used in a compile time. Each set of options
 // produces a unique shader permutation that is used during rendering.
-
-// A vertex shader stays the same as before
-static String s_vertexShader =
-    "void main()                                    \n"
-    "{                                              \n"
-    "    gl_Position = gl_Vertex;                   \n"
-    "}                                              \n"
-    ;
 
 // Here we define a shader that has a single option - F_Pink
 // that controlls an output color of all fragments output
@@ -97,8 +82,12 @@ class FirstUbershader : public RenderingApplicationDelegate
         }
 
         InputLayout inputLayout = m_renderingContext->requestInputLayout(VertexFormat::Position);
-        VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(s_vertices, sizeof(s_vertices));
-        Program program = m_renderingContext->requestProgram(s_vertexShader, s_fragmentShader);
+        
+        // Create a vertex buffer from a triangle vertex buffer preset.
+        VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(Presets::VertexBuffers::Triangle, sizeof(Presets::VertexBuffers::Triangle));
+        
+        // Create a shader program. Nothing special in vertex shader, so use a preset.
+        Program program = m_renderingContext->requestProgram(Presets::Shaders::VertexIdentity, s_fragmentShader);
         
         // Create a feature layout
         FeatureLayout featureLayout = m_renderingContext->requestPipelineFeatureLayout(s_features);

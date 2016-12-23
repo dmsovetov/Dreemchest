@@ -129,7 +129,7 @@ UniformElement Light::s_layout[] =
     , { NULL }
 };
 
-class PointLights : public RenderingApplicationDelegate
+class IBL : public RenderingApplicationDelegate
 {
     struct Object
     {
@@ -181,16 +181,16 @@ class PointLights : public RenderingApplicationDelegate
         // Configure a light constant buffer
         {
             s_light.position  = Vec3(-1.0f, 1.0f, -1.0f);
-            s_light.color     = Rgb(1.0f, 1.0f, 1.0f);
+            s_light.color     = Rgb(0.25f, 1.0f, 0.5f);
             s_light.intensity = 1.0f;
             s_light.range     = 1.0f;
             UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Light", Light::s_layout);
             m_lightConstantBuffer = m_renderingContext->requestConstantBuffer(&s_light, sizeof(s_light), uniformLayout);
         }
         
+        static ImageLoader::CubeMap cubeMap = ImageLoader::cubeFromDds("Assets/Textures/coast2.dds");
+        Texture_ envmap = m_renderingContext->requestTextureCube(&cubeMap.pixels[0], cubeMap.size, cubeMap.mipLevels, cubeMap.format);
         {
-            static ImageLoader::CubeMap cubeMap = ImageLoader::cubeFromDds("Assets/Textures/coast2.dds");
-            Texture_ envmap = m_renderingContext->requestTextureCube(&cubeMap.pixels[0], cubeMap.size, cubeMap.mipLevels, cubeMap.format);
             m_bunny.states.bindTexture(envmap, 0);
         }
         
@@ -220,7 +220,7 @@ class PointLights : public RenderingApplicationDelegate
         StateScope lightScope = states.newScope();
         lightScope->bindConstantBuffer(m_lightConstantBuffer, 2);
         
-        f32 time = currentTime() * 0.001f;
+        f32 time = currentTime() * 0.0002f;
         
         // Update light parameters
         {
@@ -237,7 +237,7 @@ class PointLights : public RenderingApplicationDelegate
         
         // Clear the viewport
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
-
+        
         // Render the platform
         renderObject(states, commands, m_platform, Matrix4());
         
@@ -278,4 +278,4 @@ class PointLights : public RenderingApplicationDelegate
     }
 };
 
-dcDeclareApplication(new PointLights)
+dcDeclareApplication(new IBL)

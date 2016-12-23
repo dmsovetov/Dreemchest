@@ -31,13 +31,6 @@ DC_USE_DREEMCHEST
 using namespace Platform;
 using namespace Renderer;
 
-static f32 s_vertices[] =
-{
-    -1.0f, -1.0f, 0.0f,
-     1.0f, -1.0f, 0.0f,
-     0.0f,  1.0f, 0.0f,
-};
-
 // Declare a vertex shader code that will output a received vertex.
 static String s_vertexShader =
     "void main()                                    \n"
@@ -68,8 +61,10 @@ class Shaders : public RenderingApplicationDelegate
             application->quit(-1);
         }
 
-        Renderer::InputLayout inputLayout  = m_renderingContext->requestInputLayout(VertexFormat::Position);
-        Renderer::VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(s_vertices, sizeof(s_vertices));
+        Renderer::InputLayout   inputLayout  = m_renderingContext->requestInputLayout(VertexFormat::Position);
+        
+        // This time we will use a vertex buffer preset to render a triangle
+        Renderer::VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(Presets::VertexBuffers::Triangle, sizeof(Presets::VertexBuffers::Triangle));
         
         // Create a program that consists from a vertex and fragment shaders.
         Renderer::Program program = m_renderingContext->requestProgram(s_vertexShader, s_fragmentShader);

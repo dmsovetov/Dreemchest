@@ -32,52 +32,38 @@ using namespace Platform;
 using namespace Renderer;
 
 static String s_vertexShader =
-    "cbuffer Pass     pass     : 0;                     \n"
-    "cbuffer Instance instance : 1;                     \n"
-    "                                                   \n"
+    "cbuffer Projection projection : 0;                 \n"
+    "cbuffer Camera     camera     : 1;                 \n"
+    "cbuffer Instance   instance   : 2;                 \n"
+
     "varying vec3 v_color;                              \n"
-    "                                                   \n"
+
     "void main()                                        \n"
     "{                                                  \n"
     "   v_color     = gl_Normal * 0.5 + 0.5;            \n"
-    "   gl_Position = pass.projection * pass.view * instance.transform * gl_Vertex; \n"
+    "   mat4 mvp    = projection.transform              \n"
+    "               * camera.transform                  \n"
+    "               * instance.transform                \n"
+    "               ;                                   \n"
+
+    "   gl_Position = mvp * gl_Vertex;                  \n"
     "}                                                  \n"
 ;
 
 static String s_fragmentShader =
     "varying vec3 v_color;                              \n"
-    "                                                   \n"
+
     "void main()                                        \n"
     "{                                                  \n"
     "   gl_FragColor = vec4(v_color, 1.0);              \n"
     "}                                                  \n"
     ;
 
-struct Pass
-{
-    Matrix4 projection;
-    Matrix4 view;
-    static UniformElement s_layout[];
-} s_pass;
-
-UniformElement Pass::s_layout[] =
-{
-      { "projection", UniformElement::Matrix4, offsetof(Pass, projection) }
-    , { "view",       UniformElement::Matrix4, offsetof(Pass, view)       }
-    , { NULL }
-};
-
-struct Instance
-{
-    Matrix4 transform;
-    static UniformElement s_layout[];
-} s_instance;
-
-UniformElement Instance::s_layout[] =
-{
-      { "transform", UniformElement::Matrix4, offsetof(Instance, transform) }
-    , { NULL }
-};
+// Construct required constant buffers from presets.
+// See the 'Constant Buffers' example for detailed explanation how constant buffers work.
+static Presets::CBuffer::Projection s_projection;
+static Presets::CBuffer::Camera     s_camera     = Presets::CBuffer::Camera::lookAt(Vec3(0.0f, 2.0f, -2.0f), Vec3(0.0f, 0.6f, 0.0f));
+static Presets::CBuffer::Instance   s_instance;
 
 class Textures : public RenderingApplicationDelegate
 {
@@ -117,20 +103,27 @@ class Textures : public RenderingApplicationDelegate
             m_renderStates.bindIndexBuffer(indexBuffer);
         }
         
-        // Configure pass constant buffer
+        // Configure projection constant buffer
         {
-            s_pass.projection = Matrix4::perspective(60.0f, m_window->aspectRatio(), 0.1f, 100.0f);
-            s_pass.view       = Matrix4::lookAt(Vec3(0.0f, 2.0f, -2.0f), Vec3(0.0f, 0.6f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
-            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Pass", Pass::s_layout);
-            ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&s_pass, sizeof(s_pass), uniformLayout);
+            s_projection = Presets::CBuffer::Projection::perspective(60.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
+            
+            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Projection", Presets::CBuffer::Projection::Layout);
+            ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&s_projection, sizeof(s_projection), uniformLayout);
             m_renderStates.bindConstantBuffer(constantBuffer, 0);
+        }
+        
+        // Configure camera constant buffer
+        {
+            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Camera", Presets::CBuffer::Camera::Layout);
+            ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&s_camera, sizeof(s_camera), uniformLayout);
+            m_renderStates.bindConstantBuffer(constantBuffer, 1);
         }
         
         // Configure instance constant buffer
         {
-            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Instance", Instance::s_layout);
+            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Instance", Presets::CBuffer::Instance::Layout);
             m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(&s_instance, sizeof(s_instance), uniformLayout);
-            m_renderStates.bindConstantBuffer(m_instanceConstantBuffer, 1);
+            m_renderStates.bindConstantBuffer(m_instanceConstantBuffer, 2);
         }
         
         // Create a simple shader program
@@ -148,7 +141,7 @@ class Textures : public RenderingApplicationDelegate
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
         
         // Update an instance constant buffer
-        s_instance.transform = Matrix4::rotateXY(0.0f, currentTime() * 0.001f);
+        s_instance = Presets::CBuffer::Instance::fromTransform(Matrix4::rotateXY(0.0f, currentTime() * 0.001f));
         commands.uploadConstantBuffer(m_instanceConstantBuffer, &s_instance, sizeof(s_instance));
         
         // Render the mesh

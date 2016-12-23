@@ -31,28 +31,6 @@ DC_USE_DREEMCHEST
 using namespace Platform;
 using namespace Renderer;
 
-// A textured vertex data structure.
-struct TexturedVertex
-{
-    f32 position[3];
-    f32 uv[2];
-};
-
-static TexturedVertex s_vertices[] =
-{
-    { { -0.7f, -0.7f, 0.0f }, { 0.0f, 0.0f } },
-    { {  0.7f, -0.7f, 0.0f }, { 1.0f, 0.0f } },
-    { {  0.7f,  0.7f, 0.0f }, { 1.0f, 1.0f } },
-    { { -0.7f,  0.7f, 0.0f }, { 0.0f, 1.0f } },
-};
-
-static u16 s_indices[] =
-{
-    0, 1, 2,
-    0, 2, 3,
-};
-
-
 // Declare a vertex shader code that will output a received vertex.
 static String s_vertexShader =
     "varying vec2 v_texCoord;                       \n"
@@ -110,8 +88,10 @@ class Textures : public RenderingApplicationDelegate
         
         // Finally configure mesh rendering states as before
         InputLayout inputLayout = m_renderingContext->requestInputLayout(VertexFormat::Position | VertexFormat::TexCoord0);
-        VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(s_vertices, sizeof(s_vertices));
-        IndexBuffer_ indexBuffer = m_renderingContext->requestIndexBuffer(s_indices, sizeof(s_indices));
+        
+        // Create vertex and index buffer from a textured quad preset
+        VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(Presets::VertexBuffers::TexturedQuad, sizeof(Presets::VertexBuffers::TexturedQuad));
+        IndexBuffer_ indexBuffer = m_renderingContext->requestIndexBuffer(Presets::IndexBuffers::TriangulatedQuad, sizeof(Presets::IndexBuffers::TriangulatedQuad));
 
         m_renderStates.bindVertexBuffer(vertexBuffer);
         m_renderStates.bindIndexBuffer(indexBuffer);

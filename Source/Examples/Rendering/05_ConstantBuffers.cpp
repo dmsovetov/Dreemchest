@@ -31,20 +31,7 @@ DC_USE_DREEMCHEST
 using namespace Platform;
 using namespace Renderer;
 
-static f32 s_vertices[] =
-{
-    -1.0f, -1.0f, 0.0f,
-     1.0f, -1.0f, 0.0f,
-     0.0f,  1.0f, 0.0f,
-};
-
-static String s_vertexShader =
-    "void main()                                    \n"
-    "{                                              \n"
-    "   gl_Position = gl_Vertex;                    \n"
-    "}                                              \n"
-    ;
-
+// A fragment shader that takes data from a passed constant buffer
 static String s_fragmentShader =
     "cbuffer Material material : 0;                             \n" // This line declares a constant buffer of type 'Material' that is bound to unit 0
     "                                                           \n"
@@ -83,9 +70,14 @@ class ConstantBuffers : public RenderingApplicationDelegate
             application->quit(-1);
         }
 
-        InputLayout inputLayout = m_renderingContext->requestInputLayout(VertexFormat::Position);
-        VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(s_vertices, sizeof(s_vertices));
-        Program program = m_renderingContext->requestProgram(s_vertexShader, s_fragmentShader);
+        InputLayout inputLayout  = m_renderingContext->requestInputLayout(VertexFormat::Position);
+        
+        // Initialize a vertex buffer from a preset data.
+        VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(Presets::VertexBuffers::Triangle, sizeof(Presets::VertexBuffers::Triangle));
+        
+        // To not bother with vertex shader we are using an vertex identity
+        // preset here, that just passes an input to an ouput.
+        Program program = m_renderingContext->requestProgram(Presets::Shaders::VertexIdentity, s_fragmentShader);
         
         // Initialize a material constant buffer
         s_material.color = Vec4(1.0f, 0.5f, 0.25f, 1.0f);
