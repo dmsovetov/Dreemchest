@@ -736,8 +736,8 @@ const f32 VertexBuffers::Triangle[9] =
      0.0f,  1.0f, 0.0f,
 };
 
-// ** VertexBuffers::FullScreenQuad
-const f32 VertexBuffers::FullScreenQuad[12] =
+// ** VertexBuffers::FullscreenQuad
+const f32 VertexBuffers::FullscreenQuad[12] =
 {
     -1.0f, -1.0f, 0.0f,
      1.0f, -1.0f, 0.0f,

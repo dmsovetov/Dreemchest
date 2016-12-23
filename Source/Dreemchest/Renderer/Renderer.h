@@ -396,7 +396,7 @@ namespace Renderer {
         struct VertexBuffers
         {
             static const f32 Triangle[9];           //!< A triangle mesh.
-            static const f32 FullScreenQuad[12];    //!< A fullscreen quad mesh.
+            static const f32 FullscreenQuad[12];    //!< A fullscreen quad mesh.
             static const f32 QuatterScreenQuad[12]; //!< A quad that occupes a quatter of a screen area.
             static const f32 TexturedQuad[20];      //!< A textured quad.
         };
