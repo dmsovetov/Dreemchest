@@ -143,6 +143,13 @@ namespace Examples
         "}                              \n"
         ;
     
+    const String FragmentPink =
+        "void main()                                    \n"
+        "{                                              \n"
+        "   gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);    \n"
+        "}                                              \n"
+        ;
+    
     const f32 Triangle[9] =
     {
         -1.0f, -1.0f, 0.0f,
@@ -179,6 +186,72 @@ namespace Examples
         0, 1, 2,
         0, 2, 3,
     };
+    
+    Rgba CubeFaceColors[] =
+    {
+          Rgba(1.0f, 0.0f, 0.0f)
+        , Rgba(0.0f, 1.0f, 0.0f)
+        , Rgba(0.0f, 0.0f, 1.0f)
+        , Rgba(1.0f, 1.0f, 0.0f)
+        , Rgba(0.0f, 1.0f, 1.0f)
+        , Rgba(1.0f, 0.0f, 1.0f)
+    };
+    
+    Vec3 CubeFaceNormals[] =
+    {
+           Vec3::axisX()
+        , -Vec3::axisX()
+        ,  Vec3::axisY()
+        , -Vec3::axisY()
+        ,  Vec3::axisZ()
+        , -Vec3::axisZ()
+    };
+    
+    struct MeshStateBlock
+    {
+        StateBlock      states;
+        PrimitiveType   primitives;
+        s32             size;
+    };
+    
+    // Creates a rendering states block from a mesh file
+    MeshStateBlock createMeshRenderingStates(RenderingContextWPtr renderingContext, RenderFrame& frame, const String& fileName)
+    {
+        Mesh mesh = objFromFile(fileName);
+        NIMBLE_ABORT_IF(!mesh, "failed to load a mesh");
+        
+        MeshStateBlock meshStates;
+        
+        VertexFormat vertexFormat = mesh.vertexFormat;
+        VertexBuffer_ vertexBuffer = renderingContext->requestVertexBuffer(frame.internBuffer(&mesh.vertices[0], mesh.vertices.size()), mesh.vertices.size());
+        InputLayout inputLayout = renderingContext->requestInputLayout(vertexFormat);
+
+        meshStates.states.bindVertexBuffer(vertexBuffer);
+        meshStates.states.bindInputLayout(inputLayout);
+        meshStates.primitives = mesh.primitives;
+        meshStates.size       = mesh.vertices.size() / vertexFormat.vertexSize();
+        
+        return meshStates;
+    }
+    
+    // Creates an environment map from a texture
+    Texture_ createEnvTexture(RenderingContextWPtr renderingContext, RenderFrame& frame, const String& fileName)
+    {
+        CubeMap cubeMap = cubeFromDds(fileName);
+        return renderingContext->requestTextureCube(frame.internBuffer(&cubeMap.pixels[0], cubeMap.pixels.size()), cubeMap.size, cubeMap.mipLevels, cubeMap.format);
+    }
+    
+    //! Creates a fullscreen quad rendering states
+    StateBlock createFullscreenRenderingStates(RenderingContextWPtr renderingContext)
+    {
+        StateBlock states;
+        InputLayout   il = renderingContext->requestInputLayout(0);
+        VertexBuffer_ vb = renderingContext->requestVertexBuffer(FullscreenQuad, sizeof(FullscreenQuad));
+        states.bindVertexBuffer(vb);
+        states.bindInputLayout(il);
+        states.setDepthState(LessEqual, false);
+        return states;
+    }
     
 } // namespace Examples
 

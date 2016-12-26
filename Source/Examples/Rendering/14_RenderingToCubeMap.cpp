@@ -56,36 +56,6 @@ static String s_fragmentShader =
     "}                                                          \n"
     ;
 
-struct Transform
-{
-    Matrix4 projection;
-    Matrix4 view;
-    Matrix4 instance;
-    static UniformElement s_layout[];
-} s_transform;
-
-UniformElement Transform::s_layout[] =
-{
-      { "projection", UniformElement::Matrix4, offsetof(Transform, projection) }
-    , { "view",       UniformElement::Matrix4, offsetof(Transform, view)       }
-    , { "instance",   UniformElement::Matrix4, offsetof(Transform, instance)   }
-    , { NULL }
-};
-
-struct Viewport
-{
-    f32 width;
-    f32 height;
-    static UniformElement s_layout[];
-} s_viewport;
-
-UniformElement Viewport::s_layout[] =
-{
-      { "width",  UniformElement::Float, offsetof(Viewport, width)  }
-    , { "height", UniformElement::Float, offsetof(Viewport, height) }
-    , { NULL }
-};
-
 static Vec3 s_vertices[] =
 {
       Vec3(-1.0f, -1.0f, 0.0f)
@@ -94,88 +64,176 @@ static Vec3 s_vertices[] =
     , Vec3(-1.0f,  1.0f, 0.0f)
 };
 
-static String s_vertexDownsample =
-    "void main()                      \n"
-    "{                                \n"
-    "   gl_Position = gl_Vertex;      \n"
-    "}                                \n"
+static String s_vertexMesh =
+    "cbuffer Projection projection : 0;                     \n"
+    "cbuffer Camera     camera     : 1;                     \n"
+    "cbuffer Instance   instance   : 2;                     \n"
+
+    "varying vec3 v_normal;                                 \n"
+
+    "void main()                                            \n"
+    "{                                                      \n"
+    "   vec4 n   = vec4(gl_Normal, 1.0);                    \n"
+    "   v_normal = (instance.inverseTranspose * n).xyz;     \n"
+    "   mat4 mvp = projection.transform                     \n"
+    "            * camera.transform                         \n"
+    "            * instance.transform                       \n"
+    "            ;                                          \n"
+    "   gl_Position = mvp * gl_Vertex;                      \n"
+    "}                                                      \n"
+    ;
+
+static String s_fragmentMesh =
+    "uniform samplerCube Texture0;                          \n"
+
+    "varying vec3 v_normal;                                 \n"
+
+    "void main()                                            \n"
+    "{                                                      \n"
+    "   vec3 n = normalize(v_normal);                       \n"
+    "   gl_FragColor = textureCube(Texture0, n);            \n"
+    "}                                                      \n"
     ;
 
 static String s_fragmentDownsample =
-    "cbuffer Viewport viewport : 0;         \n"
+    "uniform samplerCube Texture0;                          \n"
+    "cbuffer Convolution convolution   : 0;                 \n"
 
-    "uniform samplerCube Texture0;          \n"
+    "vec3 calculateCubeCoordinates(vec4 fragCoord, vec2 vp, float face) \n"
+    "{                                                                  \n"
+    "   vec3 ray = vec3(fragCoord.xy / vp * 2.0 - 1.0, 0.0);            \n"
+    "        if(face == 0.0) ray = normalize(vec3(  1, -ray.y,-ray.x));  \n"
+    "   else if(face == 1.0) ray = normalize(vec3( -1, -ray.y, ray.x));  \n"
+    "   else if(face == 2.0) ray = normalize(vec3(ray.x, 1,  -ray.y));  \n"
+    "   else if(face == 3.0) ray = normalize(vec3(ray.x, -1, ray.y));  \n"
+    "   else if(face == 4.0) ray = normalize(vec3(ray.x, -ray.y,  1));                      \n"
+    "   else if(face == 5.0) ray = normalize(vec3(ray.x, -ray.y, -1));  \n"
+    "   return ray;                                                     \n"
+    "}                                                                  \n"
+
+    "vec3 tangentFromFace(float face)                   \n"
+    "{                                                  \n"
+    "   if (face == 0.0)    return vec3(0.0, 1.0, 0.0); \n"
+    "   if (face == 1.0)    return vec3(0.0, 1.0, 0.0); \n"
+    "   if (face == 2.0)    return vec3(1.0, 0.0, 0.0); \n"
+    "   if (face == 3.0)    return vec3(1.0, 0.0, 0.0); \n"
+    "   if (face == 4.0)    return vec3(0.0, 1.0, 0.0); \n"
+    "   if (face == 5.0)    return vec3(0.0, 1.0, 0.0); \n"
+    "}                                                  \n"
+
+    "vec3 hemisphereDirection(vec3 t, vec3 b, vec3 n, float theta, float phi)           \n"
+    "{                                                                                  \n"
+    "   vec4 angles = vec4(cos(theta), sin(theta), cos(phi), sin(phi));                 \n"
+    "   vec3 dir    = t * angles.x * angles.w + b * angles.y * angles.w + n * angles.z; \n"
+    "   return normalize(dir);                                                          \n"
+    "}                                                                                  \n"
 
     "void main()                                                                        \n"
-    "{                                                                                  \n"
-    "   vec2 vp        = vec2(viewport.width, viewport.height);                         \n"
-    "   vec3 ray       = vec3(gl_FragCoord.xy / vp * 2.0 - 1.0, -gl_FragCoord.z * 2.0); \n"
-    "   vec3 direction = normalize(ray);                                                \n"
-    "   gl_FragColor   = textureCube(Texture0, direction);                              \n"
-    "}\n"
+    "{                                                                                              \n"
+    "   vec3 n = calculateCubeCoordinates(gl_FragCoord, convolution.viewport, convolution.face);    \n"
+    "   vec3 t = tangentFromFace(convolution.face);                                                 \n"
+    "   vec3 b = cross(n, t);                                                                       \n"
+    "   float index = 0.0;                                                                          \n"
+    "   vec4 final = vec4(0.0);                                                                     \n"
+
+    "   for(float phi = 0.0; phi < 6.283; phi += 0.025)                                             \n"
+    "   {                                                                                           \n"
+    "       for(float theta = 0.0; theta < 1.57; theta += 0.1)                                      \n"
+    "       {                                                                                       \n"
+    "           vec3 dir = hemisphereDirection(t, b, n, phi, theta);                                \n"
+    "           final += textureCube(Texture0, dir) * dot(dir, n);                                  \n"
+    "           index++;                                                                            \n"
+    "       }                                                                                       \n"
+    "   }                                                                                           \n"
+    "   gl_FragColor = final / index;                                                               \n"
+    "}                                                                                              \n"
     ;
+
+struct Convolution
+{
+    Vec3    direction;
+    Vec2    viewport;
+    float   face;
+    static const UniformElement Layout[];
+} s_convolution;
+
+const UniformElement Convolution::Layout[] =
+{
+      { "direction", UniformElement::Vec3, offsetof(Convolution, direction) }
+    , { "viewport",  UniformElement::Vec2, offsetof(Convolution, viewport) }
+    , { "face",      UniformElement::Float, offsetof(Convolution, face) }
+    , { NULL }
+};
 
 class RenderingToTexture : public RenderingApplicationDelegate
 {
     StateBlock m_renderStates;
-    StateBlock  m_fullscreenQuadStates;
     RenderFrame m_renderFrame;
-    Examples::Mesh m_mesh;
-    StateBlock m_meshStates;
-    ConstantBuffer_ m_transformCBuffer;
-    ConstantBuffer_ m_viewportCBuffer;
+    ConstantBuffer_ m_cameraCBuffer;
+    ConstantBuffer_ m_projectionCBuffer;
+    ConstantBuffer_ m_instanceCBuffer;
+    ConstantBuffer_ m_convolutionCBuffer;
+    Examples::MeshStateBlock m_mesh;
+    StateBlock m_fullscreenQuad;
     Texture_ m_envmap;
     Program m_downsampleProgram;
+    Program m_meshProgram;
+    
+    Examples::Camera s_camera;
+    Examples::Projection s_projection;
+    Examples::Instance s_instance;
     
     virtual void handleLaunched(Application* application) NIMBLE_OVERRIDE
     {
         Logger::setStandardLogger();
 
-        if (!initialize(800, 600))
+        if (!initialize(800 / 4, 600 / 4))
         {
             application->quit(-1);
         }
 
         // Load mesh from a file
-        m_mesh = Examples::objFromFile("Assets/Meshes/bunny_decimated.obj");
-        NIMBLE_ABORT_IF(!m_mesh, "failed to load mesh");
+        m_mesh = Examples::createMeshRenderingStates(m_renderingContext, m_renderFrame, "Assets/Meshes/capsule.obj");
         
-        static Examples::CubeMap cubeMap = Examples::cubeFromDds("Assets/Textures/coast2.dds");
-        m_envmap = m_renderingContext->requestTextureCube(&cubeMap.pixels[0], cubeMap.size, cubeMap.mipLevels, cubeMap.format);
+        m_envmap = Examples::createEnvTexture(m_renderingContext, m_renderFrame, "Assets/Textures/coast2.dds");
         
+        // Projection cbuffer
         {
-            s_transform.projection = Matrix4::perspective(60.0f, m_window->aspectRatio(), 0.1f, 100.0f);
-            s_transform.view       = Matrix4::lookAt(Vec3(0.0f, 2.0f, -2.0f), Vec3(0.0f, 0.5f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
+            s_projection = Examples::Projection::perspective(60.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
             
-            VertexFormat vertexFormat = m_mesh.vertexFormat;
-            VertexBuffer_ vb = m_renderingContext->requestVertexBuffer(&m_mesh.vertices[0], m_mesh.vertices.size());
-            InputLayout il = m_renderingContext->requestInputLayout(vertexFormat);
-            UniformLayout layout = m_renderingContext->requestUniformLayout("Transform", Transform::s_layout);
-            m_transformCBuffer = m_renderingContext->requestConstantBuffer(&s_transform, sizeof(s_transform), layout);
-            m_meshStates.bindVertexBuffer(vb);
-            m_meshStates.bindInputLayout(il);
-            m_meshStates.bindConstantBuffer(m_transformCBuffer, 0);
+            UniformLayout layout = m_renderingContext->requestUniformLayout("Projection", Examples::Projection::Layout);
+            m_projectionCBuffer = m_renderingContext->requestConstantBuffer(&s_projection, sizeof(s_projection), layout);
         }
         
+        // Camera cbuffer
         {
-            UniformLayout layout = m_renderingContext->requestUniformLayout("Viewport", Viewport::s_layout);
-            m_viewportCBuffer = m_renderingContext->requestConstantBuffer(&s_viewport, sizeof(s_viewport), layout);
+            s_camera = Examples::Camera::lookAt(Vec3(0.0f, 2.0f, -2.0f), Vec3(0.0f, 0.5f, 0.0f));
+            
+            UniformLayout layout = m_renderingContext->requestUniformLayout("Camera", Examples::Camera::Layout);
+            m_cameraCBuffer = m_renderingContext->requestConstantBuffer(&s_camera, sizeof(s_camera), layout);
         }
         
-        // Cobfigure quad rendering state block
+        // Camera cbuffer
         {
-            InputLayout   il = m_renderingContext->requestInputLayout(0);
-            VertexBuffer_ vb = m_renderingContext->requestVertexBuffer(s_vertices, sizeof(s_vertices));
-            m_fullscreenQuadStates.bindVertexBuffer(vb);
-            m_fullscreenQuadStates.bindInputLayout(il);
-            m_fullscreenQuadStates.setDepthState(LessEqual, false);
+            UniformLayout layout = m_renderingContext->requestUniformLayout("Instance", Examples::Instance::Layout);
+            m_instanceCBuffer = m_renderingContext->requestConstantBuffer(&s_instance, sizeof(s_instance), layout);
         }
+        
+        // Convolution cbuffer
+        {
+            UniformLayout layout = m_renderingContext->requestUniformLayout("Convolution", Convolution::Layout);
+            m_convolutionCBuffer = m_renderingContext->requestConstantBuffer(&s_convolution, sizeof(s_convolution), layout);
+        }
+        
+        m_fullscreenQuad = Examples::createFullscreenRenderingStates(m_renderingContext);
         
         // Create a program that consists from a vertex and fragment shaders.
         Program program = m_renderingContext->requestProgram(s_vertexShader, s_fragmentShader);
         m_renderStates.bindProgram(program);
         
-        m_downsampleProgram = m_renderingContext->requestProgram(s_vertexDownsample, s_fragmentDownsample);
+        m_meshProgram = m_renderingContext->requestProgram(s_vertexMesh, s_fragmentMesh);
+        
+        m_downsampleProgram = m_renderingContext->requestProgram(Examples::VertexIdentity, s_fragmentDownsample);
     }
  
     virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
@@ -189,57 +247,47 @@ class RenderingToTexture : public RenderingApplicationDelegate
         
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
         
-        // Allocate a transient cube map texture
         const s32 envTextureSize = 128;
+        
+        // Allocate a transient cube map texture
         TransientTexture env = commands.acquireTextureCube(envTextureSize, PixelRgb8);
         
         // Now render to a cube map
         {
-            static Rgba s_colors[] =
-            {
-                  Rgba(1.0f, 0.0f, 0.0f)
-                , Rgba(0.0f, 1.0f, 0.0f)
-                , Rgba(0.0f, 0.0f, 1.0f)
-                , Rgba(1.0f, 1.0f, 0.0f)
-                , Rgba(0.0f, 1.0f, 1.0f)
-                , Rgba(1.0f, 0.0f, 1.0f)
-            };
+            StateScope downsamplePass = stateStack.newScope();
+            downsamplePass->bindProgram(m_downsampleProgram);
+            downsamplePass->bindTexture(m_envmap, 0);
+            downsamplePass->bindConstantBuffer(m_convolutionCBuffer, 0);
             
-            StateScope fullscreenQuadScope = stateStack.push(&m_fullscreenQuadStates);
-            
-            StateScope downsampleScope = stateStack.newScope();
-            downsampleScope->bindTexture(m_envmap, 0);
-            downsampleScope->bindProgram(m_downsampleProgram);
-            downsampleScope->bindConstantBuffer(m_viewportCBuffer, 0);
-            
-            s_viewport.width = envTextureSize;
-            s_viewport.height = envTextureSize;
-            commands.uploadConstantBuffer(m_viewportCBuffer, &s_viewport, sizeof(s_viewport));
+            StateScope quadStates = stateStack.push(&m_fullscreenQuad);
             
             for (s32 i = 0; i < 6; i++)
             {
+                s_convolution.direction = Examples::CubeFaceNormals[i];
+                s_convolution.viewport  = Vec2(envTextureSize, envTextureSize);
+                s_convolution.face      = i;
+                
                 CommandBuffer& renderToCubeMap = commands.renderToCubeMap(m_renderFrame, env, i);
-                renderToCubeMap.clear(s_colors[i], ClearAll);
-                //renderToCubeMap.drawPrimitives(0, PrimQuads, 0, 4, stateStack);
+                renderToCubeMap.clear(Rgba(1.0f, 1.0f, 1.0f, 1.0f), ClearAll);
+                renderToCubeMap.uploadConstantBuffer(m_convolutionCBuffer, m_renderFrame.internBuffer(&s_convolution, sizeof(s_convolution)), sizeof(s_convolution));
+                renderToCubeMap.drawPrimitives(0, PrimQuads, 0, 4, stateStack);
             }
         }
         
-        // Render quad
-        {
-            StateScope quadScope = stateStack.push(&m_fullscreenQuadStates);
-            StateScope scope = stateStack.newScope();
-            scope->bindTexture(env, 0);
-            scope->bindProgram(m_downsampleProgram);
-            scope->bindConstantBuffer(m_transformCBuffer, 0);
-            
-            s_viewport.width = m_window->width();
-            s_viewport.height = m_window->height();
-            commands.uploadConstantBuffer(m_viewportCBuffer, &s_viewport, sizeof(s_viewport));
-            commands.drawPrimitives(0, PrimQuads, 0, 4, stateStack);
-        }
-
+        StateScope meshPass = stateStack.newScope();
+        meshPass->bindConstantBuffer(m_projectionCBuffer, 0);
+        meshPass->bindConstantBuffer(m_cameraCBuffer, 1);
+        meshPass->bindConstantBuffer(m_instanceCBuffer, 2);
+        meshPass->bindProgram(m_meshProgram);
+        meshPass->bindTexture(env, 0);
+        
+        StateScope meshStates = stateStack.push(&m_mesh.states);
+        s_instance = Examples::Instance::fromTransform(Matrix4::rotateXY(0.0f, currentTime() * 0.001f));
+        commands.uploadConstantBuffer(m_instanceCBuffer, &s_instance, sizeof(s_instance));
+        commands.drawPrimitives(0, m_mesh.primitives, 0, m_mesh.size, stateStack);
+        
         commands.releaseTexture(env);
-
+        
         m_renderingContext->display(m_renderFrame);
     }
 };
