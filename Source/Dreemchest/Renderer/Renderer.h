@@ -339,6 +339,15 @@ namespace Renderer {
         virtual void                endFrame( void ) {}
     };
     
+    //! Available texture filtering modes.
+    enum TextureFilter
+    {
+        FilterNearest,      //!< The texture filtering is disabled.
+        FilterLinear,       //!< Interpolate texels.
+        FilterMipNearest,   //!< Use texture mip-maps.
+        FilterMipLinear,    //!< Use texture mip-map and interpolate between the mip levels.
+    };
+    
 #if DEV_DEPRECATED_HAL
     // ** class RenderResource
     //! RenderResource is a base class for all render resources.
@@ -420,14 +429,6 @@ namespace Renderer {
     enum TextureWrap {
         Clamp,              //!< Clamp texture.
         Repeat              //!< Repeat texture.
-    };
-
-    //! Texture filtering.
-    enum TextureFilter {
-        FilterNearest,      //!< The texture filtering is disabled.
-        FilterLinear,       //!< Interpolate texels.
-        FilterMipNearest,   //!< Use texture mip-maps.
-        FilterMipLinear,    //!< Use texture mip-map and interpolate between the mip levels.
     };
 
     // ** enum RenderStateValue

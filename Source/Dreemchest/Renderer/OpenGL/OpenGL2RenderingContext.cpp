@@ -134,7 +134,7 @@ ResourceId OpenGL2RenderingContext::acquireTexture(u8 type, u16 width, u16 heigh
     };
     
     LogVerbose("renderingContext", "allocating a transient %s texture of size %dx%d\n", s_textureType[type], width, height);
-    return allocateTexture(type, NULL, width, height, 1, format);
+    return allocateTexture(type, NULL, width, height, 1, format, FilterLinear);
 }
 
 // ** OpenGL2RenderingContext::releaseTexture
@@ -144,7 +144,7 @@ void OpenGL2RenderingContext::releaseTexture(ResourceId id)
 }
     
 // ** OpenGL2RenderingContext::allocateTexture
-ResourceId OpenGL2RenderingContext::allocateTexture(u8 type, const void* data, u16 width, u16 height, u16 mipLevels, u16 pixelFormat, ResourceId id)
+ResourceId OpenGL2RenderingContext::allocateTexture(u8 type, const void* data, u16 width, u16 height, u16 mipLevels, u16 pixelFormat, TextureFilter filter, ResourceId id)
 {
     // Allocate a resource identifier if it was not passed
     if (!id)
@@ -159,12 +159,12 @@ ResourceId OpenGL2RenderingContext::allocateTexture(u8 type, const void* data, u
     switch (type)
     {
         case TextureType2D:
-            texture.id     = OpenGL2::Texture::create2D(data, width, width, format);
+            texture.id     = OpenGL2::Texture::create2D(data, width, width, mipLevels, format, filter);
             texture.target = GL_TEXTURE_2D;
             break;
             
         case TextureTypeCube:
-            texture.id     = OpenGL2::Texture::createCube(data, width, mipLevels, format);
+            texture.id     = OpenGL2::Texture::createCube(data, width, mipLevels, format, filter);
             texture.target = GL_TEXTURE_CUBE_MAP;
             break;
             
@@ -231,7 +231,9 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                                 , opCode.createTexture.height
                                 , opCode.createTexture.mipLevels
                                 , opCode.createTexture.format
-                                , opCode.createTexture.id);
+                                , FilterMipLinear
+                                , opCode.createTexture.id
+                                );
                 break;
                 
             case CommandBuffer::OpCode::CreateIndexBuffer:

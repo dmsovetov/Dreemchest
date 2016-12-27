@@ -373,7 +373,7 @@ void OpenGL2::Program::use(GLuint program)
 // ----------------------------------------------------------- OpenGL2::Texture ---------------------------------------------------------- //
     
 // ** OpenGL2::Texture::create2D
-GLuint OpenGL2::Texture::create2D(const void* data, u16 width, u16 height, PixelFormat pixelFormat)
+GLuint OpenGL2::Texture::create2D(const void* data, u16 width, u16 height, u16 mipLevels, PixelFormat pixelFormat, TextureFilter filter)
 {
     DC_CHECK_GL;
     GLuint id;
@@ -381,18 +381,23 @@ GLuint OpenGL2::Texture::create2D(const void* data, u16 width, u16 height, Pixel
     
     glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_2D, id);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, textureFilter(filter));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, textureFilter(filter));
     glPixelStorei(GL_UNPACK_ALIGNMENT, align);
+    
+    if (filter != FilterNearest && filter != FilterLinear && mipLevels == 1)
+    {
+        glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+    }
+    
     texImage(GL_TEXTURE_2D, reinterpret_cast<const GLbyte*>(data), width, height, 1, pixelFormat);
-    //glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, data);
     glBindTexture(GL_TEXTURE_2D, 0);
 
     return id;
 }
     
 // ** OpenGL2::Texture::createCube
-GLuint OpenGL2::Texture::createCube(const void* data, u16 size, u16 mipLevels, PixelFormat pixelFormat)
+GLuint OpenGL2::Texture::createCube(const void* data, u16 size, u16 mipLevels, PixelFormat pixelFormat, TextureFilter filter)
 {
     DC_CHECK_GL;
     GLuint id;
@@ -400,9 +405,14 @@ GLuint OpenGL2::Texture::createCube(const void* data, u16 size, u16 mipLevels, P
     
     glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_CUBE_MAP, id);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, mipLevels > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, mipLevels > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, textureFilter(filter));
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, textureFilter(filter));
     glPixelStorei(GL_UNPACK_ALIGNMENT, align);
+    
+    if (filter != FilterNearest && filter != FilterLinear && mipLevels == 1)
+    {
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_GENERATE_MIPMAP, GL_TRUE);
+    }
     
     const GLbyte* pixels = reinterpret_cast<const GLbyte*>(data);
     for (s32 i = 0; i < 6; i++)
@@ -861,6 +871,21 @@ GLenum OpenGL2::textureAlign(PixelFormat pixelFormat)
     }
     
     return 4;
+}
+    
+// ** OpenGL2::textureFilter
+GLenum OpenGL2::textureFilter(TextureFilter filter)
+{
+    switch (filter)
+    {
+        case FilterNearest:     return GL_NEAREST;
+        case FilterLinear:      return GL_LINEAR;
+        case FilterMipNearest:  return GL_NEAREST_MIPMAP_NEAREST;
+        case FilterMipLinear:   return GL_LINEAR_MIPMAP_LINEAR;
+        default:                NIMBLE_NOT_IMPLEMENTED;
+    }
+    
+    return GL_NEAREST;
 }
 
 } // namespace Renderer

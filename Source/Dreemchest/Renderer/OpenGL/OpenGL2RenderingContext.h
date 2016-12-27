@@ -82,7 +82,7 @@ namespace Renderer
         void                        releaseTexture(ResourceId id);
         
         //! Allocates a new texture of specified type.
-        ResourceId                  allocateTexture(u8 type, const void* data, u16 width, u16 height, u16 mipLevels, u16 pixelFormat, ResourceId id = 0);
+        ResourceId                  allocateTexture(u8 type, const void* data, u16 width, u16 height, u16 mipLevels, u16 pixelFormat, TextureFilter filter, ResourceId id = 0);
         
     private:
         

@@ -146,10 +146,10 @@ namespace Renderer
         public:
             
             //! Creates a 2D texture object with a specified type and returns it's identifier.
-            static GLuint   create2D(const void* data, u16 width, u16 height, PixelFormat pixelFormat);
+            static GLuint   create2D(const void* data, u16 width, u16 height, u16 mipLevels, PixelFormat pixelFormat, TextureFilter filter);
             
             //! Creates a cube texture object with a specified type and returns it's identifier.
-            static GLuint   createCube(const void* data, u16 size, u16 mipLevels, PixelFormat pixelFormat);
+            static GLuint   createCube(const void* data, u16 size, u16 mipLevels, PixelFormat pixelFormat, TextureFilter filter);
             
             //! Uploads a image data to a texture.
             static GLsizei  texImage(GLenum target, const GLbyte* data, u16 width, u16 height, s32 mipLevels, PixelFormat pixelFormat);
@@ -217,6 +217,9 @@ namespace Renderer
         
         //! Returns a texture image align from a pixel format.
         static GLenum   textureAlign(PixelFormat pixelFormat);
+        
+        //! Returns a texture filtering mode.
+        static GLenum   textureFilter(TextureFilter filter);
         
         //! Renders an indexed batch of primitives.
         static void     drawElements(PrimitiveType primType, GLenum type, u32 firstIndex, u32 count);
