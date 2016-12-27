@@ -128,13 +128,13 @@ namespace Renderer
             static void     uniform1f(GLint location, f32 value);
             
             //! Sets an vec2 uniform value.
-            static void     uniform2f(GLint location, const f32 value[2]);
+            static void     uniform2f(GLint location, const f32* value, s32 count);
             
             //! Sets an vec3 uniform value.
-            static void     uniform3f(GLint location, const f32 value[3]);
+            static void     uniform3f(GLint location, const f32* value, s32 count);
             
             //! Sets an vec4 uniform value.
-            static void     uniform4f(GLint location, const f32 value[4]);
+            static void     uniform4f(GLint location, const f32* value, s32 count);
 
             //! Binds a shader program.
             static void     use(GLuint program);

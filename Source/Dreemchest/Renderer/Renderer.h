@@ -313,10 +313,11 @@ namespace Renderer {
             , Vec4      //!< Vec4 constant value.
             , Matrix4   //!< 4x4 matrix constant value.
         };
-        
-        FixedString name;       //!< Uniform name.
-        Type        type;       //!< Uniform type.
-        u32         offset;     //!< Uniform offset.
+
+        FixedString                 name;       //!< Uniform name.
+        Type                        type;       //!< Uniform type.
+        u32                         offset;     //!< Uniform offset.
+        InitializedValue<u16, 0>    size;       //!< An array size.
     };
     
     typedef Array<UniformElement> UniformBufferLayout;

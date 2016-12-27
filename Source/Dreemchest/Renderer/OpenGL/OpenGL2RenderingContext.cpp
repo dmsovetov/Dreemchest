@@ -73,7 +73,18 @@ String OpenGL2RenderingContext::ShaderPreprocessor::generateBufferDefinition(con
 
     for (const UniformElement* element = elements; element->name; element++)
     {
-        definition += "\t" + s_types[element->type] + " " + element->name.value() + ";\n";
+        String def;
+        
+        if (element->size > 0)
+        {
+            def = String(element->name.value()) + "[" + toString(element->size) + "]";
+        }
+        else
+        {
+            def = element->name.value();
+        }
+        
+        definition += "\t" + s_types[element->type] + " " + def + ";\n";
     }
     definition += "}; uniform " + type + " cb_" + toString(slot) + ";\n#define " + name + " cb_" + toString(slot) + "\n";
 
@@ -673,15 +684,15 @@ void OpenGL2RenderingContext::updateUniforms(const RequestedState& state, Pipeli
                     break;
                     
                 case UniformElement::Vec2:
-                    OpenGL2::Program::uniform2f(location, reinterpret_cast<const f32*>(&constantBuffer.data[constant->offset]));
+                    OpenGL2::Program::uniform2f(location, reinterpret_cast<const f32*>(&constantBuffer.data[constant->offset]), constant->size);
                     break;
                     
                 case UniformElement::Vec3:
-                    OpenGL2::Program::uniform3f(location, reinterpret_cast<const f32*>(&constantBuffer.data[constant->offset]));
+                    OpenGL2::Program::uniform3f(location, reinterpret_cast<const f32*>(&constantBuffer.data[constant->offset]), constant->size);
                     break;
                     
                 case UniformElement::Vec4:
-                    OpenGL2::Program::uniform4f(location, reinterpret_cast<const f32*>(&constantBuffer.data[constant->offset]));
+                    OpenGL2::Program::uniform4f(location, reinterpret_cast<const f32*>(&constantBuffer.data[constant->offset]), constant->size);
                     break;
                     
                 case UniformElement::Matrix4:

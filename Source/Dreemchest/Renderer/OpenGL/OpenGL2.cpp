@@ -344,24 +344,24 @@ void OpenGL2::Program::uniform1f(GLint location, f32 value)
 }
 
 // ** OpenGL2::Program::uniform2f
-void OpenGL2::Program::uniform2f(GLint location, const f32 value[2])
+void OpenGL2::Program::uniform2f(GLint location, const f32* value, s32 count)
 {
     DC_CHECK_GL;
-    glUniform2fv(location - 1, 1, value);
+    glUniform2fv(location - 1, max2(1, count), value);
 }
 
 // ** OpenGL2::Program::uniform3f
-void OpenGL2::Program::uniform3f(GLint location, const f32 value[3])
+void OpenGL2::Program::uniform3f(GLint location, const f32* value, s32 count)
 {
     DC_CHECK_GL;
-    glUniform3fv(location - 1, 1, value);
+    glUniform3fv(location - 1, max2(1, count), value);
 }
 
 // ** OpenGL2::Program::uniform4f
-void OpenGL2::Program::uniform4f(GLint location, const f32 value[4])
+void OpenGL2::Program::uniform4f(GLint location, const f32* value, s32 count)
 {
     DC_CHECK_GL;
-    glUniform4fv(location - 1, 1, value);
+    glUniform4fv(location - 1, max2(1, count), value);
 }
 
 // ** OpenGL2::Program::use
