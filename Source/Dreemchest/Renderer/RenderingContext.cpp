@@ -357,7 +357,7 @@ void RenderingContext::setDefaultProgram(Program value)
 }
     
 // ** RenderingContext::display
-void RenderingContext::display( RenderFrame& frame )
+void RenderingContext::display(RenderFrame& frame)
 {
     // Begin frame
     if (m_view.valid())
@@ -366,8 +366,7 @@ void RenderingContext::display( RenderFrame& frame )
     }
     
     // First execute a construction command buffer
-    execute(frame, *m_constructionCommandBuffer);
-    m_constructionCommandBuffer->reset();
+    construct(frame);
     
     // Execute an entry point command buffer
     execute( frame, frame.entryPoint() );
@@ -382,6 +381,13 @@ void RenderingContext::display( RenderFrame& frame )
     }
 }
     
+// ** RenderingContext::construct
+void RenderingContext::construct(RenderFrame& frame)
+{
+    execute(frame, *m_constructionCommandBuffer);
+    m_constructionCommandBuffer->reset();
+}
+
 // ** RenderingContext::execute
 void RenderingContext::execute( const RenderFrame& frame, const CommandBuffer& commands )
 {

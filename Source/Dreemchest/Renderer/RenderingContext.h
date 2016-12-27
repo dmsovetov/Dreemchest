@@ -50,7 +50,10 @@ namespace Renderer
         void                                    setDefaultProgram(Program value);
         
         //! Displays a frame captured by a render scene.
-        void                                    display( RenderFrame& frame );
+        void                                    display(RenderFrame& frame);
+        
+        //! Forces a rendering context to construct all queued resources.
+        void                                    construct(RenderFrame& frame);
         
         //! Queues an input layout instance for creation and returns it's index.
         InputLayout                             requestInputLayout( const VertexFormat& vertexFormat );
