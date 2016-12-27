@@ -144,7 +144,7 @@ void OpenGL2RenderingContext::releaseTexture(ResourceId id)
 }
     
 // ** OpenGL2RenderingContext::allocateTexture
-ResourceId OpenGL2RenderingContext::allocateTexture(u8 type, const void* data, u16 width, u16 height, u16 mipLevels, u16 pixelFormat, TextureFilter filter, ResourceId id)
+ResourceId OpenGL2RenderingContext::allocateTexture(u8 type, const void* data, u16 width, u16 height, u16 mipLevels, u16 pixelFormat, u8 filter, ResourceId id)
 {
     // Allocate a resource identifier if it was not passed
     if (!id)
@@ -153,18 +153,19 @@ ResourceId OpenGL2RenderingContext::allocateTexture(u8 type, const void* data, u
     }
     
     Texture texture;
-    PixelFormat format = static_cast<PixelFormat>(pixelFormat);
+    PixelFormat   format        = static_cast<PixelFormat>(pixelFormat);
+    TextureFilter textureFilter = static_cast<TextureFilter>(filter);
     
     // Create a texture instance according to a type.
     switch (type)
     {
         case TextureType2D:
-            texture.id     = OpenGL2::Texture::create2D(data, width, width, mipLevels, format, filter);
+            texture.id     = OpenGL2::Texture::create2D(data, width, width, mipLevels, format, textureFilter);
             texture.target = GL_TEXTURE_2D;
             break;
             
         case TextureTypeCube:
-            texture.id     = OpenGL2::Texture::createCube(data, width, mipLevels, format, filter);
+            texture.id     = OpenGL2::Texture::createCube(data, width, mipLevels, format, textureFilter);
             texture.target = GL_TEXTURE_CUBE_MAP;
             break;
             
@@ -231,7 +232,7 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                                 , opCode.createTexture.height
                                 , opCode.createTexture.mipLevels
                                 , opCode.createTexture.format
-                                , FilterMipLinear
+                                , opCode.createTexture.filter
                                 , opCode.createTexture.id
                                 );
                 break;
@@ -275,13 +276,14 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
             }
                 break;
                 
-            case CommandBuffer::OpCode::RenderTarget:
+            case CommandBuffer::OpCode::RenderToTexture:
+            case CommandBuffer::OpCode::RenderToTransientTexture:
             {
                 DC_CHECK_GL_CONTEXT;
                 DC_CHECK_GL;
                 
                 // Get a transient resource id by a slot
-                ResourceId id = transientResource(opCode.renderToTextures.id);
+                ResourceId id = opCode.type == CommandBuffer::OpCode::RenderToTexture ? opCode.renderToTextures.id : transientResource(opCode.renderToTextures.id);
                 NIMBLE_ABORT_IF(!id, "invalid transient identifier");
                 
                 // Get a render target by an id.

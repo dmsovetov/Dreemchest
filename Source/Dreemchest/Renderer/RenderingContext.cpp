@@ -154,10 +154,10 @@ public:
     ConstantBuffer_             createConstantBuffer(ConstantBuffer_ id, const void* data, s32 size, UniformLayout layout);
     
     //! Emits a texture creation command.
-    Texture_                    createTexture2D(Texture_ id, const void* data, u16 width, u16 height, PixelFormat format);
+    Texture_                    createTexture2D(Texture_ id, const void* data, u16 width, u16 height, PixelFormat format, TextureFilter filter);
     
     //! Emits a cube texture creation command.
-    Texture_                    createTextureCube(Texture_ id, const void* data, u16 size, u16 mipLevels, PixelFormat format);
+    Texture_                    createTextureCube(Texture_ id, const void* data, u16 size, u16 mipLevels, PixelFormat format, TextureFilter filter);
 };
 
 // ** RenderingContext::ConstructionCommandBuffer::createVertexBuffer
@@ -206,7 +206,7 @@ ConstantBuffer_ RenderingContext::ConstructionCommandBuffer::createConstantBuffe
 }
 
 // ** RenderingContext::ConstructionCommandBuffer::createTexture2D
-Texture_ RenderingContext::ConstructionCommandBuffer::createTexture2D(Texture_ id, const void* data, u16 width, u16 height, PixelFormat format)
+Texture_ RenderingContext::ConstructionCommandBuffer::createTexture2D(Texture_ id, const void* data, u16 width, u16 height, PixelFormat format, TextureFilter filter)
 {
     OpCode opCode;
     opCode.type = OpCode::CreateTexture;
@@ -217,12 +217,13 @@ Texture_ RenderingContext::ConstructionCommandBuffer::createTexture2D(Texture_ i
     opCode.createTexture.mipLevels = 1;
     opCode.createTexture.type = TextureType2D;
     opCode.createTexture.format = format;
+    opCode.createTexture.filter = filter;
     push( opCode );
     return id;
 }
 
 // ** RenderingContext::ConstructionCommandBuffer::createTextureCube
-Texture_ RenderingContext::ConstructionCommandBuffer::createTextureCube(Texture_ id, const void* data, u16 size, u16 mipLevels, PixelFormat format)
+Texture_ RenderingContext::ConstructionCommandBuffer::createTextureCube(Texture_ id, const void* data, u16 size, u16 mipLevels, PixelFormat format, TextureFilter filter)
 {
     OpCode opCode;
     opCode.type = OpCode::CreateTexture;
@@ -233,6 +234,7 @@ Texture_ RenderingContext::ConstructionCommandBuffer::createTextureCube(Texture_
     opCode.createTexture.format = format;
     opCode.createTexture.type = TextureTypeCube;
     opCode.createTexture.mipLevels = mipLevels;
+    opCode.createTexture.filter = filter;
     push( opCode );
     return id;
 }
@@ -525,17 +527,17 @@ ConstantBuffer_ RenderingContext::requestConstantBuffer(const void* data, s32 si
 }
 
 // ** RenderingContext::requestTexture2D
-Texture_ RenderingContext::requestTexture2D(const void* data, u16 width, u16 height, PixelFormat format)
+Texture_ RenderingContext::requestTexture2D(const void* data, u16 width, u16 height, PixelFormat format, TextureFilter filter)
 {
     Texture_ id = allocateIdentifier(RenderResourceType::Texture);
-    return m_constructionCommandBuffer->createTexture2D(id, data, width, height, format);
+    return m_constructionCommandBuffer->createTexture2D(id, data, width, height, format, filter);
 }
     
 // ** RenderingContext::requestTextureCube
-Texture_ RenderingContext::requestTextureCube(const void* data, u16 size, u16 mipLevels, PixelFormat format)
+Texture_ RenderingContext::requestTextureCube(const void* data, u16 size, u16 mipLevels, PixelFormat format, TextureFilter filter)
 {
     Texture_ id = allocateIdentifier(RenderResourceType::Texture);
-    return m_constructionCommandBuffer->createTextureCube(id, data, size, mipLevels, format);
+    return m_constructionCommandBuffer->createTextureCube(id, data, size, mipLevels, format, filter);
 }
     
 // ** RenderingContext::requestProgram

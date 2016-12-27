@@ -138,6 +138,7 @@ namespace Renderer
                     u8                          mipLevels;                  //!< A total number of mip levels stored in a data buffer.
                     PixelFormat                 format;                     //!< A texture format.
                     u8                          type;                       //!< A texture type to be created.
+                    u8                          filter;                     //!< A requested texture filtering.
                 } createTexture;
             };
         };
