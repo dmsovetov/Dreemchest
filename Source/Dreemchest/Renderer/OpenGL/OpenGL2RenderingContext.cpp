@@ -211,13 +211,13 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
             case CommandBuffer::OpCode::UploadConstantBuffer:
             {
                 ConstantBuffer& constantBuffer = m_constantBuffers[opCode.upload.id];
-                NIMBLE_ABORT_IF(static_cast<s32>(constantBuffer.data.size()) < opCode.upload.size, "buffer is too small");
-                memcpy(&constantBuffer.data[0], opCode.upload.data, opCode.upload.size);
+                NIMBLE_ABORT_IF(static_cast<s32>(constantBuffer.data.size()) < opCode.upload.buffer.size, "buffer is too small");
+                memcpy(&constantBuffer.data[0], opCode.upload.buffer.data, opCode.upload.buffer.size);
             }
                 break;
                 
             case CommandBuffer::OpCode::UploadVertexBuffer:
-                OpenGL2::Buffer::subData(GL_ARRAY_BUFFER, m_vertexBuffers[opCode.upload.id], 0, opCode.upload.size, opCode.upload.data);
+                OpenGL2::Buffer::subData(GL_ARRAY_BUFFER, m_vertexBuffers[opCode.upload.id], 0, opCode.upload.buffer.size, opCode.upload.buffer.data);
                 break;
                 
             case CommandBuffer::OpCode::CreateInputLayout:
@@ -226,7 +226,7 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 
             case CommandBuffer::OpCode::CreateTexture:
                 allocateTexture(  opCode.createTexture.type
-                                , opCode.createTexture.data
+                                , opCode.createTexture.buffer.data
                                 , opCode.createTexture.width
                                 , opCode.createTexture.height
                                 , opCode.createTexture.mipLevels
@@ -237,12 +237,12 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 break;
                 
             case CommandBuffer::OpCode::CreateIndexBuffer:
-                id = OpenGL2::Buffer::create(GL_ARRAY_BUFFER, opCode.createBuffer.data, opCode.createBuffer.size, GL_DYNAMIC_DRAW);
+                id = OpenGL2::Buffer::create(GL_ARRAY_BUFFER, opCode.createBuffer.buffer.data, opCode.createBuffer.buffer.size, GL_DYNAMIC_DRAW);
                 m_indexBuffers.emplace(opCode.createBuffer.id, id);
                 break;
                 
             case CommandBuffer::OpCode::CreateVertexBuffer:
-                id = OpenGL2::Buffer::create(GL_ELEMENT_ARRAY_BUFFER, opCode.createBuffer.data, opCode.createBuffer.size, GL_DYNAMIC_DRAW);
+                id = OpenGL2::Buffer::create(GL_ELEMENT_ARRAY_BUFFER, opCode.createBuffer.buffer.data, opCode.createBuffer.buffer.size, GL_DYNAMIC_DRAW);
                 m_vertexBuffers.emplace(opCode.createBuffer.id, id);
                 break;
                 
@@ -250,10 +250,11 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
             {
                 ConstantBuffer constantBuffer;
                 constantBuffer.layout = &m_uniformLayouts[opCode.createBuffer.layout][0];
-                constantBuffer.data.resize(opCode.createBuffer.size);
-                if (opCode.createBuffer.data)
+                constantBuffer.data.resize(opCode.createBuffer.buffer.size);
+                
+                if (opCode.createBuffer.buffer.data)
                 {
-                    memcpy(&constantBuffer.data[0], opCode.createBuffer.data, opCode.createBuffer.size);
+                    memcpy(&constantBuffer.data[0], opCode.createBuffer.buffer.data, opCode.createBuffer.buffer.size);
                 }
                 m_constantBuffers.emplace(opCode.createBuffer.id, constantBuffer);
             }

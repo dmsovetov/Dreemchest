@@ -114,20 +114,20 @@ void RenderingContextHal::executeCommandBuffer( const RenderFrame& frame, const 
                                                             break;
         case CommandBuffer::OpCode::Execute:                execute( frame, *opCode.execute.commands );
                                                             break;
-        case CommandBuffer::OpCode::UploadConstantBuffer:   commandUploadConstantBuffer( opCode.upload.id, opCode.upload.data, opCode.upload.size );
+        case CommandBuffer::OpCode::UploadConstantBuffer:   commandUploadConstantBuffer( opCode.upload.id, opCode.upload.buffer.data, opCode.upload.buffer.size );
                                                             break;
-        case CommandBuffer::OpCode::UploadVertexBuffer:     commandUploadVertexBuffer( opCode.upload.id, opCode.upload.data, opCode.upload.size );
+        case CommandBuffer::OpCode::UploadVertexBuffer:     commandUploadVertexBuffer( opCode.upload.id, opCode.upload.buffer.data, opCode.upload.buffer.size );
                                                             break;
         case CommandBuffer::OpCode::CreateInputLayout:      commandCreateInputLayout(opCode.createInputLayout.id, opCode.createInputLayout.format);
                                                             break;
-        case CommandBuffer::OpCode::CreateTexture:          commandCreateTexture(opCode.createTexture.id, opCode.createTexture.width, opCode.createTexture.height, opCode.createTexture.data, opCode.createTexture.format);
+        case CommandBuffer::OpCode::CreateTexture:          commandCreateTexture(opCode.createTexture.id, opCode.createTexture.width, opCode.createTexture.height, opCode.createTexture.buffer.data, opCode.createTexture.format);
                                                             break;
-        case CommandBuffer::OpCode::CreateIndexBuffer:      commandCreateIndexBuffer(opCode.createBuffer.id, opCode.createBuffer.data, opCode.createBuffer.size);
+        case CommandBuffer::OpCode::CreateIndexBuffer:      commandCreateIndexBuffer(opCode.createBuffer.id, opCode.createBuffer.buffer.data, opCode.createBuffer.buffer.size);
                                                             break;
-        case CommandBuffer::OpCode::CreateVertexBuffer:     commandCreateVertexBuffer(opCode.createBuffer.id, opCode.createBuffer.data, opCode.createBuffer.size);
+        case CommandBuffer::OpCode::CreateVertexBuffer:     commandCreateVertexBuffer(opCode.createBuffer.id, opCode.createBuffer.buffer.data, opCode.createBuffer.buffer.size);
                                                             break;
         case CommandBuffer::OpCode::CreateConstantBuffer:   {
-                                                                commandCreateConstantBuffer(opCode.createBuffer.id, opCode.createBuffer.data, opCode.createBuffer.size, opCode.createBuffer.layout);
+                                                                commandCreateConstantBuffer(opCode.createBuffer.id, opCode.createBuffer.buffer.data, opCode.createBuffer.buffer.size, opCode.createBuffer.layout);
                                                             }
                                                             break;
         case CommandBuffer::OpCode::RenderTarget:           renderToTarget( frame, opCode.renderToTextures.id, &opCode.renderToTextures.viewport, *opCode.renderToTextures.commands );

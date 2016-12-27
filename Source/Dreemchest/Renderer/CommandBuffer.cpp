@@ -42,6 +42,12 @@ CommandBuffer::CommandBuffer( void )
 void CommandBuffer::reset( void )
 {
     m_commands.clear();
+    
+    for (List<u8*>::const_iterator i = m_data.begin(), end = m_data.end(); i != end; ++i)
+    {
+        delete[]*i;
+    }
+    m_data.clear();
 }
 
 // ** CommandBuffer::clear
@@ -170,8 +176,7 @@ void CommandBuffer::uploadConstantBuffer( ConstantBuffer_ id, const void* data, 
     OpCode opCode;
     opCode.type = OpCode::UploadConstantBuffer;
     opCode.upload.id = id;
-    opCode.upload.data = data;
-    opCode.upload.size = size;
+    opCode.upload.buffer = adoptDataBuffer(data, size);
     push( opCode );
 }
 
@@ -181,8 +186,7 @@ void CommandBuffer::uploadVertexBuffer( VertexBuffer_ id, const void* data, s32 
     OpCode opCode;
     opCode.type = OpCode::UploadVertexBuffer;
     opCode.upload.id = id;
-    opCode.upload.data = data;
-    opCode.upload.size = size;
+    opCode.upload.buffer = adoptDataBuffer(data, size);
     push( opCode );
 }
 
@@ -230,6 +234,20 @@ void CommandBuffer::emitDrawCall( OpCode::Type type, u32 sorting, PrimitiveType 
 void CommandBuffer::push(const OpCode& opCode)
 {
     m_commands.push_back(opCode);
+}
+ 
+// ** CommandBuffer::adoptDataBuffer
+CommandBuffer::Buffer CommandBuffer::adoptDataBuffer(const void* data, s32 size)
+{
+    u8* adopted = new u8[size];
+    memcpy(adopted, data, size);
+    
+    Buffer buffer;
+    buffer.data    = adopted;
+    buffer.size    = size;
+    m_data.push_back(adopted);
+    
+    return buffer;
 }
 
 } // namespace Renderer

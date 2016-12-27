@@ -172,25 +172,23 @@ InputLayout RenderingContext::ConstructionCommandBuffer::createInputLayout(Input
 }
 
 // ** RenderingContext::ConstructionCommandBuffer::createVertexBuffer
-VertexBuffer_ RenderingContext::ConstructionCommandBuffer::createVertexBuffer(VertexBuffer_ id, const void *data, s32 size)
+VertexBuffer_ RenderingContext::ConstructionCommandBuffer::createVertexBuffer(VertexBuffer_ id, const void* data, s32 size)
 {
     OpCode opCode;
     opCode.type = OpCode::CreateVertexBuffer;
     opCode.createBuffer.id = id;
-    opCode.createBuffer.data = data;
-    opCode.createBuffer.size = size;
+    opCode.createBuffer.buffer = adoptDataBuffer(data, size);
     push( opCode );
     return id;
 }
 
 // ** RenderingContext::ConstructionCommandBuffer::createIndexBuffer
-IndexBuffer_ RenderingContext::ConstructionCommandBuffer::createIndexBuffer(IndexBuffer_ id, const void *data, s32 size)
+IndexBuffer_ RenderingContext::ConstructionCommandBuffer::createIndexBuffer(IndexBuffer_ id, const void* data, s32 size)
 {
     OpCode opCode;
     opCode.type = OpCode::CreateIndexBuffer;
     opCode.createBuffer.id = id;
-    opCode.createBuffer.data = data;
-    opCode.createBuffer.size = size;
+    opCode.createBuffer.buffer = adoptDataBuffer(data, size);
     push( opCode );
     return id;
 }
@@ -201,8 +199,7 @@ ConstantBuffer_ RenderingContext::ConstructionCommandBuffer::createConstantBuffe
     OpCode opCode;
     opCode.type = OpCode::CreateConstantBuffer;
     opCode.createBuffer.id = id;
-    opCode.createBuffer.data = data;
-    opCode.createBuffer.size = size;
+    opCode.createBuffer.buffer = adoptDataBuffer(data, size);
     opCode.createBuffer.layout = layout;
     push( opCode );
     return id;
@@ -214,7 +211,7 @@ Texture_ RenderingContext::ConstructionCommandBuffer::createTexture2D(Texture_ i
     OpCode opCode;
     opCode.type = OpCode::CreateTexture;
     opCode.createTexture.id = id;
-    opCode.createTexture.data = data;
+    opCode.createTexture.buffer = adoptDataBuffer(data, bytesPerMipChain(format, width, height, 1));
     opCode.createTexture.width = width;
     opCode.createTexture.height = height;
     opCode.createTexture.mipLevels = 1;
@@ -230,7 +227,7 @@ Texture_ RenderingContext::ConstructionCommandBuffer::createTextureCube(Texture_
     OpCode opCode;
     opCode.type = OpCode::CreateTexture;
     opCode.createTexture.id = id;
-    opCode.createTexture.data = data;
+    opCode.createTexture.buffer = adoptDataBuffer(data, bytesPerMipChain(format, size, size, mipLevels) * 6);
     opCode.createTexture.width = size;
     opCode.createTexture.height = size;
     opCode.createTexture.format = format;

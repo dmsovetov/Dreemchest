@@ -84,6 +84,11 @@ StateStack& RenderFrame::stateStack( void )
 // ** RenderFrame::clear
 void RenderFrame::clear( void )
 {
+    for (Commands::iterator i = m_commandBuffers.begin(), end = m_commandBuffers.end(); i != end; ++i)
+    {
+        (*i)->reset();
+    }
+    
     m_commandBuffers.clear();
     m_entryPoint = &createCommandBuffer();
 

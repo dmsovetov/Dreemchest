@@ -38,6 +38,13 @@ namespace Renderer
     {
     friend class RenderFrame;
     public:
+        
+        //! A data buffer used by a command.
+        struct Buffer
+        {
+            const u8*   data;           //!< A source data pointer.
+            s32         size;           //!< A buffer size.
+        };
 
         //! A single render operation.
         struct OpCode
@@ -106,8 +113,7 @@ namespace Renderer
                 struct
                 {
                     ResourceId                  id;                         //!< A target buffer handle.
-                    const void*                 data;                       //!< A source data point.
-                    s32                         size;                       //!< A total number of bytes to upload.
+                    Buffer                      buffer;                     //!< An attached data buffer.
                 } upload;
                 
                 struct
@@ -119,15 +125,14 @@ namespace Renderer
                 struct
                 {
                     ResourceId                  id;                         //!< Handle to a buffer object being constructed.
-                    const void*                 data;                       //!< Data that should be uploaded to a buffer after construction.
-                    s32                         size;                       //!< A buffer size.
+                    Buffer                      buffer;                     //!< An attached data buffer.
                     ResourceId                  layout;                     //!< Used by a constant buffer constructor.
                 } createBuffer;
                 
                 struct
                 {
                     ResourceId                  id;                         //!< Handle to a texture being constructed.
-                    const void*                 data;                       //!< A texture data that should be uploaded after construction.
+                    Buffer                      buffer;                     //!< An attached data buffer.
                     u16                         width;                      //!< A texture width.
                     u16                         height;                     //!< A texture height.
                     u8                          mipLevels;                  //!< A total number of mip levels stored in a data buffer.
@@ -198,10 +203,14 @@ namespace Renderer
         
         //! Pushes a new command to a buffer.
         void                        push(const OpCode& opCode);
+        
+        //! Adopts a data buffer.
+        Buffer                      adoptDataBuffer(const void* data, s32 size);
 
     private:
 
         Array<OpCode>               m_commands;                 //!< An array of recorded commands.
+        List<u8*>                   m_data;                     //!< A list of adopted data pointers.
         u8                          m_transientResourceIndex;   //!< A transient resource index relative to a current stack offset.
     };
 
