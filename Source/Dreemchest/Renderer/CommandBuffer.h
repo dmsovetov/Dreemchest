@@ -52,20 +52,21 @@ namespace Renderer
             //! An op-code type.
             enum Type
             {
-                  DrawIndexed           //!< Draws a list of primitives using an index buffer.
-                , DrawPrimitives        //!< Draws a list of primitives from an active vertex buffer.
-                , Clear                 //!< Clears a render target.
-                , Execute               //!< Executes a command buffer.
-                , RenderTarget          //!< Begins rendering to a viewport.
-                , UploadConstantBuffer  //!< Uploads data to a constant buffer.
-                , UploadVertexBuffer    //!< Uploads data to a vertex buffer.
-                , AcquireTexture        //!< Acquires a transient texture instance.
-                , ReleaseTexture        //!< Releases a transient texture instance.
-                , CreateInputLayout     //!< Creates a new input layout from a vertex declaration.
-                , CreateVertexBuffer    //!< Creates a new vertex buffer object.
-                , CreateIndexBuffer     //!< Creates a new index buffer object.
-                , CreateConstantBuffer  //!< Creates a new constant buffer object.
-                , CreateTexture         //!< Creates a new texture.
+                  DrawIndexed               //!< Draws a list of primitives using an index buffer.
+                , DrawPrimitives            //!< Draws a list of primitives from an active vertex buffer.
+                , Clear                     //!< Clears a render target.
+                , Execute                   //!< Executes a command buffer.
+                , RenderToTexture           //!< Begins rendering to a persistent texture.
+                , RenderToTransientTexture  //!< Begins rendering to a transient texture.
+                , UploadConstantBuffer      //!< Uploads data to a constant buffer.
+                , UploadVertexBuffer        //!< Uploads data to a vertex buffer.
+                , AcquireTexture            //!< Acquires a transient texture instance.
+                , ReleaseTexture            //!< Releases a transient texture instance.
+                , CreateInputLayout         //!< Creates a new input layout from a vertex declaration.
+                , CreateVertexBuffer        //!< Creates a new vertex buffer object.
+                , CreateIndexBuffer         //!< Creates a new index buffer object.
+                , CreateConstantBuffer      //!< Creates a new constant buffer object.
+                , CreateTexture             //!< Creates a new texture.
             };
 
             Type                                type;                       //!< An op code type.
@@ -90,7 +91,7 @@ namespace Renderer
 
                 struct
                 {
-                    TransientResourceId         id;                         //!< A render target resource to be activated.
+                    ResourceId                  id;                         //!< A render target resource to be activated.
                     NormalizedViewport          viewport;                   //!< A viewport value to be set.
                     u8                          side;                       //!< A side of a cube map to render to.
                     const CommandBuffer*        commands;                   //!< A command buffer to be executed after setting a viewport.
@@ -172,6 +173,9 @@ namespace Renderer
         
         //! Emits a command to start rendering to a viewport of a specified cube map side.
         CommandBuffer&              renderToCubeMap(RenderFrame& frame, TransientTexture id, u8 side, const Rect& viewport = Rect(0.0f, 0.0f, 1.0f, 1.0f));
+        
+        //! Emits a command to start rendering to a viewport of a specified cube map side.
+        CommandBuffer&              renderToCubeMap(RenderFrame& frame, Texture_ id, u8 side, const Rect& viewport = Rect(0.0f, 0.0f, 1.0f, 1.0f));
         
         //! Emits a rendering to a viewport.
         CommandBuffer&              renderToTarget( RenderFrame& frame, const Rect& viewport = Rect( 0.0f, 0.0f, 1.0f, 1.0f ) );

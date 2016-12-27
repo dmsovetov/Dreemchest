@@ -130,7 +130,7 @@ void RenderingContextHal::executeCommandBuffer( const RenderFrame& frame, const 
                                                                 commandCreateConstantBuffer(opCode.createBuffer.id, opCode.createBuffer.buffer.data, opCode.createBuffer.buffer.size, opCode.createBuffer.layout);
                                                             }
                                                             break;
-        case CommandBuffer::OpCode::RenderTarget:           renderToTarget( frame, opCode.renderToTextures.id, &opCode.renderToTextures.viewport, *opCode.renderToTextures.commands );
+        case CommandBuffer::OpCode::RenderToTransientTexture: renderToTarget( frame, opCode.renderToTextures.id, &opCode.renderToTextures.viewport, *opCode.renderToTextures.commands );
                                                             break;
         case CommandBuffer::OpCode::DrawIndexed:            {
                                                                 // Apply rendering states from a stack

@@ -80,10 +80,10 @@ CommandBuffer& CommandBuffer::renderToTexture(RenderFrame& frame, TransientTextu
     CommandBuffer& commands = frame.createCommandBuffer();
 
     OpCode opCode;
-    opCode.type = OpCode::RenderTarget;
+    opCode.type = OpCode::RenderToTransientTexture;
     opCode.sorting = 0;
     opCode.renderToTextures.commands = &commands;
-    opCode.renderToTextures.id = id;
+    opCode.renderToTextures.id = static_cast<u8>(id);
     opCode.renderToTextures.side = 255;
     opCode.renderToTextures.viewport.x = viewport.min().x;
     opCode.renderToTextures.viewport.y = viewport.min().y;
@@ -100,7 +100,27 @@ CommandBuffer& CommandBuffer::renderToCubeMap(RenderFrame& frame, TransientTextu
     CommandBuffer& commands = frame.createCommandBuffer();
     
     OpCode opCode;
-    opCode.type = OpCode::RenderTarget;
+    opCode.type = OpCode::RenderToTransientTexture;
+    opCode.sorting = 0;
+    opCode.renderToTextures.commands = &commands;
+    opCode.renderToTextures.id = static_cast<u8>(id);
+    opCode.renderToTextures.side = side;
+    opCode.renderToTextures.viewport.x = viewport.min().x;
+    opCode.renderToTextures.viewport.y = viewport.min().y;
+    opCode.renderToTextures.viewport.width = viewport.width();
+    opCode.renderToTextures.viewport.height = viewport.height();
+    push( opCode );
+    
+    return commands;
+}
+ 
+// ** CommandBuffer::renderToCubeMap
+CommandBuffer& CommandBuffer::renderToCubeMap(RenderFrame& frame, Texture_ id, u8 side, const Rect& viewport)
+{
+    CommandBuffer& commands = frame.createCommandBuffer();
+    
+    OpCode opCode;
+    opCode.type = OpCode::RenderToTexture;
     opCode.sorting = 0;
     opCode.renderToTextures.commands = &commands;
     opCode.renderToTextures.id = id;
@@ -113,7 +133,7 @@ CommandBuffer& CommandBuffer::renderToCubeMap(RenderFrame& frame, TransientTextu
     
     return commands;
 }
-    
+
 // ** CommandBuffer::renderToTarget
 CommandBuffer& CommandBuffer::renderToTarget( RenderFrame& frame, const Rect& viewport )
 {
@@ -239,10 +259,18 @@ void CommandBuffer::push(const OpCode& opCode)
 // ** CommandBuffer::adoptDataBuffer
 CommandBuffer::Buffer CommandBuffer::adoptDataBuffer(const void* data, s32 size)
 {
+    Buffer buffer;
+    
+    if (data == NULL)
+    {
+        buffer.data = NULL;
+        buffer.size = size;
+        return buffer;
+    }
+    
     u8* adopted = new u8[size];
     memcpy(adopted, data, size);
     
-    Buffer buffer;
     buffer.data    = adopted;
     buffer.size    = size;
     m_data.push_back(adopted);
