@@ -159,6 +159,16 @@ namespace Examples
             convertBgrToRgb(image.pixels, bytesPerPixel);
         }
         
+        s32      pitch = image.width * bitsPerPixel / 8;
+        UPtr<u8> temp  = new u8[pitch];
+        
+        for (s32 i = 0; i < image.height / 2; i++)
+        {
+            memcpy(temp.get(), &image.pixels[i * pitch], pitch);
+            memcpy(&image.pixels[i * pitch], &image.pixels[(image.height - i - 1) * pitch], pitch);
+            memcpy(&image.pixels[(image.height - i - 1) * pitch], temp.get(), pitch);
+        }
+        
         fclose(file);
         
         return image;
