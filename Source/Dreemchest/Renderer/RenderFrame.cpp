@@ -33,9 +33,9 @@ namespace Renderer
 {
 
 // ** RenderFrame::RenderFrame
-RenderFrame::RenderFrame( void )
-    : m_stateStack( 4096, MaxStateStackDepth )
-    , m_allocator( 1024 * 100 )
+RenderFrame::RenderFrame(s32 size)
+    : m_stateStack(4096, MaxStateStackDepth)
+    , m_allocator(size)
 {
     m_entryPoint = &createCommandBuffer();
 }

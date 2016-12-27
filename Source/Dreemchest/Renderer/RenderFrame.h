@@ -39,7 +39,7 @@ namespace Renderer
     public:
                         
                                                 //! Constructs a RenderFrame instance.
-                                                RenderFrame( void );
+                                                RenderFrame(s32 size = 1024 * 100);
 
         //! Returns a total number of captured command buffers.
         s32                                     commandBufferCount( void ) const;
