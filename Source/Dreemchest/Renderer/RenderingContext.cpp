@@ -272,6 +272,7 @@ RenderingContext::RenderingContext(RenderViewPtr view)
     m_defaultStateBlock.setCullFace(TriangleFaceBack);
     m_defaultStateBlock.setDepthState(LessEqual, true);
     m_defaultStateBlock.disableAlphaTest();
+    m_defaultStateBlock.disableBlending();
     m_defaultStateBlock.setColorMask(ColorMaskAll);
     //m_defaultStateBlock.setPolygonMode(PolygonFill);
     //m_defaultStateBlock.bindProgram(0);
