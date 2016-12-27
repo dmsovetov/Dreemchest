@@ -223,7 +223,7 @@ namespace Examples
         MeshStateBlock meshStates;
         
         VertexFormat vertexFormat = mesh.vertexFormat;
-        VertexBuffer_ vertexBuffer = renderingContext->requestVertexBuffer(frame.internBuffer(&mesh.vertices[0], mesh.vertices.size()), mesh.vertices.size());
+        VertexBuffer_ vertexBuffer = renderingContext->requestVertexBuffer(&mesh.vertices[0], mesh.vertices.size());
         InputLayout inputLayout = renderingContext->requestInputLayout(vertexFormat);
 
         meshStates.states.bindVertexBuffer(vertexBuffer);
@@ -238,7 +238,31 @@ namespace Examples
     Texture_ createEnvTexture(RenderingContextWPtr renderingContext, RenderFrame& frame, const String& fileName)
     {
         CubeMap cubeMap = cubeFromDds(fileName);
-        return renderingContext->requestTextureCube(frame.internBuffer(&cubeMap.pixels[0], cubeMap.pixels.size()), cubeMap.size, cubeMap.mipLevels, cubeMap.format);
+        return renderingContext->requestTextureCube(&cubeMap.pixels[0], cubeMap.size, cubeMap.mipLevels, cubeMap.format);
+    }
+    
+    // Creates an environment map from a set of cube map faces.
+    Texture_ createEnvFromFiles(RenderingContextWPtr renderingContext, RenderFrame& frame, const String& path)
+    {
+        Image images[6];
+        String fileNames[] =
+        {
+              path + "/right.tga"
+            , path + "/left.tga"
+            , path + "/top.tga"
+            , path + "/bottom.tga"
+            , path + "/front.tga"
+            , path + "/back.tga"
+        };
+        
+        Surface pixels;
+        for (s32 i = 0; i < 6; i++)
+        {
+            images[i] = tgaFromFile(fileNames[i]);
+            pixels.insert(pixels.end(), images[i].pixels.begin(), images[i].pixels.end());
+        }
+        
+        return renderingContext->requestTextureCube(&pixels[0], images[0].width, 1, images[0].format);
     }
     
     //! Creates a fullscreen quad rendering states
