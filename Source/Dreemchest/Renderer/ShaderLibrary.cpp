@@ -311,6 +311,8 @@ void ShaderLibrary::preprocessShader(String& shader) const
         return;
     }
     
+    shader = "\n#define M_PI 3.1415926535897932384626433832795\n" + shader;
+    
     for (List<ShaderPreprocessorUPtr>::const_iterator i = m_preprocessors.begin(); i != m_preprocessors.end(); ++i)
     {
         (*i)->preprocess(m_renderingContext, shader);
