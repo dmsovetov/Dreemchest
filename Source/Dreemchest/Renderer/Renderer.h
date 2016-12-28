@@ -168,6 +168,9 @@ namespace Renderer {
                                     //! Returns true if this resource identifier is valid.
                                     operator bool( void ) const;
         
+        //! Compares two resoruce identifiers.
+        bool                        operator < (const ResourceIdentifier& other) const;
+        
         //! Compares two resource identifiers.
         bool                        operator == (const ResourceIdentifier& other) const;
         
@@ -224,6 +227,13 @@ namespace Renderer {
     NIMBLE_INLINE ResourceIdentifier<TResource, TIdentifier>::operator bool( void ) const
     {
         return m_id != 0;
+    }
+    
+    // ** ResourceIdentifier::operator <
+    template<RenderResourceType::Enum TResource, typename TIdentifier>
+    NIMBLE_INLINE bool ResourceIdentifier<TResource, TIdentifier>::operator < (const ResourceIdentifier& other) const
+    {
+        return m_id < other.m_id;
     }
     
     // ** ResourceIdentifier::operator ==
