@@ -336,7 +336,7 @@ namespace Renderer {
         virtual bool                beginFrame( void ) { return false; }
         
         //! Ends a frame rendering.
-        virtual void                endFrame( void ) {}
+        virtual void                endFrame( bool wait ) {}
     };
     
     //! Available texture filtering modes.

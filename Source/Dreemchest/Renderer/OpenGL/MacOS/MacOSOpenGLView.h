@@ -43,7 +43,7 @@ namespace Renderer {
         // ** IView
         virtual bool        makeCurrent( void );
         virtual bool        beginFrame( void );
-        virtual void        endFrame( void );
+        virtual void        endFrame(bool wait);
 
         // ** MacOSOpenGLView
         bool                initialize( NSWindow* window, PixelFormat depthStencil, id delegate );

@@ -105,7 +105,7 @@ bool Hal::clear( const Rgba& clearColor, f32 depth, u32 stencil, u32 mask )
 // ** Hal::present
 void Hal::present( void )
 {
-    if( m_view.valid() ) m_view->endFrame();
+    if( m_view.valid() ) m_view->endFrame(false);
 }
 
 // ** Hal::renderIndexed

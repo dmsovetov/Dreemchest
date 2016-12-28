@@ -357,7 +357,7 @@ void RenderingContext::setDefaultProgram(Program value)
 }
     
 // ** RenderingContext::display
-void RenderingContext::display(RenderFrame& frame)
+void RenderingContext::display(RenderFrame& frame, bool wait)
 {
     // Begin frame
     if (m_view.valid())
@@ -377,7 +377,7 @@ void RenderingContext::display(RenderFrame& frame)
     // End frame
     if (m_view.valid())
     {
-        m_view->endFrame();
+        m_view->endFrame(wait);
     }
 }
     

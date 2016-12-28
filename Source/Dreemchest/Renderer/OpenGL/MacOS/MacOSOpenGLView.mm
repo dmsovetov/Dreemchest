@@ -60,9 +60,13 @@ bool MacOSOpenGLView::beginFrame( void )
 }
 
 // ** MacOSOpenGLView::endFrame
-void MacOSOpenGLView::endFrame( void )
+void MacOSOpenGLView::endFrame(bool wait)
 {
     [m_view endFrame];
+    if (wait)
+    {
+        glFinish();
+    }
 }
 
 // ** MacOSOpenGLView::makeCurrent
