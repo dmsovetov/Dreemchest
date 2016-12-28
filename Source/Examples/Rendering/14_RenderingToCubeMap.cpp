@@ -141,7 +141,7 @@ struct Convolution
     f32     multiplier;
     f32     power;
     static const UniformElement Layout[];
-} s_convolution;
+};
 
 const UniformElement Convolution::Layout[] =
 {
@@ -175,14 +175,11 @@ class RenderingToTexture : public RenderingApplicationDelegate
     ConstantBuffer_ m_cameraCBuffer;
     ConstantBuffer_ m_projectionCBuffer;
     ConstantBuffer_ m_instanceCBuffer;
-    ConstantBuffer_ m_convolutionCBuffer;
-    ConstantBuffer_ m_kernelCBuffer;
     Examples::MeshStateBlock m_mesh;
     StateBlock m_fullscreenQuad;
     Texture_ m_envmap;
     Texture_ m_diffuse;
     Texture_ m_specular;
-    Program m_convolutionProgram;
     Program m_meshProgram;
     Program m_backgroundProgram;
     
@@ -225,18 +222,6 @@ class RenderingToTexture : public RenderingApplicationDelegate
             m_instanceCBuffer = m_renderingContext->requestConstantBuffer(&s_instance, sizeof(s_instance), layout);
         }
         
-        // Convolution cbuffer
-        {
-            UniformLayout layout = m_renderingContext->requestUniformLayout("Convolution", Convolution::Layout);
-            m_convolutionCBuffer = m_renderingContext->requestConstantBuffer(&s_convolution, sizeof(s_convolution), layout);
-        }
-        
-        // Convolution kernel cbuffer
-        {
-            UniformLayout layout = m_renderingContext->requestUniformLayout("Kernel", Kernel::Layout);
-            m_kernelCBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Kernel), layout);
-        }
-        
         m_fullscreenQuad = Examples::createFullscreenRenderingStates(m_renderingContext);
         
         // Create a program that consists from a vertex and fragment shaders.
@@ -245,7 +230,6 @@ class RenderingToTexture : public RenderingApplicationDelegate
         m_renderStates.bindConstantBuffer(m_projectionCBuffer, 0);
         
         m_meshProgram        = m_renderingContext->requestProgram(s_vertexMesh, s_fragmentMesh);
-        m_convolutionProgram = m_renderingContext->requestProgram(Examples::VertexIdentity, s_fragmentConvolution);
         m_backgroundProgram  = m_renderingContext->requestProgram(Examples::VertexIdentity, s_fragmentBackground);
         
         // Force a rendering context to construct all queued resources
@@ -295,48 +279,60 @@ class RenderingToTexture : public RenderingApplicationDelegate
     Texture_ convolve(Texture_ env, s32 size, s32 iterations, f32 power = 1.0f)
     {
         printf("Performing a convolution with cosine kernel of power %2.2f with %d samples in %d iterations...\n", power, Kernel::MaxSamples, iterations);
-
-        Texture_    output = m_renderingContext->requestTextureCube(NULL, size, 1, PixelRgba32F, FilterLinear);
-        RenderFrame frame;
         
+        RenderFrame    frame;
         StateStack&    stateStack = frame.stateStack();
         CommandBuffer& commands   = frame.entryPoint();
         Kernel         kernel;
 
+        // Create an output cube map texture
+        Texture_ output = m_renderingContext->requestTextureCube(NULL, size, 1, PixelRgba32F, FilterLinear);
+        
+        // Create a convolution program instance
+        Program program = m_renderingContext->requestProgram(Examples::VertexIdentity, s_fragmentConvolution);
+        
+        // Create the convolution cbuffer
+        UniformLayout convolutionLayout    = m_renderingContext->requestUniformLayout("Convolution", Convolution::Layout);
+        ConstantBuffer_ convolutionCBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Convolution), convolutionLayout);
+        
+        // Create the kernel cbuffer
+        UniformLayout kernelLayout    = m_renderingContext->requestUniformLayout("Kernel", Kernel::Layout);
+        ConstantBuffer_ kernelCBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Kernel), kernelLayout);
+        
+        // Configure a convolution render pass
+        StateScope convolutionPass = stateStack.newScope();
+        convolutionPass->bindProgram(program);
+        convolutionPass->bindTexture(env, 0);
+        convolutionPass->bindConstantBuffer(convolutionCBuffer, 0);
+        convolutionPass->bindConstantBuffer(kernelCBuffer, 1);
+        convolutionPass->setBlend(BlendOne, BlendOne);
+        
+        // Now declare a convolution parameters constant buffer
+        Convolution convolution;
+        convolution.viewport   = Vec2(size, size);
+        convolution.multiplier = 1.0f / iterations;
+        convolution.power      = power;
+        
         u32 commandBufferTime = currentTime();
         for (s32 j = 0; j < iterations; j++)
         {
-            StateScope convolution = stateStack.newScope();
-            convolution->bindProgram(m_convolutionProgram);
-            convolution->bindTexture(m_envmap, 0);
-            convolution->bindConstantBuffer(m_convolutionCBuffer, 0);
-            convolution->bindConstantBuffer(m_kernelCBuffer, 1);
-            convolution->setBlend(BlendOne, BlendOne);
-            
-            if (power > 1.0f)
-            {
-                convolution->enableFeatures(BIT(0));
-            }
-            
             StateScope quadStates = stateStack.push(&m_fullscreenQuad);
             
             // Generate and upload a convolution kernel for this iteration
             generateConvolutionKernel(kernel);
-            commands.uploadConstantBuffer(m_kernelCBuffer, &kernel, sizeof(kernel));
+            commands.uploadConstantBuffer(kernelCBuffer, &kernel, sizeof(kernel));
             
+            // Now render each cube map face
             for (s32 i = 0; i < 6; i++)
             {
-                s_convolution.viewport   = Vec2(size, size);
-                s_convolution.face       = i;
-                s_convolution.multiplier = 1.0f / iterations;
-                s_convolution.power      = power;
+                convolution.face = i;
 
                 CommandBuffer& renderToCubeMap = commands.renderToCubeMap(frame, output, i);
                 if (j == 0)
                 {
                     renderToCubeMap.clear(Rgba(0.0f, 0.0f, 0.0f, 0.0f), ClearAll);
                 }
-                renderToCubeMap.uploadConstantBuffer(m_convolutionCBuffer, &s_convolution, sizeof(s_convolution));
+                renderToCubeMap.uploadConstantBuffer(convolutionCBuffer, &convolution, sizeof(convolution));
                 renderToCubeMap.drawPrimitives(0, PrimQuads, 0, 4, stateStack);
             }
         }
@@ -347,7 +343,14 @@ class RenderingToTexture : public RenderingApplicationDelegate
         m_renderingContext->display(frame, true);
         renderingTime = currentTime() - renderingTime;
         
-        printf("\tfinished in %d ms [commands buffer generated in %d ms, rendered in %d ms]\n", commandBufferTime + renderingTime, commandBufferTime, renderingTime);
+        // Remove allocated resources
+        m_renderingContext->deleteConstantBuffer(kernelCBuffer);
+        m_renderingContext->deleteConstantBuffer(convolutionCBuffer);
+        m_renderingContext->deleteUniformLayout(kernelLayout);
+        m_renderingContext->deleteUniformLayout(convolutionLayout);
+        m_renderingContext->deleteProgram(program);
+        
+        printf("\tfinished in %d ms [command buffer generated in %d ms, rendered in %d ms]\n", commandBufferTime + renderingTime, commandBufferTime, renderingTime);
         
         return output;
     }
