@@ -37,6 +37,19 @@ OpenGLRenderingContext::OpenGLRenderingContext(RenderViewPtr view)
 {
     m_framebuffers.push(Framebuffer());
 }
+    
+// ** OpenGLRenderingContext::deleteProgram
+void OpenGLRenderingContext::deleteProgram(ResourceId id)
+{
+    ProgramPermutations& permutations = m_permutations[id];
+    
+    for (ProgramPermutations::iterator i = permutations.begin(), end = permutations.end(); i != end; ++i)
+    {
+        OpenGL2::Program::deleteProgram(i->second.program);
+    }
+    
+    m_permutations.emplace(id, ProgramPermutations());
+}
 
 // ** OpenGLRenderingContext::lookupPermutation
 bool OpenGLRenderingContext::lookupPermutation(Program program, PipelineFeatures features, const Permutation** permutation) const

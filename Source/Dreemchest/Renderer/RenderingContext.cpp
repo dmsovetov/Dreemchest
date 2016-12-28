@@ -158,6 +158,12 @@ public:
     
     //! Emits a cube texture creation command.
     Texture_                    createTextureCube(Texture_ id, const void* data, u16 size, u16 mipLevels, PixelFormat format, TextureFilter filter);
+    
+    //! Emits a constant buffer destruction command.
+    void                        deleteConstantBuffer(ConstantBuffer_ id);
+
+    //! Emits a program destruction command.
+    void                        deleteProgram(Program id);
 };
 
 // ** RenderingContext::ConstructionCommandBuffer::createVertexBuffer
@@ -237,6 +243,24 @@ Texture_ RenderingContext::ConstructionCommandBuffer::createTextureCube(Texture_
     opCode.createTexture.filter = filter;
     push( opCode );
     return id;
+}
+    
+// ** RenderingContext::ConstructionCommandBuffer::deleteConstantBuffer
+void RenderingContext::ConstructionCommandBuffer::deleteConstantBuffer(ConstantBuffer_ id)
+{
+    OpCode opCode;
+    opCode.type = OpCode::DeleteConstantBuffer;
+    opCode.id   = id;
+    push(opCode);
+}
+
+// ** RenderingContext::ConstructionCommandBuffer::deleteConstantBuffer
+void RenderingContext::ConstructionCommandBuffer::deleteProgram(Program id)
+{
+    OpCode opCode;
+    opCode.type = OpCode::DeleteProgram;
+    opCode.id   = id;
+    push(opCode);
 }
     
 // -------------------------------------------------------------------------------- RenderingContext -------------------------------------------------------------------------------- //
@@ -485,7 +509,7 @@ UniformLayout RenderingContext::requestUniformLayout(const String& name, const U
     m_uniformLayouts[id].push_back(sentinel);
 
     // Save this layout to a name mapping
-    m_uniformLayoutByName[name] = id;
+    m_uniformLayoutByName.insert(name, id);
 
     return id;
 }
@@ -585,14 +609,32 @@ Program RenderingContext::requestProgram(const String& vertex, const String& fra
     return id;
 }
 
+// ** RenderingContext::deleteConstantBuffer
+void RenderingContext::deleteConstantBuffer(ConstantBuffer_ id)
+{
+    m_constructionCommandBuffer->deleteConstantBuffer(id);
+}
+
+// ** RenderingContext::deleteConstantBuffer
+void RenderingContext::deleteUniformLayout(UniformLayout id)
+{
+    m_uniformLayoutByName.remove(id);
+    m_uniformLayouts.remove(id);
+    releaseIdentifier(RenderResourceType::UniformLayout, id);
+}
+
+// ** RenderingContext::deleteConstantBuffer
+void RenderingContext::deleteProgram(Program id)
+{
+    m_constructionCommandBuffer->deleteProgram(id);
+}
+
 // ** RenderingContext::findUniformLayout
 const UniformElement* RenderingContext::findUniformLayout(const String& name) const
 {
-    Map<String, UniformLayout>::const_iterator i = m_uniformLayoutByName.find(name);
-
-    if (i != m_uniformLayoutByName.end())
+    if (m_uniformLayoutByName.has(name))
     {
-        return &m_uniformLayouts[i->second][0];
+        return &m_uniformLayouts[m_uniformLayoutByName.find(name)->second][0];
     }
 
     return NULL;

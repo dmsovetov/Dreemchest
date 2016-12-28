@@ -71,6 +71,9 @@ namespace Renderer
         //! Adds a new framebuffer.
         s32                                     allocateFramebuffer(GLuint id, GLuint depth, u16 width, u16 height);
         
+        //! Deletes a program and all it's permutations.
+        void                                    deleteProgram(ResourceId id);
+        
     protected:
         
         //! A texture instance descriptor.
@@ -112,7 +115,6 @@ namespace Renderer
         
         FixedArray<GLuint>                      m_vertexBuffers;        //!< Allocated vertex buffers.
         FixedArray<GLuint>                      m_indexBuffers;         //!< Allocated index buffers.
-        FixedArray<GLuint>                      m_constantBuffers;      //!< Allocated constant buffers.
         FixedArray<Texture>                     m_textures;             //!< Allocated textures.
         FixedArray<TextureInfo>                 m_textureInfo;          //!< A corresponding texture info array.
         List<Texture_>                          m_transientTextures;    //!< A list of free textures.

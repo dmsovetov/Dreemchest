@@ -67,12 +67,17 @@ namespace Renderer
                 , CreateIndexBuffer         //!< Creates a new index buffer object.
                 , CreateConstantBuffer      //!< Creates a new constant buffer object.
                 , CreateTexture             //!< Creates a new texture.
+                , DeleteTexture             //!< Destroys an allocated texture.
+                , DeleteConstantBuffer      //!< Destroys an allocated constant buffer.
+                , DeleteProgram             //!< Destroys a program and all it's permutations.
             };
 
             Type                                type;                       //!< An op code type.
             u64                                 sorting;                    //!< A sorting key.
             union
             {
+                ResourceId                      id;                         //!< A passed resource id.
+                
                 struct
                 {
                     PrimitiveType               primitives;                 //!< A primitive type to be rendered.

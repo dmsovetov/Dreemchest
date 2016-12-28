@@ -261,6 +261,28 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
             }
                 break;
                 
+            case CommandBuffer::OpCode::DeleteConstantBuffer:
+                m_constantBuffers.emplace(opCode.id, ConstantBuffer());
+                releaseIdentifier(RenderResourceType::ConstantBuffer, opCode.id);
+                
+                for (s32 i = 0; i < State::MaxConstantBuffers; i++)
+                {
+                    if (static_cast<ResourceId>(m_activeState.constantBuffer[i]) == opCode.id)
+                    {
+                        m_activeState.constantBuffer[i] = ConstantBuffer_();
+                    }
+                }
+                break;
+                
+            case CommandBuffer::OpCode::DeleteProgram:
+                if (static_cast<ResourceId>(m_activeState.program) == opCode.id)
+                {
+                    m_activeState.program = Program();
+                }
+                deleteProgram(opCode.id);
+                releaseIdentifier(RenderResourceType::Program, opCode.id);
+                break;
+                
             case CommandBuffer::OpCode::AcquireTexture:
             {
                 ResourceId id = acquireTexture(opCode.transientTexture.type, opCode.transientTexture.width, opCode.transientTexture.height, opCode.transientTexture.format);
@@ -570,7 +592,7 @@ void OpenGL2RenderingContext::compilePipelineState(RequestedState requested)
     {
         if (requested.texture[i] == m_activeState.texture[i])
         {
-            continue;
+        //    continue;
         }
         
         const Texture& texture = m_textures[requested.texture[i]];
