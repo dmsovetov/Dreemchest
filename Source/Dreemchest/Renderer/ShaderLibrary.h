@@ -51,9 +51,15 @@ namespace Renderer
 
         //! A shader preprocessor unique pointer type.
         typedef UPtr<ShaderPreprocessor> ShaderPreprocessorUPtr;
-
-        //! A container type to store all shared functions.
-        typedef Map<String, String>     SharedFunctions;
+        
+        //! A shared function name and code.
+        struct SharedFunction
+        {
+            String                      name;   //!< A function name.
+            String                      code;   //!< A function ncode.
+        };
+        
+        typedef List<SharedFunction>    SharedFunctions;
         
                                         //! Constructs a ShaderLibrary instance.
                                         ShaderLibrary(const RenderingContext& renderingContext);

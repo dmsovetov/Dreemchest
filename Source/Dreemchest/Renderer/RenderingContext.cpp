@@ -337,7 +337,7 @@ RenderingContext::RenderingContext(RenderViewPtr view)
                                                                   }
                                                                   ));
     
-    m_shaderLibrary.addSharedFunction("pbrBlinnPhong", NIMBLE_STRINGIFY(vec2 d_blinnPhong(vec4 products, float roughness)
+    m_shaderLibrary.addSharedFunction("d_blinnPhong", NIMBLE_STRINGIFY(vec2 d_blinnPhong(vec4 products, float roughness)
                                                                         {
                                                                             float a = max(0.001, roughness * roughness);
                                                                             return vec2((1.0 / ((3.1415926535897932384626433832795) * a * a)) * pow(products.z, 2.0 / (a * a) - 2.0), 0.0);
@@ -360,6 +360,19 @@ RenderingContext::RenderingContext(RenderViewPtr view)
                                                                             return (one_minus_eta * one_minus_eta) / (one_plus_eta * one_plus_eta);
                                                                         }
                                                                         ));
+    
+    m_shaderLibrary.addSharedFunction("directionFromHemisphere", NIMBLE_STRINGIFY(vec3 directionFromHemisphere(vec3 t, vec3 b, vec3 n, vec2 spherical)
+                                                                                  {
+                                                                                      vec4 angles = vec4(cos(spherical.x), sin(spherical.x), cos(spherical.y), sin(spherical.y));
+                                                                                      return t * angles.x * angles.w + b * angles.y * angles.w + n * angles.z;
+                                                                                  }
+                                                                                  ));
+    
+    m_shaderLibrary.addSharedFunction("directionFromHemisphere", NIMBLE_STRINGIFY(vec3 directionFromHemisphere(vec3 t, vec3 b, vec3 n, vec4 angles)
+                                                                                  {
+                                                                                      return t * angles.x * angles.w + b * angles.y * angles.w + n * angles.z;
+                                                                                  }
+                                                                                  ));
 }
     
 // ** RenderingContext::~RenderingContext

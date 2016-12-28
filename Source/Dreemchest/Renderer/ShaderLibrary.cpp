@@ -64,14 +64,14 @@ bool ShaderLibrary::SharedFunctionPreprocessor::preprocess(const RenderingContex
     
     for (ShaderLibrary::SharedFunctions::const_iterator i = sharedFunctions.begin(), end = sharedFunctions.end(); i != end; ++i)
     {
-        if (source.find(i->first) == String::npos)
+        if (source.find(i->name) == String::npos)
         {
             continue;
         }
         
-        LogVerbose("shaderLibrary", "imporing shared function '%s'\n", i->first.c_str());
+        LogVerbose("shaderLibrary", "imporing shared function '%s'\n", i->name.c_str());
         
-        source = i->second + source;
+        source = i->code + source;
     }
     
     return true;
@@ -349,8 +349,10 @@ void ShaderLibrary::addSharedSource(const String& name, const String& source)
 // ** ShaderLibrary::addSharedFunction
 void ShaderLibrary::addSharedFunction(const String& name, const String& source)
 {
-    NIMBLE_ABORT_IF(m_sharedFunctions.count(name) != 0, "a shader library already contains a shared function with the same name");
-    m_sharedFunctions[name] = source;
+    SharedFunction sharedFunction;
+    sharedFunction.name = name;
+    sharedFunction.code = source;
+    m_sharedFunctions.push_back(sharedFunction);
 }
 
 // ** ShaderLibrary::sharedFunctions
