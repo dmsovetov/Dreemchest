@@ -54,7 +54,7 @@ static String s_fragmentShader =
 // a rendering context how to map from pipeline features to
 // actual shader options.
 
-// Declara a user-defined feature constant
+// Declare a user-defined feature constant
 PipelineFeatures Pink = BIT(0);
 
 static PipelineFeature s_features[] =
