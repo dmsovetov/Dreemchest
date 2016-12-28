@@ -90,54 +90,47 @@ static String s_fragmentMesh =
     "}                                                      \n"
     ;
 
+static String s_vertexConvolution =
+    "cbuffer Camera camera : 1;                                                 \n"
+
+    "varying vec4 v_ray;                                                        \n"
+
+    "void main()                                                                \n"
+    "{                                                                          \n"
+    "   v_ray         = camera.transform * vec4(gl_Vertex.xy, -1.0, 1.0); \n"
+    "   gl_Position   = gl_Vertex;                                              \n"
+    "}                                                                          \n"
+    ;
+
 static String s_fragmentConvolution =
     "uniform samplerCube Texture0;                          \n"
-    "cbuffer Convolution convolution : 0;                   \n"
-    "cbuffer Kernel      kernel      : 1;                   \n"
+    "cbuffer Convolution convolution : 2;                   \n"
+    "cbuffer Kernel      kernel      : 3;                   \n"
 
-    "vec3 calculateCubeCoordinates(vec4 fragCoord, vec2 vp, float face)     \n"
-    "{                                                                      \n"
-    "   vec3 ray = vec3(fragCoord.xy / vp * 2.0 - 1.0, 0.0);                \n"
-    "        if(face == 1.0) ray = normalize(vec3(  1, -ray.y,-ray.x));     \n"
-    "   else if(face == 0.0) ray = normalize(vec3( -1, -ray.y, ray.x));     \n"
-    "   else if(face == 2.0) ray = normalize(vec3(-ray.x,  1,  -ray.y));    \n"
-    "   else if(face == 3.0) ray = normalize(vec3(-ray.x, -1,   ray.y));    \n"
-    "   else if(face == 5.0) ray = normalize(vec3(ray.x, -ray.y,  1));      \n"
-    "   else if(face == 4.0) ray = normalize(vec3(-ray.x, -ray.y, -1));     \n"
-    "   return ray;                                                         \n"
-    "}                                                                      \n"
-
-    "vec3 hemisphereDirection(vec3 t, vec3 b, vec3 n, float theta, float phi)       \n"
-    "{                                                                              \n"
-    "   vec4 angles = vec4(cos(theta), sin(theta), cos(phi), sin(phi));             \n"
-    "   return t * angles.x * angles.w + b * angles.y * angles.w + n * angles.z;    \n"
-    "}                                                                              \n"
+    "varying vec4 v_ray;                                    \n"
 
     "void main()                                                                        \n"
     "{                                                                                              \n"
-    "   vec3 n = calculateCubeCoordinates(gl_FragCoord, convolution.viewport, convolution.face);    \n"
+    "   vec3 n = -normalize(v_ray.xyz);  \n"
     "   vec3 t = vec3(0.0, 1.0, 0.0);                                                               \n"
     "   vec3 b = cross(n, t);                                                                       \n"
     "   vec4 final = vec4(0.0);                                                                     \n"
 
-    "   float factor = ((convolution.power + 2.0) / 2.0 * M_PI);                                \n"
+    "   float factor = ((convolution.power + 2.0) / 2.0 * M_PI);                                    \n"
 
-    "   for (int i = 0; i < kernel.size; i++)                                                   \n"
-    "   {                                                                                       \n"
-    "       vec2  angle = kernel.samples[i];                                                    \n"
-    "       float NdotR = cos(angle.y);                                                         \n"
-    "       vec3  dir   = hemisphereDirection(t, b, n, angle.x, angle.y);                       \n"
-    "       final += textureCube(Texture0, dir) * pow(NdotR, convolution.power) * sin(angle.y); \n"
-    "   }                                                                                       \n"
+    "   for (int i = 0; i < kernel.size; i++)                                                       \n"
+    "   {                                                                                           \n"
+    "       vec4  sample = kernel.samples[i];                                                       \n"
+    "       vec3  dir   = directionFromHemisphere(t, b, n, sample);                                 \n"
+    "       final += textureCube(Texture0, dir) * pow(sample.z, convolution.power) * sample.w;      \n"
+    "   }                                                                                           \n"
 
-    "   gl_FragColor = factor * final / float(kernel.size) * convolution.multiplier;            \n"
-    "}                                                                                          \n"
+    "   gl_FragColor = factor * final / float(kernel.size) * convolution.multiplier;                \n"
+    "}                                                                                              \n"
     ;
 
 struct Convolution
 {
-    Vec2    viewport;
-    f32     face;
     f32     multiplier;
     f32     power;
     static const UniformElement Layout[];
@@ -145,9 +138,7 @@ struct Convolution
 
 const UniformElement Convolution::Layout[] =
 {
-      { "viewport",   UniformElement::Vec2,    offsetof(Convolution, viewport) }
-    , { "face",       UniformElement::Float,   offsetof(Convolution, face) }
-    , { "multiplier", UniformElement::Float,   offsetof(Convolution, multiplier) }
+      { "multiplier", UniformElement::Float,   offsetof(Convolution, multiplier) }
     , { "power",      UniformElement::Float,   offsetof(Convolution, power) }
     , { NULL }
 };
@@ -157,14 +148,14 @@ struct Kernel
     enum { MaxSamples = 512 };
     
     s32     size;
-    Vec2    samples[MaxSamples];
+    Vec4    samples[MaxSamples];
     static const UniformElement Layout[];
 };
 
 const UniformElement Kernel::Layout[] =
 {
       { "size",    UniformElement::Integer, offsetof(Kernel, size)                        }
-    , { "samples", UniformElement::Vec2,    offsetof(Kernel, samples), Kernel::MaxSamples }
+    , { "samples", UniformElement::Vec4,    offsetof(Kernel, samples), Kernel::MaxSamples }
     , { NULL }
 };
 
@@ -191,13 +182,13 @@ class RenderingToTexture : public RenderingApplicationDelegate
     {
         Logger::setStandardLogger();
 
-        if (!initialize(800 / 3, 600 / 3))
+        if (!initialize(800 / 5, 600 / 5))
         {
             application->quit(-1);
         }
 
         // Load mesh from a file
-        m_mesh = Examples::createMeshRenderingStates(m_renderingContext, m_renderFrame, "Assets/Meshes/bunny_decimated.obj");
+        m_mesh = Examples::createMeshRenderingStates(m_renderingContext, m_renderFrame, "Assets/Meshes/bunny.obj");
         m_envmap = Examples::createEnvFromFiles(m_renderingContext, m_renderFrame, "Assets/Textures/Environments/Arches_E_PineTree_512");
 
         // Projection cbuffer
@@ -210,7 +201,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
         
         // Camera cbuffer
         {
-            s_camera = Examples::Camera::lookAt(Vec3(0.0f, 2.0f, -2.0f) /** 35*/, Vec3(0.0f, 0.5f, 0.0f));
+            s_camera = Examples::Camera::lookAt(Vec3(0.0f, 2.0f, -2.0f), Vec3(0.0f, 0.5f, 0.0f));
             
             UniformLayout layout = m_renderingContext->requestUniformLayout("Camera", Examples::Camera::Layout);
             m_cameraCBuffer = m_renderingContext->requestConstantBuffer(&s_camera, sizeof(s_camera), layout);
@@ -236,7 +227,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
         m_renderingContext->construct(m_renderFrame);
         
         // Now render a diffuse-convolved environment map
-        m_specular = convolve(m_envmap, 128, 160, 9.0f);
+        m_specular = convolve(m_envmap, 128, 160, 128.0f);
         m_diffuse  = convolve(m_envmap, 128, 160);
     }
  
@@ -250,6 +241,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
         StateScope defaults = stateStack.push(&m_renderStates);
         
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
+        commands.uploadConstantBuffer(m_cameraCBuffer, &s_camera, sizeof(s_camera));
         
         {
             s_projection.viewport = Vec4(0, 0, (f32)m_window->width(), (f32)m_window->height());
@@ -269,7 +261,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
         meshPass->bindTexture(m_specular, 1);
         
         StateScope meshStates = stateStack.push(&m_mesh.states);
-        s_instance = Examples::Instance::fromTransform(Matrix4::rotateXY(0.0f, currentTime() * 0.0003f));
+        s_instance = Examples::Instance::fromTransform(Matrix4::rotateXY(currentTime() * 0.0003f * 0.0f, currentTime() * 0.0003f));
         commands.uploadConstantBuffer(m_instanceCBuffer, &s_instance, sizeof(s_instance));
         commands.drawPrimitives(0, m_mesh.primitives, 0, m_mesh.size, stateStack);
 
@@ -289,7 +281,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
         Texture_ output = m_renderingContext->requestTextureCube(NULL, size, 1, PixelRgba32F, FilterLinear);
         
         // Create a convolution program instance
-        Program program = m_renderingContext->requestProgram(Examples::VertexIdentity, s_fragmentConvolution);
+        Program program = m_renderingContext->requestProgram(s_vertexConvolution, s_fragmentConvolution);
         
         // Create the convolution cbuffer
         UniformLayout convolutionLayout    = m_renderingContext->requestUniformLayout("Convolution", Convolution::Layout);
@@ -303,15 +295,37 @@ class RenderingToTexture : public RenderingApplicationDelegate
         StateScope convolutionPass = stateStack.newScope();
         convolutionPass->bindProgram(program);
         convolutionPass->bindTexture(env, 0);
-        convolutionPass->bindConstantBuffer(convolutionCBuffer, 0);
-        convolutionPass->bindConstantBuffer(kernelCBuffer, 1);
+        convolutionPass->bindConstantBuffer(m_cameraCBuffer, 1);
+        convolutionPass->bindConstantBuffer(convolutionCBuffer, 2);
+        convolutionPass->bindConstantBuffer(kernelCBuffer, 3);
         convolutionPass->setBlend(BlendOne, BlendOne);
         
         // Now declare a convolution parameters constant buffer
         Convolution convolution;
-        convolution.viewport   = Vec2(size, size);
         convolution.multiplier = 1.0f / iterations;
         convolution.power      = power;
+        commands.uploadConstantBuffer(convolutionCBuffer, &convolution, sizeof(convolution));
+        
+        // Declare an array of camera up vectors to
+        Vec3 up[] =
+        {
+               Vec3::axisY()
+            ,  Vec3::axisY()
+            ,  Vec3::axisZ()
+            , -Vec3::axisZ()
+            ,  Vec3::axisY()
+            ,  Vec3::axisY()
+        };
+        
+        Vec3 target[] =
+        {
+               Vec3::axisX()
+            , -Vec3::axisX()
+            , -Vec3::axisY()
+            ,  Vec3::axisY()
+            ,  Vec3::axisZ()
+            , -Vec3::axisZ()
+        };
         
         u32 commandBufferTime = currentTime();
         for (s32 j = 0; j < iterations; j++)
@@ -325,14 +339,14 @@ class RenderingToTexture : public RenderingApplicationDelegate
             // Now render each cube map face
             for (s32 i = 0; i < 6; i++)
             {
-                convolution.face = i;
-
                 CommandBuffer& renderToCubeMap = commands.renderToCubeMap(frame, output, i);
                 if (j == 0)
                 {
                     renderToCubeMap.clear(Rgba(0.0f, 0.0f, 0.0f, 0.0f), ClearAll);
                 }
-                renderToCubeMap.uploadConstantBuffer(convolutionCBuffer, &convolution, sizeof(convolution));
+                
+                Examples::Camera camera = Examples::Camera::lookAt(Vec3::zero(), target[i], up[i]);
+                renderToCubeMap.uploadConstantBuffer(m_cameraCBuffer, &camera, sizeof(camera));
                 renderToCubeMap.drawPrimitives(0, PrimQuads, 0, 4, stateStack);
             }
         }
@@ -361,7 +375,9 @@ class RenderingToTexture : public RenderingApplicationDelegate
         
         for (s32 i = 0; i < kernel.size; i++)
         {
-            kernel.samples[i] = Vec2(rand0to1() * Pi * 2.0f, rand0to1() * Pi * 0.5f);
+            f32 theta = rand0to1() * Pi * 2.0f;
+            f32 phi   = rand0to1() * Pi * 0.5f;
+            kernel.samples[i] = Vec4(cosf(theta), sinf(theta), cosf(phi), sinf(phi));
         }
     }
 };

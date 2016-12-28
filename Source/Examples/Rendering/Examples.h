@@ -55,13 +55,14 @@ namespace Examples
     //! A constant buffer definition that contains camera info.
     struct Camera
     {
-        Matrix4                     transform;  //!< A camera view matrix.
-        Vec3                        position;   //!< A camera position.
+        Matrix4                     transform;          //!< A camera view matrix.
+        Matrix4                     inverseTranspose;   //!< An inverse transpose matrix.
+        Vec3                        position;           //!< A camera position.
         
         static const UniformElement Layout[];   //!< A constant buffer layout.
         
         //! Creates a Camera constant buffer with a camera looking at the specified target.
-        static Camera               lookAt(const Vec3& position, const Vec3& target);
+        static Camera               lookAt(const Vec3& position, const Vec3& target, const Vec3& up = Vec3::axisY());
     };
     
     //! A constant buffer definition that contains instance info.
@@ -105,24 +106,26 @@ namespace Examples
     // ** Camera::Layout
     const UniformElement Camera::Layout[] =
     {
-        { "transform", UniformElement::Matrix4, offsetof(Camera, transform) }
+          { "transform", UniformElement::Matrix4, offsetof(Camera, transform) }
+        , { "inverseTranspose", UniformElement::Matrix4, offsetof(Camera, inverseTranspose) }
         , { "position",  UniformElement::Vec3,    offsetof(Camera, position)  }
         , { NULL }
     };
     
     // ** Camera::lookAt
-    Camera Camera::lookAt(const Vec3& position, const Vec3& target)
+    Camera Camera::lookAt(const Vec3& position, const Vec3& target, const Vec3& up)
     {
         Camera camera;
         camera.position = position;
-        camera.transform = Matrix4::lookAt(position, target, Vec3::axisY());
+        camera.transform = Matrix4::lookAt(position, target, up);
+        camera.inverseTranspose = camera.transform.inversed().transposed();
         return camera;
     }
     
     // ** Instance::Layout
     const UniformElement Instance::Layout[] =
     {
-        { "transform",        UniformElement::Matrix4, offsetof(Instance, transform)        }
+          { "transform",        UniformElement::Matrix4, offsetof(Instance, transform)        }
         , { "inverseTranspose", UniformElement::Matrix4, offsetof(Instance, inverseTranspose) }
         , { NULL }
     };
