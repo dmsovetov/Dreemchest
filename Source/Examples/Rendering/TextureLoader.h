@@ -28,7 +28,9 @@
 #ifndef __Examples_TextureLoader_H__
 #define __Examples_TextureLoader_H__
 
-#define MAKEFOURCC(a, b, c, d) ((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
+#ifndef MAKEFOURCC
+    #define MAKEFOURCC(a, b, c, d) ((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
+#endif
 
 namespace Examples
 {
@@ -230,10 +232,9 @@ namespace Examples
             s32            dwReserved2;
         };
         
-        DdsHeader		ddsd;
+        DdsHeader		    ddsd;
         char				header[4];
-        uint				mipFactor;
-        //uint				imageSize, bufferSize;
+        u32				    mipFactor;
         int					sides[6] = {
             DDS_CUBEMAP_POSITIVEX, DDS_CUBEMAP_NEGATIVEX,
             DDS_CUBEMAP_POSITIVEY, DDS_CUBEMAP_NEGATIVEY,
