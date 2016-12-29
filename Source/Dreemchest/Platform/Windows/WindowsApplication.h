@@ -40,6 +40,7 @@ namespace Platform {
         // ** IApplication
         virtual void                quit( u32 exitCode ) NIMBLE_OVERRIDE;
         virtual s32                 launch( Application* application ) NIMBLE_OVERRIDE;
+        virtual const String&       resourcePath( void ) const NIMBLE_OVERRIDE;
 
 	private:
 
@@ -48,7 +49,8 @@ namespace Platform {
 
     private:
 
-        Application*                m_application;  //!< Parent application instance.
+        Application*                m_application;      //!< Parent application instance.
+        mutable String              m_workingDirectory; //!< A current working directory.
     };
 
     //! Windows service application implementation
@@ -61,6 +63,7 @@ namespace Platform {
         // ** IApplication
         virtual void                quit( u32 exitCode ) NIMBLE_OVERRIDE;
         virtual s32                 launch( Application* application ) NIMBLE_OVERRIDE;
+        virtual const String&       resourcePath( void ) const NIMBLE_OVERRIDE;
 
     public:
 
@@ -99,6 +102,7 @@ namespace Platform {
         SERVICE_STATUS_HANDLE       m_statusHandle;                 //!< Used to reference our service instance.
         HANDLE                      m_stopEvent;                    //!< Service stop event handle.
         s8                          m_name[MaxServiceNameLength];   //!< Service name.
+        mutable String              m_workingDirectory;             //!< A current working directory.
     };
 
 } // namespace Platform

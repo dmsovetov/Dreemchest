@@ -26,6 +26,8 @@
 
 #include "WindowsApplication.h"
 #include "WindowsWindow.h"
+#include <direct.h>
+#define getcwd _getcwd
 
 #pragma comment( lib, "winmm.lib" )
 
@@ -100,6 +102,20 @@ void WindowsApplication::loop( void )
 	}
 }
 
+// ** WindowsApplication::resourcePath
+const String& WindowsApplication::resourcePath( void ) const
+{
+    if (m_workingDirectory.empty())
+    {
+        s8 buffer[256];
+        getcwd(buffer, sizeof(buffer));
+        m_workingDirectory = buffer;
+        m_workingDirectory += "/";
+    }
+    
+    return m_workingDirectory;
+}
+
 // ------------------------------------------------------------------------ WindowsService ------------------------------------------------------------------------ //
 
 // ** WindowsService::s_instance
@@ -155,6 +171,20 @@ s32 WindowsService::launch( Application* application )
     }
 
 	return 0;
+}
+
+// ** WindowsService::resourcePath
+const String& WindowsService::resourcePath( void ) const
+{
+    if (m_workingDirectory.empty())
+    {
+        s8 buffer[256];
+        getcwd(buffer, sizeof(buffer));
+        m_workingDirectory = buffer;
+        m_workingDirectory += "/";
+    }
+    
+    return m_workingDirectory;
 }
 
 // ** WindowsService::configure
