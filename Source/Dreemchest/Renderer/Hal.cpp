@@ -25,7 +25,6 @@
  **************************************************************************/
 
 #include "Hal.h"
-#include "RenderStateDeprecated.h"
 #include "BatchRenderer.h"
 #include "VertexBufferLayout.h"
 

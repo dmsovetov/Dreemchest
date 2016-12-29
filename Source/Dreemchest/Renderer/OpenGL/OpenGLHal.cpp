@@ -28,8 +28,6 @@
 #include    "OpenGLExtensions.h"
 #include "../VertexBufferLayout.h"
 
-#include    "../RenderStateDeprecated.h"
-
 DC_BEGIN_DREEMCHEST
 
 namespace Renderer {
@@ -537,95 +535,17 @@ void OpenGLHal::setCulling( TriangleFace value )
 // ** OpenGLHal::setBlendState
 void OpenGLHal::setBlendState( BlendState* state )
 {
-    DC_CHECK_GL;
-    NIMBLE_ABORT_IF( state == NULL, "invalid blend state" );
 
-    if( state->m_src != RSValueNotSet || state->m_dst != RSValueNotSet ) {
-        glBlendFunc( blendFactor( state->m_src ), blendFactor( state->m_dst ) );
-    }
-
-    if( state->m_blend != RSValueNotSet ) {
-        state->m_blend == 1 ? glEnable( GL_BLEND ) : glDisable( GL_BLEND );
-    }
 }
 
 // ** OpenGLHal::setDepthStencilState
 void OpenGLHal::setDepthStencilState( DepthStencilState* state )
 {
-    DC_CHECK_GL;
-    NIMBLE_ABORT_IF( state == NULL, "invalid depth stencil state" );
-
-    // ** Tencil
-    if( state->m_stencilEnable != RSValueNotSet ) {
-        state->m_stencilEnable == 0 ? glDisable( GL_STENCIL_TEST ) : glEnable( GL_STENCIL_TEST );
-    }
-
-    if( state->m_stencilZFail != RSValueNotSet || state->m_stencilZPass != RSValueNotSet || state->m_stencilFail != RSValueNotSet ) {
-        glStencilOp( stencilOp( state->m_stencilFail ), stencilOp( state->m_stencilZFail ), stencilOp( state->m_stencilZPass ) );
-    }
-
-    if( state->m_stencilMask != RSValueNotSet ) {
-        glStencilMask( state->m_stencilMask );
-    }
-
-    if( state->m_stencilFunc != RSValueNotSet ) {
-        glStencilFunc( compareFunc( state->m_stencilFunc ), state->m_stencilValue, state->m_stencilMask );
-    }
-
-    // ** Depth
-    if( state->m_depthFunc != RSValueNotSet ) {
-        glDepthFunc( compareFunc( state->m_depthFunc ) );
-    }
 }
 
 // ** OpenGLHal::setRasterizerState
 void OpenGLHal::setRasterizerState( RasterizerState* state )
 {
-    DC_CHECK_GL;
-    
-    if( !state ) {
-        // ** OpenGL Workaround
-        glDepthMask( true );
-        return;
-    }
-
-#ifndef HAVE_OPENGLES
-    // ** Polygon mode
-    if( state->m_fillMode != RSValueNotSet ) {
-        static GLenum glFill[] = { GL_LINE, GL_FILL };
-        glPolygonMode( GL_FRONT_AND_BACK, glFill[state->m_fillMode] );
-    }
-#endif
-
-    // ** Cull mode
-    if( state->m_cullMode != RSValueNotSet ) {
-        state->m_cullMode == TriangleFaceNone ? glDisable( GL_CULL_FACE ) : glEnable( GL_CULL_FACE );
-        glFrontFace( GL_CCW );
-        if( state->m_cullMode != TriangleFaceNone ) {
-            glCullFace( triangleFace( state->m_cullMode ) );
-        }
-    }
-
-    // ** Alpha
-    if( state->m_alphaFunc != RSValueNotSet ) {
-        state->m_alphaFunc == CompareDisabled ? glDisable( GL_ALPHA_TEST ) : glEnable( GL_ALPHA_TEST );
-        glAlphaFunc( compareFunc( state->m_alphaFunc ), state->m_alphaRef );
-    }
-
-    // ** Scissor
-    if( state->m_scissor != RSValueNotSet ) {
-        state->m_scissor == 0 ? glDisable( GL_SCISSOR_TEST ) : glEnable( GL_SCISSOR_TEST );
-    }
-
-    // ** Z-write
-    if( state->m_depth != RSValueNotSet ) {
-        glDepthMask( state->m_depth == 1 );
-    }
-
-    // ** Color write
-    if( state->m_red != RSValueNotSet || state->m_green != RSValueNotSet || state->m_blue != RSValueNotSet || state->m_alpha != RSValueNotSet ) {
-        glColorMask( state->m_red == 1, state->m_green == 1, state->m_blue == 1, state->m_alpha == 1 );
-    }
 }
 
 // ** OpenGLHal::setViewport

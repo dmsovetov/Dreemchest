@@ -577,7 +577,6 @@ DC_END_DREEMCHEST
 
 #ifndef DC_BUILD_LIBRARY
     #include "Hal.h"
-    #include "RenderStateDeprecated.h"
     #include "BatchRenderer.h"
     #include "Renderer2D.h"
     #include "RenderingContext.h"
