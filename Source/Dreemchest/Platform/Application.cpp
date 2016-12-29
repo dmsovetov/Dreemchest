@@ -174,6 +174,50 @@ void Application::notifyUpdate( void )
         m_delegate->handleUpdate( this );
     }
 }
+    
+// -------------------------------------------------------------- ApplicationDelegate ---------------------------------------------------------------- //
+
+// ** ApplicationDelegate::ApplicationDelegate
+ApplicationDelegate::ApplicationDelegate(const String& tag)
+    : m_loggerTag(tag)
+{
+    
+}
+    
+// ** ApplicationDelegate::debug
+void ApplicationDelegate::debug(CString prefix, CString format, ...)
+{
+    NIMBLE_LOGGER_FORMAT(format);
+    Logger::write(Logger::Context(NULL, NULL), Logger::Debug, m_loggerTag.c_str(), prefix, buffer);
+}
+
+// ** ApplicationDelegate::verbose
+void ApplicationDelegate::verbose(CString prefix, CString format, ...)
+{
+    NIMBLE_LOGGER_FORMAT(format);
+    Logger::write(Logger::Context(NULL, NULL), Logger::Verbose, m_loggerTag.c_str(), prefix, buffer);
+}
+
+// ** ApplicationDelegate::warning
+void ApplicationDelegate::warning(CString prefix, CString format, ...)
+{
+    NIMBLE_LOGGER_FORMAT(format);
+    Logger::write(Logger::Context(NULL, NULL), Logger::Warning, m_loggerTag.c_str(), prefix, buffer);
+}
+
+// ** ApplicationDelegate::error
+void ApplicationDelegate::error(CString prefix, CString format, ...)
+{
+    NIMBLE_LOGGER_FORMAT(format);
+    Logger::write(Logger::Context(NULL, NULL), Logger::Error, m_loggerTag.c_str(), prefix, buffer);
+}
+
+// ** ApplicationDelegate::fatal
+void ApplicationDelegate::fatal(CString prefix, CString format, ...)
+{
+    NIMBLE_LOGGER_FORMAT(format);
+    Logger::write(Logger::Context(NULL, NULL), Logger::Fatal, m_loggerTag.c_str(), prefix, buffer);
+}
 
 // -------------------------------------------------------------- ServiceApplication ---------------------------------------------------------------- //
 

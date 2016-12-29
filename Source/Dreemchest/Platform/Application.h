@@ -55,6 +55,7 @@ namespace Platform {
     class ApplicationDelegate {
     public:
 
+                                ApplicationDelegate(const String& tag = "APP");
         virtual                 ~ApplicationDelegate( void ) {}
 
         //! Notifies that application is about to start.
@@ -65,6 +66,27 @@ namespace Platform {
 
         //! Notifies about an application update.
         virtual void            handleUpdate( Application* application ) {}
+        
+    protected:
+        
+        //! Outputs a debug message to a console.
+        void                    debug(CString prefix, CString format, ...);
+        
+        //! Outputs a verbose message to a console.
+        void                    verbose(CString prefix, CString format, ...);
+        
+        //! Outputs a warning message to a console.
+        void                    warning(CString prefix, CString format, ...);
+        
+        //! Outputs an error message to a console.
+        void                    error(CString prefix, CString format, ...);
+        
+        //! Outputs a fatal message to a console.
+        void                    fatal(CString prefix, CString format, ...);
+        
+    private:
+        
+        String                  m_loggerTag;    //!< A tag string that is passed to a logger.
     };
 
     //! Base class for windowed applications.
