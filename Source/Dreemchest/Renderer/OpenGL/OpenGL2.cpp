@@ -77,6 +77,22 @@ static PFNGLUNIFORM2FVARBPROC           glUniform2fv            = NULL;
 static PFNGLUNIFORM3FVARBPROC           glUniform3fv            = NULL;
 static PFNGLUNIFORM4FVARBPROC           glUniform4fv            = NULL;
 static PFNGLUNIFORMMATRIX4FVARBPROC     glUniformMatrix4fv      = NULL;
+
+// GL_framebuffer_object
+static PFNGLDELETEFRAMEBUFFERSPROC      glDeleteFramebuffers        = NULL;
+static PFNGLFRAMEBUFFERTEXTURE2DPROC    glFramebufferTexture2D      = NULL;
+static PFNGLGENFRAMEBUFFERSPROC         glGenFramebuffers           = NULL;
+static PFNGLBINDFRAMEBUFFERPROC         glBindFramebuffer           = NULL;
+static PFNGLDELETERENDERBUFFERSPROC     glDeleteRenderbuffers       = NULL;
+static PFNGLGENRENDERBUFFERSPROC        glGenRenderbuffers          = NULL;
+static PFNGLBINDRENDERBUFFERPROC        glBindRenderbuffer          = NULL;
+static PFNGLRENDERBUFFERSTORAGEPROC     glRenderbufferStorage       = NULL;
+static PFNGLCHECKFRAMEBUFFERSTATUSPROC  glCheckFramebufferStatus    = NULL;
+static PFNGLFRAMEBUFFERRENDERBUFFERPROC glFramebufferRenderbuffer   = NULL;
+
+// GL_ARB_texture_compression
+static PFNGLCOMPRESSEDTEXIMAGE2DARBPROC glCompressedTexImage2D      = NULL;
+
 #elif defined(DC_PLATFORM_MACOS)
     #define GL_RGBA16F  GL_RGBA16F_ARB
     #define GL_RGBA32F  GL_RGBA32F_ARB
@@ -497,6 +513,19 @@ bool OpenGL2::initialize()
     glUniform3fv            = ( PFNGLUNIFORM3FVARBPROC )            wglGetProcAddress( "glUniform3fvARB" );
     glUniform4fv            = ( PFNGLUNIFORM4FVARBPROC )            wglGetProcAddress( "glUniform4fvARB" );
     glUniformMatrix4fv      = ( PFNGLUNIFORMMATRIX4FVARBPROC )      wglGetProcAddress( "glUniformMatrix4fvARB" );
+
+    glDeleteFramebuffers        = ( PFNGLDELETEFRAMEBUFFERSPROC )       wglGetProcAddress( "glDeleteFramebuffers" );
+    glFramebufferTexture2D      = ( PFNGLFRAMEBUFFERTEXTURE2DPROC )     wglGetProcAddress( "glFramebufferTexture2D" );
+    glGenFramebuffers           = ( PFNGLGENFRAMEBUFFERSPROC )          wglGetProcAddress( "glGenFramebuffers" );
+    glBindFramebuffer           = ( PFNGLBINDFRAMEBUFFERPROC )          wglGetProcAddress( "glBindFramebuffer" );
+    glDeleteRenderbuffers       = ( PFNGLDELETERENDERBUFFERSPROC )      wglGetProcAddress( "glDeleteRenderbuffers" );
+    glGenRenderbuffers          = ( PFNGLGENRENDERBUFFERSPROC )         wglGetProcAddress( "glGenRenderbuffers" );
+    glBindRenderbuffer          = ( PFNGLBINDRENDERBUFFERPROC )         wglGetProcAddress( "glBindRenderbuffer" );
+    glRenderbufferStorage       = ( PFNGLRENDERBUFFERSTORAGEPROC )      wglGetProcAddress( "glRenderbufferStorage" );
+    glCheckFramebufferStatus    = ( PFNGLCHECKFRAMEBUFFERSTATUSPROC )   wglGetProcAddress( "glCheckFramebufferStatus" );
+    glFramebufferRenderbuffer   = ( PFNGLFRAMEBUFFERRENDERBUFFERPROC )  wglGetProcAddress( "glFramebufferRenderbuffer" );
+
+    glCompressedTexImage2D      = ( PFNGLCOMPRESSEDTEXIMAGE2DARBPROC )  wglGetProcAddress( "glCompressedTexImage2DARB" );
 #endif  //  #ifdef DC_PLATFORM_WINDOWS
     return true;
 }
