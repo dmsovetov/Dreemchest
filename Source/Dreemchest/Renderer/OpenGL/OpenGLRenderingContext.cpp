@@ -31,6 +31,23 @@ DC_BEGIN_DREEMCHEST
 namespace Renderer
 {
 
+// ------------------------------------------------ OpenGLRenderingContext::ShaderVersionPreprocessor -------------------------------------------- //
+
+// ** OpenGLRenderingContext::ShaderVersionPreprocessor::ShaderVersionPreprocessor
+OpenGLRenderingContext::ShaderVersionPreprocessor::ShaderVersionPreprocessor(s32 version)
+    : m_version(version)
+{
+}
+
+// ** OpenGLRenderingContext::ShaderVersionPreprocessor::preprocess
+bool OpenGLRenderingContext::ShaderVersionPreprocessor::preprocess(const RenderingContext& renderingContext, String& shader) const
+{
+    shader = "#version " + toString(m_version) + "\n" + shader;
+    return true;
+}
+
+// ------------------------------------------------------ OpenGLRenderingContext --------------------------------------------------- //
+
 // ** OpenGLRenderingContext::OpenGLRenderingContext
 OpenGLRenderingContext::OpenGLRenderingContext(RenderViewPtr view)
     : RenderingContext(view)

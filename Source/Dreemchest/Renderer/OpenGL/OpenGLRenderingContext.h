@@ -109,6 +109,21 @@ namespace Renderer
             u16                 height;         //!< A framebuffer height.
             bool                acquired;       //!< Indicates that a framebuffer is in use now.
         };
+
+        //! Adds a version directive to a shader source code
+        class ShaderVersionPreprocessor : public ShaderPreprocessor
+        {
+        public:
+
+                                            ShaderVersionPreprocessor(s32 version);
+
+            //! Adds a #version directive to a shader source code
+            virtual bool                    preprocess(const RenderingContext& renderingContext, String& shader) const;
+
+        private:
+
+            s32                             m_version;  //!< A shader version to be inserted.
+        };
     
         //! A container type to store program permutations.
         typedef HashMap<PipelineFeatures, Permutation> ProgramPermutations;
