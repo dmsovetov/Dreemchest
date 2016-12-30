@@ -255,7 +255,8 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
             case CommandBuffer::OpCode::CreateConstantBuffer:
             {
                 ConstantBuffer constantBuffer;
-                constantBuffer.layout = &m_uniformLayouts[opCode.createBuffer.layout][0];
+                //constantBuffer.layout = &m_uniformLayouts[opCode.createBuffer.layout][0];
+                constantBuffer.layout = m_uniformLayouts[opCode.createBuffer.layout];
                 constantBuffer.data.resize(opCode.createBuffer.buffer.size);
                 
                 if (opCode.createBuffer.buffer.data)
@@ -687,9 +688,9 @@ void OpenGL2RenderingContext::updateUniforms(const RequestedState& state, Pipeli
         
         // Get a constant buffer at index
         const ConstantBuffer& constantBuffer = m_constantBuffers[state.constantBuffer[i]];
-    
+
         // Submit all constants to a shader
-        for (const UniformElement* constant = constantBuffer.layout; constant->name; constant++)
+        for (const UniformElement* constant = &constantBuffer.layout[0]; constant->name; constant++)
         {
             // Create a uniform name here for now, but in future this sould be cached somewhere (probably in a ConstantBuffer instance).
             String uniform = "cb_" + toString(i) + "." + constant->name.value();

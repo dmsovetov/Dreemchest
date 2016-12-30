@@ -90,7 +90,7 @@ namespace Renderer
         struct ConstantBuffer
         {
             Array<u8>               data;       //!< Actual buffer data.
-            const UniformElement*   layout;     //!< A constant buffer layout.
+            Array<UniformElement>   layout;     //!< A constant buffer layout.
         };
 
         //! Generates a uniform structure from a cbuffer definition.
