@@ -103,6 +103,11 @@ OpenGL2RenderingContext::OpenGL2RenderingContext(RenderViewPtr view)
     }
 
     m_shaderLibrary.addPreprocessor(DC_NEW ShaderPreprocessor);
+    
+    m_textures.emplace(0, Texture());
+    m_constantBuffers.emplace(0, ConstantBuffer());
+    m_vertexBuffers.emplace(0, 0);
+    m_indexBuffers.emplace(0, 0);
 }
 
 // ** OpenGL2RenderingContext::applyStateBlock
