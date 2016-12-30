@@ -107,8 +107,13 @@ bool WindowsOpenGLView::beginFrame( void )
 }
 
 // ** WindowsOpenGLView::endFrame
-void WindowsOpenGLView::endFrame( void )
+void WindowsOpenGLView::endFrame(bool wait)
 {
+    if (wait)
+    {
+        glFinish();
+    }
+
     SwapBuffers( m_deviceContext );
 }
 

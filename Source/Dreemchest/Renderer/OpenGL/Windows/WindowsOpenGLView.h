@@ -42,9 +42,9 @@ namespace Renderer {
         virtual             ~WindowsOpenGLView( void );
 
         // ** IView
-        virtual bool        makeCurrent( void );
-        virtual bool        beginFrame( void );
-        virtual void        endFrame( void );
+        virtual bool        makeCurrent() NIMBLE_OVERRIDE;
+        virtual bool        beginFrame() NIMBLE_OVERRIDE;
+        virtual void        endFrame(bool wait) NIMBLE_OVERRIDE;
 
         // ** WindowsOpenGLView
         bool                initialize( HWND window, PixelFormat depthStencil );
