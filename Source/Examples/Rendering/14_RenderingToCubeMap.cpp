@@ -182,7 +182,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
     {
         Logger::setStandardLogger();
 
-        if (!initialize(800 / 5, 600 / 5))
+        if (!initialize(800, 600))
         {
             application->quit(-1);
         }
@@ -270,7 +270,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
     
     Texture_ convolve(Texture_ env, s32 size, s32 iterations, f32 power = 1.0f)
     {
-        printf("Performing a convolution with cosine kernel of power %2.2f with %d samples in %d iterations...\n", power, Kernel::MaxSamples, iterations);
+        verbose("convolution", "performing with cosine kernel of power %2.2f with %d samples in %d iterations...\n", power, Kernel::MaxSamples, iterations);
         
         RenderFrame    frame;
         StateStack&    stateStack = frame.stateStack();
@@ -364,7 +364,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
         m_renderingContext->deleteUniformLayout(convolutionLayout);
         m_renderingContext->deleteProgram(program);
         
-        printf("\tfinished in %d ms [command buffer generated in %d ms, rendered in %d ms]\n", commandBufferTime + renderingTime, commandBufferTime, renderingTime);
+        verbose("convolution", "\tfinished in %d ms [command buffer generated in %d ms, rendered in %d ms]\n", commandBufferTime + renderingTime, commandBufferTime, renderingTime);
         
         return output;
     }
