@@ -54,13 +54,13 @@ namespace Renderer
                                                 OpenGLRenderingContext(RenderViewPtr view);
         
         //! Searches for a suitable shader program permutation.
-        bool                                    lookupPermutation(Program program, PipelineFeatures features, const Permutation** permutation) const;
+        bool                                    lookupPermutation(ResourceId program, PipelineFeatures features, const Permutation** permutation) const;
         
         //! Puts a new permutation to a cache.
-        void                                    savePermutation(Program program, PipelineFeatures features, GLuint id);
+        void                                    savePermutation(ResourceId program, PipelineFeatures features, GLuint id);
         
         //! Searches a uniform location by a name.
-        GLint                                   findUniformLocation(Program program, PipelineFeatures features, const FixedString& name);
+        GLint                                   findUniformLocation(ResourceId program, PipelineFeatures features, const FixedString& name);
         
         //! Searches for a framebuffer and marks it a used.
         s32                                     acquireFramebuffer(u16 width, u16 height);

@@ -69,7 +69,7 @@ void OpenGLRenderingContext::deleteProgram(ResourceId id)
 }
 
 // ** OpenGLRenderingContext::lookupPermutation
-bool OpenGLRenderingContext::lookupPermutation(Program program, PipelineFeatures features, const Permutation** permutation) const
+bool OpenGLRenderingContext::lookupPermutation(ResourceId program, PipelineFeatures features, const Permutation** permutation) const
 {
     if (static_cast<s32>(program) >= m_permutations.count())
     {
@@ -92,7 +92,7 @@ bool OpenGLRenderingContext::lookupPermutation(Program program, PipelineFeatures
 }
     
 // ** OpenGLRenderingContext::savePermutation
-void OpenGLRenderingContext::savePermutation(Program program, PipelineFeatures features, GLuint id)
+void OpenGLRenderingContext::savePermutation(ResourceId program, PipelineFeatures features, GLuint id)
 {
     Permutation permutation;
     permutation.program = id;
@@ -100,7 +100,7 @@ void OpenGLRenderingContext::savePermutation(Program program, PipelineFeatures f
 }
  
 // ** OpenGLRenderingContext::findUniformLocation
-GLint OpenGLRenderingContext::findUniformLocation(Program program, PipelineFeatures features, const FixedString& name)
+GLint OpenGLRenderingContext::findUniformLocation(ResourceId program, PipelineFeatures features, const FixedString& name)
 {
     Permutation& permutation = m_permutations[program][features];
     UniformLocations& uniforms = permutation.uniforms;
