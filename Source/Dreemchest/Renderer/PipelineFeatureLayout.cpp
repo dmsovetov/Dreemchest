@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "PipelineFeatureLayout.h"
+#include "VertexBufferLayout.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -82,16 +83,30 @@ PipelineFeatures PipelineFeature::user(PipelineFeatures userDefined)
     return userDefined << UserDefinedFeaturesOffset;
 }
     
-// ------------------------------------------------------------------ PipelineFeature -------------------------------------------------------------------- //
+// ------------------------------------------------------------------ PipelineState -------------------------------------------------------------------- //
     
 // ** PipelineState::PipelineState
 PipelineState::PipelineState( void )
-    : m_stateBlockFeatures(0)
+    : m_program(0)
     , m_features(0)
     , m_featureLayout(NULL)
-    , m_changes(~0)
+    , m_inputLayout(NULL)
+    , m_vertexBuffer(0)
+    , m_indexBuffer(0)
+    , m_colorMask(0)
 {
+    setBlending(BlendDisabled, BlendDisabled);
+    setDepthState(LessEqual, true);
+    setCullFace(TriangleFaceBack);
+    setStencilFunction(CompareDisabled, 0, ~0);
+    setStencilOp(StencilKeep, StencilKeep, StencilKeep);
+    setColorMask(~0);
+    setRasterization(PolygonFill);
+    setAlphaTest(CompareDisabled, 0);
+    setPolygonOffset(0.0f, 0.0f);
     
+    memset(m_texture, 0, sizeof(m_texture));
+    memset(m_constantBuffer, 0, sizeof(m_constantBuffer));
 }
     
 // ** PipelineState::features
@@ -100,14 +115,30 @@ PipelineFeatures PipelineState::features( void ) const
     return m_features;
 }
 
+// ** PipelineState::resetFeatures
+void PipelineState::resetFeatures()
+{
+    m_features = 0;
+}
+
 // ** PipelineState::mask
 PipelineFeatures PipelineState::mask( void ) const
 {
     return m_featureLayout ? m_featureLayout->mask() : 0;
 }
 
+void PipelineState::setCullFace(TriangleFace value)
+{
+    m_cullFace = value;
+}
+
+TriangleFace PipelineState::cullFace() const
+{
+    return m_cullFace;
+}
+
 // ** PipelineState::setProgram
-void PipelineState::setProgram(Program value)
+void PipelineState::setProgram(ResourceId value)
 {
     if (value == m_program)
     {
@@ -115,11 +146,10 @@ void PipelineState::setProgram(Program value)
     }
     
     m_program = value;
-    m_changes = m_changes | ProgramChanged;
 }
     
 // ** PipelineState::program
-Program PipelineState::program( void ) const
+ResourceId PipelineState::program( void ) const
 {
     return m_program;
 }
@@ -133,7 +163,6 @@ void PipelineState::setFeatureLayout(const PipelineFeatureLayout* value)
     }
     
     m_featureLayout = value;
-    m_changes = m_changes | FeatureLayoutChanged;
 }
     
 // ** PipelineState::featureLayout
@@ -142,65 +171,250 @@ const PipelineFeatureLayout* PipelineState::featureLayout( void ) const
     return m_featureLayout;
 }
     
-// ** PipelineState::activateVertexAttributes
-void PipelineState::activateVertexAttributes(PipelineFeatures features)
+// ** PipelineState::setInputLayout
+void PipelineState::setInputLayout(const VertexBufferLayout* value)
 {
-    m_stateBlockFeatures = m_stateBlockFeatures | features;
+    m_inputLayout = value;
+    m_features = m_features | value->features();
+}
+    
+// ** PipelineState::inputLayout
+const VertexBufferLayout* PipelineState::inputLayout() const
+{
+    return m_inputLayout;
 }
 
-// ** PipelineState::activateSampler
-void PipelineState::activateSampler(u8 index)
+// ** PipelineState::setTexture
+void PipelineState::setTexture(ResourceId id, u8 index)
 {
     NIMBLE_BREAK_IF(index >= State::MaxTextureSamplers, "sampler index is out of range");
-    m_stateBlockFeatures = m_stateBlockFeatures | PipelineFeature::sampler(index);
+    m_features = m_features | PipelineFeature::sampler(index);
+    m_texture[index] = id;
+}
+    
+// ** PipelineState::texture
+ResourceId PipelineState::texture(u8 index) const
+{
+    NIMBLE_BREAK_IF(index >= State::MaxTextureSamplers, "sampler index is out of range");
+    return m_texture[index];
 }
 
-// ** PipelineState::activateConstantBuffer
-void PipelineState::activateConstantBuffer(u8 index)
+// ** PipelineState::setConstantBuffer
+void PipelineState::setConstantBuffer(ResourceId id, u8 index)
 {
     NIMBLE_BREAK_IF(index >= State::MaxConstantBuffers, "constant buffer index is out of range");
-    m_stateBlockFeatures = m_stateBlockFeatures | PipelineFeature::constantBuffer(index);
+    m_features = m_features | PipelineFeature::constantBuffer(index);
+    m_constantBuffer[index] = id;
+}
+    
+// ** PipelineState::texture
+ResourceId PipelineState::constantBuffer(u8 index) const
+{
+    NIMBLE_BREAK_IF(index >= State::MaxConstantBuffers, "constant buffer index is out of range");
+    return m_constantBuffer[index];
+}
+    
+// ** PipelineState::setVertexBuffer
+void PipelineState::setVertexBuffer(ResourceId id)
+{
+    m_vertexBuffer = id;
+}
+    
+// ** PipelineState::vertexBuffer
+ResourceId PipelineState::vertexBuffer() const
+{
+    return m_vertexBuffer;
+}
+
+// ** PipelineState::setIndexBuffer
+void PipelineState::setIndexBuffer(ResourceId id)
+{
+    m_indexBuffer = id;
+}
+    
+// ** PipelineState::indexBuffer
+ResourceId PipelineState::indexBuffer() const
+{
+    return m_indexBuffer;
+}
+    
+// ** PipelineState::setDepthState
+void PipelineState::setDepthState(Compare function, bool depthWrite)
+{
+    m_depthState.function   = function;
+    m_depthState.depthWrite = depthWrite;
+}
+
+// ** PipelineState::depthTestFunction
+Compare PipelineState::depthTestFunction() const
+{
+    return m_depthState.function;
+}
+
+// ** PipelineState::depthWrite
+bool PipelineState::depthWrite() const
+{
+    return m_depthState.depthWrite;
+}
+    
+// ** PipelineState::setBlending
+void PipelineState::setBlending(BlendFactor src, BlendFactor dst)
+{
+    m_blend.source = src;
+    m_blend.dest   = dst;
+}
+    
+// ** PipelineState::sourceBlendFactor
+BlendFactor PipelineState::sourceBlendFactor() const
+{
+    return m_blend.source;
+}
+
+// ** PipelineState::destBlendFactor
+BlendFactor PipelineState::destBlendFactor() const
+{
+    return m_blend.dest;
+}
+
+// ** PipelineState::setColorMask
+void PipelineState::setColorMask(u8 value)
+{
+    m_colorMask = value;
+}
+
+// ** PipelineState::colorMask
+u8 PipelineState::colorMask() const
+{
+    return m_colorMask;
+}
+
+// ** PipelineState::setStencilFunction
+void PipelineState::setStencilFunction(Compare function, u8 ref, u8 mask)
+{
+    m_stencil.function = function;
+    m_stencil.ref = ref;
+    m_stencil.mask = mask;
+}
+
+// ** PipelineState::stencilFunction
+Compare PipelineState::stencilFunction() const
+{
+    return m_stencil.function;
+}
+    
+// ** PipelineState::stencilRef
+u8 PipelineState::stencilRef() const
+{
+    return m_stencil.ref;
+}
+
+// ** PipelineState::stencilMask
+u8 PipelineState::stencilMask() const
+{
+    return m_stencil.mask;
+}
+
+// ** PipelineState::setStencilOp
+void PipelineState::setStencilOp(StencilAction sfail, StencilAction dfail, StencilAction dspass)
+{
+    m_stencilOp.sfail = sfail;
+    m_stencilOp.dfail = dfail;
+    m_stencilOp.dspass = dspass;
+}
+
+// ** PipelineState::stencilStencilFail
+StencilAction PipelineState::stencilStencilFail() const
+{
+    return m_stencilOp.sfail;
+}
+
+// ** PipelineState::stencilDepthFail
+StencilAction PipelineState::stencilDepthFail() const
+{
+    return m_stencilOp.dfail;
+}
+
+// ** PipelineState::stencilPass
+StencilAction PipelineState::stencilPass() const
+{
+    return m_stencilOp.dspass;
+}
+
+// ** PipelineState::setRasterization
+void PipelineState::setRasterization(PolygonMode value)
+{
+    m_rasterization = value;
+}
+
+// ** PipelineState::rasterization
+PolygonMode PipelineState::rasterization() const
+{
+    return m_rasterization;
+}
+    
+// ** PipelineState::setAlphaTest
+void PipelineState::setAlphaTest(Compare function, u8 ref)
+{
+    m_alphaTest.function = function;
+    m_alphaTest.ref = ref;
+}
+
+// ** PipelineState::alphaTestFunction
+Compare PipelineState::alphaTestFunction() const
+{
+    return m_alphaTest.function;
+}
+    
+// ** PipelineState::alphaTestRef
+u8 PipelineState::alphaTestRef() const
+{
+    return m_alphaTest.ref;
+}
+
+// ** PipelineState::setPolygonOffset
+void PipelineState::setPolygonOffset(f32 factor, f32 units)
+{
+    m_polygonOffset.factor = factor;
+    m_polygonOffset.units = units;
+}
+
+// ** PipelineState::polygonOffsetFactor
+f32 PipelineState::polygonOffsetFactor() const
+{
+    return m_polygonOffset.factor;
+}
+
+// ** PipelineState::polygonOffsetUnits
+f32 PipelineState::polygonOffsetUnits() const
+{
+    return m_polygonOffset.units;
+}
+
+// ** PipelineState::resetConstantBuffer
+void PipelineState::resetConstantBuffer(ResourceId id)
+{
+    for (s32 i = 0; i < State::MaxConstantBuffers; i++)
+    {
+        if (m_constantBuffer[i] == id)
+        {
+            m_constantBuffer[i] = 0;
+        }
+    }
+}
+    
+// ** PipelineState::resetProgram
+void PipelineState::resetProgram(ResourceId id)
+{
+    if (m_program == id)
+    {
+        m_program = 0;
+    }
 }
 
 // ** PipelineState::activateUserFeatures
 void PipelineState::activateUserFeatures(PipelineFeatures features)
 {
-    m_stateBlockFeatures = m_stateBlockFeatures | PipelineFeature::user(features);
-}
-
-// ** PipelineState::beginStateBlock
-void PipelineState::beginStateBlock( void )
-{
-    m_stateBlockFeatures = 0;
-}
-
-// ** PipelineState::endStateBlock
-void PipelineState::endStateBlock( void )
-{
-    // Mask activated features with a feature layout mask to reject those features that won't be used by a shader program.
-    PipelineFeatures features = m_stateBlockFeatures & mask();
-    
-    // Do we have any changes?
-    if (m_features == features)
-    {
-        return;
-    }
-    
-    // Save this feature bitmask and record changes in a bitmask.
-    m_features = features;
-    m_changes  = m_changes | FeaturesChanged;
-}
-    
-// ** PipelineState::changes
-u8 PipelineState::changes( void ) const
-{
-    return m_changes;
-}
-    
-// ** PipelineState::acceptChanges
-void PipelineState::acceptChanges( void )
-{
-    m_changes = 0;
+    m_features = m_features | PipelineFeature::user(features);
 }
     
 // ---------------------------------------------------------------- PipelineFeatureLayout ---------------------------------------------------------------- //

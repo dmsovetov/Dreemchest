@@ -286,7 +286,7 @@ void RenderingContextHal::commandCreateTexture(Texture_ id, u16 width, u16 heigh
 // ** RenderingContextHal::applyStates
 PipelineFeatures RenderingContextHal::applyStates( const RenderFrame& frame, const StateBlock* const * stateBlocks, s32 count )
 {
-    State states[MaxStateChanges];
+/*    State states[MaxStateChanges];
     PipelineFeatures userDefined;
     
     // This will notify a pipeline that we started the stage change process
@@ -303,13 +303,14 @@ PipelineFeatures RenderingContextHal::applyStates( const RenderFrame& frame, con
         (this->*m_stateSwitches[state.type])(frame, state);
     }
     
-    return finishPipelineConfiguration(userDefined);
+    return finishPipelineConfiguration(userDefined);*/
+    return 0;
 }
     
 // ** RenderingContextHal::activateShaderPermutation
 void RenderingContextHal::activateShaderPermutation( PipelineFeatures features )
 {
-    // Get an active program
+/*    // Get an active program
     Program program = m_pipeline.program();
     NIMBLE_ABORT_IF(!program && !m_defaultProgram, "no valid program set and no default one specified");
     
@@ -331,7 +332,7 @@ void RenderingContextHal::activateShaderPermutation( PipelineFeatures features )
     
     // Bind an active shader permutation
     NIMBLE_ABORT_IF(!m_activeProgram.valid(), "no valie shader permutation set");
-    m_hal->setShader(m_activeProgram);
+    m_hal->setShader(m_activeProgram);*/
 }
     
 // ** RenderingContextHal::compileShaderPermutation
@@ -399,7 +400,7 @@ void RenderingContextHal::switchConstantBuffer( const RenderFrame& frame, const 
     m_hal->setConstantBuffer( constantBuffer, state.data.index );
 
     // Update resource features
-    m_pipeline.activateConstantBuffer(state.data.index);
+    //m_pipeline.activateConstantBuffer(state.data.index);
 }
 
 // ** RenderingContextHal::switchVertexBuffer
@@ -427,7 +428,7 @@ void RenderingContextHal::switchInputLayout( const RenderFrame& frame, const Sta
     m_hal->setInputLayout( inputLayout );
 
     // Update an input layout features
-    m_pipeline.activateVertexAttributes(inputLayout->features());
+    //m_pipeline.activateVertexAttributes(inputLayout->features());
 }
     
 // ** RenderingContextHal::switchPipelineFeatureLayout
@@ -467,7 +468,7 @@ void RenderingContextHal::switchTexture( const RenderFrame& frame, const State& 
     }
 
     // Update resource features
-    m_pipeline.activateSampler(samplerIndex);
+    //m_pipeline.activateSampler(samplerIndex);
 }
 
 // ** RenderingContextHal::switchCullFace

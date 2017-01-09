@@ -42,38 +42,20 @@ namespace Renderer
         
     protected:
         
-        //! A pipeline state that was constructed from an array of render state changes.
-        struct RequestedState
-        {
-            VertexBuffer_           vertexBuffer;                               //!< A vertex buffer that should be set.
-            IndexBuffer_            indexBuffer;                                //!< An index buffer that should be set.
-            InputLayout             inputLayout;                                //!< An input layout that should be set.
-            FeatureLayout           featureLayout;                              //!< A feature layout that should be set.
-            Program                 program;                                    //!< A shader program that should be set.
-            ConstantBuffer_         constantBuffer[State::MaxConstantBuffers];  //!< An array of bound constant buffers.
-            Texture_                texture[State::MaxTextureSamplers];         //!< An array of bound textures.
-            PipelineFeatures        features;                                   //!< A bitmask of user-defined pipeline features.
-            
-                                    RequestedState() : features(0) {}
-        };
-        
         //! Applies a specified state block.
         virtual PipelineFeatures    applyStateBlock(const RenderFrame& frame, const StateBlock& stateBlock) NIMBLE_OVERRIDE;
         
         //! Executes a specified command buffer.
         virtual void                executeCommandBuffer(const RenderFrame& frame, const CommandBuffer& commands) NIMBLE_OVERRIDE;
         
-        //! Unrolls a state stack an applies all state changes, returns an up-to-date pipeline feature mask.
-        RequestedState              applyStates(const RenderFrame& frame, const StateBlock* const * stateBlocks, s32 count);
-        
         //! Compiles the requested rendering state (activates a shader permuation that best matches active pipeline state, bind buffers, textures, etc.).
-        void                        compilePipelineState(RequestedState state);
+        void                        compilePipelineState(const PipelineState& state);
         
         //! Compiles a shader program permutation.
-        GLuint                      compileShaderPermutation(Program program, PipelineFeatures features, const PipelineFeatureLayout* featureLayout);
+        GLuint                      compileShaderPermutation(ResourceId program, PipelineFeatures features, const PipelineFeatureLayout* featureLayout);
         
         //! Update uniforms from active constant buffers.
-        void                        updateUniforms(const RequestedState& state, PipelineFeatures features, Program program);
+        void                        updateUniforms(const PipelineState& state, PipelineFeatures features, ResourceId program);
 
         //! Acquires a transient texture.
         ResourceId                  acquireTexture(u8 type, u16 width, u16 height, PixelFormat format);
@@ -100,8 +82,8 @@ namespace Renderer
             virtual String          generateBufferDefinition(const RenderingContext& renderingContext, const String& type, const String& name, s32 slot) const NIMBLE_OVERRIDE;
         };
         
-        RequestedState              m_activeState;      //!< An active rendering pipeline state.
-        FixedArray<ConstantBuffer>  m_constantBuffers;  //!< An array of allocated constant buffer instances.
+        FixedArray<ConstantBuffer>  m_constantBuffers;      //!< An array of allocated constant buffer instances.
+        const VertexBufferLayout*   m_activeInputLayout;    //!< An active input layout.
     };
     
 } // namespace Renderer

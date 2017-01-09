@@ -451,7 +451,7 @@ void RenderingContext::unloadTransientResource(TransientResourceId transient)
 }
     
 // ** RenderingContext::transientTarget
-ResourceId RenderingContext::transientResource(TransientResourceId transient)
+ResourceId RenderingContext::transientResource(TransientResourceId transient) const
 {
     return m_transientResources->get(transient);
 }
@@ -652,91 +652,91 @@ const UniformElement* RenderingContext::findUniformLayout(const String& name) co
 
     return NULL;
 }
-
-// ** RenderingContext::mergeStateBlocks
-s32 RenderingContext::mergeStateBlocks(const StateBlock* const * stateBlocks, s32 blockCount, State* states, s32 maxStates, PipelineFeatures& userDefined) const
+    
+// ** RenderingContext::applyStates
+void RenderingContext::applyStates(PipelineState& pipeline, const State* states, s32 count) const
 {
-    PipelineFeatures userFeatures = 0;
-    PipelineFeatures userFeaturesMask = ~0;
+    pipeline.resetFeatures();
     
-    // A bitmask of states that were already set
-    u32 activeStateMask = 0;
-    
-    // A total number of states written to an output array
-    s32 statesWritten = 0;
-    
-    for( s32 i = 0; i < blockCount; i++ )
+    for (s32 i = 0; i < count; i++)
     {
-        // Get a state block at specified index
-        const StateBlock* block = stateBlocks[i];
+        const State& state = states[i];
         
-        // No more state blocks in a stack - break
-        if( block == NULL )
+        switch (state.type)
         {
-            break;
-        }
-        
-        // Update feature set
-        userFeatures      = userFeatures     | block->features();
-        userFeaturesMask  = userFeaturesMask & block->featureMask();
-        
-        // Skip redundant state blocks by testing a block bitmask against an active state mask
-        if( (activeStateMask ^ block->mask()) == 0 )
-        {
-            continue;
-        }
-        
-        // Apply all states in a block
-        for( s32 j = 0, n = block->stateCount(); j < n; j++ )
-        {
-            // Get a render state bit
-            u32 stateBit = block->stateBit( j );
-            
-            // Skip redundate state blocks by testing a state bitmask agains an active state mask
-            if( activeStateMask & stateBit )
-            {
-                continue;
-            }
-            
-            NIMBLE_ABORT_IF(statesWritten >= maxStates, "to much render states");
-            
-            // Write a render state at specified index to an output array
-            states[statesWritten++] = block->state(j);
-            
-            // Update an active state mask
-            activeStateMask = activeStateMask | stateBit;
+            case State::BindVertexBuffer:
+                pipeline.setVertexBuffer(state.resourceId);
+                break;
+                
+            case State::BindIndexBuffer:
+                pipeline.setIndexBuffer(state.resourceId);
+                break;
+                
+            case State::BindProgram:
+                pipeline.setProgram(state.resourceId);
+                break;
+                
+            case State::BindTexture:
+                pipeline.setTexture(state.resourceId, state.samplerIndex());
+                break;
+                
+            case State::BindTransientTexture:
+                pipeline.setTexture(transientResource(state.resourceId), state.samplerIndex());
+                break;
+                
+            case State::BindConstantBuffer:
+                pipeline.setConstantBuffer(state.resourceId, state.data.index);
+                break;
+                
+            case State::SetInputLayout:
+                pipeline.setInputLayout(m_inputLayouts[state.resourceId].get());
+                break;
+                
+            case State::SetFeatureLayout:
+                pipeline.setFeatureLayout(m_pipelineFeatureLayouts[state.resourceId].get());
+                break;
+                
+            case State::DepthState:
+                pipeline.setDepthState(state.function(), state.data.depthWrite);
+                break;
+                
+            case State::Blending:
+                pipeline.setBlending(state.sourceBlendFactor(), state.destBlendFactor());
+                break;
+                
+            case State::ColorMask:
+                pipeline.setColorMask(state.mask);
+                break;
+                
+            case State::Rasterization:
+                pipeline.setRasterization(static_cast<PolygonMode>(state.rasterization));
+                break;
+                
+            case State::AlphaTest:
+                pipeline.setAlphaTest(state.function(), state.alphaReference());
+                break;
+                
+            case State::PolygonOffset:
+                pipeline.setPolygonOffset(state.polygonOffsetFactor(), state.polygonOffsetUnits());
+                break;
+                
+            case State::StencilFunc:
+                pipeline.setStencilFunction(static_cast<Compare>(state.stencilFunction.op), state.data.ref, state.stencilFunction.mask);
+                break;
+                
+            case State::StencilOp:
+                pipeline.setStencilOp(state.stencilFail(), state.depthFail(), state.depthStencilPass());
+                break;
+                
+            case State::CullFace:
+                pipeline.setCullFace(static_cast<TriangleFace>(state.cullFace));
+                break;
+                
+            default:
+                LogFatal("renderingContext", "state type '%s' is not implemented\n", State::nameFromType(static_cast<State::Type>(state.type)).c_str());
+                NIMBLE_NOT_IMPLEMENTED
         }
     }
-    
-    // Compose a user defined feature mask
-    userDefined = userFeatures & userFeaturesMask;
-    
-    return statesWritten;
-}
-
-// ** RenderingContext::startPipelineConfiguration
-s32 RenderingContext::startPipelineConfiguration(const StateBlock* const * stateBlocks, s32 blockCount, State* states, s32 maxStates, PipelineFeatures& userDefined)
-{
-    // Merge all state blocks to a single array of rendering states
-    s32 stateCount = mergeStateBlocks(stateBlocks, blockCount, states, maxStates, userDefined);
-    
-    // This will start recording pipeline changes
-    m_pipeline.beginStateBlock();
-    
-    return stateCount;
-}
-
-// ** RenderingContext::finishPipelineConfiguration
-PipelineFeatures RenderingContext::finishPipelineConfiguration(PipelineFeatures userDefined)
-{
-    // Apply a user defined feature mask
-    m_pipeline.activateUserFeatures(userDefined);
-    
-    // Finish applying state blocks
-    m_pipeline.endStateBlock();
-    
-    //return features;
-    return m_pipeline.features();
 }
 
 // ** RenderingContext::createVertexBufferLayout

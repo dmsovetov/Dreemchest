@@ -58,22 +58,14 @@ namespace Renderer
     {
     public:
         
-        //! A bitfields that encode changes in a pipeline state.
-        enum
-        {
-              ProgramChanged        = BIT(0)    //!< Indicates that a bound shader program was changed.
-            , FeaturesChanged       = BIT(1)    //!< Indicates that a pipeline feature bitmask was changed.
-            , FeatureLayoutChanged  = BIT(2)    //!< Indicates that a pipeline feature layout was changed.
-        };
-        
                                         //! Constructs a PipelineState instance.
                                         PipelineState( void );
         
         //! Sets an active program.
-        void                            setProgram(Program value);
+        void                            setProgram(ResourceId value);
         
         //! Returns an active program.
-        Program                         program( void ) const;
+        ResourceId                      program( void ) const;
         
         //! Sets an active feature layout.
         void                            setFeatureLayout(const PipelineFeatureLayout* value);
@@ -81,23 +73,41 @@ namespace Renderer
         //! Returns an active feature layout.
         const PipelineFeatureLayout*    featureLayout( void ) const;
         
-        //! Activates vertex attribute features.
-        void                            activateVertexAttributes(PipelineFeatures features);
+        //! Sets an input layout.
+        void                            setInputLayout(const VertexBufferLayout* value);
+        
+        //! Returns an active input layout.
+        const VertexBufferLayout*       inputLayout() const;
+        
+        //! Sets a vertex buffer.
+        void                            setVertexBuffer(ResourceId id);
+        
+        //! Returns an active vertex buffer.
+        ResourceId                      vertexBuffer() const;
+        
+        //! Sets an index buffer.
+        void                            setIndexBuffer(ResourceId id);
+        
+        //! Returns an active index buffer.
+        ResourceId                      indexBuffer() const;
         
         //! Activates a corresponding sampler bit in a feature bitmask.
-        void                            activateSampler(u8 index);
+        void                            setTexture(ResourceId id, u8 index);
+        
+        //! Returns an texture id bound to a specified sampler.
+        ResourceId                      texture(u8 index) const;
         
         //! Activates a corresponding constant buffer bit in a feature bitmask.
-        void                            activateConstantBuffer(u8 index);
+        void                            setConstantBuffer(ResourceId id, u8 index);
+        
+        //! Returns an constant buffer id bound to a specified slot.
+        ResourceId                      constantBuffer(u8 index) const;
         
         //! Activates a corresponding user defined bits in a feature bitmask.
         void                            activateUserFeatures(PipelineFeatures features);
         
-        //! This method should be called BEFORE applying state blocks to track pipeline changes.
-        void                            beginStateBlock( void );
-        
-        //! This method should be called AFTER all state block are applied to track pipeline changes.
-        void                            endStateBlock( void );
+        //! Resets pipeline features.
+        void                            resetFeatures();
         
         //! Returns an active feature bitmask.
         PipelineFeatures                features( void ) const;
@@ -105,19 +115,141 @@ namespace Renderer
         //! Returns a supported features bitmask.
         PipelineFeatures                mask( void ) const;
         
-        //! Returns a pipeline state changes bitmask.
-        u8                              changes( void ) const;
+        //! Resets a constant buffer binding for a specified id.
+        void                            resetConstantBuffer(ResourceId id);
         
-        //! This method should be called after activating a program permutation.
-        void                            acceptChanges( void );
+        //! Resets a program buffer binding for a specified id.
+        void                            resetProgram(ResourceId id);
+        
+        //! Sets a depth state.
+        void                            setDepthState(Compare function, bool depthWrite);
+        
+        //! Returns a depth test function.
+        Compare                         depthTestFunction() const;
+        
+        //! Returns a depth write value.
+        bool                            depthWrite() const;
+        
+        //! Sets a blend factor.
+        void                            setBlending(BlendFactor src, BlendFactor dst);
+        
+        //! Returns a source blend factor.
+        BlendFactor                     sourceBlendFactor() const;
+        
+        //! Returns a destination blend factor.
+        BlendFactor                     destBlendFactor() const;
+        
+        //! Sets a color mask.
+        void                            setColorMask(u8 value);
+        
+        //! Returns a color mask.
+        u8                              colorMask() const;
+        
+        //! Sets a stencil test function.
+        void                            setStencilFunction(Compare function, u8 ref, u8 mask);
+        
+        //! Returns a stencil test function.
+        Compare                         stencilFunction() const;
+        
+        //! Returns a stencil test mask.
+        u8                              stencilMask() const;
+        
+        //! Returns a stencil test reference value.
+        u8                              stencilRef() const;
+        
+        //! Sets a stencil actions.
+        void                            setStencilOp(StencilAction sfail, StencilAction dfail, StencilAction dspass);
+        
+        //! Returns a stencil fail stencil action.
+        StencilAction                   stencilStencilFail() const;
+        
+        //! Returns a depth fail stencil action.
+        StencilAction                   stencilDepthFail() const;
+        
+        //! Returns a depth stencil pass stencil action.
+        StencilAction                   stencilPass() const;
+        
+        //! Sets a triangle side to be culled away.
+        void                            setCullFace(TriangleFace value);
+        
+        //! Returns a triangle side to be culled away.
+        TriangleFace                    cullFace() const;
+        
+        //! Sets a rasterization mode.
+        void                            setRasterization(PolygonMode value);
+        
+        //! Returns a rasterization mode.
+        PolygonMode                     rasterization() const;
+        
+        //! Sets an alpha test function.
+        void                            setAlphaTest(Compare function, u8 ref);
+        
+        //! Returns an alpha test function.
+        Compare                         alphaTestFunction() const;
+        
+        //! Returns an alpha test reference value.
+        u8                              alphaTestRef() const;
+        
+        //! Sets a polygon offset.
+        void                            setPolygonOffset(f32 factor, f32 units);
+        
+        //! Returns a polygon offset factor.
+        f32                             polygonOffsetFactor() const;
+        
+        //! Returns a polygon offset units.
+        f32                             polygonOffsetUnits() const;
         
     private:
         
-        Program                         m_program;              //!< An active program.
-        PipelineFeatures                m_stateBlockFeatures;   //!< A bitmask of pipeline features activated by a list of state blocks.
-        PipelineFeatures                m_features;             //!< A bitmask of activated pipeline features.
-        const PipelineFeatureLayout*    m_featureLayout;        //!< An active feature layout.
-        u8                              m_changes;              //!< A bitmask of recorded pipeline state changed.
+        ResourceId                      m_program;                                      //!< An active program.
+        PipelineFeatures                m_features;                                     //!< A bitmask of activated pipeline features.
+        const PipelineFeatureLayout*    m_featureLayout;                                //!< An active feature layout.
+        const VertexBufferLayout*       m_inputLayout;                                  //!< A vertex buffer input layout.
+        ResourceId                      m_vertexBuffer;                                 //!< A vertex buffer that should be set.
+        ResourceId                      m_indexBuffer;                                  //!< An index buffer that should be set.
+        ResourceId                      m_constantBuffer[State::MaxConstantBuffers];    //!< An array of bound constant buffers.
+        ResourceId                      m_texture[State::MaxTextureSamplers];           //!< An array of bound textures.
+        u8                              m_colorMask;                                    //!< A color mask.
+        TriangleFace                    m_cullFace;
+        PolygonMode                     m_rasterization;
+        
+        struct
+        {
+            Compare                     function;                                       //!< A depth test function.
+            bool                        depthWrite;                                     //!< Is the depth write enabled?
+        } m_depthState;
+        
+        struct
+        {
+            BlendFactor                 source;                                         //!< A source blending factor.
+            BlendFactor                 dest;                                           //!< A destination blending factor.
+        } m_blend;
+        
+        struct
+        {
+            f32                         factor;
+            f32                         units;
+        } m_polygonOffset;
+        
+        struct
+        {
+            Compare                     function;                                       //!< An alpha test function.
+            u8                          ref;                                            //!< An alpha test reference value.
+        } m_alphaTest;
+        
+        struct
+        {
+            Compare                     function;                                       //!< A stencil test function.
+            u8                          ref;                                            //!< A stencil test reference value.
+            u8                          mask;                                           //!< A stencil test mask.
+        } m_stencil;
+        
+        struct
+        {
+            StencilAction               sfail;                                          //!< A stencil fail action.
+            StencilAction               dfail;                                          //!< A depth fail action.
+            StencilAction               dspass;                                         //!< A depth stencil pass action.
+        } m_stencilOp;
     };
     
     //! Pipeline feature layout defines mappings from a pipeline feature mask to actual preprocessor definitions.

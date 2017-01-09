@@ -105,10 +105,7 @@ namespace Renderer
         
         //! Queues a shader instance creation and returns it's index.
         Program                                 deprecatedRequestShader(const String& fileName);
-        
-        //! Merges a list of state blocks into a single array of render states.
-        s32                                     mergeStateBlocks(const StateBlock* const * stateBlocks, s32 blockCount, State* states, s32 maxStates, PipelineFeatures& userDefined) const;
-        
+
     protected:
         
                                                 //! Constructs a RenderingContext instance.
@@ -130,16 +127,13 @@ namespace Renderer
         void                                    unloadTransientResource(TransientResourceId index);
         
         //! Returns an transient resource at specified slot.
-        ResourceId                              transientResource(TransientResourceId index);
+        ResourceId                              transientResource(TransientResourceId index) const;
         
         //! Creates a vertex buffer layout instance from a flexible vertex format.
         VertexBufferLayoutUPtr                  createVertexBufferLayout(VertexFormat vertexFormat) const;
         
-        //! Starts a process of pipeline state configuration.
-        s32                                     startPipelineConfiguration(const StateBlock* const * stateBlocks, s32 blockCount, State* states, s32 maxStates, PipelineFeatures& userDefined);
-        
-        //! Finishes a process of pipeline state configration.
-        PipelineFeatures                        finishPipelineConfiguration(PipelineFeatures userDefined);
+        //! Configures a pipeline state according to a state stack.
+        void                                    applyStates(PipelineState& pipeline, const State* states, s32 count) const;
         
         //! Allocates a new persistent identifier of specified type.
         ResourceId                              allocateIdentifier(RenderResourceType::Enum type);

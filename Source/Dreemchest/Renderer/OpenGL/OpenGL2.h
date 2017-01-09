@@ -187,12 +187,46 @@ namespace Renderer
             //! Destroys a framebuffer object.
             static void     destroy(GLuint id);
         };
+        
+        //! An internal class that contains all stencil buffer related functions.
+        class Stencil
+        {
+        public:
+            
+            //! Sets a stencil test operations.
+            static void     setOperations(StencilAction sfail, StencilAction dfail, StencilAction pass);
+            
+            //! Sets a stencil test functions.
+            static void     setFunction(Compare function, u8 ref, u8 mask);
+        };
+        
 
         //! Initializes an OpenGL 2 wrapper.
         static bool     initialize();
         
         //! Clears an active viewport.
         static void     clear(const GLclampf* color, u8 mask, GLclampd depth, GLint stencil);
+        
+        //! Sets an alpha test function.
+        static void     setAlphaTest(Compare function, u8 ref);
+        
+        //! Sets a triangle side culling
+        static void     setCullFace(TriangleFace value);
+        
+        //! Sets a polygon offset.
+        static void     setPolygonOffset(f32 factor, f32 units);
+        
+        //! Sets a polygon rasterization mode.
+        static void     setRasterization(PolygonMode value);
+        
+        //! Sets a blend mode.
+        static void     setBlending(BlendFactor src, BlendFactor dst);
+        
+        //! Sets a depth state.
+        static void     setDepthState(Compare function, bool depthWrite);
+        
+        //! Sets a color write mask.
+        static void     setColorMask(u8 value);
         
         //! Converts a blend factor constant to an OpenGL value.
         static GLenum   convertBlendFactor(BlendFactor value);
