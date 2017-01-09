@@ -167,7 +167,7 @@ BlendFactor State::sourceBlendFactor() const
     return static_cast<BlendFactor>(data.blend >> 4);
 }
 
-// ** State::sourceBlendFactor
+// ** State::destBlendFactor
 BlendFactor State::destBlendFactor() const
 {
     return static_cast<BlendFactor>(data.blend & 0xF);
@@ -239,9 +239,41 @@ u32 State::bit(Type type)
         case BindTexture:
         case BindTransientTexture:
             return type + MaxConstantBuffers;
+        default:
+            break;
     }
     
     return type;
+}
+    
+// ** State::nameFromType
+String State::nameFromType(Type type)
+{
+    switch (type)
+    {
+        case BindVertexBuffer:      return "BindVertexBuffer";
+        case BindIndexBuffer:       return "BindIndexBuffer";
+        case SetInputLayout:        return "SetInputLayout";
+        case SetFeatureLayout:      return "SetFeatureLayout";
+        case BindProgram:           return "BindProgram";
+        case Blending:              return "Blending";
+        case PolygonOffset:         return "PolygonOffset";
+        case DepthState:            return "DepthState";
+        case AlphaTest:             return "AlphaTest";
+        case CullFace:              return "CullFace";
+        case Rasterization:         return "Rasterization";
+        case StencilOp:             return "StencilOp";
+        case StencilFunc:           return "StencilFunc";
+        case StencilMask:           return "StencilMask";
+        case ColorMask:             return "ColorMask";
+        case BindConstantBuffer:    return "BindConstantBuffer";
+        case BindTexture:           return "BindTexture";
+        case BindTransientTexture:  return "BindTransientTexture";
+        default:
+            NIMBLE_NOT_IMPLEMENTED
+    }
+    
+    return "";
 }
 
 // -------------------------------------------------------------------------- StateBlock -------------------------------------------------------------------------- //
@@ -527,6 +559,67 @@ void StateStack::reset( void )
     m_allocator.reset();
     m_stack = reinterpret_cast<const StateBlock**>(m_allocator.allocate(sizeof(StateBlock*) * m_maxStackSize));
     m_size = 0;
+}
+    
+// ** StateStack::mergeBlocks
+s32 StateStack::mergeBlocks(const StateBlock* const * stateBlocks, s32 count, State* states, s32 maxStates, PipelineFeatures& userDefined)
+{
+    PipelineFeatures userFeatures = 0;
+    PipelineFeatures userFeaturesMask = ~0;
+    
+    // A bitmask of states that were already set
+    u32 activeStateMask = 0;
+    
+    // A total number of states written to an output array
+    s32 statesWritten = 0;
+    
+    for (s32 i = 0; i < count; i++)
+    {
+        // Get a state block at specified index
+        const StateBlock* block = stateBlocks[i];
+        
+        // No more state blocks in a stack - break
+        if( block == NULL )
+        {
+            break;
+        }
+        
+        // Update feature set
+        userFeatures      = userFeatures     | block->features();
+        userFeaturesMask  = userFeaturesMask & block->featureMask();
+        
+        // Skip redundant state blocks by testing a block bitmask against an active state mask
+        if( (activeStateMask ^ block->mask()) == 0 )
+        {
+            continue;
+        }
+        
+        // Apply all states in a block
+        for( s32 j = 0, n = block->stateCount(); j < n; j++ )
+        {
+            // Get a render state bit
+            u32 stateBit = block->stateBit( j );
+            
+            // Skip redundate state blocks by testing a state bitmask agains an active state mask
+            if( activeStateMask & stateBit )
+            {
+                continue;
+            }
+            
+            NIMBLE_ABORT_IF(statesWritten >= maxStates, "to much render states");
+            
+            // Write a render state at specified index to an output array
+            states[statesWritten++] = block->state(j);
+            
+            // Update an active state mask
+            activeStateMask = activeStateMask | stateBit;
+        }
+    }
+    
+    // Compose a user defined feature mask
+    userDefined = userFeatures & userFeaturesMask;
+    
+    return statesWritten;
 }
 
 } // namespace Renderer

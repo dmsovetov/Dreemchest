@@ -157,6 +157,9 @@ namespace Renderer
         //! Returns a rendering state bit index.
         static u32                      bit(Type type);
         
+        //! Returns a rendering state name from an identifier (used for debugging purposes).
+        static String                   nameFromType(Type type);
+        
         union
         {
             ResourceId                  resourceId;         //!< Resource identifier to be bound to a pipeline.
@@ -414,7 +417,10 @@ namespace Renderer
         void                        reset( void );
 
         //! Returns the stack pointer.
-        const StateBlock**    states( void ) const;
+        const StateBlock**          states( void ) const;
+        
+        //! Converts an array of state blocks to an array of states.
+        static s32                  mergeBlocks(const StateBlock* const * stateBlocks, s32 count, State* states, s32 maxStates, PipelineFeatures& userDefined);
 
     private:
 
