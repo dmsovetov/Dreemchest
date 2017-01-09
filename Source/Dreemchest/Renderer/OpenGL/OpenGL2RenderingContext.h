@@ -52,10 +52,10 @@ namespace Renderer
         void                        compilePipelineState(const PipelineState& state);
         
         //! Compiles a shader program permutation.
-        GLuint                      compileShaderPermutation(ResourceId program, PipelineFeatures features, const PipelineFeatureLayout* featureLayout);
+        const Permutation*          compileShaderPermutation(ResourceId program, PipelineFeatures features, const PipelineFeatureLayout* featureLayout);
         
         //! Update uniforms from active constant buffers.
-        void                        updateUniforms(const PipelineState& state, PipelineFeatures features, ResourceId program);
+        void                        updateUniforms(const PipelineState& state, const Permutation* permutation);
 
         //! Acquires a transient texture.
         ResourceId                  acquireTexture(u8 type, u16 width, u16 height, PixelFormat format);

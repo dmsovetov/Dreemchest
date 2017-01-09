@@ -92,30 +92,43 @@ bool OpenGLRenderingContext::lookupPermutation(ResourceId program, PipelineFeatu
 }
     
 // ** OpenGLRenderingContext::savePermutation
-void OpenGLRenderingContext::savePermutation(ResourceId program, PipelineFeatures features, GLuint id)
+const OpenGLRenderingContext::Permutation* OpenGLRenderingContext::savePermutation(ResourceId program, PipelineFeatures features, GLuint id)
 {
     Permutation permutation;
     permutation.program = id;
-    m_permutations[program][features] = permutation;
-}
- 
-// ** OpenGLRenderingContext::findUniformLocation
-GLint OpenGLRenderingContext::findUniformLocation(ResourceId program, PipelineFeatures features, const FixedString& name)
-{
-    Permutation& permutation = m_permutations[program][features];
-    UniformLocations& uniforms = permutation.uniforms;
     
-    UniformLocations::const_iterator i = uniforms.find(name.hash());
+    OpenGL2::Program::Uniform uniformInfo;
     
-    if (i != uniforms.end())
+    for (GLuint i = 0, n = OpenGL2::Program::uniformCount(id); i < n; i++)
     {
-        return i->second;
+        OpenGL2::Program::uniformAt(id, i, uniformInfo);
+        
+        Permutation::Uniform uniform;
+        uniform.location = OpenGL2::Program::uniformLocation(id, uniformInfo.name);
+        uniform.type     = uniformInfo.type;
+        uniform.size     = uniformInfo.size;
+        
+        switch (uniformInfo.type)
+        {
+            case GL_SAMPLER_1D:
+            case GL_SAMPLER_2D:
+            case GL_SAMPLER_3D:
+            case GL_SAMPLER_CUBE:
+                uniform.index = uniformInfo.name[uniformInfo.length - 1] - '0';
+                uniform.hash  = String32();
+                break;
+            default:
+                uniform.index = uniformInfo.name[3] - '0';
+                uniform.hash  = String32(uniformInfo.name + 5, uniformInfo.length - 5 - ((uniformInfo.name[uniformInfo.length - 1] == ']') ? 3 : 0));
+        }
+        
+        LogDebug("opengl", "\tuniform '%s' location %d\n", uniformInfo.name, uniform.location);
+        
+        permutation.uniforms.push_back(uniform);
     }
     
-    GLint location = OpenGL2::Program::uniformLocation(permutation.program, name);
-    uniforms[name.hash()] = location;
-    
-    return location;
+    m_permutations[program][features] = permutation;
+    return &m_permutations[program][features];
 }
 
 // ** OpenGLRenderingContext::acquireFramebuffer

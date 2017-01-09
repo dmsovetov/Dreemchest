@@ -264,6 +264,7 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 constantBuffer.layout = m_uniformLayouts[opCode.createBuffer.layout];
                 constantBuffer.data.resize(opCode.createBuffer.buffer.size);
                 
+                // Cache uniform names
                 if (opCode.createBuffer.buffer.data)
                 {
                     memcpy(&constantBuffer.data[0], opCode.createBuffer.buffer.data, opCode.createBuffer.buffer.size);
@@ -462,110 +463,85 @@ void OpenGL2RenderingContext::compilePipelineState(const PipelineState& state)
     }
     
     // Switch the program one the pipeline state was changed
-    GLuint activeProgram = compileShaderPermutation(program, features, state.featureLayout());
-    OpenGL2::Program::use(activeProgram);
+    const Permutation* permutation = compileShaderPermutation(program, features, state.featureLayout());
+    OpenGL2::Program::use(permutation->program);
 
     // Update all uniforms
-    updateUniforms(state, features, program);
+    updateUniforms(state, permutation);
 }
     
 // ** OpenGL2RenderingContext::updateUniforms
-void OpenGL2RenderingContext::updateUniforms(const PipelineState& state, PipelineFeatures features, ResourceId program)
+void OpenGL2RenderingContext::updateUniforms(const PipelineState& state, const Permutation* permutation)
 {
-    // Bind texture samplers
-    static FixedString s_samplers[] =
+    struct UniformPointer
     {
-          "Texture0"
-        , "Texture1"
-        , "Texture2"
-        , "Texture3"
-        , "Texture4"
-        , "Texture5"
-        , "Texture6"
-        , "Texture7"
+        static const void* findByName(const Permutation::Uniform& uniform, const FixedArray<ConstantBuffer>& constantBuffers, const PipelineState& state)
+        {
+            const ConstantBuffer& cbuffer = constantBuffers[state.constantBuffer(uniform.index)];
+
+            for (const UniformElement* constant = &cbuffer.layout[0]; constant->name; constant++)
+            {
+                if (constant->name.hash() == uniform.hash)
+                {
+                    return &cbuffer.data[constant->offset];
+                }
+            }
+            
+            NIMBLE_NOT_IMPLEMENTED
+            return NULL;
+        }
     };
     
-    s32 nSamplers = sizeof(s_samplers) / sizeof(s_samplers[1]);
-    NIMBLE_ABORT_IF(nSamplers != State::MaxTextureSamplers, "invalid sampler name initialization");
-    
-    for (s32 i = 0, n = nSamplers; i < n; i++ )
+    for (size_t i = 0, n = permutation->uniforms.size(); i < n; i++)
     {
-        GLint location = findUniformLocation(program, features, s_samplers[i]);
+        const Permutation::Uniform& uniform = permutation->uniforms[i];
         
-        if (location)
+        switch (uniform.type)
         {
-            OpenGL2::Program::uniform1i(location, i);
-        }
-    }
-    
-    // Process each bound constant buffer
-    for (s32 i = 0; i < State::MaxConstantBuffers; i++)
-    {
-        // No constant buffer bound to this slot
-        if (!state.constantBuffer(i))
-        {
-            continue;
-        }
-        
-        // Get a constant buffer at index
-        const ConstantBuffer& constantBuffer = m_constantBuffers[state.constantBuffer(i)];
-
-        // Submit all constants to a shader
-        for (const UniformElement* constant = &constantBuffer.layout[0]; constant->name; constant++)
-        {
-            // Create a uniform name here for now, but in future this sould be cached somewhere (probably in a ConstantBuffer instance).
-            String uniform = "cb_" + toString(i) + "." + constant->name.value();
-
-            // Lookup a uniform location by name
-            GLint location = findUniformLocation(program, features, uniform.c_str());
-            
-            // Not found - skip
-            if (location == 0)
-            {
-            //    LogWarning("opengl2", "a uniform location '%s' for constant buffer %d could not be found\n", constant->name.value(), i);
-                continue;
-            }
-            
-            // Submit constant to a shader
-            switch (constant->type)
-            {
-                case UniformElement::Integer:
-                    OpenGL2::Program::uniform1i(location, *reinterpret_cast<const s32*>(&constantBuffer.data[constant->offset]));
-                    break;
-                    
-                case UniformElement::Float:
-                    OpenGL2::Program::uniform1f(location, *reinterpret_cast<const f32*>(&constantBuffer.data[constant->offset]));
-                    break;
-                    
-                case UniformElement::Vec2:
-                    OpenGL2::Program::uniform2f(location, reinterpret_cast<const f32*>(&constantBuffer.data[constant->offset]), constant->size);
-                    break;
-                    
-                case UniformElement::Vec3:
-                    OpenGL2::Program::uniform3f(location, reinterpret_cast<const f32*>(&constantBuffer.data[constant->offset]), constant->size);
-                    break;
-                    
-                case UniformElement::Vec4:
-                    OpenGL2::Program::uniform4f(location, reinterpret_cast<const f32*>(&constantBuffer.data[constant->offset]), constant->size);
-                    break;
-                    
-                case UniformElement::Matrix4:
-                    OpenGL2::Program::uniformMatrix4(location, reinterpret_cast<const f32*>(&constantBuffer.data[constant->offset]));
-                    break;
-            }
+            case GL_SAMPLER_2D:
+            case GL_SAMPLER_CUBE:
+                OpenGL2::Program::uniform1i(uniform.location, uniform.index);
+                break;
+                
+            case GL_INT:
+                OpenGL2::Program::uniform1i(uniform.location, *reinterpret_cast<const s32*>(UniformPointer::findByName(uniform, m_constantBuffers, state)));
+                break;
+                
+            case GL_FLOAT:
+                OpenGL2::Program::uniform1f(uniform.location, *reinterpret_cast<const f32*>(UniformPointer::findByName(uniform, m_constantBuffers, state)));
+                break;
+                
+            case GL_FLOAT_VEC2:
+                OpenGL2::Program::uniform2f(uniform.location, reinterpret_cast<const f32*>(UniformPointer::findByName(uniform, m_constantBuffers, state)), uniform.size);
+                break;
+                
+            case GL_FLOAT_VEC3:
+                OpenGL2::Program::uniform3f(uniform.location, reinterpret_cast<const f32*>(UniformPointer::findByName(uniform, m_constantBuffers, state)), uniform.size);
+                break;
+                
+            case GL_FLOAT_VEC4:
+                OpenGL2::Program::uniform4f(uniform.location, reinterpret_cast<const f32*>(UniformPointer::findByName(uniform, m_constantBuffers, state)), uniform.size);
+                break;
+                
+            case GL_FLOAT_MAT4:
+                OpenGL2::Program::uniformMatrix4(uniform.location, reinterpret_cast<const f32*>(UniformPointer::findByName(uniform, m_constantBuffers, state)));
+                break;
+                
+            default:
+                NIMBLE_NOT_IMPLEMENTED
         }
     }
 }
     
 // ** OpenGL2RenderingContext::compileShaderPermutation
-GLuint OpenGL2RenderingContext::compileShaderPermutation(ResourceId program, PipelineFeatures features, const PipelineFeatureLayout* featureLayout)
+const OpenGL2RenderingContext::Permutation* OpenGL2RenderingContext::compileShaderPermutation(ResourceId program, PipelineFeatures features, const PipelineFeatureLayout* featureLayout)
 {
     // Lookup a shader permutation in cache
     const Permutation* permutation = NULL;
 
     if (lookupPermutation(program, features, &permutation))
     {
-        return permutation->program;
+        return permutation;
     }
 
     // Now create a shader source code from a descriptor
@@ -602,9 +578,9 @@ GLuint OpenGL2RenderingContext::compileShaderPermutation(ResourceId program, Pip
     }
     
     // Finally save a compiled permutation
-    savePermutation(program, features, id);
+    permutation = savePermutation(program, features, id);
     
-    return id;
+    return permutation;
 }
     
 } // namespace Renderer

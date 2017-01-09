@@ -46,8 +46,17 @@ namespace Renderer
         //! A shader program permutation entry.
         struct Permutation
         {
+            struct Uniform
+            {
+                String32        hash;           //!< A hash value of a uniform name.
+                GLenum          type;           //!< A uniform data type.
+                GLint           size;           //!< A uniform size.
+                u8              index;          //!< A uniform sampler of constant buffer index.
+                GLint           location;       //!< A uniform location.
+            };
+            
             GLuint              program;
-            UniformLocations    uniforms;
+            Array<Uniform>      uniforms;
         };
         
                                                 //! Constructs an OpenGLRenderingContext instance.
@@ -57,10 +66,7 @@ namespace Renderer
         bool                                    lookupPermutation(ResourceId program, PipelineFeatures features, const Permutation** permutation) const;
         
         //! Puts a new permutation to a cache.
-        void                                    savePermutation(ResourceId program, PipelineFeatures features, GLuint id);
-        
-        //! Searches a uniform location by a name.
-        GLint                                   findUniformLocation(ResourceId program, PipelineFeatures features, const FixedString& name);
+        const Permutation*                      savePermutation(ResourceId program, PipelineFeatures features, GLuint id);
         
         //! Searches for a framebuffer and marks it a used.
         s32                                     acquireFramebuffer(u16 width, u16 height);
