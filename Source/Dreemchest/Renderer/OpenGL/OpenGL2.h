@@ -100,6 +100,15 @@ namespace Renderer
         {
         public:
             
+            //! Contains a uniform information, like type or size
+            struct Uniform
+            {
+                s8          name[32];   //!< A uniform name.
+                GLenum      type;       //!< A uniform type.
+                GLint       length;     //!< A uniform name length.
+                GLint       size;       //!< A uniform size.
+            };
+            
             //! Compiles a shader program from a source code.
             static GLuint   compileShader(GLenum type, CString source, s8* error, s32 maxErrorSize);
             
@@ -111,6 +120,12 @@ namespace Renderer
             
             //! Destroys a shader.
             static void     deleteShader(GLuint id);
+            
+            //! Returns a total number of active uniforms.
+            static GLint    uniformCount(GLuint program);
+            
+            //! Returns a uniform name.
+            static void     uniformAt(GLuint program, GLuint index, Uniform& uniform);
             
             //! Searches for a uniform location.
             static GLint    uniformLocation(GLuint program, CString name);

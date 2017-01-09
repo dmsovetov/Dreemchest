@@ -291,6 +291,20 @@ GLuint OpenGL2::Program::compileShader(GLenum type, CString source, s8* error, s
     return 0;
 #endif  //  #if !DEV_PROFILE_CPU
 }
+    
+// ** OpenGL2::Program::uniformCount
+GLint OpenGL2::Program::uniformCount(GLuint id)
+{
+    GLint value;
+    glGetProgramiv(id, GL_ACTIVE_UNIFORMS, &value);
+    return value;
+}
+    
+// ** OpenGL2::Program::uniformAt
+void OpenGL2::Program::uniformAt(GLuint program, GLuint index, Uniform& uniform)
+{
+    glGetActiveUniform(program, index, sizeof(uniform.name), &uniform.length, &uniform.size, &uniform.type, uniform.name);
+}
 
 // ** OpenGL2::Program::createProgram
 GLuint OpenGL2::Program::createProgram(const GLuint* shaders, s32 count, s8* error, s32 maxErrorSize)
