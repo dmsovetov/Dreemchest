@@ -57,7 +57,7 @@ static String s_fragmentShader =
 
 class Textures : public RenderingApplicationDelegate
 {
-    StateBlock m_renderStates;
+    StateBlock8 m_renderStates;
     RenderFrame m_renderFrame;
     
     virtual void handleLaunched(Application* application) NIMBLE_OVERRIDE

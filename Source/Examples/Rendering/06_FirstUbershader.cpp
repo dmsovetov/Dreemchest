@@ -70,7 +70,7 @@ static PipelineFeature s_features[] =
 
 class FirstUbershader : public RenderingApplicationDelegate
 {
-    StateBlock m_renderStates;
+    StateBlock8 m_renderStates;
     RenderFrame m_renderFrame;
     
     virtual void handleLaunched(Application* application) NIMBLE_OVERRIDE

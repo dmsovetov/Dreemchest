@@ -44,14 +44,14 @@ namespace Scene {
 
             ConstantBuffer_             constantBuffer; //!< A material constant buffer handle.
             CBuffer                     data;           //!< Material constant buffer.
-            StateBlock                  states;         //!< Material states that is bound prior an instance state block.
+            StateBlock8                 states;         //!< Material states that is bound prior an instance state block.
         };
 
         //! A renderable node contains a cached state block that binds input layout, vertex/index buffers.
         struct RenderableNode {
             s32                         offset;         //!< Render command offset argument.
             s32                         count;          //!< Render command count argument.
-            StateBlock                  states;         //!< Renderable instance states that is bound right before rendering.
+            StateBlock8                 states;         //!< Renderable instance states that is bound right before rendering.
         };
 
         virtual                                 ~AbstractRenderCache( void ) {}

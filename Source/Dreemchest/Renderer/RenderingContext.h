@@ -44,11 +44,11 @@ namespace Renderer
         virtual                                 ~RenderingContext( void );
         
         //! Sets a default state block.
-        void                                    setDefaultStateBlock(const StateBlock& value);
+        void                                    setDefaultStateBlock(const StateBlock12& value);
         
         //! Returns a default state block.
-        const StateBlock&                       defaultStateBlock() const;
-        StateBlock&                             defaultStateBlock();
+        const StateBlock12&                     defaultStateBlock() const;
+        StateBlock12&                           defaultStateBlock();
         
         //! Sets a default program.
         void                                    setDefaultProgram(Program value);
@@ -164,7 +164,7 @@ namespace Renderer
         InputLayout                             m_inputLayoutCache[MaxInputLayouts];                    //!< A lookup table for input layout types.
         ResourceCommandBuffer*                  m_resourceCommandBuffer;                                //!< A command buffer that is used for resource construction commands.
         TransientResourceStack*                 m_transientResources;                                   //!< A transient resource stack.
-        StateBlock                              m_defaultStateBlock;                                    //!< A default state block is applied after all commands were executed.
+        StateBlock12                            m_defaultStateBlock;                                    //!< A default state block is applied after all commands were executed.
         Program                                 m_defaultProgram;                                       //!< A default program to be used.
         PipelineState                           m_pipeline;                                             //!< An active pipeline state.
         ShaderLibrary                           m_shaderLibrary;                                        //!< A shader library.

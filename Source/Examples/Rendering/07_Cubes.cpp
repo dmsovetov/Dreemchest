@@ -115,7 +115,7 @@ UniformElement Instance::s_layout[] =
 
 class Cubes : public RenderingApplicationDelegate
 {
-    StateBlock m_renderStates;
+    StateBlock8 m_renderStates;
     RenderFrame m_renderFrame;
     ConstantBuffer_ m_instanceConstantBuffer;
     
@@ -170,7 +170,7 @@ class Cubes : public RenderingApplicationDelegate
 
                 StateScope instance = stateStack.newScope();
                 instance->bindConstantBuffer(m_instanceConstantBuffer, 1);
-                commands.uploadConstantBuffer(m_instanceConstantBuffer, m_renderFrame.internBuffer(&s_instance, sizeof(s_instance)), sizeof(s_instance));
+                commands.uploadConstantBuffer(m_instanceConstantBuffer, &s_instance, sizeof(s_instance));
                 commands.drawIndexed(0, Renderer::PrimTriangles, 0, sizeof(s_indices) / sizeof(u16), stateStack);
             }
         }

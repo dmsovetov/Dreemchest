@@ -47,7 +47,7 @@ class FirstTriangle : public RenderingApplicationDelegate
     // rendering process. Render state block is a composition of
     // rendering states required for rendering, like vertex buffer
     // binding or blend state changes.
-    StateBlock m_renderStates;
+    StateBlock4 m_renderStates;
     
     // A render frame instance records all data and commands required
     // to render a single frame.

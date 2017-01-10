@@ -212,7 +212,7 @@ namespace Examples
     
     struct MeshStateBlock
     {
-        StateBlock      states;
+        StateBlock4     states;
         PrimitiveType   primitives;
         s32             size;
     };
@@ -269,13 +269,13 @@ namespace Examples
     }
     
     //! Creates a fullscreen quad rendering states
-    StateBlock createFullscreenRenderingStates(RenderingContextWPtr renderingContext)
+    StateBlock8 createFullscreenRenderingStates(RenderingContextWPtr renderingContext)
     {
-        StateBlock states;
+        StateBlock8 states;
         InputLayout   il = renderingContext->requestInputLayout(0);
         VertexBuffer_ vb = renderingContext->requestVertexBuffer(FullscreenQuad, sizeof(FullscreenQuad));
-        states.bindVertexBuffer(vb);
         states.bindInputLayout(il);
+        states.bindVertexBuffer(vb);
         states.setDepthState(LessEqual, false);
         return states;
     }

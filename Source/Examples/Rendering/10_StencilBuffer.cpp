@@ -94,10 +94,9 @@ class StencilBuffer : public RenderingApplicationDelegate
     struct Object
     {
         Examples::Mesh mesh;
-        StateBlock     states;
+        StateBlock4     states;
     };
     
-    StateBlock  m_renderStates;
     RenderFrame m_renderFrame;
     Object      m_platform;
     Object      m_bunny;
@@ -107,7 +106,7 @@ class StencilBuffer : public RenderingApplicationDelegate
     {
         Logger::setStandardLogger();
 
-        if (!initialize(800, 600))
+        if (!initialize(800 / 4, 600 / 4))
         {
             application->quit(-1);
         }
@@ -116,30 +115,32 @@ class StencilBuffer : public RenderingApplicationDelegate
         initializeObjectFromMesh("Assets/Meshes/platform.obj", m_platform);
         initializeObjectFromMesh("Assets/Meshes/column.obj", m_bunny);
         
+        // Create a simple shader program
+        Program program = m_renderingContext->requestProgram(s_vertexShader, s_fragmentShader);
+        
+        // Modify a default state block by adding common resource bindings
+        StateBlock& defaults = m_renderingContext->defaultStateBlock();
+        defaults.bindProgram(program);
+        
         // Configure pass constant buffer
         {
             s_pass.projection = Matrix4::perspective(60.0f, m_window->aspectRatio(), 0.1f, 100.0f);
             s_pass.view       = Matrix4::lookAt(Vec3(0.0f, 2.0f, -3.0f), Vec3(0.0f, 0.6f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
             UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Pass", Pass::s_layout);
             ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&s_pass, sizeof(s_pass), uniformLayout);
-            m_renderStates.bindConstantBuffer(constantBuffer, 0);
+            
+            // And bind it to a default state block
+            defaults.bindConstantBuffer(constantBuffer, 0);
         }
         
         // Configure instance constant buffer
         {
             UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Instance", Instance::s_layout);
             m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(&s_instance, sizeof(s_instance), uniformLayout);
-            m_renderStates.bindConstantBuffer(m_instanceConstantBuffer, 1);
+            
+            // And bind it to a default state block
+            defaults.bindConstantBuffer(m_instanceConstantBuffer, 1);
         }
-        
-        // Create a simple shader program
-        Program program = m_renderingContext->requestProgram(s_vertexShader, s_fragmentShader);
-        m_renderStates.bindProgram(program);
-        m_renderStates.setColorMask(ColorMaskAll);
-        m_renderStates.setDepthState(LessEqual, true);
-        m_renderStates.disableStencilTest();
-        m_renderStates.disableBlending();
-        m_renderStates.setCullFace(TriangleFaceBack);
     }
  
     virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
@@ -151,8 +152,7 @@ class StencilBuffer : public RenderingApplicationDelegate
         // In this sample we will use a state stack
         StateStack& states = m_renderFrame.stateStack();
         
-        // Push the default state
-        StateScope defaultScope = states.push(&m_renderStates);
+        StateScope defaults = m_renderFrame.stateStack().push(&m_renderingContext->defaultStateBlock());
         
         // Clear the viewport
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
@@ -214,7 +214,7 @@ class StencilBuffer : public RenderingApplicationDelegate
         s_instance.transform = transform;
         s_instance.alpha = alpha;
         s_instance.normal = transform.inversed().transposed();
-        commands.uploadConstantBuffer(m_instanceConstantBuffer, m_renderFrame.internBuffer(&s_instance, sizeof(s_instance)), sizeof(s_instance));
+        commands.uploadConstantBuffer(m_instanceConstantBuffer, &s_instance, sizeof(s_instance));
         commands.drawPrimitives(0, object.mesh.primitives, 0, object.mesh.vertices.size(), states);
     }
 };

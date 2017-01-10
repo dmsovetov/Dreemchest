@@ -68,7 +68,7 @@ static Examples::Instance   s_instance;
 
 class Meshes : public RenderingApplicationDelegate
 {
-    StateBlock m_renderStates;
+    StateBlock8 m_renderStates;
     RenderFrame m_renderFrame;
     Examples::Mesh mesh;
     ConstantBuffer_ m_instanceConstantBuffer;

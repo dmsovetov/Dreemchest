@@ -249,19 +249,19 @@ RenderingContext::~RenderingContext( void )
 }
     
 // ** RenderingContext::setDefaultStateBlock
-void RenderingContext::setDefaultStateBlock(const StateBlock& value)
+void RenderingContext::setDefaultStateBlock(const StateBlock12& value)
 {
     m_defaultStateBlock = value;
 }
     
 // ** RenderingContext::defaultStateBlock
-const StateBlock& RenderingContext::defaultStateBlock() const
+const StateBlock12& RenderingContext::defaultStateBlock() const
 {
     return m_defaultStateBlock;
 }
     
 // ** RenderingContext::defaultStateBlock
-StateBlock& RenderingContext::defaultStateBlock()
+StateBlock12& RenderingContext::defaultStateBlock()
 {
     return m_defaultStateBlock;
 }

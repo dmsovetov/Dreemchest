@@ -145,10 +145,10 @@ UniformElement Transform::s_layout[] =
 
 class RenderingToTexture : public RenderingApplicationDelegate
 {
-    StateBlock m_renderStates;
+    StateBlock8 m_renderStates;
     RenderFrame m_renderFrame;
     Examples::Mesh m_mesh;
-    StateBlock m_meshStates;
+    StateBlock4 m_meshStates;
     ConstantBuffer_ m_transformCBuffer;
     
     virtual void handleLaunched(Application* application) NIMBLE_OVERRIDE

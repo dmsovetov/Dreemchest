@@ -285,11 +285,13 @@ String State::nameFromType(Type type)
 // -------------------------------------------------------------------------- StateBlock -------------------------------------------------------------------------- //
 
 // ** StateBlock::StateBlock
-StateBlock::StateBlock( void )
+StateBlock::StateBlock(State* states, s16 maxStates)
     : m_mask(0)
     , m_features(0)
     , m_featureMask(~0)
     , m_count(0)
+    , m_maxStates(maxStates)
+    , m_states(states)
 {
 }
 
@@ -447,7 +449,7 @@ void StateBlock::disableBlending( void )
 void StateBlock::pushState(const State& state)
 {
     NIMBLE_BREAK_IF(m_mask & BIT(state.bit()), "a state setting could not be overriden");
-    NIMBLE_ABORT_IF(m_count + 1 > MaxStates, "state block overflow");
+    NIMBLE_ABORT_IF(m_count + 1 > m_maxStates, "state block overflow");
 
     // Push a state to a state block
     m_states[m_count] = state;
@@ -512,7 +514,7 @@ StateScope StateStack::newScope( void )
     void* allocated = m_allocator.allocate( sizeof( StateBlock ) );
     NIMBLE_ABORT_IF( allocated == NULL, "to much render state blocks allocated" );
 
-    StateBlock* block = new( allocated ) StateBlock;
+    StateBlock* block = new( allocated ) StateBlock8;
     return push( block );
 }
 

@@ -144,10 +144,10 @@ class PointLights : public RenderingApplicationDelegate
     struct Object
     {
         Examples::Mesh mesh;
-        StateBlock     states;
+        StateBlock4     states;
     };
     
-    StateBlock  m_renderStates;
+    StateBlock8  m_renderStates;
     RenderFrame m_renderFrame;
     Object      m_platform;
     Object      m_bunny;
@@ -277,7 +277,7 @@ class PointLights : public RenderingApplicationDelegate
         StateScope instanceState = states.push(&object.states);
         s_instance.transform = transform;
         s_instance.normal = transform.inversed().transposed();
-        commands.uploadConstantBuffer(m_instanceConstantBuffer, m_renderFrame.internBuffer(&s_instance, sizeof(s_instance)), sizeof(s_instance));
+        commands.uploadConstantBuffer(m_instanceConstantBuffer, &s_instance, sizeof(s_instance));
         commands.drawPrimitives(0, object.mesh.primitives, 0, object.mesh.vertices.size(), states);
     }
 };

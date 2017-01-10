@@ -204,11 +204,8 @@ namespace Renderer
     {
     public:
 
-        //! A maximum number of states that can be stored inside a single block.
-        enum { MaxStates = 9 };
-
                                         //! Constructs a StateBlock block.
-                                        StateBlock( void );
+                                        StateBlock(State* states, s16 maxStates);
 
         //! Binds a vertex buffer to a pipeline.
         void                            bindVertexBuffer(VertexBuffer_ id);
@@ -302,13 +299,14 @@ namespace Renderer
         //! Pushes a new state to a block.
         void                            pushState(const State& state);
 
-    private:
+    protected:
 
         StateMask                       m_mask;                 //!< A bit mask of state changes that are preset inside this state block.
         PipelineFeatures                m_features;             //!< A shader feature set.
         PipelineFeatures                m_featureMask;          //!< A shader feature mask.
-        State                           m_states[MaxStates];    //!< An array of state changes.
         s16                             m_count;                //!< A total number of states stored inside a block.
+        s16                             m_maxStates;            //!< A maximum number of states that can be stored inside a block.
+        State*                          m_states;               //!< An array of state changes.
     };
 
     // ** StateBlock::mask
@@ -341,7 +339,58 @@ namespace Renderer
         NIMBLE_ABORT_IF( index < 0 || index >= stateCount(), "index is out of range" );
         return m_states[index];
     }
-
+    
+    //! Rendering state block of a fixed size.
+    template<s32 TMaxStates>
+    class FixedStateBlock : public StateBlock
+    {
+    public:
+        
+                                    //! Constructs a FixedStateBlock instance.
+                                    FixedStateBlock();
+        
+                                    //! Constructs a copy of a FixedStateBlock instance.
+                                    FixedStateBlock(const FixedStateBlock& other);
+        
+        //! Copies a fixed state block from another one.
+        const FixedStateBlock&      operator = (const FixedStateBlock& other);
+        
+    private:
+        
+        State                       m_block[TMaxStates];    //!< An array of rendering states.
+    };
+    
+    // ** FixedStateBlock::FixedStateBlock
+    template<s32 TMaxStates>
+    FixedStateBlock<TMaxStates>::FixedStateBlock()
+        : StateBlock(m_block, TMaxStates)
+    {
+    }
+    
+    // ** FixedStateBlock::FixedStateBlock
+    template<s32 TMaxStates>
+    FixedStateBlock<TMaxStates>::FixedStateBlock(const FixedStateBlock& other)
+        : StateBlock(m_block, TMaxStates)
+    {
+        this->operator = (other);
+    }
+    
+    // ** FixedStateBlock::operator =
+    template<s32 TMaxStates>
+    const FixedStateBlock<TMaxStates>& FixedStateBlock<TMaxStates>::operator = (const FixedStateBlock& other)
+    {
+        m_mask        = other.m_mask;
+        m_features    = other.m_features;
+        m_featureMask = other.m_featureMask;
+        m_count       = other.m_count;
+        memcpy(m_block, other.m_block, sizeof(State) * other.stateCount());
+        
+        return *this;
+    }
+    
+    typedef FixedStateBlock<4> StateBlock4;
+    typedef FixedStateBlock<8> StateBlock8;
+    typedef FixedStateBlock<12> StateBlock12;
     
     //! Forward declare a StateStack class.
     class StateStack;

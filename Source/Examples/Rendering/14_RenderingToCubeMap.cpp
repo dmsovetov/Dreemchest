@@ -161,13 +161,13 @@ const UniformElement Kernel::Layout[] =
 
 class RenderingToTexture : public RenderingApplicationDelegate
 {
-    StateBlock m_renderStates;
+    StateBlock8 m_renderStates;
     RenderFrame m_renderFrame;
     ConstantBuffer_ m_cameraCBuffer;
     ConstantBuffer_ m_projectionCBuffer;
     ConstantBuffer_ m_instanceCBuffer;
     Examples::MeshStateBlock m_mesh;
-    StateBlock m_fullscreenQuad;
+    StateBlock8 m_fullscreenQuad;
     Texture_ m_envmap;
     Texture_ m_diffuse;
     Texture_ m_specular;
