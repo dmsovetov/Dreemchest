@@ -272,7 +272,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
     {
         verbose("convolution", "performing with cosine kernel of power %2.2f with %d samples in %d iterations...\n", power, Kernel::MaxSamples, iterations);
         
-        RenderFrame    frame;
+        RenderFrame    frame(1024 * 1024);
         StateStack&    stateStack = frame.stateStack();
         Kernel         kernel;
 

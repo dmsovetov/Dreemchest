@@ -172,7 +172,7 @@ void RenderCommandBuffer::releaseTexture(TransientTexture id)
 // ** RenderCommandBuffer::drawIndexed
 void RenderCommandBuffer::drawIndexed(u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateStack& stateStack)
 {
-    emitDrawCall(OpCode::DrawIndexed, sorting, primitives, first, count, stateStack.states(), MaxStateStackDepth);
+    emitDrawCall(OpCode::DrawIndexed, sorting, primitives, first, count, stateStack.states(), stateStack.size());
 }
 
 // ** RenderCommandBuffer::drawIndexed
@@ -184,7 +184,7 @@ void RenderCommandBuffer::drawIndexed(u32 sorting, PrimitiveType primitives, s32
 // ** RenderCommandBuffer::drawPrimitives
 void RenderCommandBuffer::drawPrimitives(u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateStack& stateStack)
 {
-    emitDrawCall(OpCode::DrawPrimitives, sorting, primitives, first, count, stateStack.states(), MaxStateStackDepth);
+    emitDrawCall(OpCode::DrawPrimitives, sorting, primitives, first, count, stateStack.states(), stateStack.size());
 }
 
 // ** RenderCommandBuffer::drawPrimitives
@@ -202,10 +202,11 @@ void RenderCommandBuffer::emitDrawCall( OpCode::Type type, u32 sorting, Primitiv
     opCode.drawCall.primitives  = primitives;
     opCode.drawCall.first       = first;
     opCode.drawCall.count       = count;
+    opCode.drawCall.states      = (const StateBlock**)m_frame.allocate(sizeof(StateBlock*) * (stateCount + 1));
     
-    memset(opCode.drawCall.states, 0, sizeof(opCode.drawCall.states));
+    opCode.drawCall.states[stateCount] = NULL;
     memcpy(opCode.drawCall.states, states, sizeof(StateBlock*) * stateCount);
-    
+
     push(opCode);
 }
     

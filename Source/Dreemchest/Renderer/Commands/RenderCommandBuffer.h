@@ -81,7 +81,7 @@ namespace Renderer
                                     RenderCommandBuffer(RenderFrame& frame);
         
         //! Emits a draw call command.
-        void                        emitDrawCall( OpCode::Type type, u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateBlock** states, s32 stateCount );
+        void                        emitDrawCall( OpCode::Type type, u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateBlock** states, s32 stateCount);
         
     private:
         

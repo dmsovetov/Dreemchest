@@ -76,7 +76,7 @@ namespace Renderer
                 PrimitiveType               primitives;                 //!< A primitive type to be rendered.
                 s32                         first;                      //!< First index or primitive.
                 s32                         count;                      //!< A total number of indices or primitives to use.
-                const StateBlock*           states[MaxStateStackDepth]; //!< States from this stack are applied before a rendering command.
+                const StateBlock**          states;                     //!< States from this stack are applied before a rendering command.
             } drawCall;
             
             struct
