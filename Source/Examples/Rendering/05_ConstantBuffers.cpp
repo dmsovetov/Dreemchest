@@ -101,7 +101,7 @@ class ConstantBuffers : public RenderingApplicationDelegate
 
     virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
     {
-        CommandBuffer& commands = m_renderFrame.entryPoint();
+        RenderCommandBuffer& commands = m_renderFrame.entryPoint();
         
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
         commands.drawPrimitives(0, PrimTriangles, 0, 3, &m_renderStates);

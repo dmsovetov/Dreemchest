@@ -235,8 +235,8 @@ class RenderingToTexture : public RenderingApplicationDelegate
     {
         m_renderFrame.clear();
         
-        StateStack&    stateStack = m_renderFrame.stateStack();
-        CommandBuffer& commands  = m_renderFrame.entryPoint();
+        StateStack&         stateStack = m_renderFrame.stateStack();
+        RenderCommandBuffer& commands   = m_renderFrame.entryPoint();
         
         StateScope defaults = stateStack.push(&m_renderStates);
         
@@ -274,8 +274,9 @@ class RenderingToTexture : public RenderingApplicationDelegate
         
         RenderFrame    frame;
         StateStack&    stateStack = frame.stateStack();
-        CommandBuffer& commands   = frame.entryPoint();
         Kernel         kernel;
+
+        RenderCommandBuffer& commands = frame.entryPoint();
 
         // Create an output cube map texture
         Texture_ output = m_renderingContext->requestTextureCube(NULL, size, 1, PixelRgba32F, FilterLinear);
@@ -339,7 +340,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
             // Now render each cube map face
             for (s32 i = 0; i < 6; i++)
             {
-                CommandBuffer& renderToCubeMap = commands.renderToCubeMap(frame, output, i);
+                RenderCommandBuffer& renderToCubeMap = commands.renderToCubeMap(output, i);
                 if (j == 0)
                 {
                     renderToCubeMap.clear(Rgba(0.0f, 0.0f, 0.0f, 0.0f), ClearAll);

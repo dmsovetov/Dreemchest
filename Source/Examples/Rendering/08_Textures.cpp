@@ -103,7 +103,7 @@ class Textures : public RenderingApplicationDelegate
     {
         m_renderFrame.clear();
         
-        CommandBuffer& commands = m_renderFrame.entryPoint();
+        RenderCommandBuffer& commands = m_renderFrame.entryPoint();
         
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
         commands.drawIndexed(0, Renderer::PrimTriangles, 0, 6, &m_renderStates);

@@ -42,12 +42,12 @@ namespace Scene {
         virtual                 ~RenderSystemBase( void ) {}
 
         //! Renders all active cameras to their viewports.
-        void                    render( RenderFrame& frame, CommandBuffer& commands );
+        void                    render( RenderFrame& frame, RenderCommandBuffer& commands );
 
     protected:
 
         //! Emits rendering operations to a command buffer for a specified camera.
-        virtual void            emitRenderOperations( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) {}
+        virtual void            emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) {}
 
     protected:
 
@@ -67,10 +67,10 @@ namespace Scene {
     protected:
 
         //! Extracts the render component from a camera entity and passes it an abstract method that should be overridden in a subclass.
-        virtual void            emitRenderOperations( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) NIMBLE_OVERRIDE;
+        virtual void            emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) NIMBLE_OVERRIDE;
 
         //! Emits rendering operations to a command buffer for a specified camera.
-        virtual void            emitRenderOperations( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const TRenderer& renderer ) = 0;
+        virtual void            emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const TRenderer& renderer ) = 0;
     };
 
     // ** RenderSystem::RenderSystem
@@ -82,7 +82,7 @@ namespace Scene {
 
     // ** RenderSystem::emitRenderOperations
     template<typename TRenderer>
-    void RenderSystem<TRenderer>::emitRenderOperations( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
+    void RenderSystem<TRenderer>::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform )
     {
         emitRenderOperations( frame, commands, stateStack, entity, camera, transform, *entity.get<TRenderer>() );
     }

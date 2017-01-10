@@ -40,7 +40,7 @@ RenderPassBase::RenderPassBase( Renderer::RenderingContext& context, RenderScene
 }
 
 // ** RenderPassBase::renderWithColor
-void RenderPassBase::renderWithColor( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Rgba& color )
+void RenderPassBase::renderWithColor( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const Rgba& color )
 {
     // Create a diffuse material constant buffer
     RenderScene::CBuffer::Material material = diffuseMaterial( color );
@@ -59,7 +59,7 @@ void RenderPassBase::renderWithColor( RenderFrame& frame, CommandBuffer& command
 }
 
 // ** RenderPassBase::emitStaticMeshes
-void RenderPassBase::emitStaticMeshes( const RenderScene::StaticMeshes& staticMeshes, RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, u8 mask )
+void RenderPassBase::emitStaticMeshes( const RenderScene::StaticMeshes& staticMeshes, RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, u8 mask )
 {
     // Process each mesh entity
     for( s32 i = 0, n = staticMeshes.count(); i < n; i++ ) {
@@ -86,7 +86,7 @@ void RenderPassBase::emitStaticMeshes( const RenderScene::StaticMeshes& staticMe
 }
 
 // ** RenderPassBase::emitPointClouds
-void RenderPassBase::emitPointClouds( const RenderScene::PointClouds& pointClouds, RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, u8 mask )
+void RenderPassBase::emitPointClouds( const RenderScene::PointClouds& pointClouds, RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, u8 mask )
 {
     // Process each active point cloud
     for( s32 i = 0, n = pointClouds.count(); i < n; i++ ) {

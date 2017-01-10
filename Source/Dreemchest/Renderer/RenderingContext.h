@@ -146,10 +146,7 @@ namespace Renderer
         void                                    releaseIdentifier(RenderResourceType::Enum type, ResourceId id);
         
     protected:
-        
-        //! A forward declaration of an internal command buffer type used for resource construction.
-        class ConstructionCommandBuffer;
-        
+
         //! A forward declaration of a stack type to store intermediate render targets.
         class TransientResourceStack;
         
@@ -167,7 +164,7 @@ namespace Renderer
         FixedArray<UniformBufferLayout>         m_uniformLayouts;                                       //!< Allocated uniform layouts.
         BidMap<String, UniformLayout>           m_uniformLayoutByName;                                  //!< Maps from a name to a uniform layout id.
         InputLayout                             m_inputLayoutCache[MaxInputLayouts];                    //!< A lookup table for input layout types.
-        ConstructionCommandBuffer*              m_constructionCommandBuffer;                            //!< A command buffer that is used for resource construction commands.
+        ResourceCommandBuffer*                  m_resourceCommandBuffer;                                //!< A command buffer that is used for resource construction commands.
         TransientResourceStack*                 m_transientResources;                                   //!< A transient resource stack.
         StateBlock                              m_defaultStateBlock;                                    //!< A default state block is applied after all commands were executed.
         Program                                 m_defaultProgram;                                       //!< A default program to be used.

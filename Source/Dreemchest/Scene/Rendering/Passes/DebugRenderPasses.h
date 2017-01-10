@@ -44,7 +44,7 @@ namespace Scene {
     protected:
 
         //! Emits render operations to render a single bounding box.
-        virtual void        emitRenderOperations( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const StaticMesh& staticMesh, const Transform& transform ) NIMBLE_OVERRIDE;
+        virtual void        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const StaticMesh& staticMesh, const Transform& transform ) NIMBLE_OVERRIDE;
     };
 
     //! Renders fixtures for all lights that reside in scene.
@@ -57,7 +57,7 @@ namespace Scene {
     protected:
 
         //! Emits render operations to render a single bounding box.
-        virtual void        emitRenderOperations( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Light& light, const Transform& transform ) NIMBLE_OVERRIDE;
+        virtual void        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Light& light, const Transform& transform ) NIMBLE_OVERRIDE;
     };
 
     //! Renders frustums for all cameras that reside in scene.
@@ -70,7 +70,7 @@ namespace Scene {
     protected:
 
         //! Emits render operations to render a single frustum.
-        virtual void        emitRenderOperations( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) NIMBLE_OVERRIDE;
+        virtual void        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) NIMBLE_OVERRIDE;
     };
 
     //! A debug render pass that renders intermediate render targets.
@@ -81,7 +81,7 @@ namespace Scene {
                             DebugRenderTarget( RenderingContext& context, RenderScene& renderScene );
 
         //! Emits render operations to render a target as a 2D rectangle.
-        void                render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Viewport& viewport, TransientTexture texture, s32 size, s32 x, s32 y );
+        void                render( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const Viewport& viewport, TransientTexture texture, s32 size, s32 x, s32 y );
 
     private:
 
@@ -97,12 +97,12 @@ namespace Scene {
                             DebugCascadedShadows( RenderingContext& context, RenderScene& renderScene );
 
         //! Emits render operations to show a cascaded shadows debug info.
-        void                render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const CascadedShadowMaps& csm, const Rgba colors[] = NULL );
+        void                render( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const CascadedShadowMaps& csm, const Rgba colors[] = NULL );
 
     protected:
 
         //! Emits render operations to render a single bounding box.
-        virtual void        emitRenderOperations( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) NIMBLE_OVERRIDE;
+        virtual void        emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform ) NIMBLE_OVERRIDE;
 
     private:
 

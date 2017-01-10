@@ -44,7 +44,7 @@
 #include <Renderer/VertexFormat.h>
 #include <Renderer/RenderFrame.h>
 #include <Renderer/RenderingContext.h>
-#include <Renderer/CommandBuffer.h>
+#include <Renderer/Commands/RenderCommandBuffer.h>
 
 #include <Assets/Asset.h>
 #include <Assets/AssetHandle.h>

@@ -378,6 +378,10 @@ namespace Renderer {
     class RenderFrame;
     class PipelineFeatureLayout;
     
+    class CommandBuffer;
+        class RenderCommandBuffer;
+        class ResourceCommandBuffer;
+    
     //! Render command buffer unique pointer type.
     typedef UPtr<class CommandBuffer> CommandBufferUPtr;
 

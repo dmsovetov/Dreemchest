@@ -84,7 +84,7 @@ class Shaders : public RenderingApplicationDelegate
         // upon initialization, so this method stays same as in a
         // 'First Triangle' exmple.
         
-        CommandBuffer& commands = m_renderFrame.entryPoint();
+        RenderCommandBuffer& commands = m_renderFrame.entryPoint();
         
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
         commands.drawPrimitives(0, PrimTriangles, 0, 3, &m_renderStates);

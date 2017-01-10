@@ -209,7 +209,7 @@ class IBL : public RenderingApplicationDelegate
     {
         m_renderFrame.clear();
         
-        CommandBuffer& commands = m_renderFrame.entryPoint();
+        RenderCommandBuffer& commands = m_renderFrame.entryPoint();
         
         // In this sample we will use a state stack
         StateStack& states = m_renderFrame.stateStack();
@@ -269,7 +269,7 @@ class IBL : public RenderingApplicationDelegate
         }
     }
     
-    void renderObject(StateStack& states, CommandBuffer& commands, const Object& object, const Matrix4& transform)
+    void renderObject(StateStack& states, RenderCommandBuffer& commands, const Object& object, const Matrix4& transform)
     {
         StateScope instanceState = states.push(&object.states);
         s_instance.transform = transform;

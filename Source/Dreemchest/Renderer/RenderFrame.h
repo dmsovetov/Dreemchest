@@ -42,51 +42,51 @@ namespace Renderer
                                                 RenderFrame(s32 size = 1024 * 100);
 
         //! Returns a total number of captured command buffers.
-        s32                                     commandBufferCount( void ) const;
+        s32                                     commandBufferCount() const;
 
         //! Returns a command buffer at specified index.
-        const CommandBuffer&                    commandBufferAt( s32 index ) const;
+        const CommandBuffer&                    commandBufferAt(s32 index) const;
 
         //! Creates a new command buffer.
-        CommandBuffer&                          createCommandBuffer( void );
+        RenderCommandBuffer&                    createCommandBuffer();
 
         //! Returns a state stack.
-        StateStack&                             stateStack( void );
+        StateStack&                             stateStack();
 
         //! Returns a root command buffer.
-        const CommandBuffer&                    entryPoint( void ) const;
-        CommandBuffer&                          entryPoint( void );
+        const RenderCommandBuffer&              entryPoint() const;
+        RenderCommandBuffer&                    entryPoint();
 
         //! Interns a memory buffer that will by used during a frame rendering.
-        const void*                             internBuffer( const void* data, s32 size );
+        const void*                             internBuffer(const void* data, s32 size);
 
         //! Allocates a block of memory that is used during a frame rendering.
-        void*                                   allocate( s32 size );
+        void*                                   allocate(s32 size);
         
         //! Clears all data recorded by this frame.
-        void                                    clear( void );
+        void                                    clear();
 
     private:
 
         //! Container type to store recorded command buffers.
         typedef Array<CommandBufferUPtr>        Commands;
 
-        CommandBuffer*                          m_entryPoint;           //!< A root command buffer.
+        RenderCommandBuffer*                    m_entryPoint;           //!< A root command buffer.
         Commands                                m_commandBuffers;       //!< An array of recorded commands buffers.
         StateStack                              m_stateStack;           //!< Current state stack.
         LinearAllocator                         m_allocator;            //!< A linear allocator used by a frame renderers.
     };
 
     //! Returns a total number of captured command buffers.
-    NIMBLE_INLINE s32 RenderFrame::commandBufferCount( void ) const
+    NIMBLE_INLINE s32 RenderFrame::commandBufferCount() const
     {
-        return static_cast<s32>( m_commandBuffers.size() );
+        return static_cast<s32>(m_commandBuffers.size());
     }
 
     //! Returns a command buffer at specified index.
-    NIMBLE_INLINE const CommandBuffer& RenderFrame::commandBufferAt( s32 index ) const
+    NIMBLE_INLINE const CommandBuffer& RenderFrame::commandBufferAt(s32 index) const
     {
-        NIMBLE_ABORT_IF( index < 0 || index >= commandBufferCount(), "index is out of range" );
+        NIMBLE_ABORT_IF(index < 0 || index >= commandBufferCount(), "index is out of range");
         return *m_commandBuffers[index].get();
     }
 

@@ -152,7 +152,7 @@ class Cubes : public RenderingApplicationDelegate
     {
         m_renderFrame.clear();
         
-        CommandBuffer& commands = m_renderFrame.entryPoint();
+        RenderCommandBuffer& commands = m_renderFrame.entryPoint();
         StateStack& stateStack = m_renderFrame.stateStack();
         
         StateScope global = stateStack.push(&m_renderStates);

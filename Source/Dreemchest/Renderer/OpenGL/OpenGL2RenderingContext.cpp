@@ -27,7 +27,7 @@
 #include "OpenGL2RenderingContext.h"
 #include "../VertexBufferLayout.h"
 #include "../VertexFormat.h"
-#include "../CommandBuffer.h"
+#include "../Commands/CommandBuffer.h"
 
 DC_BEGIN_DREEMCHEST
 

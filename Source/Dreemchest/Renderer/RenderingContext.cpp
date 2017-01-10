@@ -26,7 +26,8 @@
 
 #include "RenderingContext.h"
 #include "RenderingContextHal.h"
-#include "CommandBuffer.h"
+#include "Commands/RenderCommandBuffer.h"
+#include "Commands/ResourceCommandBuffer.h"
 #include "VertexFormat.h"
 #include "VertexBufferLayout.h"
 #include "RenderFrame.h"
@@ -133,135 +134,6 @@ void RenderingContext::TransientResourceStack::unload(TransientResourceId index)
     NIMBLE_ABORT_IF( index == 0, "invalid render target index" );
     m_stackFrame[index - 1] = 0;
 }
-
-// --------------------------------------------------------- RenderingContext::ConstructionCommandBuffer --------------------------------------------------------- //
-
-//! An internal comamnd buffer type that is used for resource construction.
-class RenderingContext::ConstructionCommandBuffer : public CommandBuffer
-{
-public:
-    
-    //! Emits an input layout creation command.
-    InputLayout                 createInputLayout(InputLayout id, const VertexFormat& vertexFormat);
-    
-    //! Emits a vertex buffer creation command.
-    VertexBuffer_               createVertexBuffer(VertexBuffer_ id, const void* data, s32 size);
-    
-    //! Emits an index buffer creation command.
-    IndexBuffer_                createIndexBuffer(IndexBuffer_ id, const void* data, s32 size);
-    
-    //! Emits a constant buffer creation command.
-    ConstantBuffer_             createConstantBuffer(ConstantBuffer_ id, const void* data, s32 size, UniformLayout layout);
-    
-    //! Emits a texture creation command.
-    Texture_                    createTexture2D(Texture_ id, const void* data, u16 width, u16 height, PixelFormat format, TextureFilter filter);
-    
-    //! Emits a cube texture creation command.
-    Texture_                    createTextureCube(Texture_ id, const void* data, u16 size, u16 mipLevels, PixelFormat format, TextureFilter filter);
-    
-    //! Emits a constant buffer destruction command.
-    void                        deleteConstantBuffer(ConstantBuffer_ id);
-
-    //! Emits a program destruction command.
-    void                        deleteProgram(Program id);
-};
-
-// ** RenderingContext::ConstructionCommandBuffer::createVertexBuffer
-InputLayout RenderingContext::ConstructionCommandBuffer::createInputLayout(InputLayout id, const VertexFormat& vertexFormat)
-{
-    OpCode opCode;
-    opCode.type = OpCode::CreateInputLayout;
-    opCode.createInputLayout.id = id;
-    opCode.createInputLayout.format = vertexFormat;
-    push( opCode );
-    return id;
-}
-
-// ** RenderingContext::ConstructionCommandBuffer::createVertexBuffer
-VertexBuffer_ RenderingContext::ConstructionCommandBuffer::createVertexBuffer(VertexBuffer_ id, const void* data, s32 size)
-{
-    OpCode opCode;
-    opCode.type = OpCode::CreateVertexBuffer;
-    opCode.createBuffer.id = id;
-    opCode.createBuffer.buffer = adoptDataBuffer(data, size);
-    push( opCode );
-    return id;
-}
-
-// ** RenderingContext::ConstructionCommandBuffer::createIndexBuffer
-IndexBuffer_ RenderingContext::ConstructionCommandBuffer::createIndexBuffer(IndexBuffer_ id, const void* data, s32 size)
-{
-    OpCode opCode;
-    opCode.type = OpCode::CreateIndexBuffer;
-    opCode.createBuffer.id = id;
-    opCode.createBuffer.buffer = adoptDataBuffer(data, size);
-    push( opCode );
-    return id;
-}
-
-// ** RenderingContext::ConstructionCommandBuffer::createConstantBuffer
-ConstantBuffer_ RenderingContext::ConstructionCommandBuffer::createConstantBuffer(ConstantBuffer_ id, const void* data, s32 size, UniformLayout layout)
-{
-    OpCode opCode;
-    opCode.type = OpCode::CreateConstantBuffer;
-    opCode.createBuffer.id = id;
-    opCode.createBuffer.buffer = adoptDataBuffer(data, size);
-    opCode.createBuffer.layout = layout;
-    push( opCode );
-    return id;
-}
-
-// ** RenderingContext::ConstructionCommandBuffer::createTexture2D
-Texture_ RenderingContext::ConstructionCommandBuffer::createTexture2D(Texture_ id, const void* data, u16 width, u16 height, PixelFormat format, TextureFilter filter)
-{
-    OpCode opCode;
-    opCode.type = OpCode::CreateTexture;
-    opCode.createTexture.id = id;
-    opCode.createTexture.buffer = adoptDataBuffer(data, bytesPerMipChain(format, width, height, 1));
-    opCode.createTexture.width = width;
-    opCode.createTexture.height = height;
-    opCode.createTexture.mipLevels = 1;
-    opCode.createTexture.type = TextureType2D;
-    opCode.createTexture.format = format;
-    opCode.createTexture.filter = filter;
-    push( opCode );
-    return id;
-}
-
-// ** RenderingContext::ConstructionCommandBuffer::createTextureCube
-Texture_ RenderingContext::ConstructionCommandBuffer::createTextureCube(Texture_ id, const void* data, u16 size, u16 mipLevels, PixelFormat format, TextureFilter filter)
-{
-    OpCode opCode;
-    opCode.type = OpCode::CreateTexture;
-    opCode.createTexture.id = id;
-    opCode.createTexture.buffer = adoptDataBuffer(data, bytesPerMipChain(format, size, size, mipLevels) * 6);
-    opCode.createTexture.width = size;
-    opCode.createTexture.height = size;
-    opCode.createTexture.format = format;
-    opCode.createTexture.type = TextureTypeCube;
-    opCode.createTexture.mipLevels = mipLevels;
-    opCode.createTexture.filter = filter;
-    push( opCode );
-    return id;
-}
-    
-// ** RenderingContext::ConstructionCommandBuffer::deleteConstantBuffer
-void RenderingContext::ConstructionCommandBuffer::deleteConstantBuffer(ConstantBuffer_ id)
-{
-    OpCode opCode;
-    opCode.type = OpCode::DeleteConstantBuffer;
-    opCode.id   = id;
-    push(opCode);
-}
-
-// ** RenderingContext::ConstructionCommandBuffer::deleteConstantBuffer
-void RenderingContext::ConstructionCommandBuffer::deleteProgram(Program id)
-{
-    OpCode opCode;
-    opCode.type = OpCode::DeleteProgram;
-    opCode.id   = id;
-    push(opCode);
-}
     
 // -------------------------------------------------------------------------------- RenderingContext -------------------------------------------------------------------------------- //
     
@@ -274,9 +146,10 @@ RenderingContext::RenderingContext(RenderViewPtr view)
     LogDebug("renderingContext", "rendering state size is %d bytes\n", sizeof(State));
     LogDebug("renderingContext", "rendering state block size is %d bytes\n", sizeof(StateBlock));
     LogDebug("renderingContext", "opcode size is %d bytes\n", sizeof(CommandBuffer::OpCode));
+    LogDebug("renderingContext", "drawCall size is %d bytes\n", sizeof(CommandBuffer::OpCode::drawCall));
 
     // Create a construction command buffer instance
-    m_constructionCommandBuffer = DC_NEW ConstructionCommandBuffer;
+    m_resourceCommandBuffer = DC_NEW ResourceCommandBuffer;
     
     // Create an intermediate target stack
     m_transientResources = DC_NEW TransientResourceStack;
@@ -378,7 +251,7 @@ RenderingContext::RenderingContext(RenderViewPtr view)
 // ** RenderingContext::~RenderingContext
 RenderingContext::~RenderingContext( void )
 {
-    delete m_constructionCommandBuffer;
+    delete m_resourceCommandBuffer;
 }
     
 // ** RenderingContext::setDefaultStateBlock
@@ -406,7 +279,7 @@ void RenderingContext::display(RenderFrame& frame, bool wait)
     construct(frame);
     
     // Execute an entry point command buffer
-    execute( frame, frame.entryPoint() );
+    execute(frame, frame.entryPoint());
     
     // Reset rendering states
     applyStateBlock(frame, m_defaultStateBlock);
@@ -421,8 +294,8 @@ void RenderingContext::display(RenderFrame& frame, bool wait)
 // ** RenderingContext::construct
 void RenderingContext::construct(RenderFrame& frame)
 {
-    execute(frame, *m_constructionCommandBuffer);
-    m_constructionCommandBuffer->reset();
+    execute(frame, *m_resourceCommandBuffer);
+    m_resourceCommandBuffer->reset();
 }
 
 // ** RenderingContext::execute
@@ -484,7 +357,7 @@ InputLayout RenderingContext::requestInputLayout(const VertexFormat& format)
     id = allocateIdentifier(RenderResourceType::InputLayout);
     
     // Nothing found - construct a new one
-    id = m_constructionCommandBuffer->createInputLayout(id, format);
+    id = m_resourceCommandBuffer->createInputLayout(id, format);
     
     // Now put a new input layout to cache
     m_inputLayoutCache[format] = id;
@@ -552,35 +425,35 @@ FeatureLayout RenderingContext::requestPipelineFeatureLayout(const PipelineFeatu
 VertexBuffer_ RenderingContext::requestVertexBuffer( const void* data, s32 size )
 {
     VertexBuffer_ id = allocateIdentifier(RenderResourceType::VertexBuffer);
-    return m_constructionCommandBuffer->createVertexBuffer(id, data, size);
+    return m_resourceCommandBuffer->createVertexBuffer(id, data, size);
 }
 
 // ** RenderingContext::requestIndexBuffer
 IndexBuffer_ RenderingContext::requestIndexBuffer( const void* data, s32 size )
 {
     IndexBuffer_ id = allocateIdentifier(RenderResourceType::IndexBuffer);
-    return m_constructionCommandBuffer->createIndexBuffer(id, data, size);
+    return m_resourceCommandBuffer->createIndexBuffer(id, data, size);
 }
 
 // ** RenderingContext::requestConstantBuffer
 ConstantBuffer_ RenderingContext::requestConstantBuffer(const void* data, s32 size, UniformLayout layout)
 {
     ConstantBuffer_ id = allocateIdentifier(RenderResourceType::ConstantBuffer);
-    return m_constructionCommandBuffer->createConstantBuffer(id, data, size, layout);
+    return m_resourceCommandBuffer->createConstantBuffer(id, data, size, layout);
 }
 
 // ** RenderingContext::requestTexture2D
 Texture_ RenderingContext::requestTexture2D(const void* data, u16 width, u16 height, PixelFormat format, TextureFilter filter)
 {
     Texture_ id = allocateIdentifier(RenderResourceType::Texture);
-    return m_constructionCommandBuffer->createTexture2D(id, data, width, height, format, filter);
+    return m_resourceCommandBuffer->createTexture2D(id, data, width, height, format, filter);
 }
     
 // ** RenderingContext::requestTextureCube
 Texture_ RenderingContext::requestTextureCube(const void* data, u16 size, u16 mipLevels, PixelFormat format, TextureFilter filter)
 {
     Texture_ id = allocateIdentifier(RenderResourceType::Texture);
-    return m_constructionCommandBuffer->createTextureCube(id, data, size, mipLevels, format, filter);
+    return m_resourceCommandBuffer->createTextureCube(id, data, size, mipLevels, format, filter);
 }
     
 // ** RenderingContext::requestProgram
@@ -625,7 +498,7 @@ Program RenderingContext::requestProgram(const String& vertex, const String& fra
 // ** RenderingContext::deleteConstantBuffer
 void RenderingContext::deleteConstantBuffer(ConstantBuffer_ id)
 {
-    m_constructionCommandBuffer->deleteConstantBuffer(id);
+    m_resourceCommandBuffer->deleteConstantBuffer(id);
 }
 
 // ** RenderingContext::deleteConstantBuffer
@@ -639,7 +512,7 @@ void RenderingContext::deleteUniformLayout(UniformLayout id)
 // ** RenderingContext::deleteConstantBuffer
 void RenderingContext::deleteProgram(Program id)
 {
-    m_constructionCommandBuffer->deleteProgram(id);
+    m_resourceCommandBuffer->deleteProgram(id);
 }
 
 // ** RenderingContext::findUniformLayout

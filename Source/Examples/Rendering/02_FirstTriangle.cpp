@@ -82,7 +82,7 @@ class FirstTriangle : public RenderingApplicationDelegate
         // A process of rendering a frame consist from a command buffer generation
         // and then submitting it to a device.
         // Here we take an entry point command buffer from our rendering frame.
-        CommandBuffer& commands = m_renderFrame.entryPoint();
+        RenderCommandBuffer& commands = m_renderFrame.entryPoint();
 
         // Emit a command that clears a viewport
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);

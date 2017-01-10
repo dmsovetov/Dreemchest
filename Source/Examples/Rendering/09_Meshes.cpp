@@ -136,7 +136,7 @@ class Meshes : public RenderingApplicationDelegate
     {
         m_renderFrame.clear();
         
-        CommandBuffer& commands = m_renderFrame.entryPoint();
+        RenderCommandBuffer& commands = m_renderFrame.entryPoint();
         
         // Clear the viewport
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);

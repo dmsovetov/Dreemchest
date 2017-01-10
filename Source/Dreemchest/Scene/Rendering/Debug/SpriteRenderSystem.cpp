@@ -54,7 +54,7 @@ SpriteRenderSystem::SpriteRenderSystem( RenderingContext& context, RenderScene& 
 }
 
 // ** SpriteRenderSystem::emitRenderOperations
-void SpriteRenderSystem::emitRenderOperations( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const SpriteRenderer& spriteRenderer )
+void SpriteRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const SpriteRenderer& spriteRenderer )
 {
     // Push a shader sprite rendering state
     StateScope state = stateStack.newScope();
@@ -92,7 +92,7 @@ void SpriteRenderSystem::emitRenderOperations( RenderFrame& frame, CommandBuffer
 }
 
 // ** SpriteRenderSystem::emitSpriteBatch
-void SpriteRenderSystem::emitSpriteBatch( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const RenderScene::Sprites& sprites, s32 first, s32 count, f32 scaleFactor )
+void SpriteRenderSystem::emitSpriteBatch( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const RenderScene::Sprites& sprites, s32 first, s32 count, f32 scaleFactor )
 {
     // Nothing to render - just skip
     if( count == 0 ) {

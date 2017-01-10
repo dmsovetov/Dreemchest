@@ -43,7 +43,7 @@ ForwardRenderSystem::ForwardRenderSystem( RenderingContext& context, RenderScene
 }
 
 // ** ForwardRenderSystem::emitRenderOperations
-void ForwardRenderSystem::emitRenderOperations( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const ForwardRenderer& forwardRenderer )
+void ForwardRenderSystem::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const Camera& camera, const Transform& transform, const ForwardRenderer& forwardRenderer )
 {
     // First perform an ambient render pass
     m_ambient.render( frame, commands, stateStack );
@@ -70,7 +70,7 @@ void ForwardRenderSystem::emitRenderOperations( RenderFrame& frame, CommandBuffe
 }
 
 // ** ForwardRenderSystem::renderSpotLight
-void ForwardRenderSystem::renderSpotLight( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const ForwardRenderer& forwardRenderer, const RenderScene::LightNode& light )
+void ForwardRenderSystem::renderSpotLight( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const ForwardRenderer& forwardRenderer, const RenderScene::LightNode& light )
 {
     TransientTexture shadowTexture;
     ShadowParameters shadowParameters;
@@ -96,7 +96,7 @@ void ForwardRenderSystem::renderSpotLight( RenderFrame& frame, CommandBuffer& co
 }
 
 // ** ForwardRenderSystem::renderPointLight
-void ForwardRenderSystem::renderPointLight( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const ForwardRenderer& forwardRenderer, const RenderScene::LightNode& light )
+void ForwardRenderSystem::renderPointLight( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const ForwardRenderer& forwardRenderer, const RenderScene::LightNode& light )
 {
     // Render a light pass
     RenderScene::CBuffer::ClipPlanes clip = RenderScene::CBuffer::ClipPlanes::fromSphere( *light.matrix * Vec3::zero(), light.light->range() );
@@ -104,7 +104,7 @@ void ForwardRenderSystem::renderPointLight( RenderFrame& frame, CommandBuffer& c
 }
 
 // ** ForwardRenderSystem::renderDirectionalLight
-void ForwardRenderSystem::renderDirectionalLight( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const ForwardRenderer& forwardRenderer, const Camera& camera, const Transform& cameraTransform, const Viewport& viewport, const RenderScene::LightNode& light )
+void ForwardRenderSystem::renderDirectionalLight( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const ForwardRenderer& forwardRenderer, const Camera& camera, const Transform& cameraTransform, const Viewport& viewport, const RenderScene::LightNode& light )
 {
     // Light does not cast any shadows, so just render it
     if( !light.light->castsShadows() ) {
@@ -152,7 +152,7 @@ void ForwardRenderSystem::renderDirectionalLight( RenderFrame& frame, CommandBuf
 }
 
 // ** ForwardRenderSystem::renderLight
-void ForwardRenderSystem::renderLight( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const RenderScene::LightNode& light, const RenderScene::CBuffer::ClipPlanes* clip, TransientTexture shadows )
+void ForwardRenderSystem::renderLight( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const RenderScene::LightNode& light, const RenderScene::CBuffer::ClipPlanes* clip, TransientTexture shadows )
 {
     // A light type feature bits
     PipelineFeatures lightType[] = { ShaderPointLight, ShaderSpotLight, ShaderDirectionalLight };

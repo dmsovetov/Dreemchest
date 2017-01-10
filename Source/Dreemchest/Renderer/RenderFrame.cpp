@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include "RenderFrame.h"
-#include "CommandBuffer.h"
+#include "Commands/RenderCommandBuffer.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -57,22 +57,23 @@ void* RenderFrame::allocate( s32 size )
 }
 
 // ** RenderFrame::entryPoint
-const CommandBuffer& RenderFrame::entryPoint( void ) const
+const RenderCommandBuffer& RenderFrame::entryPoint( void ) const
 {
     return *m_entryPoint;
 }
 
 // ** RenderFrame::entryPoint
-CommandBuffer& RenderFrame::entryPoint( void )
+RenderCommandBuffer& RenderFrame::entryPoint( void )
 {
     return *m_entryPoint;
 }
 
 // ** RenderFrame::createCommandBuffer
-CommandBuffer& RenderFrame::createCommandBuffer( void )
+RenderCommandBuffer& RenderFrame::createCommandBuffer( void )
 {
-    m_commandBuffers.push_back( DC_NEW CommandBuffer );
-    return *m_commandBuffers.back().get();
+    RenderCommandBuffer* commandBuffer = DC_NEW RenderCommandBuffer(*this);
+    m_commandBuffers.push_back(commandBuffer);
+    return *commandBuffer;
 }
 
 // ** RenderFrame::stateStack

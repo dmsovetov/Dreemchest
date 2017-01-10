@@ -39,7 +39,7 @@ AmbientPass::AmbientPass( RenderingContext& context, RenderScene& renderScene )
 }
 
 // ** AmbientPass::render
-void AmbientPass::render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack )
+void AmbientPass::render( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack )
 {
     StateScope pass = stateStack.newScope();
     pass->bindProgram( m_shader );
@@ -69,7 +69,7 @@ ConstantBuffer_ ShadowPass::cbuffer( void ) const
 }
 
 // ** ShadowPass::render
-TransientTexture ShadowPass::render( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const RenderScene::CBuffer::Shadow& parameters )
+TransientTexture ShadowPass::render( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const RenderScene::CBuffer::Shadow& parameters )
 {
     // Acquire a shadow render target
     s32 dimensions  = static_cast<s32>( 1.0f / parameters.invSize );
@@ -77,7 +77,7 @@ TransientTexture ShadowPass::render( RenderFrame& frame, CommandBuffer& commands
     TransientTexture renderTarget = commands.acquireTexture2D( dimensions, dimensions, Renderer::PixelD24X8 );
 
     // Render scene from a light's point of view
-    CommandBuffer& cmd = commands.renderToTexture( frame, renderTarget );
+    RenderCommandBuffer& cmd = commands.renderToTexture(renderTarget);
 
     cmd.clear( Rgba( 1.0f, 1.0f, 1.0f, 1.0f ), ~0 );
 

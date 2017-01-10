@@ -41,45 +41,45 @@ namespace Scene {
                                         StreamedRenderPassBase( RenderingContext& context, RenderScene& renderScene, s32 maxVerticesInBatch );
 
         //! Flushes a generated vertex stream.
-        virtual void                    end( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack ) NIMBLE_OVERRIDE;
+        virtual void                    end( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack ) NIMBLE_OVERRIDE;
 
     protected:
 
         //! Writes transformed vertices of a single line instance.
-        void                            emitLine( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Vec3& start, const Vec3& end, const Rgba* color = NULL );
+        void                            emitLine( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const Vec3& start, const Vec3& end, const Rgba* color = NULL );
 
         //! Writes transformed vertices to a single triangle.
-        void                            emitTriangle( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Vec3* positions, const Rgba* colors );
+        void                            emitTriangle( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const Vec3* positions, const Rgba* colors );
 
         //! Writes a wire box to an output stream.
-        void                            emitWireBounds( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Bounds& bounds, const Rgba* color = NULL );
+        void                            emitWireBounds( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const Bounds& bounds, const Rgba* color = NULL );
 
         //! Writes a wire box based on it's vertices to an output stream.
-        void                            emitWireBounds( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Vec3 vertices[8], const Rgba* color = NULL );
+        void                            emitWireBounds( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const Vec3 vertices[8], const Rgba* color = NULL );
 
         //! Writes a frustum to an output stream.
-        void                            emitFrustum( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, f32 fov, f32 aspect, f32 near, f32 far, const Matrix4& transform, const Rgba* color = NULL );
+        void                            emitFrustum( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, f32 fov, f32 aspect, f32 near, f32 far, const Matrix4& transform, const Rgba* color = NULL );
 
         //! Writes a basis to an output stream.
-        void                            emitBasis( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Matrix4& transform );
+        void                            emitBasis( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const Matrix4& transform );
 
         //! Writes a rectangle to an output stream.
-        void                            emitRect( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Vec3* positions, const Vec2* uv, const Rgba* colors );
+        void                            emitRect( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const Vec3* positions, const Vec2* uv, const Rgba* colors );
 
         //! Writes a rectangle based on a point and two basis vectors to an output stream.
-        void                            emitRect( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Vec3& point, const Vec3& u, const Vec3& v, const Rgba* color = NULL );
+        void                            emitRect( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const Vec3& point, const Vec3& u, const Vec3& v, const Rgba* color = NULL );
 
         //! Writes a set of vertices to an output stream.
-        void                            emitVertices( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, Renderer::PrimitiveType primitive, const Vec3* positions, const Vec2* uv, const Rgba* colors, s32 count );
+        void                            emitVertices( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, Renderer::PrimitiveType primitive, const Vec3* positions, const Vec2* uv, const Rgba* colors, s32 count );
 
         //! Begins a new batch.
-        void                            beginBatch( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, VertexFormat vertexFormat, Renderer::PrimitiveType primitive, s32 capacity );
+        void                            beginBatch( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, VertexFormat vertexFormat, Renderer::PrimitiveType primitive, s32 capacity );
 
         //! Restarts a batch with a same parameters by flushing an active buffer.
-        void                            restartBatch( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, VertexFormat vertexFormat, Renderer::PrimitiveType primitive );
+        void                            restartBatch( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, VertexFormat vertexFormat, Renderer::PrimitiveType primitive );
 
         //! Flushes an active batch.
-        void                            flush( CommandBuffer& commands, StateStack& stateStack );
+        void                            flush( RenderCommandBuffer& commands, StateStack& stateStack );
 
         //! Returns true if a batch can hold an additional amount of vertices.
         bool                            hasEnoughSpace( s32 additionalVertices ) const;
@@ -119,12 +119,12 @@ namespace Scene {
                                     StreamedRenderPass( RenderingContext& context, RenderScene& renderScene, s32 maxVerticesInBatch );
 
         //! Processes an entity family and generates a vertex stream from it.
-        virtual void                emitRenderOperations( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack ) NIMBLE_OVERRIDE;
+        virtual void                emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack ) NIMBLE_OVERRIDE;
 
     protected:
 
         //! Emits render operation for a single renderable entity.
-        virtual void                emitRenderOperations( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const TRenderable& renderable, const Transform& transform ) NIMBLE_ABSTRACT;
+        virtual void                emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack, const Ecs::Entity& entity, const TRenderable& renderable, const Transform& transform ) NIMBLE_ABSTRACT;
 
     protected:
 
@@ -141,7 +141,7 @@ namespace Scene {
 
     // ** StreamedRenderPass::emitRenderOperations
     template<typename TRenderable>
-    void StreamedRenderPass<TRenderable>::emitRenderOperations( RenderFrame& frame, CommandBuffer& commands, StateStack& stateStack )
+    void StreamedRenderPass<TRenderable>::emitRenderOperations( RenderFrame& frame, RenderCommandBuffer& commands, StateStack& stateStack )
     {
         // Get the entity set from index
         const Ecs::EntitySet& entities = m_index->entities();

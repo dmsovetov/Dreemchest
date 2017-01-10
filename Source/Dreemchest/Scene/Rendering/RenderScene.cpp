@@ -247,7 +247,7 @@ Renderer::RenderFrameUPtr RenderScene::captureFrame( void )
     Renderer::StateStack& stateStack = frame->stateStack();
 
     // Gen a frame entry point command buffer
-    Renderer::CommandBuffer& entryPoint = frame->entryPoint();
+    Renderer::RenderCommandBuffer& entryPoint = frame->entryPoint();
 
     // Push a default state block
     Renderer::StateScope defaults = stateStack.newScope();
@@ -269,8 +269,8 @@ Renderer::RenderFrameUPtr RenderScene::captureFrame( void )
     {
         const CameraNode& camera = cameras[i];
         entryPoint
-            .renderToTarget( *frame, camera.viewport->denormalize( camera.camera->ndc() ) )
-            .clear( camera.camera->clearColor(), camera.camera->clearMask() );
+            .renderToTarget(camera.viewport->denormalize(camera.camera->ndc()))
+            .clear(camera.camera->clearColor(), camera.camera->clearMask());
     }
 
     // Process all render systems
