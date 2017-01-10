@@ -97,6 +97,19 @@ namespace Renderer {
     //! A unique pointer type for a pipeline feature layout instance.
     typedef UPtr<class PipelineFeatureLayout>   PipelineFeatureLayoutUPtr;
     
+    //! A wrapper type that indicates that a pointer stored inside is persistent.
+    struct PersistentPointer
+    {
+        const void* value;
+    };
+    
+    //! Creates a persistent pointer
+    NIMBLE_INLINE PersistentPointer persistentPointer(const void* value)
+    {
+        PersistentPointer pointer = { value };
+        return pointer;
+    }
+    
     //! Vertex attributes that are passed to a shader.
     enum VertexAttribute
     {

@@ -307,6 +307,12 @@ class RenderingToTexture : public RenderingApplicationDelegate
         convolution.power      = power;
         commands.uploadConstantBuffer(convolutionCBuffer, &convolution, sizeof(convolution));
         
+        Kernel* kernels = new Kernel[iterations];
+        for (s32 i = 0; i < iterations; i++)
+        {
+            generateConvolutionKernel(kernels[i]);
+        }
+        
         // Declare an array of camera up vectors to
         Vec3 up[] =
         {
@@ -334,8 +340,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
             StateScope quadStates = stateStack.push(&m_fullscreenQuad);
             
             // Generate and upload a convolution kernel for this iteration
-            generateConvolutionKernel(kernel);
-            commands.uploadConstantBuffer(kernelCBuffer, &kernel, sizeof(kernel));
+            commands.uploadConstantBuffer(kernelCBuffer, persistentPointer(&kernels[j]), sizeof(Kernel));
             
             // Now render each cube map face
             for (s32 i = 0; i < 6; i++)

@@ -59,7 +59,7 @@ void CommandBuffer::execute( const CommandBuffer& commands )
 }
 
 // ** CommandBuffer::uploadConstantBuffer
-void CommandBuffer::uploadConstantBuffer( ConstantBuffer_ id, const void* data, s32 size )
+void CommandBuffer::uploadConstantBuffer(ConstantBuffer_ id, const void* data, s32 size)
 {
     OpCode opCode;
     opCode.type = OpCode::UploadConstantBuffer;
@@ -68,8 +68,19 @@ void CommandBuffer::uploadConstantBuffer( ConstantBuffer_ id, const void* data, 
     push( opCode );
 }
 
+// ** CommandBuffer::uploadConstantBuffer
+void CommandBuffer::uploadConstantBuffer(ConstantBuffer_ id, const PersistentPointer& data, s32 size)
+{
+    OpCode opCode;
+    opCode.type = OpCode::UploadConstantBuffer;
+    opCode.upload.id = id;
+    opCode.upload.buffer.data = reinterpret_cast<const u8*>(data.value);
+    opCode.upload.buffer.size = size;
+    push( opCode );
+}
+
 // ** CommandBuffer::uploadVertexBuffer
-void CommandBuffer::uploadVertexBuffer( VertexBuffer_ id, const void* data, s32 size )
+void CommandBuffer::uploadVertexBuffer(VertexBuffer_ id, const void* data, s32 size)
 {
     OpCode opCode;
     opCode.type = OpCode::UploadVertexBuffer;
@@ -77,10 +88,27 @@ void CommandBuffer::uploadVertexBuffer( VertexBuffer_ id, const void* data, s32 
     opCode.upload.buffer = adoptDataBuffer(data, size);
     push( opCode );
 }
+
+// ** CommandBuffer::uploadVertexBuffer
+void CommandBuffer::uploadVertexBuffer(VertexBuffer_ id, const PersistentPointer& data, s32 size)
+{
+    OpCode opCode;
+    opCode.type = OpCode::UploadVertexBuffer;
+    opCode.upload.id = id;
+    opCode.upload.buffer.data = reinterpret_cast<const u8*>(data.value);
+    opCode.upload.buffer.size = size;
+    push( opCode );
+}
     
 // ** CommandBuffer::push
 void CommandBuffer::push(const OpCode& opCode)
 {
+    if (m_commands.capacity() == m_commands.size())
+    {
+        s32 growBy = max2<s32>(5, m_commands.capacity() * 0.1f);
+        m_commands.reserve(m_commands.capacity() + growBy);
+    }
+    
     m_commands.push_back(opCode);
 }
  

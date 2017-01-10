@@ -53,9 +53,15 @@ namespace Renderer
         
         //! Emits a constant buffer upload command.
         void                        uploadConstantBuffer(ConstantBuffer_ id, const void* data, s32 size);
-
+        
+        //! Emits a constant buffer upload command.
+        void                        uploadConstantBuffer(ConstantBuffer_ id, const PersistentPointer& data, s32 size);
+        
         //! Emits a vertex buffer upload command.
         void                        uploadVertexBuffer(VertexBuffer_ id, const void* data, s32 size);
+
+        //! Emits a vertex buffer upload command.
+        void                        uploadVertexBuffer(VertexBuffer_ id, const PersistentPointer& data, s32 size);
 
     protected:
 
