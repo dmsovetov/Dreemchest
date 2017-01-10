@@ -469,7 +469,9 @@ void OpenGL2RenderingContext::updateUniforms(const PipelineState& state, const P
     {
         static const void* findByName(const Permutation::Uniform& uniform, const FixedArray<ConstantBuffer>& constantBuffers, const PipelineState& state)
         {
-            const ConstantBuffer& cbuffer = constantBuffers[state.constantBuffer(uniform.index)];
+            ResourceId id = state.constantBuffer(uniform.index);
+            NIMBLE_ABORT_IF(!id, "no constant buffer bound");
+            const ConstantBuffer& cbuffer = constantBuffers[id];
 
             for (const UniformElement* constant = &cbuffer.layout[0]; constant->name; constant++)
             {
