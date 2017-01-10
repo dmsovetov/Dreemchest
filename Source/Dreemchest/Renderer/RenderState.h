@@ -292,10 +292,10 @@ namespace Renderer
         u32                             stateBit(s32 index) const;
 
         //! Returns a feature set enabled by a state block.
-        u64                             features( void ) const;
+        PipelineFeatures                features( void ) const;
 
         //! Returns a feature mask exposed by a state block.
-        u64                             featureMask( void ) const;
+        PipelineFeatures                featureMask( void ) const;
 
     private:
 
@@ -305,8 +305,8 @@ namespace Renderer
     private:
 
         u32                             m_mask;                 //!< A bit mask of state changes that are preset inside this state block.
-        u64                             m_features;             //!< A shader feature set.
-        u64                             m_featureMask;          //!< A shader feature mask.
+        PipelineFeatures                m_features;             //!< A shader feature set.
+        PipelineFeatures                m_featureMask;          //!< A shader feature mask.
         u32                             m_stateBits[MaxStates]; //!< An array of state bits.
         State                           m_states[MaxStates];    //!< An array of state changes.
         s16                             m_count;                //!< A total number of states stored inside a block.
@@ -319,13 +319,13 @@ namespace Renderer
     }
 
     //! Returns a feature set enabled by a state block.
-    NIMBLE_INLINE u64 StateBlock::features( void ) const
+    NIMBLE_INLINE PipelineFeatures StateBlock::features( void ) const
     {
         return m_features;
     }
 
     //! Returns a feature mask exposed by a state block.
-    NIMBLE_INLINE u64 StateBlock::featureMask( void ) const
+    NIMBLE_INLINE PipelineFeatures StateBlock::featureMask( void ) const
     {
         return m_featureMask;
     }
