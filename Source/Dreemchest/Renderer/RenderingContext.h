@@ -46,6 +46,10 @@ namespace Renderer
         //! Sets a default state block.
         void                                    setDefaultStateBlock(const StateBlock& value);
         
+        //! Returns a default state block.
+        const StateBlock&                       defaultStateBlock() const;
+        StateBlock&                             defaultStateBlock();
+        
         //! Sets a default program.
         void                                    setDefaultProgram(Program value);
         
@@ -110,9 +114,6 @@ namespace Renderer
         
                                                 //! Constructs a RenderingContext instance.
                                                 RenderingContext(RenderViewPtr view);
-        
-        //! Applies a specified state block.
-        virtual PipelineFeatures                applyStateBlock(const RenderFrame& frame, const StateBlock& stateBlock) NIMBLE_ABSTRACT;
         
         //! Executes a specified command buffer.
         virtual void                            executeCommandBuffer(const RenderFrame& frame, const CommandBuffer& commands) NIMBLE_ABSTRACT;

@@ -111,14 +111,6 @@ OpenGL2RenderingContext::OpenGL2RenderingContext(RenderViewPtr view)
     m_vertexBuffers.emplace(0, 0);
     m_indexBuffers.emplace(0, 0);
 }
-
-// ** OpenGL2RenderingContext::applyStateBlock
-PipelineFeatures OpenGL2RenderingContext::applyStateBlock(const RenderFrame& frame, const StateBlock& stateBlock)
-{
-//    const StateBlock* blocks[] = { &stateBlock };
-//    return applyStates(frame, blocks, 1).features;
-    return 0;
-}
     
 // ** OpenGL2RenderingContext::acquireTexture
 ResourceId OpenGL2RenderingContext::acquireTexture(u8 type, u16 width, u16 height, PixelFormat format)

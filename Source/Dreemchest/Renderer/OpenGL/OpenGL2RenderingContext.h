@@ -42,9 +42,6 @@ namespace Renderer
         
     protected:
         
-        //! Applies a specified state block.
-        virtual PipelineFeatures    applyStateBlock(const RenderFrame& frame, const StateBlock& stateBlock) NIMBLE_OVERRIDE;
-        
         //! Executes a specified command buffer.
         virtual void                executeCommandBuffer(const RenderFrame& frame, const CommandBuffer& commands) NIMBLE_OVERRIDE;
         

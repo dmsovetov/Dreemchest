@@ -202,7 +202,7 @@ namespace Renderer
     public:
 
         //! A maximum number of states that can be stored inside a single block.
-        enum { MaxStates = 8 };
+        enum { MaxStates = 9 };
 
                                         //! Constructs a StateBlock block.
                                         StateBlock( void );

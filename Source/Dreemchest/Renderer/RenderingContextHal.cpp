@@ -159,12 +159,6 @@ void RenderingContextHal::executeCommandBuffer( const RenderFrame& frame, const 
     }*/
 }
     
-// ** RenderingContextHal::applyStateBlock
-PipelineFeatures RenderingContextHal::applyStateBlock(const RenderFrame& frame, const StateBlock& stateBlock)
-{
-    const StateBlock* blocks[] = { &stateBlock };
-    return applyStates(frame, blocks, 1);
-}
 
 // ** RenderingContextHal::clear
 void RenderingContextHal::clear( const f32* color, f32 depth, s32 stencil, u8 mask )

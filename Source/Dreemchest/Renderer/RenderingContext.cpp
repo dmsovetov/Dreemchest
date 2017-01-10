@@ -169,14 +169,8 @@ RenderingContext::RenderingContext(RenderViewPtr view)
     m_defaultStateBlock.setDepthState(LessEqual, true);
     m_defaultStateBlock.disableAlphaTest();
     m_defaultStateBlock.disableBlending();
+    m_defaultStateBlock.disableStencilTest();
     m_defaultStateBlock.setColorMask(ColorMaskAll);
-    //m_defaultStateBlock.setPolygonMode(PolygonFill);
-    //m_defaultStateBlock.bindProgram(0);
-    //m_defaultStateBlock.bindVertexBuffer(0);
-    //for (s32 i = 0; i < State::MaxTextureSamplers; i++)
-    //{
-    //    m_defaultStateBlock.bindTexture(0, static_cast<State::TextureSampler>(i));
-    //}
     
     // Create a default program
     Program defaultProgram = requestProgram(ShaderProgramDescriptor());
@@ -260,6 +254,18 @@ void RenderingContext::setDefaultStateBlock(const StateBlock& value)
     m_defaultStateBlock = value;
 }
     
+// ** RenderingContext::defaultStateBlock
+const StateBlock& RenderingContext::defaultStateBlock() const
+{
+    return m_defaultStateBlock;
+}
+    
+// ** RenderingContext::defaultStateBlock
+StateBlock& RenderingContext::defaultStateBlock()
+{
+    return m_defaultStateBlock;
+}
+    
 // ** RenderingContext::setDefaultProgram
 void RenderingContext::setDefaultProgram(Program value)
 {
@@ -280,10 +286,7 @@ void RenderingContext::display(RenderFrame& frame, bool wait)
     
     // Execute an entry point command buffer
     execute(frame, frame.entryPoint());
-    
-    // Reset rendering states
-    applyStateBlock(frame, m_defaultStateBlock);
-    
+
     // End frame
     if (m_view.valid())
     {
