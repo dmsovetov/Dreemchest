@@ -65,6 +65,15 @@ namespace Renderer
             s32         size;           //!< A buffer size.
         };
         
+        //! A compiled state block is bundled with a draw call command.
+        struct CompiledStateBlock
+        {
+            u8                              size;     //!< A total number of rendering states stored inside this block.
+            StateMask                       mask;     //!< A rendering state bit mask.
+            PipelineFeatures                features; //!< A bit mask of activated highlevel features.
+            const State*                    states;   //!< An array of rendering states to be applied before an actual draw call.
+        };
+        
         Type                                type;                       //!< An op code type.
         u64                                 sorting;                    //!< A sorting key.
         union
@@ -76,7 +85,7 @@ namespace Renderer
                 PrimitiveType               primitives;                 //!< A primitive type to be rendered.
                 s32                         first;                      //!< First index or primitive.
                 s32                         count;                      //!< A total number of indices or primitives to use.
-                const StateBlock**          states;                     //!< States from this stack are applied before a rendering command.
+                CompiledStateBlock*         stateBlock;                 //!< A compiled state block to be applied before running a command.
             } drawCall;
             
             struct

@@ -413,7 +413,7 @@ namespace Renderer
         const StateBlock**          states( void ) const;
         
         //! Converts an array of state blocks to an array of states.
-        static s32                  mergeBlocks(const StateBlock* const * stateBlocks, s32 count, State* states, s32 maxStates, PipelineFeatures& userDefined);
+        static s32                  mergeBlocks(const StateBlock* const * stateBlocks, s32 count, State* states, s32 maxStates, StateMask& activeStateMask, PipelineFeatures& userDefined);
 
     private:
 

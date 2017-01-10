@@ -192,9 +192,6 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
 {
     PipelineState    pipelineState;
     GLuint           id;
-    s32              stateCount;
-    State            states[MaxStateChanges];
-    PipelineFeatures userFeatures;
     
     for (s32 i = 0, n = commands.size(); i < n; i++)
     {
@@ -355,10 +352,9 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 break;
 
             case OpCode::DrawIndexed:
-                // Apply rendering states from a stack
-                stateCount = StateStack::mergeBlocks(opCode.drawCall.states, MaxStateStackDepth, states, MaxStateChanges, userFeatures);
-                applyStates(pipelineState, states, stateCount);
-                pipelineState.activateUserFeatures(userFeatures);
+                // Apply rendering states bundled with a draw call
+                applyStates(pipelineState, opCode.drawCall.stateBlock->states, opCode.drawCall.stateBlock->size);
+                pipelineState.activateUserFeatures(opCode.drawCall.stateBlock->features);
 
                 // Now activate a matching shader permutation
                 compilePipelineState(pipelineState);
@@ -368,10 +364,9 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 break;
                 
             case OpCode::DrawPrimitives:
-                // Apply rendering states from a stack
-                stateCount = StateStack::mergeBlocks(opCode.drawCall.states, MaxStateStackDepth, states, MaxStateChanges, userFeatures);
-                applyStates(pipelineState, states, stateCount);
-                pipelineState.activateUserFeatures(userFeatures);
+                // Apply rendering states bundled with a draw call
+                applyStates(pipelineState, opCode.drawCall.stateBlock->states, opCode.drawCall.stateBlock->size);
+                pipelineState.activateUserFeatures(opCode.drawCall.stateBlock->features);
 
                 // Now activate a matching shader permutation
                 compilePipelineState(pipelineState);

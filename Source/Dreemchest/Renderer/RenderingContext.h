@@ -154,9 +154,6 @@ namespace Renderer
         //! A maximum number of input layout types
         enum { MaxInputLayouts = 255 };
         
-        //! A maximum number of state changes that can be applied in a row.
-        enum { MaxStateChanges = 16 };
-        
         RenderViewPtr                           m_view;                                                 //!< A rendering viewport.
         ResourceIdentifiers                     m_identifiers[RenderResourceType::TotalTypes];          //!< An array of persistent identifier managers.
         FixedArray<PipelineFeatureLayoutUPtr>   m_pipelineFeatureLayouts;                               //!< An array of constructed pipeline feature layouts.

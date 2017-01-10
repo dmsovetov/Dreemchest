@@ -566,13 +566,13 @@ void StateStack::reset( void )
 }
     
 // ** StateStack::mergeBlocks
-s32 StateStack::mergeBlocks(const StateBlock* const * stateBlocks, s32 count, State* states, s32 maxStates, PipelineFeatures& userDefined)
+s32 StateStack::mergeBlocks(const StateBlock* const * stateBlocks, s32 count, State* states, s32 maxStates, StateMask& activeStateMask, PipelineFeatures& userDefined)
 {
     PipelineFeatures userFeatures = 0;
     PipelineFeatures userFeaturesMask = ~0;
     
-    // A bitmask of states that were already set
-    StateMask activeStateMask = 0;
+    // Reset a bitmask of states that were already set
+    activeStateMask = 0;
     
     // A total number of states written to an output array
     s32 statesWritten = 0;

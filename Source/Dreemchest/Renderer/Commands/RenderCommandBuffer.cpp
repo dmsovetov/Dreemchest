@@ -194,19 +194,27 @@ void RenderCommandBuffer::drawPrimitives(u32 sorting, PrimitiveType primitives, 
 }
 
 // ** RenderCommandBuffer::emitDrawCall
-void RenderCommandBuffer::emitDrawCall( OpCode::Type type, u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateBlock** states, s32 stateCount)
+void RenderCommandBuffer::emitDrawCall(OpCode::Type type, u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateBlock** stateBlocks, s32 stateBlockCount)
 {
+    // Compile an array of state blocks
+    OpCode::CompiledStateBlock* stateBlock = (OpCode::CompiledStateBlock*)m_frame.allocate(sizeof(OpCode::CompiledStateBlock));
+    
+    s32 maxStates = (m_frame.allocationCapacity() - m_frame.allocatedBytes()) / sizeof(State);
+    State* states = (State*)m_frame.allocate(sizeof(State));
+    stateBlock->states = states;
+    stateBlock->size   = StateStack::mergeBlocks(stateBlocks, stateBlockCount, states, maxStates, stateBlock->mask, stateBlock->features);
+    
+    m_frame.allocate(sizeof(State) * (stateBlock->size - 1));
+    
+    // Now push a draw call command
     OpCode opCode;
+    memset(&opCode, 0, sizeof(opCode));
     opCode.type                 = type;
     opCode.sorting              = sorting;
     opCode.drawCall.primitives  = primitives;
     opCode.drawCall.first       = first;
     opCode.drawCall.count       = count;
-    opCode.drawCall.states      = (const StateBlock**)m_frame.allocate(sizeof(StateBlock*) * (stateCount + 1));
-    
-    opCode.drawCall.states[stateCount] = NULL;
-    memcpy(opCode.drawCall.states, states, sizeof(StateBlock*) * stateCount);
-
+    opCode.drawCall.stateBlock  = stateBlock;
     push(opCode);
 }
     
