@@ -41,7 +41,7 @@ RenderFrame::RenderFrame(s32 size)
 }
 
 // ** RenderFrame::internBuffer
-const void* RenderFrame::internBuffer( const void* data, s32 size )
+const void* RenderFrame::internBuffer(const void* data, s32 size)
 {
     void* interned = allocate( size );
     memcpy( interned, data, size );
@@ -49,41 +49,53 @@ const void* RenderFrame::internBuffer( const void* data, s32 size )
 }
 
 // ** RenderFrame::allocate
-void* RenderFrame::allocate( s32 size )
+void* RenderFrame::allocate(s32 size)
 {
-    void* allocated = m_allocator.allocate( size );
+    void* allocated = m_allocator.allocate(size);
     NIMBLE_ABORT_IF( allocated == NULL, "render frame is out of memory" );
     return allocated;
 }
+    
+// ** RenderFrame::allocatedBytes
+s32 RenderFrame::allocatedBytes() const
+{
+    return m_allocator.allocated();
+}
+    
+// ** RenderFrame::allocationCapacity
+s32 RenderFrame::allocationCapacity() const
+{
+    return m_allocator.size();
+}
 
 // ** RenderFrame::entryPoint
-const RenderCommandBuffer& RenderFrame::entryPoint( void ) const
+const RenderCommandBuffer& RenderFrame::entryPoint() const
 {
     return *m_entryPoint;
 }
 
 // ** RenderFrame::entryPoint
-RenderCommandBuffer& RenderFrame::entryPoint( void )
+RenderCommandBuffer& RenderFrame::entryPoint()
 {
     return *m_entryPoint;
 }
 
 // ** RenderFrame::createCommandBuffer
-RenderCommandBuffer& RenderFrame::createCommandBuffer( void )
+RenderCommandBuffer& RenderFrame::createCommandBuffer()
 {
-    RenderCommandBuffer* commandBuffer = DC_NEW RenderCommandBuffer(*this);
+    RenderCommandBuffer* commandBuffer = DC_NEW (allocate(sizeof(RenderCommandBuffer))) RenderCommandBuffer(*this);
     m_commandBuffers.push_back(commandBuffer);
     return *commandBuffer;
 }
 
 // ** RenderFrame::stateStack
-StateStack& RenderFrame::stateStack( void )
+StateStack& RenderFrame::stateStack()
 {
     return m_stateStack;
 }
     
 // ** RenderFrame::clear
-void RenderFrame::clear( void )
+void RenderFrame::clear()
 {
     for (Commands::iterator i = m_commandBuffers.begin(), end = m_commandBuffers.end(); i != end; ++i)
     {

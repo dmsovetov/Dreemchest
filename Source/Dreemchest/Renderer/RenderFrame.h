@@ -63,13 +63,19 @@ namespace Renderer
         //! Allocates a block of memory that is used during a frame rendering.
         void*                                   allocate(s32 size);
         
+        //! Returns a total number of allocated bytes.
+        s32                                     allocatedBytes() const;
+        
+        //! Returns a maximum number of bytes that can be allocated by this frame instance.
+        s32                                     allocationCapacity() const;
+        
         //! Clears all data recorded by this frame.
         void                                    clear();
 
     private:
 
         //! Container type to store recorded command buffers.
-        typedef Array<CommandBufferUPtr>        Commands;
+        typedef Array<CommandBuffer*>           Commands;
 
         RenderCommandBuffer*                    m_entryPoint;           //!< A root command buffer.
         Commands                                m_commandBuffers;       //!< An array of recorded commands buffers.
@@ -87,7 +93,7 @@ namespace Renderer
     NIMBLE_INLINE const CommandBuffer& RenderFrame::commandBufferAt(s32 index) const
     {
         NIMBLE_ABORT_IF(index < 0 || index >= commandBufferCount(), "index is out of range");
-        return *m_commandBuffers[index].get();
+        return *m_commandBuffers[index];
     }
 
 } // namespace Renderer

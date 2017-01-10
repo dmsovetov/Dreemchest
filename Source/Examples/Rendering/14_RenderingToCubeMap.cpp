@@ -365,7 +365,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
         m_renderingContext->deleteUniformLayout(convolutionLayout);
         m_renderingContext->deleteProgram(program);
         
-        verbose("convolution", "\tfinished in %d ms [command buffer generated in %d ms, rendered in %d ms]\n", commandBufferTime + renderingTime, commandBufferTime, renderingTime);
+        verbose("convolution", "\tfinished in %d ms, allocated %d/%d bytes [command buffer generated in %d ms, rendered in %d ms]\n", commandBufferTime + renderingTime, frame.allocatedBytes(), frame.allocationCapacity(), commandBufferTime, renderingTime);
         
         return output;
     }
