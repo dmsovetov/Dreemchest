@@ -145,8 +145,8 @@ RenderingContext::RenderingContext(RenderViewPtr view)
     LogDebug("renderingContext", "rendering context size is %d bytes\n", sizeof(RenderingContext));
     LogDebug("renderingContext", "rendering state size is %d bytes\n", sizeof(State));
     LogDebug("renderingContext", "rendering state block size is %d bytes\n", sizeof(StateBlock));
-    LogDebug("renderingContext", "opcode size is %d bytes\n", sizeof(CommandBuffer::OpCode));
-    LogDebug("renderingContext", "drawCall size is %d bytes\n", sizeof(CommandBuffer::OpCode::drawCall));
+    LogDebug("renderingContext", "opcode size is %d bytes\n", sizeof(OpCode));
+    LogDebug("renderingContext", "drawCall size is %d bytes\n", sizeof(OpCode::drawCall));
 
     // Create a construction command buffer instance
     m_resourceCommandBuffer = DC_NEW ResourceCommandBuffer;

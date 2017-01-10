@@ -85,9 +85,9 @@ void CommandBuffer::push(const OpCode& opCode)
 }
  
 // ** CommandBuffer::adoptDataBuffer
-CommandBuffer::Buffer CommandBuffer::adoptDataBuffer(const void* data, s32 size)
+OpCode::Buffer CommandBuffer::adoptDataBuffer(const void* data, s32 size)
 {
-    Buffer buffer;
+    OpCode::Buffer buffer;
     
     if (data == NULL)
     {

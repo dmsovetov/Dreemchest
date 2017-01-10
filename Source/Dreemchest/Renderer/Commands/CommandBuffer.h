@@ -28,6 +28,7 @@
 #define __DC_Renderer_CommandBuffer_H__
 
 #include "../RenderState.h"
+#include "OpCode.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -37,116 +38,6 @@ namespace Renderer
     class CommandBuffer
     {
     public:
-        
-        //! A data buffer used by a command.
-        struct Buffer
-        {
-            const u8*   data;           //!< A source data pointer.
-            s32         size;           //!< A buffer size.
-        };
-
-        //! A single render operation.
-        struct OpCode
-        {
-            //! An op-code type.
-            enum Type
-            {
-                  DrawIndexed               //!< Draws a list of primitives using an index buffer.
-                , DrawPrimitives            //!< Draws a list of primitives from an active vertex buffer.
-                , Clear                     //!< Clears a render target.
-                , Execute                   //!< Executes a command buffer.
-                , RenderToTexture           //!< Begins rendering to a persistent texture.
-                , RenderToTransientTexture  //!< Begins rendering to a transient texture.
-                , UploadConstantBuffer      //!< Uploads data to a constant buffer.
-                , UploadVertexBuffer        //!< Uploads data to a vertex buffer.
-                , AcquireTexture            //!< Acquires a transient texture instance.
-                , ReleaseTexture            //!< Releases a transient texture instance.
-                , CreateInputLayout         //!< Creates a new input layout from a vertex declaration.
-                , CreateVertexBuffer        //!< Creates a new vertex buffer object.
-                , CreateIndexBuffer         //!< Creates a new index buffer object.
-                , CreateConstantBuffer      //!< Creates a new constant buffer object.
-                , CreateTexture             //!< Creates a new texture.
-                , DeleteTexture             //!< Destroys an allocated texture.
-                , DeleteConstantBuffer      //!< Destroys an allocated constant buffer.
-                , DeleteProgram             //!< Destroys a program and all it's permutations.
-            };
-
-            Type                                type;                       //!< An op code type.
-            u64                                 sorting;                    //!< A sorting key.
-            union
-            {
-                ResourceId                      id;                         //!< A passed resource id.
-                
-                struct
-                {
-                    PrimitiveType               primitives;                 //!< A primitive type to be rendered.
-                    s32                         first;                      //!< First index or primitive.
-                    s32                         count;                      //!< A total number of indices or primitives to use.
-                    const StateBlock*           states[MaxStateStackDepth]; //!< States from this stack are applied before a rendering command.
-                } drawCall;
-
-                struct
-                {
-                    u8                          mask;                       //!< A clear mask.
-                    f32                         color[4];                   //!< A color buffer clear value.
-                    f32                         depth;                      //!< A depth buffer clear value.
-                    s32                         stencil;                    //!< A stencil buffer clear value.
-                } clear;
-
-                struct
-                {
-                    ResourceId                  id;                         //!< A render target resource to be activated.
-                    NormalizedViewport          viewport;                   //!< A viewport value to be set.
-                    u8                          side;                       //!< A side of a cube map to render to.
-                    const CommandBuffer*        commands;                   //!< A command buffer to be executed after setting a viewport.
-                } renderToTextures;
-                
-                struct
-                {
-                    TransientResourceId         id;
-                    u16                         width;
-                    u16                         height;
-                    PixelFormat                 format;
-                    u8                          type;
-                } transientTexture;
-
-                struct
-                {
-                    const CommandBuffer*        commands;                   //!< A command buffer to be executed.
-                } execute;
-
-                struct
-                {
-                    ResourceId                  id;                         //!< A target buffer handle.
-                    Buffer                      buffer;                     //!< An attached data buffer.
-                } upload;
-                
-                struct
-                {
-                    ResourceId                  id;                         //!< Handle to an input layout being constructed.
-                    u8                          format;                     //!< Vertex format used by an input layout constructor.
-                } createInputLayout;
-                
-                struct
-                {
-                    ResourceId                  id;                         //!< Handle to a buffer object being constructed.
-                    Buffer                      buffer;                     //!< An attached data buffer.
-                    ResourceId                  layout;                     //!< Used by a constant buffer constructor.
-                } createBuffer;
-                
-                struct
-                {
-                    ResourceId                  id;                         //!< Handle to a texture being constructed.
-                    Buffer                      buffer;                     //!< An attached data buffer.
-                    u16                         width;                      //!< A texture width.
-                    u16                         height;                     //!< A texture height.
-                    u8                          mipLevels;                  //!< A total number of mip levels stored in a data buffer.
-                    PixelFormat                 format;                     //!< A texture format.
-                    u8                          type;                       //!< A texture type to be created.
-                    u8                          filter;                     //!< A requested texture filtering.
-                } createTexture;
-            };
-        };
 
         //! Returns a total number of recorded commands.
         s32                         size() const;
@@ -175,7 +66,7 @@ namespace Renderer
         void                        push(const OpCode& opCode);
         
         //! Adopts a data buffer.
-        Buffer                      adoptDataBuffer(const void* data, s32 size);
+        OpCode::Buffer              adoptDataBuffer(const void* data, s32 size);
 
     private:
 
@@ -184,13 +75,13 @@ namespace Renderer
     };
 
     // ** CommandBuffer::size
-    NIMBLE_INLINE s32 CommandBuffer::size( void ) const
+    NIMBLE_INLINE s32 CommandBuffer::size() const
     {
-        return static_cast<s32>( m_commands.size() );
+        return static_cast<s32>(m_commands.size());
     }
 
     // ** CommandBuffer::opCodeAt
-    NIMBLE_INLINE const CommandBuffer::OpCode& CommandBuffer::opCodeAt( s32 index ) const
+    NIMBLE_INLINE const OpCode& CommandBuffer::opCodeAt(s32 index) const
     {
         NIMBLE_ABORT_IF( index < 0 || index >= size(), "index is out of range" );
         return m_commands[index];

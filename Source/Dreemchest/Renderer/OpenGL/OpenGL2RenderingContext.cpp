@@ -207,20 +207,20 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
     for (s32 i = 0, n = commands.size(); i < n; i++)
     {
         // Get a render operation at specified index
-        const CommandBuffer::OpCode& opCode = commands.opCodeAt( i );
+        const OpCode& opCode = commands.opCodeAt(i);
         
         // Perform a draw call
         switch(opCode.type)
         {
-            case CommandBuffer::OpCode::Clear:
+            case OpCode::Clear:
                 OpenGL2::clear(opCode.clear.color, opCode.clear.mask, opCode.clear.depth, opCode.clear.stencil);
                 break;
                 
-            case CommandBuffer::OpCode::Execute:
+            case OpCode::Execute:
                 execute(frame, *opCode.execute.commands);
                 break;
                 
-            case CommandBuffer::OpCode::UploadConstantBuffer:
+            case OpCode::UploadConstantBuffer:
             {
                 ConstantBuffer& constantBuffer = m_constantBuffers[opCode.upload.id];
                 NIMBLE_ABORT_IF(static_cast<s32>(constantBuffer.data.size()) < opCode.upload.buffer.size, "buffer is too small");
@@ -228,15 +228,15 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
             }
                 break;
                 
-            case CommandBuffer::OpCode::UploadVertexBuffer:
+            case OpCode::UploadVertexBuffer:
                 OpenGL2::Buffer::subData(GL_ARRAY_BUFFER, m_vertexBuffers[opCode.upload.id], 0, opCode.upload.buffer.size, opCode.upload.buffer.data);
                 break;
                 
-            case CommandBuffer::OpCode::CreateInputLayout:
+            case OpCode::CreateInputLayout:
                 m_inputLayouts.emplace(opCode.createInputLayout.id, createVertexBufferLayout(opCode.createInputLayout.format));
                 break;
                 
-            case CommandBuffer::OpCode::CreateTexture:
+            case OpCode::CreateTexture:
                 allocateTexture(  opCode.createTexture.type
                                 , opCode.createTexture.buffer.data
                                 , opCode.createTexture.width
@@ -248,17 +248,17 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                                 );
                 break;
                 
-            case CommandBuffer::OpCode::CreateIndexBuffer:
+            case OpCode::CreateIndexBuffer:
                 id = OpenGL2::Buffer::create(GL_ARRAY_BUFFER, opCode.createBuffer.buffer.data, opCode.createBuffer.buffer.size, GL_DYNAMIC_DRAW);
                 m_indexBuffers.emplace(opCode.createBuffer.id, id);
                 break;
                 
-            case CommandBuffer::OpCode::CreateVertexBuffer:
+            case OpCode::CreateVertexBuffer:
                 id = OpenGL2::Buffer::create(GL_ELEMENT_ARRAY_BUFFER, opCode.createBuffer.buffer.data, opCode.createBuffer.buffer.size, GL_DYNAMIC_DRAW);
                 m_vertexBuffers.emplace(opCode.createBuffer.id, id);
                 break;
                 
-            case CommandBuffer::OpCode::CreateConstantBuffer:
+            case OpCode::CreateConstantBuffer:
             {
                 ConstantBuffer constantBuffer;
                 constantBuffer.layout = m_uniformLayouts[opCode.createBuffer.layout];
@@ -273,26 +273,26 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
             }
                 break;
                 
-            case CommandBuffer::OpCode::DeleteConstantBuffer:
+            case OpCode::DeleteConstantBuffer:
                 m_constantBuffers.emplace(opCode.id, ConstantBuffer());
                 releaseIdentifier(RenderResourceType::ConstantBuffer, opCode.id);
                 m_pipeline.resetConstantBuffer(opCode.id);
                 break;
                 
-            case CommandBuffer::OpCode::DeleteProgram:
+            case OpCode::DeleteProgram:
                 m_pipeline.resetProgram(opCode.id);
                 deleteProgram(opCode.id);
                 releaseIdentifier(RenderResourceType::Program, opCode.id);
                 break;
                 
-            case CommandBuffer::OpCode::AcquireTexture:
+            case OpCode::AcquireTexture:
             {
                 ResourceId id = acquireTexture(opCode.transientTexture.type, opCode.transientTexture.width, opCode.transientTexture.height, opCode.transientTexture.format);
                 loadTransientResource(opCode.transientTexture.id, id);
             }
                 break;
                 
-            case CommandBuffer::OpCode::ReleaseTexture:
+            case OpCode::ReleaseTexture:
             {
                 ResourceId id = transientResource(opCode.transientTexture.id);
                 releaseTexture(id);
@@ -300,14 +300,14 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
             }
                 break;
                 
-            case CommandBuffer::OpCode::RenderToTexture:
-            case CommandBuffer::OpCode::RenderToTransientTexture:
+            case OpCode::RenderToTexture:
+            case OpCode::RenderToTransientTexture:
             {
                 DC_CHECK_GL_CONTEXT;
                 DC_CHECK_GL;
                 
                 // Get a transient resource id by a slot
-                ResourceId id = opCode.type == CommandBuffer::OpCode::RenderToTexture ? opCode.renderToTextures.id : transientResource(opCode.renderToTextures.id);
+                ResourceId id = opCode.type == OpCode::RenderToTexture ? opCode.renderToTextures.id : transientResource(opCode.renderToTextures.id);
                 NIMBLE_ABORT_IF(!id, "invalid transient identifier");
                 
                 // Get a render target by an id.
@@ -362,7 +362,7 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
             }
                 break;
 
-            case CommandBuffer::OpCode::DrawIndexed:
+            case OpCode::DrawIndexed:
                 // Apply rendering states from a stack
                 stateCount = StateStack::mergeBlocks(opCode.drawCall.states, MaxStateStackDepth, states, MaxStateChanges, userFeatures);
                 applyStates(pipelineState, states, stateCount);
@@ -375,7 +375,7 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 OpenGL2::drawElements(opCode.drawCall.primitives, GL_UNSIGNED_SHORT, opCode.drawCall.first, opCode.drawCall.count);
                 break;
                 
-            case CommandBuffer::OpCode::DrawPrimitives:
+            case OpCode::DrawPrimitives:
                 // Apply rendering states from a stack
                 stateCount = StateStack::mergeBlocks(opCode.drawCall.states, MaxStateStackDepth, states, MaxStateChanges, userFeatures);
                 applyStates(pipelineState, states, stateCount);

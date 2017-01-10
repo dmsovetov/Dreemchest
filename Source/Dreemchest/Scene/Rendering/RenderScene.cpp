@@ -43,7 +43,7 @@ struct Debug_Structure_To_Track_Data_Size_Used_By_Node_Types
         , _StaticMesh = sizeof( RenderScene::StaticMeshNode )
         , _StateBlock = sizeof( Renderer::StateBlock )
         , _State = sizeof( Renderer::State )
-        , _OpCode = sizeof( Renderer::CommandBuffer::OpCode )
+        , _OpCode = sizeof( Renderer::OpCode )
     };
 };
 

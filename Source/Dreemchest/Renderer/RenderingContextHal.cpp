@@ -103,10 +103,10 @@ void RenderingContextHal::renderToTarget( const RenderFrame& frame, u8 renderTar
 // ** RenderingContextHal::executeCommandBuffer
 void RenderingContextHal::executeCommandBuffer( const RenderFrame& frame, const CommandBuffer& commands )
 {
-    for( s32 i = 0, n = commands.size(); i < n; i++ )
+/*    for( s32 i = 0, n = commands.size(); i < n; i++ )
     {
         // Get a render operation at specified index
-        const CommandBuffer::OpCode& opCode = commands.opCodeAt( i );
+        const OpCode& opCode = commands.opCodeAt( i );
 
         // Perform a draw call
         switch( opCode.type ) {
@@ -156,7 +156,7 @@ void RenderingContextHal::executeCommandBuffer( const RenderFrame& frame, const 
                                                             break;
         default:                                            NIMBLE_NOT_IMPLEMENTED;
         }
-    }
+    }*/
 }
     
 // ** RenderingContextHal::applyStateBlock
