@@ -43,9 +43,8 @@ RenderFrame::RenderFrame(s32 size)
 // ** RenderFrame::internBuffer
 const void* RenderFrame::internBuffer(const void* data, s32 size)
 {
-    void* interned = allocate( size );
-    memcpy( interned, data, size );
-    return interned;
+    NIMBLE_NOT_IMPLEMENTED;
+    return NULL;
 }
 
 // ** RenderFrame::allocate
