@@ -79,6 +79,9 @@ namespace Renderer {
     //! A pipeline feature mask type.
     typedef u64 PipelineFeatures;
     
+    //! A rendering state bit mask type.
+    typedef u32 StateMask;
+    
     //! A transient resource identifier type alias.
     typedef u8 TransientResourceId;
     

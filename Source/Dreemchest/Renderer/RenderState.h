@@ -155,7 +155,10 @@ namespace Renderer
         s32                             samplerIndex() const;
         
         //! Returns a rendering state bit index.
-        static u32                      bit(Type type);
+        u32                             bit() const;
+        
+        //! Returns a rendering state bit mask.
+        StateMask                       bitmask() const;
         
         //! Returns a rendering state name from an identifier (used for debugging purposes).
         static String                   nameFromType(Type type);
@@ -280,16 +283,13 @@ namespace Renderer
         void                            disableBlending( void );
 
         //! Returns a state block mask.
-        u32                             mask( void ) const;
+        StateMask                       mask( void ) const;
 
         //! Returns a total number of states inside this block.
         s32                             stateCount( void ) const;
 
         //! Returns a state at specified index.
         const State&                    state(s32 index) const;
-
-        //! Returns a state bit at specified index.
-        u32                             stateBit(s32 index) const;
 
         //! Returns a feature set enabled by a state block.
         PipelineFeatures                features( void ) const;
@@ -300,20 +300,19 @@ namespace Renderer
     private:
 
         //! Pushes a new state to a block.
-        void                            pushState(const State& state, u32 stateBit);
+        void                            pushState(const State& state);
 
     private:
 
-        u32                             m_mask;                 //!< A bit mask of state changes that are preset inside this state block.
+        StateMask                       m_mask;                 //!< A bit mask of state changes that are preset inside this state block.
         PipelineFeatures                m_features;             //!< A shader feature set.
         PipelineFeatures                m_featureMask;          //!< A shader feature mask.
-        u32                             m_stateBits[MaxStates]; //!< An array of state bits.
         State                           m_states[MaxStates];    //!< An array of state changes.
         s16                             m_count;                //!< A total number of states stored inside a block.
     };
 
     // ** StateBlock::mask
-    NIMBLE_INLINE u32 StateBlock::mask( void ) const
+    NIMBLE_INLINE StateMask StateBlock::mask( void ) const
     {
         return m_mask;
     }
@@ -343,12 +342,6 @@ namespace Renderer
         return m_states[index];
     }
 
-    // ** StateBlock::stateBit
-    NIMBLE_INLINE u32 StateBlock::stateBit( s32 index ) const
-    {
-        NIMBLE_ABORT_IF( index < 0 || index >= stateCount(), "index is out of range" );
-        return m_stateBits[index];
-    }
     
     //! Forward declare a StateStack class.
     class StateStack;

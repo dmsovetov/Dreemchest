@@ -230,15 +230,15 @@ s32 State::samplerIndex() const
 }
     
 // ** State::bit
-u32 State::bit(Type type)
+u32 State::bit() const
 {
     switch (type)
     {
         case BindConstantBuffer:
-            return type;
+            return type + data.index;
         case BindTexture:
         case BindTransientTexture:
-            return type + MaxConstantBuffers;
+            return type + MaxConstantBuffers + data.index;
         default:
             break;
     }
@@ -246,6 +246,12 @@ u32 State::bit(Type type)
     return type;
 }
     
+// ** State::bitmask
+u32 State::bitmask() const
+{
+    return BIT(bit());
+}
+
 // ** State::nameFromType
 String State::nameFromType(Type type)
 {
@@ -290,61 +296,61 @@ StateBlock::StateBlock( void )
 // ** StateBlock::bindVertexBuffer
 void StateBlock::bindVertexBuffer(VertexBuffer_ id)
 {
-    pushState(State(id), State::bit(State::BindVertexBuffer));
+    pushState(State(id));
 }
 
 // ** StateBlock::bindIndexBuffer
 void StateBlock::bindIndexBuffer(IndexBuffer_ id)
 {
-    pushState(State(id), State::bit(State::BindIndexBuffer));
+    pushState(State(id));
 }
 
 // ** StateBlock::bindInputLayout
 void StateBlock::bindInputLayout(InputLayout id)
 {
-    pushState(State(id), State::bit(State::SetInputLayout));
+    pushState(State(id));
 }
     
 // ** StateBlock::bindFeatureLayout
 void StateBlock::bindFeatureLayout(FeatureLayout id)
 {
-    pushState(State(id), State::bit(State::SetFeatureLayout));
+    pushState(State(id));
 }
 
 // ** StateBlock::bindConstantBuffer
 void StateBlock::bindConstantBuffer(ConstantBuffer_ id, u8 index)
 {
-    pushState(State(id, index), State::bit(State::BindConstantBuffer) + index);
+    pushState(State(id, index));
 }
 
 // ** StateBlock::bindProgram
 void StateBlock::bindProgram(Program id)
 {
-    pushState(State(id), State::bit(State::BindProgram));
+    pushState(State(id));
 }
 
 // ** StateBlock::bindTexture
 void StateBlock::bindTexture(Texture_ id, u8 sampler)
 {
-    pushState(State(id, sampler), State::bit(State::BindTexture) + sampler);
+    pushState(State(id, sampler));
 }
 
 // ** StateBlock::bindTexture
 void StateBlock::bindTexture(TransientTexture id, u8 sampler)
 {
-    pushState(State(id, sampler), State::bit(State::BindTexture) + sampler);
+    pushState(State(id, sampler));
 }
 
 // ** StateBlock::setBlend
 void StateBlock::setBlend(BlendFactor src, BlendFactor dst)
 {
-    pushState(State(src, dst), State::bit(State::Blending));
+    pushState(State(src, dst));
 }
 
 // ** StateBlock::setDepthState
 void StateBlock::setDepthState(Compare function, bool write)
 {
-    pushState(State(function, write), State::bit(State::DepthState));
+    pushState(State(function, write));
 }
 
 // ** StateBlock::enableFeatures
@@ -362,7 +368,7 @@ void StateBlock::disableFeatures(PipelineFeatures mask)
 // ** StateBlock::setPolygonOffset
 void StateBlock::setPolygonOffset(f32 factor, f32 units)
 {
-    pushState(State(factor, units), State::bit(State::PolygonOffset));
+    pushState(State(factor, units));
 }
 
 // ** StateBlock::disablePolygonOffset
@@ -374,13 +380,13 @@ void StateBlock::disablePolygonOffset( void )
 // ** StateBlock::setPolygonMode
 void StateBlock::setPolygonMode(PolygonMode value)
 {
-    pushState(State(value), State::bit(State::Rasterization));
+    pushState(State(value));
 }
 
 // ** StateBlock::setStencilOp
 void StateBlock::setStencilOp(StencilAction sfail, StencilAction dfail, StencilAction dppass)
 {
-    pushState(State(sfail, dfail, dppass), State::bit(State::StencilOp));
+    pushState(State(sfail, dfail, dppass));
 }
 
 // ** StateBlock::setStencilMask
@@ -389,13 +395,13 @@ void StateBlock::setStencilMask(u8 value)
     State state;
     state.type = State::StencilMask;
     state.stencilFunction.mask = value;
-    pushState(state, State::bit(State::StencilMask));
+    pushState(state);
 }
 
 // ** StateBlock::setStencilFunction
 void StateBlock::setStencilFunction(Compare function, u8 ref, u8 value)
 {
-    pushState(State(function, ref, value), State::bit(State::StencilFunc));
+    pushState(State(function, ref, value));
 }
     
 // ** StateBlock::disableStencilTest
@@ -410,19 +416,19 @@ void StateBlock::setColorMask(u8 value)
     State state;
     state.type = State::ColorMask;
     state.mask = value;
-    pushState(state, State::bit(State::ColorMask));
+    pushState(state);
 }
 
 // ** StateBlock::setAlphaTest
 void StateBlock::setAlphaTest(Compare function, f32 reference)
 {
-    pushState(State(function, reference), State::bit(State::AlphaTest));
+    pushState(State(function, reference));
 }
 
 // ** StateBlock::setCullFace
 void StateBlock::setCullFace(TriangleFace face)
 {
-    pushState(State(face), State::bit(State::CullFace));
+    pushState(State(face));
 }
 
 // ** StateBlock::disableBlending
@@ -438,19 +444,17 @@ void StateBlock::disableBlending( void )
 }
 
 // ** StateBlock::pushState
-void StateBlock::pushState(const State& state, u32 stateBit)
+void StateBlock::pushState(const State& state)
 {
-    NIMBLE_BREAK_IF( m_mask & BIT( stateBit ), "a state setting could not be overriden" );
-    NIMBLE_BREAK_IF(stateBit >= sizeof(m_stateBits[0]) * 8, "state bit overflow");
-    NIMBLE_ABORT_IF( m_count + 1 > MaxStates, "state block overflow" );
+    NIMBLE_BREAK_IF(m_mask & BIT(state.bit()), "a state setting could not be overriden");
+    NIMBLE_ABORT_IF(m_count + 1 > MaxStates, "state block overflow");
 
     // Push a state to a state block
     m_states[m_count] = state;
-    m_stateBits[m_count] = BIT( stateBit );
     m_count++;
 
     // Update a state block bitmask
-    m_mask = m_mask | BIT( stateBit );
+    m_mask = m_mask | BIT(state.bit());
 }
 
 // ---------------------------------------------------------------------------- StateScope ------------------------------------------------------------------------------ //
@@ -568,7 +572,7 @@ s32 StateStack::mergeBlocks(const StateBlock* const * stateBlocks, s32 count, St
     PipelineFeatures userFeaturesMask = ~0;
     
     // A bitmask of states that were already set
-    u32 activeStateMask = 0;
+    StateMask activeStateMask = 0;
     
     // A total number of states written to an output array
     s32 statesWritten = 0;
@@ -597,11 +601,14 @@ s32 StateStack::mergeBlocks(const StateBlock* const * stateBlocks, s32 count, St
         // Apply all states in a block
         for( s32 j = 0, n = block->stateCount(); j < n; j++ )
         {
+            // Get a render state by an index
+            const State& state = block->state(j);
+            
             // Get a render state bit
-            u32 stateBit = block->stateBit( j );
+            StateMask stateMask = state.bitmask();
             
             // Skip redundate state blocks by testing a state bitmask agains an active state mask
-            if( activeStateMask & stateBit )
+            if( activeStateMask & stateMask )
             {
                 continue;
             }
@@ -609,10 +616,10 @@ s32 StateStack::mergeBlocks(const StateBlock* const * stateBlocks, s32 count, St
             NIMBLE_ABORT_IF(statesWritten >= maxStates, "to much render states");
             
             // Write a render state at specified index to an output array
-            states[statesWritten++] = block->state(j);
+            states[statesWritten++] = state;
             
             // Update an active state mask
-            activeStateMask = activeStateMask | stateBit;
+            activeStateMask = activeStateMask | stateMask;
         }
     }
     
