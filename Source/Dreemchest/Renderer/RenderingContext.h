@@ -40,6 +40,12 @@ namespace Renderer
     {
     public:
         
+        //! A rendering context counters.
+        struct Counters
+        {
+            s32                                 uniformsUploaded;   //!< A total number of uniforms that were uploaded during a frame rendering.
+        };
+        
         //! Cleans all allocated resources.
         virtual                                 ~RenderingContext( void );
         
@@ -49,6 +55,9 @@ namespace Renderer
         //! Returns a default state block.
         const StateBlock12&                     defaultStateBlock() const;
         StateBlock12&                           defaultStateBlock();
+        
+        //! Returns last frame rendering counters.
+        const Counters&                         counters() const;
         
         //! Sets a default program.
         void                                    setDefaultProgram(Program value);
@@ -168,6 +177,7 @@ namespace Renderer
         Program                                 m_defaultProgram;                                       //!< A default program to be used.
         PipelineState                           m_pipeline;                                             //!< An active pipeline state.
         ShaderLibrary                           m_shaderLibrary;                                        //!< A shader library.
+        Counters                                m_counters;                                             //!< Performance counters.
     };
     
     // ** RenderingContext::allocateIdentifier

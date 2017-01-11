@@ -86,7 +86,7 @@ private:
 RenderingContext::TransientResourceStack::TransientResourceStack( void )
     : m_stackFrame( m_identifiers )
 {
-    memset( m_identifiers, 0, sizeof m_identifiers );
+    memset(m_identifiers, 0, sizeof(m_identifiers));
 }
 
 // ** RenderingContext::TransientResourceStack::pushFrame
@@ -155,7 +155,8 @@ RenderingContext::RenderingContext(RenderViewPtr view)
     m_transientResources = DC_NEW TransientResourceStack;
     
     // Reset input layout cache
-    memset( m_inputLayoutCache, 0, sizeof( m_inputLayoutCache ) );
+    memset(m_inputLayoutCache, 0, sizeof(m_inputLayoutCache));
+    memset(&m_counters, 0, sizeof(m_counters));
     
     // Resize all resource index managers
     for (s32 i = 0; i < RenderResourceType::TotalTypes; i++)
@@ -272,6 +273,12 @@ void RenderingContext::setDefaultProgram(Program value)
     m_defaultProgram = value;
 }
     
+// ** RenderingContext::counters
+const RenderingContext::Counters& RenderingContext::counters() const
+{
+    return m_counters;
+}
+
 // ** RenderingContext::display
 void RenderingContext::display(RenderFrame& frame, bool wait)
 {
@@ -280,6 +287,9 @@ void RenderingContext::display(RenderFrame& frame, bool wait)
     {
         m_view->beginFrame();
     }
+    
+    // Clear all counters.
+    memset(&m_counters, 0, sizeof(m_counters));
     
     // First execute a construction command buffer
     construct(frame);

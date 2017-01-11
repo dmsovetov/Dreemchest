@@ -515,6 +515,9 @@ void OpenGL2RenderingContext::updateUniforms(const PipelineState& state, const P
         }
     #endif  //  #if DEV_RENDERER_UNIFORM_CACHING
         
+        // Count this uniform update
+        m_counters.uniformsUploaded++;
+        
         switch (uniform.type)
         {
             case GL_INT:
