@@ -41,10 +41,11 @@ namespace Renderer
     public:
         
         //! A rendering context counters.
-        struct Counters
+        struct FrameCounters
         {
-            s32                                 uniformsUploaded;       //!< A total number of uniforms that were uploaded during a frame rendering.
-            s32                                 permutationsCompiled;   //!< A total number of new program permutations compiled during a frame rendering.
+            s32                                 programSwitches;        //!< A total number of times shader program was switched.
+            s32                                 uniformsUploaded;       //!< A total number of uniforms that were uploaded.
+            s32                                 permutationsCompiled;   //!< A total number of new program permutations compiled.
         };
         
         //! Cleans all allocated resources.
@@ -58,7 +59,7 @@ namespace Renderer
         StateBlock12&                           defaultStateBlock();
         
         //! Returns last frame rendering counters.
-        const Counters&                         counters() const;
+        const FrameCounters&                    frameCounters() const;
         
         //! Sets a default program.
         void                                    setDefaultProgram(Program value);
@@ -178,7 +179,7 @@ namespace Renderer
         Program                                 m_defaultProgram;                                       //!< A default program to be used.
         PipelineState                           m_pipeline;                                             //!< An active pipeline state.
         ShaderLibrary                           m_shaderLibrary;                                        //!< A shader library.
-        Counters                                m_counters;                                             //!< Performance counters.
+        FrameCounters                           m_counters;                                             //!< Performance counters.
     };
     
     // ** RenderingContext::allocateIdentifier

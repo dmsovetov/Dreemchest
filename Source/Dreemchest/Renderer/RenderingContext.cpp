@@ -273,8 +273,8 @@ void RenderingContext::setDefaultProgram(Program value)
     m_defaultProgram = value;
 }
     
-// ** RenderingContext::counters
-const RenderingContext::Counters& RenderingContext::counters() const
+// ** RenderingContext::frameCounters
+const RenderingContext::FrameCounters& RenderingContext::frameCounters() const
 {
     return m_counters;
 }
