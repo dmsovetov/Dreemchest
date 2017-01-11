@@ -499,11 +499,6 @@ void OpenGL2RenderingContext::updateUniforms(const PipelineState& state, const P
         
         switch (uniform.type)
         {
-            case GL_SAMPLER_2D:
-            case GL_SAMPLER_CUBE:
-                OpenGL2::Program::uniform1i(uniform.location, uniform.index);
-                break;
-                
             case GL_INT:
                 pointer = UniformPointer::findByName(uniform, m_constantBuffers, state);
                 OpenGL2::Program::uniform1i(uniform.location, *reinterpret_cast<const s32*>(pointer));

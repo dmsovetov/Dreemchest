@@ -98,6 +98,7 @@ const OpenGLRenderingContext::Permutation* OpenGLRenderingContext::savePermutati
     permutation.program = id;
     
     OpenGL2::Program::Uniform uniformInfo;
+    OpenGL2::Program::use(id);
     
     for (GLuint i = 0, n = OpenGL2::Program::uniformCount(id); i < n; i++)
     {
@@ -116,6 +117,8 @@ const OpenGLRenderingContext::Permutation* OpenGLRenderingContext::savePermutati
             case GL_SAMPLER_CUBE:
                 uniform.index = uniformInfo.name[uniformInfo.length - 1] - '0';
                 uniform.hash  = String32();
+                OpenGL2::Program::uniform1i(uniform.location, uniform.index);
+                continue;
                 break;
             default:
                 uniform.index = uniformInfo.name[3] - '0';
