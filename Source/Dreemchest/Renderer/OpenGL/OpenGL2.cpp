@@ -32,8 +32,6 @@
     #define glPointSizePointer  glPointSizePointerAPPLE
 #endif  //  #if defined( DC_PLATFORM_MACOS )
 
-#define DEV_PROFILE_CPU (0)
-
 DC_BEGIN_DREEMCHEST
 
 namespace Renderer
@@ -111,33 +109,27 @@ GLuint OpenGL2::Buffer::create(GLenum type, const void* data, s32 size, GLenum u
     DC_CHECK_GL;
     
     GLuint id;
-#if !DEV_PROFILE_CPU
     glGenBuffers(1, &id);
     glBindBuffer(type, id);
     glBufferData(type, size, data, usage);
     glBindBuffer(type, 0);
-#endif  //  #if !DEV_PROFILE_CPU
     return id;
 }
     
 // ** OpenGL2::Buffer::subData
 void OpenGL2::Buffer::subData(GLenum target, GLuint id, GLintptr offset, GLsizeiptr size, const GLvoid* data)
 {
-#if !DEV_PROFILE_CPU
     DC_CHECK_GL;
     glBindBuffer(target, id);
     glBufferSubData(target, offset, size, data);
     glBindBuffer(target, 0);
-#endif  //  #if !DEV_PROFILE_CPU
 }
 
 // ** OpenGL2::Buffer::bind
 void OpenGL2::Buffer::bind(GLenum type, GLuint id)
 {
-#if !DEV_PROFILE_CPU
     DC_CHECK_GL;
     glBindBuffer(type, id);
-#endif  //  #if !DEV_PROFILE_CPU
 }
     
 // ---------------------------------------------------------- OpenGL2::Framebuffer ------------------------------------------------------- //
@@ -145,12 +137,10 @@ void OpenGL2::Buffer::bind(GLenum type, GLuint id)
 // ** OpenGL2::Framebuffer::bind
 void OpenGL2::Framebuffer::bind(GLuint id)
 {
-#if !DEV_PROFILE_CPU
     DC_CHECK_GL_CONTEXT;
     DC_CHECK_GL;
     
     glBindFramebuffer(GL_FRAMEBUFFER, id);
-#endif  //  #if !DEV_PROFILE_CPU
 }
     
 // ** OpenGL2::Framebuffer::create
@@ -160,9 +150,7 @@ GLuint OpenGL2::Framebuffer::create()
     DC_CHECK_GL;
     
     GLuint id;
-#if !DEV_PROFILE_CPU
     glGenFramebuffers(1, &id);
-#endif  //  #if !DEV_PROFILE_CPU
     return id;
 }
     
@@ -173,8 +161,7 @@ GLuint OpenGL2::Framebuffer::renderbuffer(GLuint id, GLsizei width, GLsizei heig
     DC_CHECK_GL;
     
     GLuint rid;
-    
-#if !DEV_PROFILE_CPU
+
     glGenRenderbuffers(1, &rid);
     glBindRenderbuffer(GL_RENDERBUFFER, rid);
     glRenderbufferStorage(GL_RENDERBUFFER, internalFormat, width, height);
@@ -182,7 +169,6 @@ GLuint OpenGL2::Framebuffer::renderbuffer(GLuint id, GLsizei width, GLsizei heig
     glBindFramebuffer(GL_FRAMEBUFFER, id);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment, GL_RENDERBUFFER, rid);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-#endif  //  #if !DEV_PROFILE_CPU
     
     return rid;
 }
@@ -190,15 +176,12 @@ GLuint OpenGL2::Framebuffer::renderbuffer(GLuint id, GLsizei width, GLsizei heig
 // ** OpenGL2::Framebuffer::texture2D
 void OpenGL2::Framebuffer::texture2D(GLuint id, GLenum attachment, GLenum target, GLint level)
 {
-#if !DEV_PROFILE_CPU
     glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, target, id, level);
-#endif  //  #if !DEV_PROFILE_CPU
 }
     
 // ** OpenGL2::Framebuffer::check
 bool OpenGL2::Framebuffer::check(GLuint id)
 {
-#if !DEV_PROFILE_CPU
     DC_CHECK_GL_CONTEXT;
     DC_CHECK_GL;
         
@@ -207,29 +190,22 @@ bool OpenGL2::Framebuffer::check(GLuint id)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     return status == GL_FRAMEBUFFER_COMPLETE;
-#else
-    return true;
-#endif  //  #if !DEV_PROFILE_CPU
 }
 
 // ** OpenGL2::Framebuffer::destroyRenderBuffer
 void OpenGL2::Framebuffer::destroyRenderBuffer(GLuint id)
 {
-#if !DEV_PROFILE_CPU
     DC_CHECK_GL_CONTEXT;
     DC_CHECK_GL;
     glDeleteRenderbuffers(1, &id);
-#endif  //  #if !DEV_PROFILE_CPU
 }
 
 // ** OpenGL2::Framebuffer::destroy
 void OpenGL2::Framebuffer::destroy(GLuint id)
 {
-#if !DEV_PROFILE_CPU
     DC_CHECK_GL_CONTEXT;
     DC_CHECK_GL;
     glDeleteFramebuffers(1, &id);
-#endif  //  #if !DEV_PROFILE_CPU
 }
 
 // ----------------------------------------------------------- OpenGL2::Program ---------------------------------------------------------- //
@@ -237,25 +213,20 @@ void OpenGL2::Framebuffer::destroy(GLuint id)
 // ** OpenGL2::Program::deleteProgram
 void OpenGL2::Program::deleteProgram(GLuint id)
 {
-#if !DEV_PROFILE_CPU
     DC_CHECK_GL;
     glDeleteProgram(id);
-#endif  //  #if !DEV_PROFILE_CPU
 }
 
 // ** OpenGL2::Program::deleteShader
 void OpenGL2::Program::deleteShader(GLuint id)
 {
-#if !DEV_PROFILE_CPU
     DC_CHECK_GL;
     glDeleteShader(id);
-#endif  //  #if !DEV_PROFILE_CPU
 }
 
 // ** OpenGL2::Program::compileShader
 GLuint OpenGL2::Program::compileShader(GLenum type, CString source, s8* error, s32 maxErrorSize)
 {
-#if !DEV_PROFILE_CPU
     DC_CHECK_GL;
     
     GLint result;
@@ -287,9 +258,6 @@ GLuint OpenGL2::Program::compileShader(GLenum type, CString source, s8* error, s
     }
     
     return id;
-#else
-    return 0;
-#endif  //  #if !DEV_PROFILE_CPU
 }
     
 // ** OpenGL2::Program::uniformCount
@@ -309,7 +277,6 @@ void OpenGL2::Program::uniformAt(GLuint program, GLuint index, Uniform& uniform)
 // ** OpenGL2::Program::createProgram
 GLuint OpenGL2::Program::createProgram(const GLuint* shaders, s32 count, s8* error, s32 maxErrorSize)
 {
-#if !DEV_PROFILE_CPU
     DC_CHECK_GL;
     
     // Create a shader program
@@ -353,7 +320,6 @@ GLuint OpenGL2::Program::createProgram(const GLuint* shaders, s32 count, s8* err
     }
     
     deleteProgram(program);
-#endif  //  #if !DEV_PROFILE_CPU
     return 0;
 }
     
@@ -366,74 +332,56 @@ GLint OpenGL2::Program::uniformLocation(GLuint program, CString name)
 // ** OpenGL2::Program::uniformLocation
 GLint OpenGL2::Program::uniformLocation(GLuint program, const FixedString& name)
 {
-#if !DEV_PROFILE_CPU
     DC_CHECK_GL;
     return glGetUniformLocation(program, name) + 1;
-#else
-    return 0;
-#endif  //  #if !DEV_PROFILE_CPU
 }
     
 // ** OpenGL2::Program::uniformMatrix4
 void OpenGL2::Program::uniformMatrix4(GLint location, const f32 value[16], GLboolean transpose)
 {
-#if !DEV_PROFILE_CPU
     DC_CHECK_GL;
     glUniformMatrix4fv(location - 1, 1, transpose, value);
-#endif  //  #if !DEV_PROFILE_CPU
 }
 
 // ** OpenGL2::Program::uniform1i
 void OpenGL2::Program::uniform1i(GLint location, s32 value)
 {
-#if !DEV_PROFILE_CPU
     DC_CHECK_GL;
     glUniform1i(location - 1, value);
-#endif  //  #if !DEV_PROFILE_CPU
 }
 
 // ** OpenGL2::Program::uniform1f
 void OpenGL2::Program::uniform1f(GLint location, f32 value)
 {
-#if !DEV_PROFILE_CPU
     DC_CHECK_GL;
     glUniform1f(location - 1, value);
-#endif  //  #if !DEV_PROFILE_CPU
 }
 
 // ** OpenGL2::Program::uniform2f
 void OpenGL2::Program::uniform2f(GLint location, const f32* value, s32 count)
 {
-#if !DEV_PROFILE_CPU
     DC_CHECK_GL;
     glUniform2fv(location - 1, max2(1, count), value);
-#endif  //  #if !DEV_PROFILE_CPU
 }
 
 // ** OpenGL2::Program::uniform3f
 void OpenGL2::Program::uniform3f(GLint location, const f32* value, s32 count)
 {
-#if !DEV_PROFILE_CPU
     DC_CHECK_GL;
     glUniform3fv(location - 1, max2(1, count), value);
-#endif  //  #if !DEV_PROFILE_CPU
 }
 
 // ** OpenGL2::Program::uniform4f
 void OpenGL2::Program::uniform4f(GLint location, const f32* value, s32 count)
 {
-#if !DEV_PROFILE_CPU
     DC_CHECK_GL;
     glUniform4fv(location - 1, max2(1, count), value);
-#endif  //  #if !DEV_PROFILE_CPU
 }
 
 // ** OpenGL2::Program::use
 void OpenGL2::Program::use(GLuint program)
 {
-#if !DEV_PROFILE_CPU
     glUseProgram(program);
-#endif  //  #if !DEV_PROFILE_CPU
 }
     
 // ----------------------------------------------------------- OpenGL2::Texture ---------------------------------------------------------- //
@@ -443,7 +391,6 @@ GLuint OpenGL2::Texture::create2D(const void* data, u16 width, u16 height, u16 m
 {
     DC_CHECK_GL;
     GLuint id;
-#if !DEV_PROFILE_CPU
     GLint  align = textureAlign(pixelFormat);
     
     glGenTextures(1, &id);
@@ -459,7 +406,6 @@ GLuint OpenGL2::Texture::create2D(const void* data, u16 width, u16 height, u16 m
     
     texImage(GL_TEXTURE_2D, reinterpret_cast<const GLbyte*>(data), width, height, 1, pixelFormat);
     glBindTexture(GL_TEXTURE_2D, 0);
-#endif  //  #if !DEV_PROFILE_CPU
     return id;
 }
     
@@ -468,7 +414,6 @@ GLuint OpenGL2::Texture::createCube(const void* data, u16 size, u16 mipLevels, P
 {
     DC_CHECK_GL;
     GLuint id;
-#if !DEV_PROFILE_CPU
     GLint  align = textureAlign(pixelFormat);
     
     glGenTextures(1, &id);
@@ -489,14 +434,12 @@ GLuint OpenGL2::Texture::createCube(const void* data, u16 size, u16 mipLevels, P
     }
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-#endif  //  #if !DEV_PROFILE_CPU
     return id;
 }
     
 // ** OpenGL2::Texture::texImage
 GLsizei OpenGL2::Texture::texImage(GLenum target, const GLbyte* data, u16 width, u16 height, s32 mipLevels, PixelFormat pixelFormat)
 {
-#if !DEV_PROFILE_CPU
     DC_CHECK_GL_CONTEXT;
     DC_CHECK_GL;
     
@@ -536,28 +479,21 @@ GLsizei OpenGL2::Texture::texImage(GLenum target, const GLbyte* data, u16 width,
     }
     
     return bytesConsumed;
-#else
-    return 0;
-#endif  //  #if !DEV_PROFILE_CPU
 }
     
 // ** OpenGL2::Texture::bind
 void OpenGL2::Texture::bind(GLenum target, GLuint id, GLuint sampler)
 {
-#if !DEV_PROFILE_CPU
     DC_CHECK_GL;
     glActiveTexture(GL_TEXTURE0 + sampler);
     glBindTexture(target, id);
-#endif  //  #if !DEV_PROFILE_CPU
 }
 
 // ** OpenGL2::Texture::destroy
 void OpenGL2::Texture::destroy(GLuint id)
 {
-#if !DEV_PROFILE_CPU
     DC_CHECK_GL;
     glDeleteTextures(1, &id);
-#endif  //  #if !DEV_PROFILE_CPU
 }
   
 // ----------------------------------------------------------- OpenGL2::Stencil ---------------------------------------------------------- //
@@ -565,15 +501,12 @@ void OpenGL2::Texture::destroy(GLuint id)
 // ** OpenGL2::Stencil::setOperations
 void OpenGL2::Stencil::setOperations(StencilAction sfail, StencilAction dfail, StencilAction pass)
 {
-#if !DEV_PROFILE_CPU
     glStencilOp(convertStencilAction(sfail), convertStencilAction(dfail), convertStencilAction(pass));
-#endif  //  #if !DEV_PROFILE_CPU
 }
 
 // ** OpenGL2::Stencil::setFunction
 void OpenGL2::Stencil::setFunction(Compare function, u8 ref, u8 mask)
 {
-#if !DEV_PROFILE_CPU
     if (function == CompareDisabled)
     {
         glDisable(GL_STENCIL_TEST);
@@ -583,7 +516,6 @@ void OpenGL2::Stencil::setFunction(Compare function, u8 ref, u8 mask)
         glEnable(GL_STENCIL_TEST);
         glStencilFunc(convertCompareFunction(function), ref, mask);
     }
-#endif  //  #if !DEV_PROFILE_CPU
 }
     
 // --------------------------------------------------------------- OpenGL2 --------------------------------------------------------------- //
@@ -645,7 +577,6 @@ bool OpenGL2::initialize()
 // ** OpenGL2::clear
 void OpenGL2::clear(const GLclampf* color, u8 mask, GLclampd depth, GLint stencil)
 {
-#if !DEV_PROFILE_CPU
     DC_CHECK_GL;
     
     GLbitfield flags = 0;
@@ -682,13 +613,11 @@ void OpenGL2::clear(const GLclampf* color, u8 mask, GLclampd depth, GLint stenci
     {
         glDepthMask(activeDepthMask);
     }
-#endif  //  #if !DEV_PROFILE_CPU
 }
     
 // ** OpenGL2::enableInputLayout
 void OpenGL2::enableInputLayout(GLbyte* pointer, const VertexBufferLayout& layout)
 {
-#if !DEV_PROFILE_CPU
     DC_CHECK_GL;
     
     s32 stride = layout.vertexSize();
@@ -732,13 +661,11 @@ void OpenGL2::enableInputLayout(GLbyte* pointer, const VertexBufferLayout& layou
     
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(position.count, GL_FLOAT, stride, pointer + position.offset);
-#endif  //  #if !DEV_PROFILE_CPU
 }
 
 // ** OpenGL2::disableInputLayout
 void OpenGL2::disableInputLayout(const VertexBufferLayout& layout)
 {
-#if !DEV_PROFILE_CPU
     DC_CHECK_GL;
     
     if(layout.normal())
@@ -768,13 +695,11 @@ void OpenGL2::disableInputLayout(const VertexBufferLayout& layout)
     }
     
     glDisableClientState(GL_VERTEX_ARRAY);
-#endif  //  #if !DEV_PROFILE_CPU
 }
     
 // ** OpenGL2::setAlphaTest
 void OpenGL2::setAlphaTest(Compare function, u8 ref)
 {
-#if !DEV_PROFILE_CPU
     if (function == CompareDisabled)
     {
         glDisable(GL_ALPHA_TEST);
@@ -784,13 +709,11 @@ void OpenGL2::setAlphaTest(Compare function, u8 ref)
         glEnable(GL_ALPHA_TEST);
         glAlphaFunc(convertCompareFunction(function), ref);
     }
-#endif  //  #if !DEV_PROFILE_CPU
 }
 
 // ** OpenGL2::setCullFace
 void OpenGL2::setCullFace(TriangleFace value)
 {
-#if !DEV_PROFILE_CPU
     if (value == TriangleFaceNone)
     {
         glDisable(GL_CULL_FACE);
@@ -801,13 +724,11 @@ void OpenGL2::setCullFace(TriangleFace value)
         glFrontFace(GL_CCW);
         glCullFace(convertTriangleFace(value));
     }
-#endif  //  #if !DEV_PROFILE_CPU
 }
 
 // ** OpenGL2::setPolygonOffset
 void OpenGL2::setPolygonOffset(f32 factor, f32 units)
 {
-#if !DEV_PROFILE_CPU
     if (equal3(factor, units, 0.0f))
     {
         glDisable(GL_POLYGON_OFFSET_FILL);
@@ -817,13 +738,11 @@ void OpenGL2::setPolygonOffset(f32 factor, f32 units)
         glEnable(GL_POLYGON_OFFSET_FILL);
         glPolygonOffset(factor, units);
     }
-#endif  //  #if !DEV_PROFILE_CPU
 }
 
 // ** OpenGL2::setRasterization
 void OpenGL2::setRasterization(PolygonMode value)
 {
-#if !DEV_PROFILE_CPU
     switch (value)
     {
         case PolygonFill:
@@ -835,13 +754,11 @@ void OpenGL2::setRasterization(PolygonMode value)
         default:
             NIMBLE_NOT_IMPLEMENTED
     }
-#endif  //  #if !DEV_PROFILE_CPU
 }
 
 // ** OpenGL2::setBlending
 void OpenGL2::setBlending(BlendFactor src, BlendFactor dst)
 {
-#if !DEV_PROFILE_CPU
     // Apply the blend state
     if(src == BlendDisabled || dst == BlendDisabled)
     {
@@ -852,31 +769,26 @@ void OpenGL2::setBlending(BlendFactor src, BlendFactor dst)
         glEnable(GL_BLEND);
         glBlendFunc(convertBlendFactor(src), convertBlendFactor(dst));
     }
-#endif  //  #if !DEV_PROFILE_CPU
 }
     
 // ** OpenGL2::setDepthState
 void OpenGL2::setDepthState(Compare function, bool depthWrite)
 {
-#if !DEV_PROFILE_CPU
     glDepthMask(depthWrite ? GL_TRUE : GL_FALSE);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(convertCompareFunction(function));
-#endif  //  #if !DEV_PROFILE_CPU
 }
     
 // **  OpenGL2::setColorMask
 void OpenGL2::setColorMask(u8 value)
 {
-#if !DEV_PROFILE_CPU
     glColorMask(value & ColorMaskRed, value & ColorMaskGreen, value & ColorMaskBlue, value & ColorMaskAlpha);
-#endif  //  #if !DEV_PROFILE_CPU
 }
 
 // ** OpenGL2::drawElements
 void OpenGL2::drawElements(PrimitiveType primType, GLenum type, u32 firstIndex, u32 count)
 {
-#if !DEV_PROFILE_CPU
+#if !DEV_RENDERER_SKIP_DRAW_CALLS
     DC_CHECK_GL;
     
     static GLenum mode[TotalPrimitiveTypes] =
@@ -891,13 +803,13 @@ void OpenGL2::drawElements(PrimitiveType primType, GLenum type, u32 firstIndex, 
     };
 
     glDrawElements(mode[primType], count, type, static_cast<GLbyte*>(NULL) + firstIndex);
-#endif  //  #if !DEV_PROFILE_CPU
+#endif  //  #if !DEV_RENDERER_SKIP_DRAW_CALLS
 }
 
 // ** OpenGL2::drawArrays
 void OpenGL2::drawArrays(PrimitiveType primType, u32 offset, u32 count)
 {
-#if !DEV_PROFILE_CPU
+#if !DEV_RENDERER_SKIP_DRAW_CALLS
     DC_CHECK_GL;
 
     static GLenum mode[TotalPrimitiveTypes] =
@@ -912,7 +824,7 @@ void OpenGL2::drawArrays(PrimitiveType primType, u32 offset, u32 count)
     };
     
     glDrawArrays(mode[primType], offset, count);
-#endif  //  #if !DEV_PROFILE_CPU
+#endif  //  #if !DEV_RENDERER_SKIP_DRAW_CALLS
 }
 
 // ** OpenGL2::convertBlendFactor
