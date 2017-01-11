@@ -291,6 +291,9 @@ void RenderingContext::display(RenderFrame& frame, bool wait)
     // Clear all counters.
     memset(&m_counters, 0, sizeof(m_counters));
     
+    // Reset active rendering states
+    memset(m_activeStates, 0, sizeof(m_activeStates));
+    
     // First execute a construction command buffer
     construct(frame);
     

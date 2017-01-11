@@ -403,9 +403,22 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
 // ** OpenGL2RenderingContext::compilePipelineState
 void OpenGL2RenderingContext::compilePipelineState(const State* states, s32 count)
 {
+    const VertexBufferLayout* changeInputLayout = NULL;
+    
     for (s32 i = 0; i < count; i++)
     {
         const State& state = states[i];
+        
+    #if DEV_RENDERER_STATE_CACHING
+        if (memcmp(&state, &m_activeStates[state.bit()], sizeof(State)) == 0)
+        {
+            continue;
+        }
+    #endif  //  #if DEV_RENDERER_STATE_CACHING
+        m_activeStates[state.bit()] = state;
+        
+        // Track this state change
+        m_counters.stateSwitches++;
         
         switch (state.type)
         {
@@ -418,7 +431,7 @@ void OpenGL2RenderingContext::compilePipelineState(const State* states, s32 coun
                 break;
                 
             case State::SetInputLayout:
-                m_requestedInputLayout = m_inputLayouts[state.resourceId].get();
+                changeInputLayout = m_inputLayouts[state.resourceId].get();
                 break;
                 
             case State::BindProgram:
@@ -487,7 +500,7 @@ void OpenGL2RenderingContext::compilePipelineState(const State* states, s32 coun
     }
     
 #if DEV_RENDERER_INPUT_LAYOUT_CACHING
-    if (m_activeInputLayout != m_requestedInputLayout)
+    if (m_activeInputLayout != changeInputLayout && changeInputLayout)
 #endif  //  #if DEV_RENDERER_INPUT_LAYOUT_CACHING
     {
         // Disable the previous input layout
@@ -497,12 +510,12 @@ void OpenGL2RenderingContext::compilePipelineState(const State* states, s32 coun
         }
      
         // Now enable a new one
-        OpenGL2::enableInputLayout(NULL, *m_requestedInputLayout);
+        OpenGL2::enableInputLayout(NULL, *changeInputLayout);
      
         // Track this switch
         m_counters.inputLayoutSwitches++;
     #if DEV_RENDERER_INPUT_LAYOUT_CACHING
-        m_activeInputLayout = m_requestedInputLayout;
+        m_activeInputLayout = changeInputLayout;
     #endif  //  #if DEV_RENDERER_INPUT_LAYOUT_CACHING
     }
 }

@@ -89,7 +89,6 @@ namespace Renderer
         ResourceId                  m_requestedProgram;     //!< A shader program id to be set.
         ResourceId                  m_requestedCBuffer[State::MaxConstantBuffers];
         const PipelineFeatureLayout*    m_requestedFeatureLayout;
-        const VertexBufferLayout*   m_requestedInputLayout;
     #if DEV_RENDERER_INPUT_LAYOUT_CACHING
         const VertexBufferLayout*   m_activeInputLayout;    //!< An active input layout.
     #endif  //  #if DEV_RENDERER_INPUT_LAYOUT_CACHING

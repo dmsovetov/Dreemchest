@@ -47,6 +47,7 @@ namespace Renderer
             s32                                 inputLayoutSwitches;    //!< A total number of times an input layout was switched.
             s32                                 uniformsUploaded;       //!< A total number of uniforms that were uploaded.
             s32                                 permutationsCompiled;   //!< A total number of new program permutations compiled.
+            s32                                 stateSwitches;          //!< Recorded number of state changes.
         };
         
         //! Cleans all allocated resources.
@@ -177,6 +178,7 @@ namespace Renderer
         Program                                 m_defaultProgram;                                       //!< A default program to be used.
         ShaderLibrary                           m_shaderLibrary;                                        //!< A shader library.
         FrameCounters                           m_counters;                                             //!< Performance counters.
+        State                                   m_activeStates[32];                                     //!< Active rendering states.
     };
     
     // ** RenderingContext::allocateIdentifier
