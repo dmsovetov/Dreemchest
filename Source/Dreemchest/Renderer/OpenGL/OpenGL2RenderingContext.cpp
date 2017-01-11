@@ -97,6 +97,10 @@ String OpenGL2RenderingContext::ShaderPreprocessor::generateBufferDefinition(con
 OpenGL2RenderingContext::OpenGL2RenderingContext(RenderViewPtr view)
     : OpenGLRenderingContext(view)
     , m_activeInputLayout(NULL)
+#if DEV_RENDERER_PROGRAM_CACHING
+    , m_activePermutation(NULL)
+    , m_activeProgram(0)
+#endif  //  #if DEV_RENDERER_PROGRAM_CACHING
 {
     if (m_view.valid())
     {
@@ -464,6 +468,14 @@ const OpenGLRenderingContext::Permutation* OpenGL2RenderingContext::applyProgram
     ResourceId       program  = state.program();
     PipelineFeatures features = state.features();
     
+#if DEV_RENDERER_PROGRAM_CACHING
+    if (program == m_activeProgram)
+    {
+        return m_activePermutation;
+    }
+    m_activeProgram = program;
+#endif  //  #if DEV_RENDERER_PROGRAM_CACHING
+    
     // Get an active program
     NIMBLE_ABORT_IF(!program && !m_defaultProgram, "no valid program set and no default one specified");
     
@@ -481,8 +493,19 @@ const OpenGLRenderingContext::Permutation* OpenGL2RenderingContext::applyProgram
         permutation = compileShaderPermutation(program, features, state.featureLayout());
     }
     
+#if DEV_RENDERER_PROGRAM_CACHING
+    if (m_activePermutation == permutation)
+    {
+        return permutation;
+    }
+    m_activePermutation = permutation;
+#endif  //  #if DEV_RENDERER_PROGRAM_CACHING
+    
     // Switch the program one the pipeline state was changed
     OpenGL2::Program::use(permutation->program);
+    
+    // Track this program switch
+    m_counters.programSwitches++;
     
     return permutation;
 }

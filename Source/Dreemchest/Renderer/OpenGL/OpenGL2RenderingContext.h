@@ -87,6 +87,10 @@ namespace Renderer
         
         FixedArray<ConstantBuffer>  m_constantBuffers;      //!< An array of allocated constant buffer instances.
         const VertexBufferLayout*   m_activeInputLayout;    //!< An active input layout.
+    #if DEV_RENDERER_PROGRAM_CACHING
+        const Permutation*          m_activePermutation;    //!< An active program permutation.
+        ResourceId                  m_activeProgram;        //!< An active program.
+    #endif  //  #if DEV_RENDERER_PROGRAM_CACHING
     };
     
 } // namespace Renderer
