@@ -523,6 +523,8 @@ void OpenGL2RenderingContext::compilePipelineState(const State* states, s32 coun
 // ** OpenGL2RenderingContext::applyProgramPermutation
 const OpenGLRenderingContext::Permutation* OpenGL2RenderingContext::applyProgramPermutation(ResourceId program, const PipelineFeatureLayout* layout, PipelineFeatures features)
 {
+    features = features & (layout ? layout->mask() : 0);
+    
 #if DEV_RENDERER_PROGRAM_CACHING
     if (program == m_activeProgram && features == m_activeFeatures)
     {
