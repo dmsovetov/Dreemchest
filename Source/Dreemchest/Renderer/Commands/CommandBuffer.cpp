@@ -99,18 +99,6 @@ void CommandBuffer::uploadVertexBuffer(VertexBuffer_ id, const PersistentPointer
     opCode.upload.buffer.size = size;
     push( opCode );
 }
-    
-// ** CommandBuffer::push
-void CommandBuffer::push(const OpCode& opCode)
-{
-    if (m_commands.capacity() == m_commands.size())
-    {
-        s32 growBy = max2<s32>(5, m_commands.capacity() * 0.1f);
-        m_commands.reserve(m_commands.capacity() + growBy);
-    }
-    
-    m_commands.push_back(opCode);
-}
  
 // ** CommandBuffer::adoptDataBuffer
 OpCode::Buffer CommandBuffer::adoptDataBuffer(const void* data, s32 size)

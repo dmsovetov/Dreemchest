@@ -92,6 +92,18 @@ namespace Renderer
         NIMBLE_ABORT_IF( index < 0 || index >= size(), "index is out of range" );
         return m_commands[index];
     }
+    
+    // ** CommandBuffer::push
+    NIMBLE_INLINE void CommandBuffer::push(const OpCode& opCode)
+    {
+        if (m_commands.capacity() == m_commands.size())
+        {
+            s32 growBy = max2<s32>(5, m_commands.capacity() * 0.1f);
+            m_commands.reserve(m_commands.capacity() + growBy);
+        }
+        
+        m_commands.push_back(opCode);
+    }
 
 } // namespace Renderer
 
