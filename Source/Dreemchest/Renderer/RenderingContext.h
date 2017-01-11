@@ -43,7 +43,8 @@ namespace Renderer
         //! A rendering context counters.
         struct Counters
         {
-            s32                                 uniformsUploaded;   //!< A total number of uniforms that were uploaded during a frame rendering.
+            s32                                 uniformsUploaded;       //!< A total number of uniforms that were uploaded during a frame rendering.
+            s32                                 permutationsCompiled;   //!< A total number of new program permutations compiled during a frame rendering.
         };
         
         //! Cleans all allocated resources.

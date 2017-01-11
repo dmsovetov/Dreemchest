@@ -190,8 +190,9 @@ ResourceId OpenGL2RenderingContext::allocateTexture(u8 type, const void* data, u
 // ** OpenGL2RenderingContext::executeCommandBuffer
 void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, const CommandBuffer& commands)
 {
-    PipelineState    pipelineState;
-    GLuint           id;
+    PipelineState      pipelineState;
+    GLuint             id;
+    const Permutation* permutation = NULL;
     
     for (s32 i = 0, n = commands.size(); i < n; i++)
     {
@@ -367,7 +368,10 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 compilePipelineState(pipelineState);
                 
                 // Finally select a matching shader permutation
-                applyProgramPermutation(pipelineState);
+                permutation = applyProgramPermutation(pipelineState);
+                
+                // And update all uniforms
+                updateUniforms(pipelineState, permutation);
                 
                 // Perform an actual draw call
                 OpenGL2::drawElements(opCode.drawCall.primitives, GL_UNSIGNED_SHORT, opCode.drawCall.first, opCode.drawCall.count);
@@ -382,7 +386,10 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 compilePipelineState(pipelineState);
 
                 // Finally select a matching shader permutation
-                applyProgramPermutation(pipelineState);
+                permutation = applyProgramPermutation(pipelineState);
+                
+                // And update all uniforms
+                updateUniforms(pipelineState, permutation);
                 
                 // Perform an actual draw call
                 OpenGL2::drawArrays(opCode.drawCall.primitives, opCode.drawCall.first, opCode.drawCall.count);
@@ -452,7 +459,7 @@ void OpenGL2RenderingContext::compilePipelineState(const PipelineState& state)
 }
     
 // ** OpenGL2RenderingContext::applyProgramPermutation
-void OpenGL2RenderingContext::applyProgramPermutation(const PipelineState& state)
+const OpenGLRenderingContext::Permutation* OpenGL2RenderingContext::applyProgramPermutation(const PipelineState& state)
 {
     ResourceId       program  = state.program();
     PipelineFeatures features = state.features();
@@ -466,12 +473,18 @@ void OpenGL2RenderingContext::applyProgramPermutation(const PipelineState& state
         program = m_defaultProgram;
     }
     
+    // Lookup a shader permutation in cache
+    const Permutation* permutation = NULL;
+    
+    if (!lookupPermutation(program, features, &permutation))
+    {
+        permutation = compileShaderPermutation(program, features, state.featureLayout());
+    }
+    
     // Switch the program one the pipeline state was changed
-    const Permutation* permutation = compileShaderPermutation(program, features, state.featureLayout());
     OpenGL2::Program::use(permutation->program);
     
-    // Update all uniforms
-    updateUniforms(state, permutation);
+    return permutation;
 }
     
 // ** OpenGL2RenderingContext::updateUniforms
@@ -574,10 +587,13 @@ const OpenGL2RenderingContext::Permutation* OpenGL2RenderingContext::compileShad
     // Lookup a shader permutation in cache
     const Permutation* permutation = NULL;
 
-    if (lookupPermutation(program, features, &permutation))
-    {
-        return permutation;
-    }
+    //if (lookupPermutation(program, features, &permutation))
+    //{
+    //    return permutation;
+    //}
+    
+    // Track this compilation
+    m_counters.permutationsCompiled++;
 
     // Now create a shader source code from a descriptor
     String shaderSourceCode[TotalShaderTypes];
