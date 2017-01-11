@@ -44,6 +44,7 @@ namespace Renderer
         struct FrameCounters
         {
             s32                                 programSwitches;        //!< A total number of times shader program was switched.
+            s32                                 inputLayoutSwitches;    //!< A total number of times an input layout was switched.
             s32                                 uniformsUploaded;       //!< A total number of uniforms that were uploaded.
             s32                                 permutationsCompiled;   //!< A total number of new program permutations compiled.
         };

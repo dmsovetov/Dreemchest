@@ -422,6 +422,9 @@ void OpenGL2RenderingContext::compilePipelineState(const PipelineState& state)
     }
     
     // Switch the input layout
+#if DEV_RENDERER_INPUT_LAYOUT_CACHING
+    if (m_activeInputLayout != state.inputLayout())
+#endif  //  #if DEV_RENDERER_INPUT_LAYOUT_CACHING
     {
         // Disable the previous input layout
         if (m_activeInputLayout)
@@ -431,7 +434,12 @@ void OpenGL2RenderingContext::compilePipelineState(const PipelineState& state)
         
         // Now enable a new one
         OpenGL2::enableInputLayout(NULL, *state.inputLayout());
+        
+        // Track this switch
+        m_counters.inputLayoutSwitches++;
+    #if DEV_RENDERER_INPUT_LAYOUT_CACHING
         m_activeInputLayout = state.inputLayout();
+    #endif  //  #if DEV_RENDERER_INPUT_LAYOUT_CACHING
     }
     
     // Alpha test
