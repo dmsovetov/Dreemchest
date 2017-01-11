@@ -100,6 +100,7 @@ OpenGL2RenderingContext::OpenGL2RenderingContext(RenderViewPtr view)
 #if DEV_RENDERER_PROGRAM_CACHING
     , m_activePermutation(NULL)
     , m_activeProgram(0)
+    , m_activeFeatures(0)
 #endif  //  #if DEV_RENDERER_PROGRAM_CACHING
 {
     if (m_view.valid())
@@ -477,11 +478,12 @@ const OpenGLRenderingContext::Permutation* OpenGL2RenderingContext::applyProgram
     PipelineFeatures features = state.features();
     
 #if DEV_RENDERER_PROGRAM_CACHING
-    if (program == m_activeProgram)
+    if (program == m_activeProgram && features == m_activeFeatures)
     {
         return m_activePermutation;
     }
     m_activeProgram = program;
+    m_activeFeatures = features;
 #endif  //  #if DEV_RENDERER_PROGRAM_CACHING
     
     // Get an active program

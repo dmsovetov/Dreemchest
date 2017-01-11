@@ -93,6 +93,7 @@ namespace Renderer
     #if DEV_RENDERER_PROGRAM_CACHING
         const Permutation*          m_activePermutation;    //!< An active program permutation.
         ResourceId                  m_activeProgram;        //!< An active program.
+        PipelineFeatures            m_activeFeatures;       //!< An active program features.
     #endif  //  #if DEV_RENDERER_PROGRAM_CACHING
     };
     
