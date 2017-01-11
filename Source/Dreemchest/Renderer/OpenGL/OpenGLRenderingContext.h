@@ -43,20 +43,37 @@ namespace Renderer
         //! A container type to store cached uniform locations.
         typedef HashMap<String32, GLint> UniformLocations;
         
+    #if DEV_RENDERER_UNIFORM_CACHING
+        //! A constant buffer revision to skip redundant uniform uploads.
+        typedef union
+        {
+            struct
+            {
+                ResourceId  id;                 //!< A last known constant buffer id.
+                u16         value;              //!< A last known revision of that buffer.
+            };
+            u32             hash;               //!< A composed hash value.
+        } Revision;
+    #endif  //  #if DEV_RENDERER_UNIFORM_CACHING
+        
         //! A shader program permutation entry.
         struct Permutation
         {
             struct Uniform
             {
-                String32        hash;           //!< A hash value of a uniform name.
-                GLenum          type;           //!< A uniform data type.
-                GLint           size;           //!< A uniform size.
-                u8              index;          //!< A uniform sampler of constant buffer index.
-                GLint           location;       //!< A uniform location.
+                String32        hash;               //!< A hash value of a uniform name.
+                GLenum          type;               //!< A uniform data type.
+                GLint           size;               //!< A uniform size.
+                u8              index;              //!< A uniform sampler of constant buffer index.
+                GLint           location;           //!< A uniform location.
             };
             
-            GLuint              program;
-            Array<Uniform>      uniforms;
+        #if DEV_RENDERER_UNIFORM_CACHING
+            mutable Revision    buffers[State::MaxConstantBuffers];
+        #endif  //  #if DEV_RENDERER_UNIFORM_CACHING
+            
+            GLuint              program;            //!< An OpenGL program identifier.
+            Array<Uniform>      uniforms;           //!< Active uniforms extracted from a program by means of an introspection.
         };
         
                                                 //! Constructs an OpenGLRenderingContext instance.

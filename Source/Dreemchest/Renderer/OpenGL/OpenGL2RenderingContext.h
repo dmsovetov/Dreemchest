@@ -73,6 +73,9 @@ namespace Renderer
         {
             Array<u8>               data;       //!< Actual buffer data.
             Array<UniformElement>   layout;     //!< A constant buffer layout.
+        #if DEV_RENDERER_UNIFORM_CACHING
+            Revision                revision;   //!< A constant buffer revision number to track modifications.
+        #endif  //  #if DEV_RENDERER_UNIFORM_CACHING
         };
 
         //! Generates a uniform structure from a cbuffer definition.

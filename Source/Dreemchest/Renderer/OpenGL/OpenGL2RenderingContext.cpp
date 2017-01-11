@@ -214,6 +214,9 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 ConstantBuffer& constantBuffer = m_constantBuffers[opCode.upload.id];
                 NIMBLE_ABORT_IF(static_cast<s32>(constantBuffer.data.size()) < opCode.upload.buffer.size, "buffer is too small");
                 memcpy(&constantBuffer.data[0], opCode.upload.buffer.data, opCode.upload.buffer.size);
+            #if DEV_RENDERER_UNIFORM_CACHING
+                constantBuffer.revision.value++;
+            #endif  //  #if DEV_RENDERER_UNIFORM_CACHING
             }
                 break;
                 
@@ -252,6 +255,10 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 ConstantBuffer constantBuffer;
                 constantBuffer.layout = m_uniformLayouts[opCode.createBuffer.layout];
                 constantBuffer.data.resize(opCode.createBuffer.buffer.size);
+            #if DEV_RENDERER_UNIFORM_CACHING
+                constantBuffer.revision.id    = opCode.createBuffer.id;
+                constantBuffer.revision.value = 0;
+            #endif  //  #if DEV_RENDERER_UNIFORM_CACHING
                 
                 // Cache uniform names
                 if (opCode.createBuffer.buffer.data)
@@ -497,6 +504,17 @@ void OpenGL2RenderingContext::updateUniforms(const PipelineState& state, const P
     {
         const Permutation::Uniform& uniform = permutation->uniforms[i];
         
+    #if DEV_RENDERER_UNIFORM_CACHING
+        ResourceId            id      = state.constantBuffer(uniform.index);
+        const ConstantBuffer& cbuffer = m_constantBuffers[id];
+        
+        // Nothing changed, so just skip this uniform
+        if (permutation->buffers[uniform.index].hash == cbuffer.revision.hash)
+        {
+            continue;
+        }
+    #endif  //  #if DEV_RENDERER_UNIFORM_CACHING
+        
         switch (uniform.type)
         {
             case GL_INT:
@@ -533,6 +551,18 @@ void OpenGL2RenderingContext::updateUniforms(const PipelineState& state, const P
                 NIMBLE_NOT_IMPLEMENTED
         }
     }
+    
+#if DEV_RENDERER_UNIFORM_CACHING
+    for (size_t i = 0, n = permutation->uniforms.size(); i < n; i++)
+    {
+        const Permutation::Uniform& uniform = permutation->uniforms[i];
+        ResourceId                  id      = state.constantBuffer(uniform.index);
+        const ConstantBuffer&       cbuffer = m_constantBuffers[id];
+        
+        // Update uniform hash values.
+        permutation->buffers[uniform.index] = cbuffer.revision;
+    }
+#endif  //  #if DEV_RENDERER_UNIFORM_CACHING
 }
     
 // ** OpenGL2RenderingContext::compileShaderPermutation

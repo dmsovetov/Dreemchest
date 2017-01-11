@@ -96,6 +96,9 @@ const OpenGLRenderingContext::Permutation* OpenGLRenderingContext::savePermutati
 {
     Permutation permutation;
     permutation.program = id;
+#if DEV_RENDERER_UNIFORM_CACHING
+    memset(permutation.buffers, 0, sizeof(permutation.buffers));
+#endif  //  #if DEV_RENDERER_UNIFORM_CACHING
     
     OpenGL2::Program::Uniform uniformInfo;
     OpenGL2::Program::use(id);
