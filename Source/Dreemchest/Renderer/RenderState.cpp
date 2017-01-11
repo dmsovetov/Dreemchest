@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "RenderState.h"
+#include "PipelineFeatureLayout.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -287,8 +288,9 @@ String State::nameFromType(Type type)
 // ** StateBlock::StateBlock
 StateBlock::StateBlock(State* states, s16 maxStates)
     : m_mask(0)
-    , m_features(0)
-    , m_featureMask(~0)
+    , m_userDefined(0)
+    , m_userDefinedMask(~0)
+    , m_resourceFeatures(0)
     , m_count(0)
     , m_maxStates(maxStates)
     , m_states(states)
@@ -323,6 +325,7 @@ void StateBlock::bindFeatureLayout(FeatureLayout id)
 void StateBlock::bindConstantBuffer(ConstantBuffer_ id, u8 index)
 {
     pushState(State(id, index));
+    m_resourceFeatures = m_resourceFeatures | PipelineFeature::constantBuffer(index);
 }
 
 // ** StateBlock::bindProgram
@@ -335,12 +338,14 @@ void StateBlock::bindProgram(Program id)
 void StateBlock::bindTexture(Texture_ id, u8 sampler)
 {
     pushState(State(id, sampler));
+    m_resourceFeatures = m_resourceFeatures | PipelineFeature::sampler(sampler);
 }
 
 // ** StateBlock::bindTexture
 void StateBlock::bindTexture(TransientTexture id, u8 sampler)
 {
     pushState(State(id, sampler));
+    m_resourceFeatures = m_resourceFeatures | PipelineFeature::sampler(sampler);
 }
 
 // ** StateBlock::setBlend
@@ -358,13 +363,13 @@ void StateBlock::setDepthState(Compare function, bool write)
 // ** StateBlock::enableFeatures
 void StateBlock::enableFeatures(PipelineFeatures features)
 {
-    m_features = m_features | features;
+    m_userDefined = m_userDefined | PipelineFeature::user(features);
 }
 
 // ** StateBlock::disableFeatures
 void StateBlock::disableFeatures(PipelineFeatures mask)
 {
-    m_featureMask = m_featureMask & ~mask;
+    m_userDefinedMask = m_userDefinedMask & ~PipelineFeature::user(mask);
 }
 
 // ** StateBlock::setPolygonOffset
@@ -572,6 +577,7 @@ s32 StateStack::mergeBlocks(const StateBlock* const * stateBlocks, s32 count, St
 {
     PipelineFeatures userFeatures = 0;
     PipelineFeatures userFeaturesMask = ~0;
+    PipelineFeatures resourceFeatures = 0;
     
     // Reset a bitmask of states that were already set
     activeStateMask = 0;
@@ -591,8 +597,9 @@ s32 StateStack::mergeBlocks(const StateBlock* const * stateBlocks, s32 count, St
         }
         
         // Update feature set
-        userFeatures      = userFeatures     | block->features();
-        userFeaturesMask  = userFeaturesMask & block->featureMask();
+        userFeatures     = userFeatures     | block->userDefined();
+        userFeaturesMask = userFeaturesMask & block->userDefinedMask();
+        resourceFeatures = resourceFeatures | block->resourceFeatures();
         
         // Skip redundant state blocks by testing a block bitmask against an active state mask
         if( (activeStateMask ^ block->mask()) == 0 )
@@ -626,7 +633,7 @@ s32 StateStack::mergeBlocks(const StateBlock* const * stateBlocks, s32 count, St
     }
     
     // Compose a user defined feature mask
-    userDefined = userFeatures & userFeaturesMask;
+    userDefined = (userFeatures & userFeaturesMask) | resourceFeatures;
     
     return statesWritten;
 }

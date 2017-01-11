@@ -542,8 +542,6 @@ const UniformElement* RenderingContext::findUniformLayout(const String& name) co
 // ** RenderingContext::applyStates
 void RenderingContext::applyStates(PipelineState& pipeline, const State* states, s32 count) const
 {
-    pipeline.resetFeatures();
-    
     for (s32 i = 0; i < count; i++)
     {
         const State& state = states[i];

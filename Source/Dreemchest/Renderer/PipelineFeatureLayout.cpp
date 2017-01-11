@@ -88,7 +88,6 @@ PipelineFeatures PipelineFeature::user(PipelineFeatures userDefined)
 // ** PipelineState::PipelineState
 PipelineState::PipelineState( void )
     : m_program(0)
-    , m_features(0)
     , m_featureLayout(NULL)
     , m_inputLayout(NULL)
     , m_vertexBuffer(0)
@@ -107,18 +106,6 @@ PipelineState::PipelineState( void )
     
     memset(m_texture, 0, sizeof(m_texture));
     memset(m_constantBuffer, 0, sizeof(m_constantBuffer));
-}
-    
-// ** PipelineState::features
-PipelineFeatures PipelineState::features( void ) const
-{
-    return m_features;
-}
-
-// ** PipelineState::resetFeatures
-void PipelineState::resetFeatures()
-{
-    m_features = 0;
 }
 
 // ** PipelineState::mask
@@ -175,7 +162,6 @@ const PipelineFeatureLayout* PipelineState::featureLayout( void ) const
 void PipelineState::setInputLayout(const VertexBufferLayout* value)
 {
     m_inputLayout = value;
-    m_features = m_features | value->features();
 }
     
 // ** PipelineState::inputLayout
@@ -188,7 +174,6 @@ const VertexBufferLayout* PipelineState::inputLayout() const
 void PipelineState::setTexture(ResourceId id, u8 index)
 {
     NIMBLE_BREAK_IF(index >= State::MaxTextureSamplers, "sampler index is out of range");
-    m_features = m_features | PipelineFeature::sampler(index);
     m_texture[index] = id;
 }
     
@@ -203,7 +188,6 @@ ResourceId PipelineState::texture(u8 index) const
 void PipelineState::setConstantBuffer(ResourceId id, u8 index)
 {
     NIMBLE_BREAK_IF(index >= State::MaxConstantBuffers, "constant buffer index is out of range");
-    m_features = m_features | PipelineFeature::constantBuffer(index);
     m_constantBuffer[index] = id;
 }
     
@@ -411,12 +395,6 @@ void PipelineState::resetProgram(ResourceId id)
     }
 }
 
-// ** PipelineState::activateUserFeatures
-void PipelineState::activateUserFeatures(PipelineFeatures features)
-{
-    m_features = m_features | PipelineFeature::user(features);
-}
-    
 // ---------------------------------------------------------------- PipelineFeatureLayout ---------------------------------------------------------------- //
     
 // ** PipelineFeatureLayout::PipelineFeatureLayout

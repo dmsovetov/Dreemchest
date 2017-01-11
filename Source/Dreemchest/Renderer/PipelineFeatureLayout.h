@@ -103,15 +103,6 @@ namespace Renderer
         //! Returns an constant buffer id bound to a specified slot.
         ResourceId                      constantBuffer(u8 index) const;
         
-        //! Activates a corresponding user defined bits in a feature bitmask.
-        void                            activateUserFeatures(PipelineFeatures features);
-        
-        //! Resets pipeline features.
-        void                            resetFeatures();
-        
-        //! Returns an active feature bitmask.
-        PipelineFeatures                features( void ) const;
-        
         //! Returns a supported features bitmask.
         PipelineFeatures                mask( void ) const;
         
@@ -202,7 +193,6 @@ namespace Renderer
     private:
         
         ResourceId                      m_program;                                      //!< An active program.
-        PipelineFeatures                m_features;                                     //!< A bitmask of activated pipeline features.
         const PipelineFeatureLayout*    m_featureLayout;                                //!< An active feature layout.
         const VertexBufferLayout*       m_inputLayout;                                  //!< A vertex buffer input layout.
         ResourceId                      m_vertexBuffer;                                 //!< A vertex buffer that should be set.

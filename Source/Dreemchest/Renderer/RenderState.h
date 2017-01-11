@@ -289,10 +289,13 @@ namespace Renderer
         const State&                    state(s32 index) const;
 
         //! Returns a feature set enabled by a state block.
-        PipelineFeatures                features( void ) const;
+        PipelineFeatures                userDefined( void ) const;
 
         //! Returns a feature mask exposed by a state block.
-        PipelineFeatures                featureMask( void ) const;
+        PipelineFeatures                userDefinedMask( void ) const;
+        
+        //! Returns a feature mask exposed by a state block.
+        PipelineFeatures                resourceFeatures( void ) const;
 
     private:
 
@@ -302,8 +305,9 @@ namespace Renderer
     protected:
 
         StateMask                       m_mask;                 //!< A bit mask of state changes that are preset inside this state block.
-        PipelineFeatures                m_features;             //!< A shader feature set.
-        PipelineFeatures                m_featureMask;          //!< A shader feature mask.
+        PipelineFeatures                m_userDefined;          //!< A shader feature set.
+        PipelineFeatures                m_userDefinedMask;      //!< A shader feature mask.
+        PipelineFeatures                m_resourceFeatures;     //!< 
         s16                             m_count;                //!< A total number of states stored inside a block.
         s16                             m_maxStates;            //!< A maximum number of states that can be stored inside a block.
         State*                          m_states;               //!< An array of state changes.
@@ -315,16 +319,22 @@ namespace Renderer
         return m_mask;
     }
 
-    //! Returns a feature set enabled by a state block.
-    NIMBLE_INLINE PipelineFeatures StateBlock::features( void ) const
+    // ** StateBlock::userDefined
+    NIMBLE_INLINE PipelineFeatures StateBlock::userDefined( void ) const
     {
-        return m_features;
+        return m_userDefined;
     }
 
-    //! Returns a feature mask exposed by a state block.
-    NIMBLE_INLINE PipelineFeatures StateBlock::featureMask( void ) const
+    // ** StateBlock::userDefinedMask
+    NIMBLE_INLINE PipelineFeatures StateBlock::userDefinedMask( void ) const
     {
-        return m_featureMask;
+        return m_userDefinedMask;
+    }
+    
+    // ** StateBlock::resourceFeatures
+    NIMBLE_INLINE PipelineFeatures StateBlock::resourceFeatures( void ) const
+    {
+        return m_resourceFeatures;
     }
 
     // ** StateBlock::stateCount
@@ -379,10 +389,11 @@ namespace Renderer
     template<s32 TMaxStates>
     const FixedStateBlock<TMaxStates>& FixedStateBlock<TMaxStates>::operator = (const FixedStateBlock& other)
     {
-        m_mask        = other.m_mask;
-        m_features    = other.m_features;
-        m_featureMask = other.m_featureMask;
-        m_count       = other.m_count;
+        m_mask              = other.m_mask;
+        m_resourceFeatures  = other.m_resourceFeatures;
+        m_userDefined       = other.m_userDefined;
+        m_userDefinedMask   = other.m_userDefinedMask;
+        m_count             = other.m_count;
         memcpy(m_block, other.m_block, sizeof(State) * other.stateCount());
         
         return *this;

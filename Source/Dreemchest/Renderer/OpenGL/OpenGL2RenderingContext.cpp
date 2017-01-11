@@ -367,13 +367,12 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
             case OpCode::DrawIndexed:
                 // Apply rendering states bundled with a draw call
                 applyStates(pipelineState, opCode.drawCall.stateBlock->states, opCode.drawCall.stateBlock->size);
-                pipelineState.activateUserFeatures(opCode.drawCall.stateBlock->features);
 
                 // Now update the pipeline state
                 compilePipelineState(pipelineState);
                 
                 // Finally select a matching shader permutation
-                permutation = applyProgramPermutation(pipelineState);
+                permutation = applyProgramPermutation(pipelineState, opCode.drawCall.stateBlock->features | m_activeInputLayout->features());
                 
                 // And update all uniforms
                 updateUniforms(pipelineState, permutation);
@@ -385,13 +384,12 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
             case OpCode::DrawPrimitives:
                 // Apply rendering states bundled with a draw call
                 applyStates(pipelineState, opCode.drawCall.stateBlock->states, opCode.drawCall.stateBlock->size);
-                pipelineState.activateUserFeatures(opCode.drawCall.stateBlock->features);
 
                 // Now update the pipeline state
                 compilePipelineState(pipelineState);
 
                 // Finally select a matching shader permutation
-                permutation = applyProgramPermutation(pipelineState);
+                permutation = applyProgramPermutation(pipelineState, opCode.drawCall.stateBlock->features | m_activeInputLayout->features());
                 
                 // And update all uniforms
                 updateUniforms(pipelineState, permutation);
@@ -472,10 +470,9 @@ void OpenGL2RenderingContext::compilePipelineState(const PipelineState& state)
 }
     
 // ** OpenGL2RenderingContext::applyProgramPermutation
-const OpenGLRenderingContext::Permutation* OpenGL2RenderingContext::applyProgramPermutation(const PipelineState& state)
+const OpenGLRenderingContext::Permutation* OpenGL2RenderingContext::applyProgramPermutation(const PipelineState& state, PipelineFeatures features)
 {
-    ResourceId       program  = state.program();
-    PipelineFeatures features = state.features();
+    ResourceId program = state.program();
     
 #if DEV_RENDERER_PROGRAM_CACHING
     if (program == m_activeProgram && features == m_activeFeatures)

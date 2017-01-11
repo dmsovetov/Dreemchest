@@ -49,7 +49,7 @@ namespace Renderer
         void                        compilePipelineState(const PipelineState& state);
         
         //! Compiles and sets a matching shader permutation.
-        const Permutation*          applyProgramPermutation(const PipelineState& state);
+        const Permutation*          applyProgramPermutation(const PipelineState& state, PipelineFeatures features);
         
         //! Compiles a shader program permutation.
         const Permutation*          compileShaderPermutation(ResourceId program, PipelineFeatures features, const PipelineFeatureLayout* featureLayout);
