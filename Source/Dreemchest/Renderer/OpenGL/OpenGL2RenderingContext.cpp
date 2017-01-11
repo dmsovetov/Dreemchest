@@ -96,6 +96,7 @@ String OpenGL2RenderingContext::ShaderPreprocessor::generateBufferDefinition(con
 // ** OpenGL2RenderingContext::OpenGL2RenderingContext
 OpenGL2RenderingContext::OpenGL2RenderingContext(RenderViewPtr view)
     : OpenGLRenderingContext(view)
+    , m_requestedFeatureLayout(NULL)
     , m_activeInputLayout(NULL)
 #if DEV_RENDERER_PROGRAM_CACHING
     , m_activePermutation(NULL)
@@ -195,7 +196,6 @@ ResourceId OpenGL2RenderingContext::allocateTexture(u8 type, const void* data, u
 // ** OpenGL2RenderingContext::executeCommandBuffer
 void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, const CommandBuffer& commands)
 {
-    PipelineState      pipelineState;
     GLuint             id;
     const Permutation* permutation = NULL;
     
@@ -278,11 +278,11 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
             case OpCode::DeleteConstantBuffer:
                 m_constantBuffers.emplace(opCode.id, ConstantBuffer());
                 releaseIdentifier(RenderResourceType::ConstantBuffer, opCode.id);
-                m_pipeline.resetConstantBuffer(opCode.id);
+            //  resetConstantBuffer(opCode.id);
                 break;
                 
             case OpCode::DeleteProgram:
-                m_pipeline.resetProgram(opCode.id);
+            //  resetProgram(opCode.id);
                 deleteProgram(opCode.id);
                 releaseIdentifier(RenderResourceType::Program, opCode.id);
                 break;
@@ -365,34 +365,30 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 break;
 
             case OpCode::DrawIndexed:
-                // Apply rendering states bundled with a draw call
-                applyStates(pipelineState, opCode.drawCall.stateBlock->states, opCode.drawCall.stateBlock->size);
-
                 // Now update the pipeline state
-                compilePipelineState(pipelineState);
+                compilePipelineState(opCode.drawCall.stateBlock->states, opCode.drawCall.stateBlock->size);
                 
                 // Finally select a matching shader permutation
-                permutation = applyProgramPermutation(pipelineState, opCode.drawCall.stateBlock->features | m_activeInputLayout->features());
+                permutation = applyProgramPermutation(m_requestedProgram, m_requestedFeatureLayout, opCode.drawCall.stateBlock->features | m_activeInputLayout->features());
+                NIMBLE_ABORT_IF(permutation == NULL, "no valid permutation found");
                 
                 // And update all uniforms
-                updateUniforms(pipelineState, permutation);
+                updateUniforms(permutation);
                 
                 // Perform an actual draw call
                 OpenGL2::drawElements(opCode.drawCall.primitives, GL_UNSIGNED_SHORT, opCode.drawCall.first, opCode.drawCall.count);
                 break;
                 
             case OpCode::DrawPrimitives:
-                // Apply rendering states bundled with a draw call
-                applyStates(pipelineState, opCode.drawCall.stateBlock->states, opCode.drawCall.stateBlock->size);
-
                 // Now update the pipeline state
-                compilePipelineState(pipelineState);
+                compilePipelineState(opCode.drawCall.stateBlock->states, opCode.drawCall.stateBlock->size);
 
                 // Finally select a matching shader permutation
-                permutation = applyProgramPermutation(pipelineState, opCode.drawCall.stateBlock->features | m_activeInputLayout->features());
+                permutation = applyProgramPermutation(m_requestedProgram, m_requestedFeatureLayout, opCode.drawCall.stateBlock->features | m_activeInputLayout->features());
+                NIMBLE_ABORT_IF(permutation == NULL, "no valid permutation found");
                 
                 // And update all uniforms
-                updateUniforms(pipelineState, permutation);
+                updateUniforms(permutation);
                 
                 // Perform an actual draw call
                 OpenGL2::drawArrays(opCode.drawCall.primitives, opCode.drawCall.first, opCode.drawCall.count);
@@ -405,24 +401,93 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
 }
 
 // ** OpenGL2RenderingContext::compilePipelineState
-void OpenGL2RenderingContext::compilePipelineState(const PipelineState& state)
+void OpenGL2RenderingContext::compilePipelineState(const State* states, s32 count)
 {
-    // Bind an indexed buffer
-    OpenGL2::Buffer::bind(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[state.indexBuffer()]);
-    
-    // Bind a vertex buffer
-    OpenGL2::Buffer::bind(GL_ARRAY_BUFFER, m_vertexBuffers[state.vertexBuffer()]);
-    
-    // Bind texture samplers
-    for (s32 i = 0; i < State::MaxTextureSamplers; i++)
+    for (s32 i = 0; i < count; i++)
     {
-        const Texture& texture = m_textures[state.texture(i)];
-        OpenGL2::Texture::bind(texture.target, texture.id, i);
+        const State& state = states[i];
+        
+        switch (state.type)
+        {
+            case State::BindVertexBuffer:
+                OpenGL2::Buffer::bind(GL_ARRAY_BUFFER, m_vertexBuffers[state.resourceId]);
+                break;
+                
+            case State::BindIndexBuffer:
+                OpenGL2::Buffer::bind(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[state.resourceId]);
+                break;
+                
+            case State::SetInputLayout:
+                m_requestedInputLayout = m_inputLayouts[state.resourceId].get();
+                break;
+                
+            case State::BindProgram:
+                m_requestedProgram = state.resourceId;
+                break;
+                
+            case State::SetFeatureLayout:
+                m_requestedFeatureLayout = m_pipelineFeatureLayouts[state.resourceId].get();
+                break;
+                
+            case State::BindConstantBuffer:
+                m_requestedCBuffer[state.data.index] = state.resourceId;
+                break;
+                
+            case State::BindTexture:
+                OpenGL2::Texture::bind(m_textures[state.resourceId].target, m_textures[state.resourceId].id, state.samplerIndex());
+                break;
+                
+            case State::BindTransientTexture:
+            {
+                ResourceId id = transientResource(state.resourceId);
+                OpenGL2::Texture::bind(m_textures[id].target, m_textures[id].id, state.samplerIndex());
+            }
+                break;
+                
+            case State::DepthState:
+                OpenGL2::setDepthState(state.function(), state.data.depthWrite);
+                break;
+                
+            case State::Blending:
+                OpenGL2::setBlending(state.sourceBlendFactor(), state.destBlendFactor());
+                break;
+                
+            case State::ColorMask:
+                OpenGL2::setColorMask(state.mask);
+                break;
+                
+            case State::Rasterization:
+                OpenGL2::setRasterization(static_cast<PolygonMode>(state.rasterization));
+                break;
+                
+            case State::AlphaTest:
+                OpenGL2::setAlphaTest(state.function(), state.alphaReference());
+                break;
+                
+            case State::PolygonOffset:
+                OpenGL2::setPolygonOffset(state.polygonOffsetFactor(), state.polygonOffsetUnits());
+                break;
+                
+            case State::StencilFunc:
+                OpenGL2::Stencil::setFunction(static_cast<Compare>(state.stencilFunction.op), state.data.ref, state.stencilFunction.mask);
+                break;
+                
+            case State::StencilOp:
+                OpenGL2::Stencil::setOperations(state.stencilFail(), state.depthFail(), state.depthStencilPass());
+                break;
+                
+            case State::CullFace:
+                OpenGL2::setCullFace(static_cast<TriangleFace>(state.cullFace));
+                break;
+                
+            default:
+                LogFatal("renderingContext", "state type '%s' is not implemented\n", State::nameFromType(static_cast<State::Type>(state.type)).c_str());
+                NIMBLE_NOT_IMPLEMENTED
+        }
     }
     
-    // Switch the input layout
 #if DEV_RENDERER_INPUT_LAYOUT_CACHING
-    if (m_activeInputLayout != state.inputLayout())
+    if (m_activeInputLayout != m_requestedInputLayout)
 #endif  //  #if DEV_RENDERER_INPUT_LAYOUT_CACHING
     {
         // Disable the previous input layout
@@ -430,50 +495,21 @@ void OpenGL2RenderingContext::compilePipelineState(const PipelineState& state)
         {
             OpenGL2::disableInputLayout(*m_activeInputLayout);
         }
-        
+     
         // Now enable a new one
-        OpenGL2::enableInputLayout(NULL, *state.inputLayout());
-        
+        OpenGL2::enableInputLayout(NULL, *m_requestedInputLayout);
+     
         // Track this switch
         m_counters.inputLayoutSwitches++;
     #if DEV_RENDERER_INPUT_LAYOUT_CACHING
-        m_activeInputLayout = state.inputLayout();
+        m_activeInputLayout = m_requestedInputLayout;
     #endif  //  #if DEV_RENDERER_INPUT_LAYOUT_CACHING
     }
-    
-    // Alpha test
-    OpenGL2::setAlphaTest(state.alphaTestFunction(), state.alphaTestRef());
-    
-    // Polygon offset
-    OpenGL2::setPolygonOffset(state.polygonOffsetFactor(), state.polygonOffsetUnits());
-    
-    // Rasterization
-    OpenGL2::setRasterization(state.rasterization());
-    
-    // Blending
-    OpenGL2::setBlending(state.sourceBlendFactor(), state.destBlendFactor());
-    
-    // Color mask
-    OpenGL2::setColorMask(state.colorMask());
-
-    // Depth state
-    OpenGL2::setDepthState(state.depthTestFunction(), state.depthWrite());
-
-    // Cull face
-    OpenGL2::setCullFace(state.cullFace());
-
-    // Stencil op
-    OpenGL2::Stencil::setOperations(state.stencilStencilFail(), state.stencilDepthFail(), state.stencilPass());
-
-    // Stencil function
-    OpenGL2::Stencil::setFunction(state.stencilFunction(), state.stencilRef(), state.stencilMask());
 }
     
 // ** OpenGL2RenderingContext::applyProgramPermutation
-const OpenGLRenderingContext::Permutation* OpenGL2RenderingContext::applyProgramPermutation(const PipelineState& state, PipelineFeatures features)
+const OpenGLRenderingContext::Permutation* OpenGL2RenderingContext::applyProgramPermutation(ResourceId program, const PipelineFeatureLayout* layout, PipelineFeatures features)
 {
-    ResourceId program = state.program();
-    
 #if DEV_RENDERER_PROGRAM_CACHING
     if (program == m_activeProgram && features == m_activeFeatures)
     {
@@ -497,7 +533,7 @@ const OpenGLRenderingContext::Permutation* OpenGL2RenderingContext::applyProgram
     
     if (!lookupPermutation(program, features, &permutation))
     {
-        permutation = compileShaderPermutation(program, features, state.featureLayout());
+        permutation = compileShaderPermutation(program, features, layout);
     }
     
 #if DEV_RENDERER_PROGRAM_CACHING
@@ -518,14 +554,13 @@ const OpenGLRenderingContext::Permutation* OpenGL2RenderingContext::applyProgram
 }
     
 // ** OpenGL2RenderingContext::updateUniforms
-void OpenGL2RenderingContext::updateUniforms(const PipelineState& state, const Permutation* permutation)
+void OpenGL2RenderingContext::updateUniforms(const Permutation* permutation)
 {
     struct UniformPointer
     {
-        static const void* findByName(const Permutation::Uniform& uniform, const FixedArray<ConstantBuffer>& constantBuffers, const PipelineState& state)
+        static const void* findByName(const Permutation::Uniform& uniform, const FixedArray<ConstantBuffer>& constantBuffers, const ResourceId* boundConstantBuffers)
         {
-            ResourceId id = state.constantBuffer(uniform.index);
-            NIMBLE_ABORT_IF(!id, "no constant buffer bound");
+            ResourceId id = boundConstantBuffers[uniform.index];
             const ConstantBuffer& cbuffer = constantBuffers[id];
 
             for (const UniformElement* constant = &cbuffer.layout[0]; constant->name; constant++)
@@ -548,7 +583,9 @@ void OpenGL2RenderingContext::updateUniforms(const PipelineState& state, const P
         const Permutation::Uniform& uniform = permutation->uniforms[i];
         
     #if DEV_RENDERER_UNIFORM_CACHING
-        ResourceId            id      = state.constantBuffer(uniform.index);
+        ResourceId id = m_requestedCBuffer[uniform.index];
+        NIMBLE_ABORT_IF(!id, "no constant buffer bound");
+        
         const ConstantBuffer& cbuffer = m_constantBuffers[id];
         
         // Nothing changed, so just skip this uniform
@@ -564,32 +601,32 @@ void OpenGL2RenderingContext::updateUniforms(const PipelineState& state, const P
         switch (uniform.type)
         {
             case GL_INT:
-                pointer = UniformPointer::findByName(uniform, m_constantBuffers, state);
+                pointer = UniformPointer::findByName(uniform, m_constantBuffers, m_requestedCBuffer);
                 OpenGL2::Program::uniform1i(uniform.location, *reinterpret_cast<const s32*>(pointer));
                 break;
                 
             case GL_FLOAT:
-                pointer = UniformPointer::findByName(uniform, m_constantBuffers, state);
+                pointer = UniformPointer::findByName(uniform, m_constantBuffers, m_requestedCBuffer);
                 OpenGL2::Program::uniform1f(uniform.location, *reinterpret_cast<const f32*>(pointer));
                 break;
                 
             case GL_FLOAT_VEC2:
-                pointer = UniformPointer::findByName(uniform, m_constantBuffers, state);
+                pointer = UniformPointer::findByName(uniform, m_constantBuffers, m_requestedCBuffer);
                 OpenGL2::Program::uniform2f(uniform.location, reinterpret_cast<const f32*>(pointer), uniform.size);
                 break;
                 
             case GL_FLOAT_VEC3:
-                pointer = UniformPointer::findByName(uniform, m_constantBuffers, state);
+                pointer = UniformPointer::findByName(uniform, m_constantBuffers, m_requestedCBuffer);
                 OpenGL2::Program::uniform3f(uniform.location, reinterpret_cast<const f32*>(pointer), uniform.size);
                 break;
                 
             case GL_FLOAT_VEC4:
-                pointer = UniformPointer::findByName(uniform, m_constantBuffers, state);
+                pointer = UniformPointer::findByName(uniform, m_constantBuffers, m_requestedCBuffer);
                 OpenGL2::Program::uniform4f(uniform.location, reinterpret_cast<const f32*>(pointer), uniform.size);
                 break;
                 
             case GL_FLOAT_MAT4:
-                pointer = UniformPointer::findByName(uniform, m_constantBuffers, state);
+                pointer = UniformPointer::findByName(uniform, m_constantBuffers, m_requestedCBuffer);
                 OpenGL2::Program::uniformMatrix4(uniform.location, reinterpret_cast<const f32*>(pointer));
                 break;
                 
@@ -602,7 +639,7 @@ void OpenGL2RenderingContext::updateUniforms(const PipelineState& state, const P
     for (size_t i = 0, n = permutation->uniforms.size(); i < n; i++)
     {
         const Permutation::Uniform& uniform = permutation->uniforms[i];
-        ResourceId                  id      = state.constantBuffer(uniform.index);
+        ResourceId                  id      = m_requestedCBuffer[uniform.index];
         const ConstantBuffer&       cbuffer = m_constantBuffers[id];
         
         // Update uniform hash values.
@@ -616,11 +653,6 @@ const OpenGL2RenderingContext::Permutation* OpenGL2RenderingContext::compileShad
 {
     // Lookup a shader permutation in cache
     const Permutation* permutation = NULL;
-
-    //if (lookupPermutation(program, features, &permutation))
-    //{
-    //    return permutation;
-    //}
     
     // Track this compilation
     m_counters.permutationsCompiled++;

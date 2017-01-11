@@ -144,10 +144,7 @@ namespace Renderer
         
         //! Creates a vertex buffer layout instance from a flexible vertex format.
         VertexBufferLayoutUPtr                  createVertexBufferLayout(VertexFormat vertexFormat) const;
-        
-        //! Configures a pipeline state according to a state stack.
-        void                                    applyStates(PipelineState& pipeline, const State* states, s32 count) const;
-        
+
         //! Allocates a new persistent identifier of specified type.
         ResourceId                              allocateIdentifier(RenderResourceType::Enum type);
         
@@ -178,7 +175,6 @@ namespace Renderer
         TransientResourceStack*                 m_transientResources;                                   //!< A transient resource stack.
         StateBlock12                            m_defaultStateBlock;                                    //!< A default state block is applied after all commands were executed.
         Program                                 m_defaultProgram;                                       //!< A default program to be used.
-        PipelineState                           m_pipeline;                                             //!< An active pipeline state.
         ShaderLibrary                           m_shaderLibrary;                                        //!< A shader library.
         FrameCounters                           m_counters;                                             //!< Performance counters.
     };

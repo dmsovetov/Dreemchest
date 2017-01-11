@@ -384,7 +384,7 @@ void RenderingContextHal::switchBlending( const RenderFrame& frame, const State&
 // ** RenderingContextHal::switchShader
 void RenderingContextHal::switchShader( const RenderFrame& frame, const State& state )
 {
-    m_pipeline.setProgram(state.resourceId);
+    //m_pipeline.setProgram(state.resourceId);
 }
 
 // ** RenderingContextHal::switchConstantBuffer
@@ -433,7 +433,7 @@ void RenderingContextHal::switchPipelineFeatureLayout( const RenderFrame& frame,
     NIMBLE_ABORT_IF(!featureLayout.get(), "invalid resource id");
     
     // Make this feature layout active
-    m_pipeline.setFeatureLayout(featureLayout.get());
+    //m_pipeline.setFeatureLayout(featureLayout.get());
 }
 
 // ** RenderingContextHal::switchTexture

@@ -46,16 +46,16 @@ namespace Renderer
         virtual void                executeCommandBuffer(const RenderFrame& frame, const CommandBuffer& commands) NIMBLE_OVERRIDE;
         
         //! Compiles the requested rendering state (activates a shader permuation that best matches active pipeline state, bind buffers, textures, etc.).
-        void                        compilePipelineState(const PipelineState& state);
+        void                        compilePipelineState(const State* states, s32 count);
         
         //! Compiles and sets a matching shader permutation.
-        const Permutation*          applyProgramPermutation(const PipelineState& state, PipelineFeatures features);
+        const Permutation*          applyProgramPermutation(ResourceId program, const PipelineFeatureLayout* layout, PipelineFeatures features);
         
         //! Compiles a shader program permutation.
         const Permutation*          compileShaderPermutation(ResourceId program, PipelineFeatures features, const PipelineFeatureLayout* featureLayout);
         
         //! Update uniforms from active constant buffers.
-        void                        updateUniforms(const PipelineState& state, const Permutation* permutation);
+        void                        updateUniforms(const Permutation* permutation);
 
         //! Acquires a transient texture.
         ResourceId                  acquireTexture(u8 type, u16 width, u16 height, PixelFormat format);
@@ -86,6 +86,10 @@ namespace Renderer
         };
         
         FixedArray<ConstantBuffer>  m_constantBuffers;      //!< An array of allocated constant buffer instances.
+        ResourceId                  m_requestedProgram;     //!< A shader program id to be set.
+        ResourceId                  m_requestedCBuffer[State::MaxConstantBuffers];
+        const PipelineFeatureLayout*    m_requestedFeatureLayout;
+        const VertexBufferLayout*   m_requestedInputLayout;
     #if DEV_RENDERER_INPUT_LAYOUT_CACHING
         const VertexBufferLayout*   m_activeInputLayout;    //!< An active input layout.
     #endif  //  #if DEV_RENDERER_INPUT_LAYOUT_CACHING
