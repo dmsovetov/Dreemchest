@@ -48,6 +48,9 @@ namespace Renderer
         //! Compiles the requested rendering state (activates a shader permuation that best matches active pipeline state, bind buffers, textures, etc.).
         void                        compilePipelineState(const PipelineState& state);
         
+        //! Compiles and sets a matching shader permutation.
+        void                        applyProgramPermutation(const PipelineState& state);
+        
         //! Compiles a shader program permutation.
         const Permutation*          compileShaderPermutation(ResourceId program, PipelineFeatures features, const PipelineFeatureLayout* featureLayout);
         

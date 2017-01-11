@@ -356,8 +356,11 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 applyStates(pipelineState, opCode.drawCall.stateBlock->states, opCode.drawCall.stateBlock->size);
                 pipelineState.activateUserFeatures(opCode.drawCall.stateBlock->features);
 
-                // Now activate a matching shader permutation
+                // Now update the pipeline state
                 compilePipelineState(pipelineState);
+                
+                // Finally select a matching shader permutation
+                applyProgramPermutation(pipelineState);
                 
                 // Perform an actual draw call
                 OpenGL2::drawElements(opCode.drawCall.primitives, GL_UNSIGNED_SHORT, opCode.drawCall.first, opCode.drawCall.count);
@@ -368,9 +371,12 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 applyStates(pipelineState, opCode.drawCall.stateBlock->states, opCode.drawCall.stateBlock->size);
                 pipelineState.activateUserFeatures(opCode.drawCall.stateBlock->features);
 
-                // Now activate a matching shader permutation
+                // Now update the pipeline state
                 compilePipelineState(pipelineState);
 
+                // Finally select a matching shader permutation
+                applyProgramPermutation(pipelineState);
+                
                 // Perform an actual draw call
                 OpenGL2::drawArrays(opCode.drawCall.primitives, opCode.drawCall.first, opCode.drawCall.count);
                 break;
@@ -436,7 +442,11 @@ void OpenGL2RenderingContext::compilePipelineState(const PipelineState& state)
 
     // Stencil function
     OpenGL2::Stencil::setFunction(state.stencilFunction(), state.stencilRef(), state.stencilMask());
+}
     
+// ** OpenGL2RenderingContext::applyProgramPermutation
+void OpenGL2RenderingContext::applyProgramPermutation(const PipelineState& state)
+{
     ResourceId       program  = state.program();
     PipelineFeatures features = state.features();
     
@@ -452,7 +462,7 @@ void OpenGL2RenderingContext::compilePipelineState(const PipelineState& state)
     // Switch the program one the pipeline state was changed
     const Permutation* permutation = compileShaderPermutation(program, features, state.featureLayout());
     OpenGL2::Program::use(permutation->program);
-
+    
     // Update all uniforms
     updateUniforms(state, permutation);
 }
@@ -481,6 +491,8 @@ void OpenGL2RenderingContext::updateUniforms(const PipelineState& state, const P
         }
     };
     
+    const void* pointer = NULL;
+    
     for (size_t i = 0, n = permutation->uniforms.size(); i < n; i++)
     {
         const Permutation::Uniform& uniform = permutation->uniforms[i];
@@ -493,27 +505,33 @@ void OpenGL2RenderingContext::updateUniforms(const PipelineState& state, const P
                 break;
                 
             case GL_INT:
-                OpenGL2::Program::uniform1i(uniform.location, *reinterpret_cast<const s32*>(UniformPointer::findByName(uniform, m_constantBuffers, state)));
+                pointer = UniformPointer::findByName(uniform, m_constantBuffers, state);
+                OpenGL2::Program::uniform1i(uniform.location, *reinterpret_cast<const s32*>(pointer));
                 break;
                 
             case GL_FLOAT:
-                OpenGL2::Program::uniform1f(uniform.location, *reinterpret_cast<const f32*>(UniformPointer::findByName(uniform, m_constantBuffers, state)));
+                pointer = UniformPointer::findByName(uniform, m_constantBuffers, state);
+                OpenGL2::Program::uniform1f(uniform.location, *reinterpret_cast<const f32*>(pointer));
                 break;
                 
             case GL_FLOAT_VEC2:
-                OpenGL2::Program::uniform2f(uniform.location, reinterpret_cast<const f32*>(UniformPointer::findByName(uniform, m_constantBuffers, state)), uniform.size);
+                pointer = UniformPointer::findByName(uniform, m_constantBuffers, state);
+                OpenGL2::Program::uniform2f(uniform.location, reinterpret_cast<const f32*>(pointer), uniform.size);
                 break;
                 
             case GL_FLOAT_VEC3:
-                OpenGL2::Program::uniform3f(uniform.location, reinterpret_cast<const f32*>(UniformPointer::findByName(uniform, m_constantBuffers, state)), uniform.size);
+                pointer = UniformPointer::findByName(uniform, m_constantBuffers, state);
+                OpenGL2::Program::uniform3f(uniform.location, reinterpret_cast<const f32*>(pointer), uniform.size);
                 break;
                 
             case GL_FLOAT_VEC4:
-                OpenGL2::Program::uniform4f(uniform.location, reinterpret_cast<const f32*>(UniformPointer::findByName(uniform, m_constantBuffers, state)), uniform.size);
+                pointer = UniformPointer::findByName(uniform, m_constantBuffers, state);
+                OpenGL2::Program::uniform4f(uniform.location, reinterpret_cast<const f32*>(pointer), uniform.size);
                 break;
                 
             case GL_FLOAT_MAT4:
-                OpenGL2::Program::uniformMatrix4(uniform.location, reinterpret_cast<const f32*>(UniformPointer::findByName(uniform, m_constantBuffers, state)));
+                pointer = UniformPointer::findByName(uniform, m_constantBuffers, state);
+                OpenGL2::Program::uniformMatrix4(uniform.location, reinterpret_cast<const f32*>(pointer));
                 break;
                 
             default:
