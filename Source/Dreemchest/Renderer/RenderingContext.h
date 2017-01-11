@@ -108,6 +108,9 @@ namespace Renderer
         //! Queues a program instance creation and returns it's index.
         Program                                 requestProgram(const String& vertex, const String& fragment);
         
+        //! Queues a command to precompile a shader program permutation.
+        void                                    precompilePermutations(Program id, FeatureLayout features);
+        
         //! Queues a constant buffer destruction.
         void                                    deleteConstantBuffer(ConstantBuffer_ id);
         

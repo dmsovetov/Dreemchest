@@ -56,6 +56,7 @@ namespace Renderer
             , DeleteTexture             //!< Destroys an allocated texture.
             , DeleteConstantBuffer      //!< Destroys an allocated constant buffer.
             , DeleteProgram             //!< Destroys a program and all it's permutations.
+            , PrecompilePermutation     //!< Precompiles a shader program permutation.
         };
         
         //! A data buffer used by a command.
@@ -95,6 +96,12 @@ namespace Renderer
                 f32                         depth;                      //!< A depth buffer clear value.
                 s32                         stencil;                    //!< A stencil buffer clear value.
             } clear;
+            
+            struct
+            {
+                ResourceId                  program;                    //!< A passed resource id.
+                PipelineFeatures            features;                   //!< Passed shader features.
+            } precompile;
             
             struct
             {

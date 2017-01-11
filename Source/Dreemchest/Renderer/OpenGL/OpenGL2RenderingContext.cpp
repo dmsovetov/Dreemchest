@@ -287,6 +287,13 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 releaseIdentifier(RenderResourceType::Program, opCode.id);
                 break;
                 
+            case OpCode::PrecompilePermutation:
+                if (!lookupPermutation(opCode.precompile.program, opCode.precompile.features, &permutation))
+                {
+                    compileShaderPermutation(opCode.precompile.program, opCode.precompile.features, NULL);
+                }
+                break;
+                
             case OpCode::AcquireTexture:
             {
                 ResourceId id = acquireTexture(opCode.transientTexture.type, opCode.transientTexture.width, opCode.transientTexture.height, opCode.transientTexture.format);

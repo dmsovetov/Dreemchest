@@ -64,6 +64,9 @@ namespace Renderer
         //! Emits a program destruction command.
         void                        deleteProgram(Program id);
         
+        //! Emits a permutation precompilation command.
+        void                        precompilePermutation(Program id, PipelineFeatures features);
+        
     private:
         
                                     //! Constructs a ResourceCommandBuffer instance.

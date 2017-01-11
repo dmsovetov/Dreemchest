@@ -134,6 +134,16 @@ void ResourceCommandBuffer::deleteProgram(Program id)
     opCode.id   = id;
     push(opCode);
 }
+
+// ** ResourceCommandBuffer::precompilePermutation
+void ResourceCommandBuffer::precompilePermutation(Program id, PipelineFeatures features)
+{
+    OpCode opCode;
+    opCode.type                = OpCode::PrecompilePermutation;
+    opCode.precompile.program  = id;
+    opCode.precompile.features = features;
+    push(opCode);
+}
     
 } // namespace Renderer
 

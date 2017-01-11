@@ -483,6 +483,12 @@ Program RenderingContext::requestProgram(const ShaderProgramDescriptor& descript
     
     return id;
 }
+    
+// ** RenderingContext::precompilePermutations
+void RenderingContext::precompilePermutations(Program id, FeatureLayout features)
+{
+    m_resourceCommandBuffer->precompilePermutation(id, 0);
+}
 
 // ** RenderingContext::requestProgram
 Program RenderingContext::requestProgram(VertexShader vertexShader, FragmentShader fragmentShader)
