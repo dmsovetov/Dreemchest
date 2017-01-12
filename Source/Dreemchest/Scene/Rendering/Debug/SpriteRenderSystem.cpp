@@ -122,7 +122,7 @@ void SpriteRenderSystem::emitSpriteBatch( RenderFrame& frame, RenderCommandBuffe
 
     // Upload vertex data to a GPU buffer and emit a draw indexed command
     commands.uploadVertexBuffer( m_vertexBuffer, vertices, vertexCount * m_vertexFormat.vertexSize() );
-    commands.drawIndexed( 0, Renderer::PrimTriangles, 0, vertexCount * 3, stateStack );
+    commands.drawIndexed( 0, Renderer::PrimTriangles, 0, vertexCount * 3 );
 }
 
 // ** SpriteRenderSystem::emitSpriteVertices

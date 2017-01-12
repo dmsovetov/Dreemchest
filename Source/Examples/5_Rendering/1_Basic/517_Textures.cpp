@@ -58,7 +58,6 @@ static String s_fragmentShader =
 class Textures : public RenderingApplicationDelegate
 {
     StateBlock8 m_renderStates;
-    RenderFrame m_renderFrame;
     
     virtual void handleLaunched(Application* application) NIMBLE_OVERRIDE
     {
@@ -101,14 +100,14 @@ class Textures : public RenderingApplicationDelegate
  
     virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
     {
-        m_renderFrame.clear();
+        RenderFrame frame(m_renderingContext->defaultStateBlock());
         
-        RenderCommandBuffer& commands = m_renderFrame.entryPoint();
+        RenderCommandBuffer& commands = frame.entryPoint();
         
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
-        commands.drawIndexed(0, Renderer::PrimTriangles, 0, 6, &m_renderStates);
+        commands.drawIndexed(0, Renderer::PrimTriangles, 0, 6, m_renderStates);
     
-        m_renderingContext->display(m_renderFrame);
+        m_renderingContext->display(frame);
     }
 };
 

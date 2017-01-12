@@ -69,7 +69,6 @@ static Examples::Instance   s_instance;
 class Meshes : public RenderingApplicationDelegate
 {
     StateBlock8 m_renderStates;
-    RenderFrame m_renderFrame;
     Examples::Mesh mesh;
     ConstantBuffer_ m_instanceConstantBuffer;
     
@@ -83,7 +82,7 @@ class Meshes : public RenderingApplicationDelegate
         }
         
         // First load a mesh from a file
-        mesh = Examples::objFromFile("Assets/Meshes/platform.obj");
+        mesh = Examples::objFromFile("Assets/Meshes/bunny.obj");
         
         if (!mesh)
         {
@@ -134,9 +133,9 @@ class Meshes : public RenderingApplicationDelegate
  
     virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
     {
-        m_renderFrame.clear();
+        RenderFrame frame(m_renderingContext->defaultStateBlock());
         
-        RenderCommandBuffer& commands = m_renderFrame.entryPoint();
+        RenderCommandBuffer& commands = frame.entryPoint();
         
         // Clear the viewport
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
@@ -146,9 +145,9 @@ class Meshes : public RenderingApplicationDelegate
         commands.uploadConstantBuffer(m_instanceConstantBuffer, &s_instance, sizeof(s_instance));
         
         // Render the mesh
-        commands.drawPrimitives(0, mesh.primitives, 0, mesh.vertices.size(), &m_renderStates);
+        commands.drawPrimitives(0, mesh.primitives, 0, mesh.vertices.size(), m_renderStates);
     
-        m_renderingContext->display(m_renderFrame);
+        m_renderingContext->display(frame);
     }
 };
 

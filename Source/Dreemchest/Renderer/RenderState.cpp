@@ -522,6 +522,17 @@ StateScope StateStack::newScope( void )
     StateBlock* block = new( allocated ) StateBlock8;
     return push( block );
 }
+    
+// ** StateStack::push
+void StateStack::push(const StateBlock& block)
+{
+    for (s32 i = m_size; i > 0; i--)
+    {
+        m_stack[i] = m_stack[i - 1];
+    }
+    m_stack[0] = &block;
+    m_size++;
+}
 
 // ** StateStack::push
 StateScope StateStack::push( const StateBlock* block )
@@ -529,12 +540,8 @@ StateScope StateStack::push( const StateBlock* block )
     if( block == NULL ) {
         return StateScope( *this, NULL );
     }
-
-    for( s32 i = m_size; i > 0; i-- ) {
-        m_stack[i] = m_stack[i - 1];
-    }
-    m_stack[0] = block;
-    m_size++;
+    
+    push(*block);
 
     return StateScope( *this, const_cast<StateBlock*>( block ) );
 }
@@ -570,72 +577,6 @@ void StateStack::reset( void )
     m_allocator.reset();
     m_stack = reinterpret_cast<const StateBlock**>(m_allocator.allocate(sizeof(StateBlock*) * m_maxStackSize));
     m_size = 0;
-}
-    
-// ** StateStack::mergeBlocks
-s32 StateStack::mergeBlocks(const StateBlock* const * stateBlocks, s32 count, State* states, s32 maxStates, StateMask& activeStateMask, PipelineFeatures& userDefined)
-{
-    PipelineFeatures userFeatures = 0;
-    PipelineFeatures userFeaturesMask = ~0;
-    PipelineFeatures resourceFeatures = 0;
-    
-    // Reset a bitmask of states that were already set
-    activeStateMask = 0;
-    
-    // A total number of states written to an output array
-    s32 statesWritten = 0;
-    
-    for (s32 i = 0; i < count; i++)
-    {
-        // Get a state block at specified index
-        const StateBlock* block = stateBlocks[i];
-        
-        // No more state blocks in a stack - break
-        if( block == NULL )
-        {
-            break;
-        }
-        
-        // Update feature set
-        userFeatures     = userFeatures     | block->userDefined();
-        userFeaturesMask = userFeaturesMask & block->userDefinedMask();
-        resourceFeatures = resourceFeatures | block->resourceFeatures();
-        
-        // Skip redundant state blocks by testing a block bitmask against an active state mask
-        if( (activeStateMask ^ block->mask()) == 0 )
-        {
-            continue;
-        }
-        
-        // Apply all states in a block
-        for( s32 j = 0, n = block->stateCount(); j < n; j++ )
-        {
-            // Get a render state by an index
-            const State& state = block->state(j);
-            
-            // Get a render state bit
-            StateMask stateMask = state.bitmask();
-            
-            // Skip redundate state blocks by testing a state bitmask agains an active state mask
-            if( activeStateMask & stateMask )
-            {
-                continue;
-            }
-            
-            NIMBLE_ABORT_IF(statesWritten >= maxStates, "to much render states");
-            
-            // Write a render state at specified index to an output array
-            states[statesWritten++] = state;
-            
-            // Update an active state mask
-            activeStateMask = activeStateMask | stateMask;
-        }
-    }
-    
-    // Compose a user defined feature mask
-    userDefined = (userFeatures & userFeaturesMask) | resourceFeatures;
-    
-    return statesWritten;
 }
 
 } // namespace Renderer

@@ -35,6 +35,7 @@ namespace Renderer
 // ** RenderCommandBuffer::RenderCommandBuffer
 RenderCommandBuffer::RenderCommandBuffer(RenderFrame& frame)
     : m_frame(frame)
+    , m_stateStack(frame.stateStack())
     , m_transientResourceIndex(0)
 {
 }
@@ -170,41 +171,52 @@ void RenderCommandBuffer::releaseTexture(TransientTexture id)
 }
 
 // ** RenderCommandBuffer::drawIndexed
-void RenderCommandBuffer::drawIndexed(u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateStack& stateStack)
+void RenderCommandBuffer::drawIndexed(u32 sorting, PrimitiveType primitives, s32 first, s32 count)
 {
-    emitDrawCall(OpCode::DrawIndexed, sorting, primitives, first, count, stateStack.states(), stateStack.size());
+    emitDrawCall(OpCode::DrawIndexed, sorting, primitives, first, count, m_stateStack.states(), m_stateStack.size(), NULL);
 }
 
 // ** RenderCommandBuffer::drawIndexed
-void RenderCommandBuffer::drawIndexed(u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateBlock* stateBlock)
+void RenderCommandBuffer::drawIndexed(u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateBlock& stateBlock)
 {
-    emitDrawCall(OpCode::DrawIndexed, sorting, primitives, first, count, &stateBlock, 1);
+    emitDrawCall(OpCode::DrawIndexed, sorting, primitives, first, count, m_stateStack.states(), m_stateStack.size(), &stateBlock);
 }
 
 // ** RenderCommandBuffer::drawPrimitives
-void RenderCommandBuffer::drawPrimitives(u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateStack& stateStack)
+void RenderCommandBuffer::drawPrimitives(u32 sorting, PrimitiveType primitives, s32 first, s32 count)
 {
-    emitDrawCall(OpCode::DrawPrimitives, sorting, primitives, first, count, stateStack.states(), stateStack.size());
+    emitDrawCall(OpCode::DrawPrimitives, sorting, primitives, first, count, m_stateStack.states(), m_stateStack.size(), NULL);
 }
 
 // ** RenderCommandBuffer::drawPrimitives
-void RenderCommandBuffer::drawPrimitives(u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateBlock* stateBlock)
+void RenderCommandBuffer::drawPrimitives(u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateBlock& stateBlock)
 {
-    emitDrawCall(OpCode::DrawPrimitives, sorting, primitives, first, count, &stateBlock, 1);
+    emitDrawCall(OpCode::DrawPrimitives, sorting, primitives, first, count, m_stateStack.states(), m_stateStack.size(), &stateBlock);
 }
 
 // ** RenderCommandBuffer::emitDrawCall
-void RenderCommandBuffer::emitDrawCall(OpCode::Type type, u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateBlock** stateBlocks, s32 stateBlockCount)
+void RenderCommandBuffer::emitDrawCall(OpCode::Type type, u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateBlock** stateBlocks, s32 stateBlockCount, const StateBlock* overrideStateBlock)
 {
     // Compile an array of state blocks
-    OpCode::CompiledStateBlock* stateBlock = (OpCode::CompiledStateBlock*)m_frame.allocate(sizeof(OpCode::CompiledStateBlock));
+    OpCode::CompiledStateBlock* compiledStateBlock = (OpCode::CompiledStateBlock*)m_frame.allocate(sizeof(OpCode::CompiledStateBlock));
     
     s32 maxStates = (m_frame.allocationCapacity() - m_frame.allocatedBytes()) / sizeof(State);
     State* states = (State*)m_frame.allocate(sizeof(State));
-    stateBlock->states = states;
-    stateBlock->size   = StateStack::mergeBlocks(stateBlocks, stateBlockCount, states, maxStates, stateBlock->mask, stateBlock->features);
+    compiledStateBlock->states   = states;
+    compiledStateBlock->size     = 0;
+    compiledStateBlock->mask     = 0;
+    compiledStateBlock->features = 0;
     
-    m_frame.allocate(sizeof(State) * (stateBlock->size - 1));
+    // First write an override state block (if specified)
+    if (overrideStateBlock)
+    {
+        compiledStateBlock->size = compileStateStack(&overrideStateBlock, 1, states, maxStates, compiledStateBlock);
+    }
+    
+    // Now unroll the state stack
+    compiledStateBlock->size += compileStateStack(stateBlocks, stateBlockCount, states + compiledStateBlock->size, maxStates - compiledStateBlock->size, compiledStateBlock);
+    
+    m_frame.allocate(sizeof(State) * (compiledStateBlock->size - 1));
     
     // Now push a draw call command
     OpCode opCode;
@@ -214,8 +226,71 @@ void RenderCommandBuffer::emitDrawCall(OpCode::Type type, u32 sorting, Primitive
     opCode.drawCall.primitives  = primitives;
     opCode.drawCall.first       = first;
     opCode.drawCall.count       = count;
-    opCode.drawCall.stateBlock  = stateBlock;
+    opCode.drawCall.stateBlock  = compiledStateBlock;
     push(opCode);
+}
+    
+// ** RenderCommandBuffer::compileStateStack
+s32 RenderCommandBuffer::compileStateStack(const StateBlock* const * stateBlocks, s32 count, State* states, s32 maxStates, OpCode::CompiledStateBlock* compiledStateBlock)
+{
+    PipelineFeatures userFeatures = 0;
+    PipelineFeatures userFeaturesMask = ~0;
+    PipelineFeatures resourceFeatures = 0;
+
+    // A total number of states written to an output array
+    s32 statesWritten = 0;
+    
+    for (s32 i = 0; i < count; i++)
+    {
+        // Get a state block at specified index
+        const StateBlock* block = stateBlocks[i];
+        
+        // No more state blocks in a stack - break
+        if( block == NULL )
+        {
+            break;
+        }
+        
+        // Update feature set
+        userFeatures     = userFeatures     | block->userDefined();
+        userFeaturesMask = userFeaturesMask & block->userDefinedMask();
+        resourceFeatures = resourceFeatures | block->resourceFeatures();
+        
+        // Skip redundant state blocks by testing a block bitmask against an active state mask
+        if( (compiledStateBlock->mask ^ block->mask()) == 0 )
+        {
+            continue;
+        }
+        
+        // Apply all states in a block
+        for( s32 j = 0, n = block->stateCount(); j < n; j++ )
+        {
+            // Get a render state by an index
+            const State& state = block->state(j);
+            
+            // Get a render state bit
+            StateMask stateMask = state.bitmask();
+            
+            // Skip redundate state blocks by testing a state bitmask agains an active state mask
+            if( compiledStateBlock->mask & stateMask )
+            {
+                continue;
+            }
+            
+            NIMBLE_ABORT_IF(statesWritten >= maxStates, "to much render states");
+            
+            // Write a render state at specified index to an output array
+            states[statesWritten++] = state;
+            
+            // Update an active state mask
+            compiledStateBlock->mask = compiledStateBlock->mask | stateMask;
+        }
+    }
+    
+    // Compose a user defined feature mask
+    compiledStateBlock->features = compiledStateBlock->features | (userFeatures & userFeaturesMask) | resourceFeatures;
+    
+    return statesWritten;
 }
     
 } // namespace Renderer

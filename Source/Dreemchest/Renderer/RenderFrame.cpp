@@ -33,10 +33,12 @@ namespace Renderer
 {
 
 // ** RenderFrame::RenderFrame
-RenderFrame::RenderFrame(s32 size)
-    : m_stateStack(4096, MaxStateStackDepth)
+RenderFrame::RenderFrame(StateBlock& defaults, s32 size)
+    : m_defaults(defaults)
+    , m_stateStack(4096, MaxStateStackDepth)
     , m_allocator(size)
 {
+    m_stateStack.push(m_defaults);
     m_entryPoint = &createCommandBuffer();
 }
 
@@ -105,6 +107,7 @@ void RenderFrame::clear()
 
     m_allocator.reset();
     m_stateStack.reset();
+    m_stateStack.push(&m_defaults);
     
     m_entryPoint = &createCommandBuffer();
 }

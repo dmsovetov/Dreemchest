@@ -64,16 +64,16 @@ namespace Renderer
         RenderCommandBuffer&        renderToTarget(const Rect& viewport = Rect(0.0f, 0.0f, 1.0f, 1.0f));
         
         //! Emits a draw indexed command that inherits all rendering states from a state stack.
-        void                        drawIndexed(u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateStack& stateStack);
+        void                        drawIndexed(u32 sorting, PrimitiveType primitives, s32 first, s32 count);
         
         //! Emits a draw indexed command with a single render state block.
-        void                        drawIndexed(u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateBlock* stateBlock);
+        void                        drawIndexed(u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateBlock& stateBlock);
         
         //! Emits a draw primitives command that inherits all rendering states from a state stack.
-        void                        drawPrimitives(u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateStack& stateStack);
+        void                        drawPrimitives(u32 sorting, PrimitiveType primitives, s32 first, s32 count);
         
         //! Emits a draw primitives command that inherits all rendering states from a state stack.
-        void                        drawPrimitives(u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateBlock* stateBlock);
+        void                        drawPrimitives(u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateBlock& stateBlock);
         
     protected:
         
@@ -81,11 +81,15 @@ namespace Renderer
                                     RenderCommandBuffer(RenderFrame& frame);
         
         //! Emits a draw call command.
-        void                        emitDrawCall( OpCode::Type type, u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateBlock** states, s32 stateCount);
+        void                        emitDrawCall( OpCode::Type type, u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateBlock** states, s32 stateCount, const StateBlock* overrideStateBlock);
+        
+        //! Compiles a state block stack to an array of rendering state.
+        s32                         compileStateStack(const StateBlock* const * stateBlocks, s32 count, State* states, s32 maxStates, OpCode::CompiledStateBlock* compiledStateBlock);
         
     private:
         
         RenderFrame&                m_frame;                    //!< A parent render frame that issued this command buffer.
+        StateStack&                 m_stateStack;               //!< An active state stack.
         u8                          m_transientResourceIndex;   //!< A transient resource index relative to a current stack offset.
     };
 

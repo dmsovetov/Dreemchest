@@ -146,7 +146,6 @@ UniformElement Transform::s_layout[] =
 class RenderingToTexture : public RenderingApplicationDelegate
 {
     StateBlock8 m_renderStates;
-    RenderFrame m_renderFrame;
     Examples::Mesh m_mesh;
     StateBlock4 m_meshStates;
     ConstantBuffer_ m_transformCBuffer;
@@ -197,12 +196,11 @@ class RenderingToTexture : public RenderingApplicationDelegate
  
     virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
     {
-        m_renderFrame.clear();
+        RenderFrame frame(m_renderingContext->defaultStateBlock());
         
-        StateStack&    stateStack = m_renderFrame.stateStack();
-        RenderCommandBuffer& commands  = m_renderFrame.entryPoint();
+        StateStack&          stateStack = frame.stateStack();
+        RenderCommandBuffer& commands   = frame.entryPoint();
         
-        StateScope def = stateStack.push(&m_renderingContext->defaultStateBlock());
         StateScope defaults = stateStack.push(&m_renderStates);
         
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
@@ -219,20 +217,20 @@ class RenderingToTexture : public RenderingApplicationDelegate
             s_transform.instance = Matrix4::rotateXY(0.0f, currentTime() * 0.001f);
             renderToTarget.clear(Rgba(0.0f, 1.0f, 0.0f), ClearAll);
             renderToTarget.uploadConstantBuffer(m_transformCBuffer, &s_transform, sizeof(s_transform));
-            renderToTarget.drawPrimitives(0, m_mesh.primitives, 0, m_mesh.vertices.size(), stateStack);
+            renderToTarget.drawPrimitives(0, m_mesh.primitives, 0, m_mesh.vertices.size());
         }
         
         // Render a 2D quad with a rendered texture
         {
             StateScope quadStates = stateStack.newScope();
             quadStates->bindTexture(renderTarget, 0);
-            commands.drawIndexed(0, Renderer::PrimTriangles, 0, 6, stateStack);
+            commands.drawIndexed(0, Renderer::PrimTriangles, 0, 6);
         }
         
         // Always release transient render targets
         commands.releaseTexture(renderTarget);
     
-        m_renderingContext->display(m_renderFrame);
+        m_renderingContext->display(frame);
     }
 };
 

@@ -218,7 +218,7 @@ namespace Examples
     };
     
     // Creates a rendering states block from a mesh file
-    MeshStateBlock createMeshRenderingStates(RenderingContextWPtr renderingContext, RenderFrame& frame, const String& fileName)
+    MeshStateBlock createMeshRenderingStates(RenderingContextWPtr renderingContext, const String& fileName)
     {
         Mesh mesh = objFromFile(fileName);
         NIMBLE_ABORT_IF(!mesh, "failed to load a mesh");
@@ -238,14 +238,14 @@ namespace Examples
     }
     
     // Creates an environment map from a texture
-    Texture_ createEnvTexture(RenderingContextWPtr renderingContext, RenderFrame& frame, const String& fileName)
+    Texture_ createEnvTexture(RenderingContextWPtr renderingContext, const String& fileName)
     {
         CubeMap cubeMap = cubeFromDds(fileName);
         return renderingContext->requestTextureCube(&cubeMap.pixels[0], cubeMap.size, cubeMap.mipLevels, cubeMap.format);
     }
     
     // Creates an environment map from a set of cube map faces.
-    Texture_ createEnvFromFiles(RenderingContextWPtr renderingContext, RenderFrame& frame, const String& path)
+    Texture_ createEnvFromFiles(RenderingContextWPtr renderingContext, const String& path)
     {
         Image images[6];
         String fileNames[] =

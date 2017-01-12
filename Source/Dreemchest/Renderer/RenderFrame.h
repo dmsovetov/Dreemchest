@@ -39,7 +39,7 @@ namespace Renderer
     public:
                         
                                                 //! Constructs a RenderFrame instance.
-                                                RenderFrame(s32 size = 1024 * 100);
+                                                RenderFrame(StateBlock& defaults, s32 size = 1024 * 100);
 
         //! Returns a total number of captured command buffers.
         s32                                     commandBufferCount() const;
@@ -77,6 +77,7 @@ namespace Renderer
         //! Container type to store recorded command buffers.
         typedef Array<CommandBuffer*>           Commands;
 
+        StateBlock&                             m_defaults;             //!< A default state block is pushed automatically to a state stack.
         RenderCommandBuffer*                    m_entryPoint;           //!< A root command buffer.
         Commands                                m_commandBuffers;       //!< An array of recorded commands buffers.
         StateStack                              m_stateStack;           //!< Current state stack.

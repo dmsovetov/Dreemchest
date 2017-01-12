@@ -97,7 +97,6 @@ static String s_fragmentShader =
 class RenderStateStack : public RenderingApplicationDelegate
 {
     StateBlock8 m_renderStates;
-    RenderFrame m_renderFrame;
     ConstantBuffer_ m_instanceConstantBuffer;
     
     virtual void handleLaunched(Application* application) NIMBLE_OVERRIDE
@@ -154,14 +153,13 @@ class RenderStateStack : public RenderingApplicationDelegate
  
     virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
     {
-        // Clear the frame before rendering
-        m_renderFrame.clear();
+        RenderFrame frame(m_renderingContext->defaultStateBlock());
         
         // Get an entry point command buffer as usual
-        RenderCommandBuffer& commands = m_renderFrame.entryPoint();
+        RenderCommandBuffer& commands = frame.entryPoint();
         
         // Here we take a reference to a render state stack...
-        StateStack& stateStack = m_renderFrame.stateStack();
+        StateStack& stateStack = frame.stateStack();
         
         // ...and then push a default state block
         StateScope global = stateStack.push(&m_renderStates);
@@ -185,11 +183,11 @@ class RenderStateStack : public RenderingApplicationDelegate
                 
                 // Upload instance data and render a cube
                 commands.uploadConstantBuffer(m_instanceConstantBuffer, &instance, sizeof(instance));
-                commands.drawIndexed(0, Renderer::PrimTriangles, 0, sizeof(s_indices) / sizeof(u16), stateStack);
+                commands.drawIndexed(0, Renderer::PrimTriangles, 0, sizeof(s_indices) / sizeof(u16));
             }
         }
         
-        m_renderingContext->display(m_renderFrame);
+        m_renderingContext->display(frame);
     }
 };
 

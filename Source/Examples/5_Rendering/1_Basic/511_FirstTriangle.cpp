@@ -49,10 +49,6 @@ class FirstTriangle : public RenderingApplicationDelegate
     // binding or blend state changes.
     StateBlock4 m_renderStates;
     
-    // A render frame instance records all data and commands required
-    // to render a single frame.
-    RenderFrame m_renderFrame;
-    
     virtual void handleLaunched(Application* application) NIMBLE_OVERRIDE
     {
         Logger::setStandardLogger();
@@ -79,20 +75,24 @@ class FirstTriangle : public RenderingApplicationDelegate
     // actually render a frame each time the window is updated.
     virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
     {
+        // A render frame instance records all data and commands required
+        // to render a single frame.
+        RenderFrame frame(m_renderingContext->defaultStateBlock());
+        
         // A process of rendering a frame consist from a command buffer generation
         // and then submitting it to a device.
         // Here we take an entry point command buffer from our rendering frame.
-        RenderCommandBuffer& commands = m_renderFrame.entryPoint();
+        RenderCommandBuffer& commands = frame.entryPoint();
 
         // Emit a command that clears a viewport
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
         
         // Now emit a drawPrimitives command with a render state block configured upon initialization
         // as a last argument.
-        commands.drawPrimitives(0, PrimTriangles, 0, 3, &m_renderStates);
+        commands.drawPrimitives(0, PrimTriangles, 0, 3, m_renderStates);
         
         // Rendering frame is now ready, so pass it to a rendering context to display it on a screen.
-        m_renderingContext->display(m_renderFrame);
+        m_renderingContext->display(frame);
     }
 };
 

@@ -391,6 +391,7 @@ void OpenGL2RenderingContext::executeCommandBuffer(const CommandBuffer& commands
                 compilePipelineState(opCode.drawCall.stateBlock->states, opCode.drawCall.stateBlock->size);
 
                 // Finally select a matching shader permutation
+                NIMBLE_ABORT_IF(m_activeInputLayout == NULL, "no valid input layout set");
                 permutation = applyProgramPermutation(m_requestedProgram, m_requestedFeatureLayout, opCode.drawCall.stateBlock->features | m_activeInputLayout->features());
                 NIMBLE_ABORT_IF(permutation == NULL, "no valid permutation found");
                 

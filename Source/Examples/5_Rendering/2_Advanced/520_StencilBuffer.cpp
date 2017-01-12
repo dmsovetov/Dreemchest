@@ -97,7 +97,6 @@ class StencilBuffer : public RenderingApplicationDelegate
         StateBlock4     states;
     };
     
-    RenderFrame m_renderFrame;
     Object      m_platform;
     Object      m_bunny;
     ConstantBuffer_ m_instanceConstantBuffer;
@@ -145,20 +144,18 @@ class StencilBuffer : public RenderingApplicationDelegate
  
     virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
     {
-        m_renderFrame.clear();
+        RenderFrame frame(m_renderingContext->defaultStateBlock());
         
-        RenderCommandBuffer& commands = m_renderFrame.entryPoint();
+        RenderCommandBuffer& commands = frame.entryPoint();
         
         // In this sample we will use a state stack
-        StateStack& states = m_renderFrame.stateStack();
-        
-        StateScope defaults = m_renderFrame.stateStack().push(&m_renderingContext->defaultStateBlock());
-        
+        StateStack& states = frame.stateStack();
+
         // Clear the viewport
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
         
         // Render the platform
-        renderObject(states, commands, m_platform, Matrix4());
+        renderObject(commands, m_platform, Matrix4());
         
         const Vec3 position = Vec3(0.0f, 0.0f, 0.0f);
         const Vec3 scale    = Vec3(0.09f, 0.09f, 0.09f);
@@ -170,7 +167,7 @@ class StencilBuffer : public RenderingApplicationDelegate
             mask->setColorMask(0);
             mask->setStencilFunction(Always, 1);
             mask->setStencilOp(StencilKeep, StencilKeep, StencilReplace);
-            renderObject(states, commands, m_platform, Matrix4());
+            renderObject(commands, m_platform, Matrix4());
         }
         
         // Now render the reflection
@@ -181,13 +178,13 @@ class StencilBuffer : public RenderingApplicationDelegate
             reflection->setStencilOp(StencilKeep, StencilKeep, StencilKeep);
             reflection->setCullFace(TriangleFaceFront);
             reflection->setBlend(BlendSrcAlpha, BlendInvSrcAlpha);
-            renderObject(states, commands, m_bunny, Matrix4::scale(1.0f, -1.0f, 1.0f) * Matrix4::rotateXY(0.0f, currentTime() * 0.001f) * Matrix4::translation(position) * Matrix4::scale(scale), 0.3f);
+            renderObject(commands, m_bunny, Matrix4::scale(1.0f, -1.0f, 1.0f) * Matrix4::rotateXY(0.0f, currentTime() * 0.001f) * Matrix4::translation(position) * Matrix4::scale(scale), 0.3f);
         }
 
         // Finally render the stanford bunny
-        renderObject(states, commands, m_bunny, Matrix4::rotateXY(0.0f, currentTime() * 0.001f) * Matrix4::translation(position) * Matrix4::scale(scale));
+        renderObject(commands, m_bunny, Matrix4::rotateXY(0.0f, currentTime() * 0.001f) * Matrix4::translation(position) * Matrix4::scale(scale));
 
-        m_renderingContext->display(m_renderFrame);
+        m_renderingContext->display(frame);
     }
     
     void initializeObjectFromMesh(const String& fileName, Object& object)
@@ -208,14 +205,13 @@ class StencilBuffer : public RenderingApplicationDelegate
         }
     }
     
-    void renderObject(StateStack& states, RenderCommandBuffer& commands, const Object& object, const Matrix4& transform, f32 alpha = 1.0f)
+    void renderObject(RenderCommandBuffer& commands, const Object& object, const Matrix4& transform, f32 alpha = 1.0f)
     {
-        StateScope instanceState = states.push(&object.states);
         s_instance.transform = transform;
         s_instance.alpha = alpha;
         s_instance.normal = transform.inversed().transposed();
         commands.uploadConstantBuffer(m_instanceConstantBuffer, &s_instance, sizeof(s_instance));
-        commands.drawPrimitives(0, object.mesh.primitives, 0, object.mesh.vertices.size(), states);
+        commands.drawPrimitives(0, object.mesh.primitives, 0, object.mesh.vertices.size(), object.states);
     }
 };
 

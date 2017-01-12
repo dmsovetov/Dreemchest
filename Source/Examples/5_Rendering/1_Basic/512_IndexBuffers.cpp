@@ -49,7 +49,6 @@ static u16 s_indices[] =
 class IndexBuffers : public RenderingApplicationDelegate
 {
     StateBlock8 m_renderStates;
-    RenderFrame m_renderFrame;
     
     virtual void handleLaunched(Application* application) NIMBLE_OVERRIDE
     {
@@ -76,13 +75,15 @@ class IndexBuffers : public RenderingApplicationDelegate
 
     virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
     {
-        RenderCommandBuffer& commands = m_renderFrame.entryPoint();
+        RenderFrame frame(m_renderingContext->defaultStateBlock());
+        
+        RenderCommandBuffer& commands = frame.entryPoint();
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), Renderer::ClearAll);
         
         // This is a main difference - we have to invoke a drawIndexed method.
-        commands.drawIndexed(0, Renderer::PrimTriangles, 0, 6, &m_renderStates);
+        commands.drawIndexed(0, Renderer::PrimTriangles, 0, 6, m_renderStates);
 
-        m_renderingContext->display(m_renderFrame);
+        m_renderingContext->display(frame);
     }
 };
 

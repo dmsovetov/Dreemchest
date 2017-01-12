@@ -162,7 +162,6 @@ const UniformElement Kernel::Layout[] =
 class RenderingToTexture : public RenderingApplicationDelegate
 {
     StateBlock8 m_renderStates;
-    RenderFrame m_renderFrame;
     ConstantBuffer_ m_cameraCBuffer;
     ConstantBuffer_ m_projectionCBuffer;
     ConstantBuffer_ m_instanceCBuffer;
@@ -188,8 +187,8 @@ class RenderingToTexture : public RenderingApplicationDelegate
         }
 
         // Load mesh from a file
-        m_mesh = Examples::createMeshRenderingStates(m_renderingContext, m_renderFrame, "Assets/Meshes/bunny.obj");
-        m_envmap = Examples::createEnvFromFiles(m_renderingContext, m_renderFrame, "Assets/Textures/Environments/Arches_E_PineTree_512");
+        m_mesh = Examples::createMeshRenderingStates(m_renderingContext, "Assets/Meshes/bunny.obj");
+        m_envmap = Examples::createEnvFromFiles(m_renderingContext, "Assets/Textures/Environments/Arches_E_PineTree_512");
 
         // Projection cbuffer
         {
@@ -233,10 +232,10 @@ class RenderingToTexture : public RenderingApplicationDelegate
  
     virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
     {
-        m_renderFrame.clear();
+        RenderFrame frame(m_renderingContext->defaultStateBlock());
         
-        StateStack&         stateStack = m_renderFrame.stateStack();
-        RenderCommandBuffer& commands  = m_renderFrame.entryPoint();
+        StateStack&          stateStack = frame.stateStack();
+        RenderCommandBuffer& commands   = frame.entryPoint();
         
         StateScope defaults = stateStack.push(&m_renderStates);
         
@@ -250,7 +249,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
             backgroundProgram->bindProgram(m_backgroundProgram);
             backgroundProgram->bindTexture(m_envmap, 0);
             commands.uploadConstantBuffer(m_projectionCBuffer, &s_projection, sizeof(s_projection));
-            commands.drawPrimitives(1, PrimQuads, 0, 4, stateStack);
+            commands.drawPrimitives(1, PrimQuads, 0, 4);
         }
         
         StateScope meshPass = stateStack.newScope();
@@ -263,16 +262,16 @@ class RenderingToTexture : public RenderingApplicationDelegate
         StateScope meshStates = stateStack.push(&m_mesh.states);
         s_instance = Examples::Instance::fromTransform(Matrix4::rotateXY(currentTime() * 0.0003f * 0.0f, currentTime() * 0.0003f));
         commands.uploadConstantBuffer(m_instanceCBuffer, &s_instance, sizeof(s_instance));
-        commands.drawPrimitives(0, m_mesh.primitives, 0, m_mesh.size, stateStack);
+        commands.drawPrimitives(0, m_mesh.primitives, 0, m_mesh.size);
 
-        m_renderingContext->display(m_renderFrame);
+        m_renderingContext->display(frame);
     }
     
     Texture_ convolve(Texture_ env, s32 size, s32 iterations, f32 power = 1.0f)
     {
         verbose("convolution", "performing with cosine kernel of power %2.2f with %d samples in %d iterations...\n", power, Kernel::MaxSamples, iterations);
         
-        RenderFrame    frame(1024 * 1024 * 2);
+        RenderFrame    frame(m_renderingContext->defaultStateBlock(), 1024 * 1024 * 2);
         StateStack&    stateStack = frame.stateStack();
         Kernel         kernel;
 
@@ -355,7 +354,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
                 
                 Examples::Camera camera = Examples::Camera::lookAt(Vec3::zero(), target[i], up[i]);
                 renderToCubeMap.uploadConstantBuffer(m_cameraCBuffer, &camera, sizeof(camera));
-                renderToCubeMap.drawPrimitives(0, PrimQuads, 0, 4, stateStack);
+                renderToCubeMap.drawPrimitives(0, PrimQuads, 0, 4);
             }
         }
         commandBufferTime = currentTime() - commandBufferTime;

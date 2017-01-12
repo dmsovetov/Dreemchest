@@ -238,7 +238,7 @@ const  RenderScene::CameraNode& RenderScene::findCameraNode( Ecs::EntityWPtr cam
 // ** RenderScene::captureFrame
 Renderer::RenderFrameUPtr RenderScene::captureFrame( void )
 {
-    Renderer::RenderFrameUPtr frame( DC_NEW Renderer::RenderFrame );
+    Renderer::RenderFrameUPtr frame( DC_NEW Renderer::RenderFrame(m_context->defaultStateBlock()) );
 
     // Update active constant buffers
     updateConstantBuffers( *frame.get() );

@@ -452,6 +452,7 @@ namespace Renderer
     class StateStack
     {
     friend class StateScope;
+    friend class RenderFrame;
     public:
 
                                     //! Constructs a StateStack instance.
@@ -471,14 +472,14 @@ namespace Renderer
 
         //! Returns the stack pointer.
         const StateBlock**          states( void ) const;
-        
-        //! Converts an array of state blocks to an array of states.
-        static s32                  mergeBlocks(const StateBlock* const * stateBlocks, s32 count, State* states, s32 maxStates, StateMask& activeStateMask, PipelineFeatures& userDefined);
 
     private:
 
         //! Pops a state block from a top of the stack.
         void                        pop( void );
+        
+        //! Pushes a new state block to stack.
+        void                        push(const StateBlock& block);
 
     private:
 

@@ -51,7 +51,6 @@ static String s_fragmentShader =
 class Shaders : public RenderingApplicationDelegate
 {
     StateBlock8 m_renderStates;
-    RenderFrame m_renderFrame;
     
     virtual void handleLaunched(Application* application) NIMBLE_OVERRIDE
     {
@@ -80,16 +79,18 @@ class Shaders : public RenderingApplicationDelegate
 
     virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
     {
+        RenderFrame frame(m_renderingContext->defaultStateBlock());
+        
         // Note, that a shader program was bound to a rendering states block
         // upon initialization, so this method stays same as in a
         // 'First Triangle' exmple.
         
-        RenderCommandBuffer& commands = m_renderFrame.entryPoint();
+        RenderCommandBuffer& commands = frame.entryPoint();
         
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
-        commands.drawPrimitives(0, PrimTriangles, 0, 3, &m_renderStates);
+        commands.drawPrimitives(0, PrimTriangles, 0, 3, m_renderStates);
         
-        m_renderingContext->display(m_renderFrame);
+        m_renderingContext->display(frame);
     }
 };
 

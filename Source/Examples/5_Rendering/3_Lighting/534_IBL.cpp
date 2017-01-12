@@ -139,7 +139,6 @@ class IBL : public RenderingApplicationDelegate
     };
     
     StateBlock8  m_renderStates;
-    RenderFrame m_renderFrame;
     Object      m_platform;
     Object      m_bunny;
     ConstantBuffer_ m_instanceConstantBuffer;
@@ -207,12 +206,12 @@ class IBL : public RenderingApplicationDelegate
  
     virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
     {
-        m_renderFrame.clear();
+        RenderFrame frame(m_renderingContext->defaultStateBlock());
         
-        RenderCommandBuffer& commands = m_renderFrame.entryPoint();
+        RenderCommandBuffer& commands = frame.entryPoint();
         
         // In this sample we will use a state stack
-        StateStack& states = m_renderFrame.stateStack();
+        StateStack& states = frame.stateStack();
         
         // Push the default state
         StateScope defaultScope = states.push(&m_renderStates);
@@ -240,15 +239,15 @@ class IBL : public RenderingApplicationDelegate
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
         
         // Render the platform
-        renderObject(states, commands, m_platform, Matrix4());
+        renderObject(commands, m_platform, Matrix4());
         
         const Vec3 position = Vec3(0.0f, 0.0f, 0.0f);
         const Vec3 scale    = Vec3(0.9f, 0.9f, 0.9f);
         
         // Finally render the stanford bunny
-        renderObject(states, commands, m_bunny, Matrix4::rotateXY(0.0f, time * 0.5f) * Matrix4::translation(position) * Matrix4::scale(scale));
+        renderObject(commands, m_bunny, Matrix4::rotateXY(0.0f, time * 0.5f) * Matrix4::translation(position) * Matrix4::scale(scale));
 
-        m_renderingContext->display(m_renderFrame);
+        m_renderingContext->display(frame);
     }
     
     void initializeObjectFromMesh(const String& fileName, Object& object)
@@ -269,13 +268,12 @@ class IBL : public RenderingApplicationDelegate
         }
     }
     
-    void renderObject(StateStack& states, RenderCommandBuffer& commands, const Object& object, const Matrix4& transform)
+    void renderObject(RenderCommandBuffer& commands, const Object& object, const Matrix4& transform)
     {
-        StateScope instanceState = states.push(&object.states);
         s_instance.transform = transform;
         s_instance.normal = transform.inversed().transposed();
         commands.uploadConstantBuffer(m_instanceConstantBuffer, &s_instance, sizeof(s_instance));
-        commands.drawPrimitives(0, object.mesh.primitives, 0, object.mesh.vertices.size(), states);
+        commands.drawPrimitives(0, object.mesh.primitives, 0, object.mesh.vertices.size(), object.states);
     }
 };
 

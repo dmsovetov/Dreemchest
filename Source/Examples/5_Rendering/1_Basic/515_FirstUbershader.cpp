@@ -71,7 +71,6 @@ static PipelineFeature s_features[] =
 class FirstUbershader : public RenderingApplicationDelegate
 {
     StateBlock8 m_renderStates;
-    RenderFrame m_renderFrame;
     
     virtual void handleLaunched(Application* application) NIMBLE_OVERRIDE
     {
@@ -104,12 +103,13 @@ class FirstUbershader : public RenderingApplicationDelegate
 
     virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
     {
-        RenderCommandBuffer& commands = m_renderFrame.entryPoint();
+        RenderFrame frame(m_renderingContext->defaultStateBlock());
+        RenderCommandBuffer& commands = frame.entryPoint();
 
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
-        commands.drawPrimitives(0, Renderer::PrimTriangles, 0, 3, &m_renderStates);
+        commands.drawPrimitives(0, Renderer::PrimTriangles, 0, 3, m_renderStates);
         
-        m_renderingContext->display(m_renderFrame);
+        m_renderingContext->display(frame);
     }
 };
 
