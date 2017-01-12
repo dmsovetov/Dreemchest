@@ -295,10 +295,10 @@ void RenderingContext::display(RenderFrame& frame, bool wait)
     memset(m_activeStates, 0, sizeof(m_activeStates));
     
     // First execute a construction command buffer
-    construct(frame);
+    construct();
     
     // Execute an entry point command buffer
-    execute(frame, frame.entryPoint());
+    execute(frame.entryPoint());
 
     // End frame
     if (m_view.valid())
@@ -308,20 +308,20 @@ void RenderingContext::display(RenderFrame& frame, bool wait)
 }
     
 // ** RenderingContext::construct
-void RenderingContext::construct(RenderFrame& frame)
+void RenderingContext::construct()
 {
-    execute(frame, *m_resourceCommandBuffer);
+    execute(*m_resourceCommandBuffer);
     m_resourceCommandBuffer->reset();
 }
 
 // ** RenderingContext::execute
-void RenderingContext::execute( const RenderFrame& frame, const CommandBuffer& commands )
+void RenderingContext::execute(const CommandBuffer& commands)
 {
     // Push a new frame to an intermediate target stack
     m_transientResources->pushFrame();
     
     // Execute a command buffer
-    executeCommandBuffer(frame, commands);
+    executeCommandBuffer(commands);
     
     // Pop a stack frame
     m_transientResources->popFrame();

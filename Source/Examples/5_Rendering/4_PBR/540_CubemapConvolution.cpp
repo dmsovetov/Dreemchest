@@ -224,7 +224,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
         m_backgroundProgram  = m_renderingContext->requestProgram(Examples::VertexIdentity, s_fragmentBackground);
         
         // Force a rendering context to construct all queued resources
-        m_renderingContext->construct(m_renderFrame);
+        m_renderingContext->construct();
         
         // Now render a diffuse-convolved environment map
         m_specular = convolve(m_envmap, 128, 160, 128.0f);
@@ -292,7 +292,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
         // Create a convolution program instance
         Program program = m_renderingContext->requestProgram(s_vertexConvolution, s_fragmentConvolution);
         m_renderingContext->precompilePermutations(program, FeatureLayout());
-        m_renderingContext->construct(frame);
+        m_renderingContext->construct();
         
         // Configure a convolution render pass
         StateScope convolutionPass = stateStack.newScope();

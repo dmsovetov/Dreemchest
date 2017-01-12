@@ -101,7 +101,7 @@ void RenderingContextHal::renderToTarget( const RenderFrame& frame, u8 renderTar
 }
 
 // ** RenderingContextHal::executeCommandBuffer
-void RenderingContextHal::executeCommandBuffer( const RenderFrame& frame, const CommandBuffer& commands )
+void RenderingContextHal::executeCommandBuffer(const CommandBuffer& commands)
 {
 /*    for( s32 i = 0, n = commands.size(); i < n; i++ )
     {

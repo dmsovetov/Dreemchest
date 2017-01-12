@@ -194,7 +194,7 @@ ResourceId OpenGL2RenderingContext::allocateTexture(u8 type, const void* data, u
 }
 
 // ** OpenGL2RenderingContext::executeCommandBuffer
-void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, const CommandBuffer& commands)
+void OpenGL2RenderingContext::executeCommandBuffer(const CommandBuffer& commands)
 {
     GLuint             id;
     const Permutation* permutation = NULL;
@@ -212,7 +212,7 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 break;
                 
             case OpCode::Execute:
-                execute(frame, *opCode.execute.commands);
+                execute(*opCode.execute.commands);
                 break;
                 
             case OpCode::UploadConstantBuffer:
@@ -358,7 +358,7 @@ void OpenGL2RenderingContext::executeCommandBuffer(const RenderFrame& frame, con
                 glViewport(viewport.x * info.width, viewport.y * info.height, viewport.width * info.width, viewport.height * info.height);
                 
                 // Execute an attached command buffer
-                execute(frame, *opCode.renderToTextures.commands);
+                execute(*opCode.renderToTextures.commands);
                 
                 // Release an acquired framebuffer
                 releaseFramebuffer(framebufferIndex);

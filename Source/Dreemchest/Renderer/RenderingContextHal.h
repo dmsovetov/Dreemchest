@@ -44,7 +44,7 @@ namespace Renderer
     protected:
 
         //! Executes a specified command buffer.
-        virtual void                executeCommandBuffer(const RenderFrame& frame, const CommandBuffer& commands) NIMBLE_OVERRIDE;
+        virtual void                executeCommandBuffer(const CommandBuffer& commands) NIMBLE_OVERRIDE;
         
     #if 0
         //! Returns an intermediate render target.

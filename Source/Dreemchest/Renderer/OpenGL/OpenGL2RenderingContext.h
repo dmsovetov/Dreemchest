@@ -43,7 +43,7 @@ namespace Renderer
     protected:
         
         //! Executes a specified command buffer.
-        virtual void                executeCommandBuffer(const RenderFrame& frame, const CommandBuffer& commands) NIMBLE_OVERRIDE;
+        virtual void                executeCommandBuffer(const CommandBuffer& commands) NIMBLE_OVERRIDE;
         
         //! Compiles the requested rendering state (activates a shader permuation that best matches active pipeline state, bind buffers, textures, etc.).
         void                        compilePipelineState(const State* states, s32 count);

@@ -70,7 +70,7 @@ namespace Renderer
         void                                    display(RenderFrame& frame, bool wait = false);
         
         //! Forces a rendering context to construct all queued resources.
-        void                                    construct(RenderFrame& frame);
+        void                                    construct();
         
         //! Queues an input layout instance for creation and returns it's index.
         InputLayout                             requestInputLayout( const VertexFormat& vertexFormat );
@@ -132,10 +132,10 @@ namespace Renderer
                                                 RenderingContext(RenderViewPtr view);
         
         //! Executes a specified command buffer.
-        virtual void                            executeCommandBuffer(const RenderFrame& frame, const CommandBuffer& commands) NIMBLE_ABSTRACT;
+        virtual void                            executeCommandBuffer(const CommandBuffer& commands) NIMBLE_ABSTRACT;
         
         //! Executes a specified command buffer inside an intermediate render stack frame.
-        void                                    execute( const RenderFrame& frame, const CommandBuffer& commands );
+        void                                    execute(const CommandBuffer& commands);
         
         //! Loads an transient resource to a specified slot.
         void                                    loadTransientResource(TransientResourceId index, ResourceId id);
