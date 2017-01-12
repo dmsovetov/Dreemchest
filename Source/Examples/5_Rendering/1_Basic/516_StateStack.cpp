@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
+#include "../Examples.h"
 
 DC_USE_DREEMCHEST
 
@@ -67,53 +68,33 @@ static const u16 s_indices[] =
 };
 
 static String s_vertexShader =
-    "cbuffer Pass pass : 0;                         \n"
-    "cbuffer Instance instance : 1;                 \n"
+    "cbuffer Projection projection : 0;             \n"
+    "cbuffer Camera     camera     : 1;             \n"
+    "cbuffer Instance   instance   : 2;             \n"
+
     "varying vec4 v_color;                          \n"
-    "                                               \n"
+
     "void main()                                    \n"
     "{                                              \n"
     "    v_color     = gl_Color;                    \n"
-    "    gl_Position = pass.projection * pass.view * instance.transform * gl_Vertex;    \n"
+    "    gl_Position = projection.transform         \n"
+    "                * camera.transform             \n"
+    "                * instance.transform           \n"
+    "                * gl_Vertex                    \n"
+    "                ;                              \n"
     "}                                              \n"
     ;
 
 static String s_fragmentShader =
     "varying vec4 v_color;                          \n"
-    "                                               \n"
+
     "void main()                                    \n"
     "{                                              \n"
     "    gl_FragColor = v_color;                    \n"
     "}                                              \n"
     ;
 
-struct Pass
-{
-    Matrix4 projection;
-    Matrix4 view;
-    static UniformElement s_layout[];
-} s_pass;
-
-UniformElement Pass::s_layout[] =
-{
-      { "projection", UniformElement::Matrix4, offsetof(Pass, projection) }
-    , { "view",       UniformElement::Matrix4, offsetof(Pass, view)       }
-    , { NULL }
-};
-
-struct Instance
-{
-    Matrix4 transform;
-    static UniformElement s_layout[];
-} s_instance;
-
-UniformElement Instance::s_layout[] =
-{
-      { "transform", UniformElement::Matrix4, offsetof(Instance, transform) }
-    , { NULL }
-};
-
-class Cubes : public RenderingApplicationDelegate
+class RenderStateStack : public RenderingApplicationDelegate
 {
     StateBlock8 m_renderStates;
     RenderFrame m_renderFrame;
@@ -128,49 +109,82 @@ class Cubes : public RenderingApplicationDelegate
             application->quit(-1);
         }
         
-        s_pass.projection = Matrix4::perspective(60.0f, m_window->aspectRatio(), 0.1f, 100.0f);
-        s_pass.view       = Matrix4::lookAt(Vec3(0.0f, 0.0f, -35.0f), Vec3::zero(), Vec3(0.0f, 1.0f, 0.0f));
-
-        InputLayout inputLayout = m_renderingContext->requestInputLayout(VertexFormat::Position | VertexFormat::Color);
-        VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(s_vertices, sizeof(s_vertices));
-        IndexBuffer_ indexBuffer = m_renderingContext->requestIndexBuffer(s_indices, sizeof(s_indices));
-        UniformLayout viewUniformLayout = m_renderingContext->requestUniformLayout("Pass", Pass::s_layout);
-        ConstantBuffer_ viewConstantBuffer = m_renderingContext->requestConstantBuffer(&s_pass, sizeof(s_pass), viewUniformLayout);
-        UniformLayout instanceUniformLayout = m_renderingContext->requestUniformLayout("Instance", Instance::s_layout);
-        m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(s_instance), instanceUniformLayout);
+        // Create a cube vertex and index buffers
+        {
+            InputLayout inputLayout = m_renderingContext->requestInputLayout(VertexFormat::Position | VertexFormat::Color);
+            VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(s_vertices, sizeof(s_vertices));
+            IndexBuffer_ indexBuffer = m_renderingContext->requestIndexBuffer(s_indices, sizeof(s_indices));
+            
+            // And bind them to a state block
+            m_renderStates.bindVertexBuffer(vertexBuffer);
+            m_renderStates.bindIndexBuffer(indexBuffer);
+            m_renderStates.bindInputLayout(inputLayout);
+        }
         
+        // Create projection constant buffer
+        {
+            Examples::Projection projection     = Examples::Projection::perspective(60.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
+            UniformLayout        layout         = m_renderingContext->requestUniformLayout("Projection", Examples::Projection::Layout);
+            ConstantBuffer_      constantBuffer = m_renderingContext->requestConstantBuffer(&projection, sizeof(projection), layout);
+            
+            // And bind it to a state block
+            m_renderStates.bindConstantBuffer(constantBuffer, 0);
+        }
+        
+        // Create a camera constant buffer
+        {
+            Examples::Camera camera         = Examples::Camera::lookAt(Vec3(0.0f, 0.0f, -35.0f), Vec3(0.0f, 0.6f, 0.0f));
+            UniformLayout    layout         = m_renderingContext->requestUniformLayout("Camera", Examples::Camera::Layout);
+            ConstantBuffer_ constantBuffer  = m_renderingContext->requestConstantBuffer(&camera, sizeof(camera), layout);
+            
+            // And bind it to a state block
+            m_renderStates.bindConstantBuffer(constantBuffer, 1);
+        }
+        
+        // Finally create an empty instance constant buffer
+        {
+            UniformLayout layout = m_renderingContext->requestUniformLayout("Instance", Examples::Instance::Layout);
+            m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Examples::Instance), layout);
+        }
+        
+        // Create and bind the default shader program
         Program program = m_renderingContext->requestProgram(s_vertexShader, s_fragmentShader);
-
-        m_renderStates.bindVertexBuffer(vertexBuffer);
-        m_renderStates.bindIndexBuffer(indexBuffer);
-        m_renderStates.bindInputLayout(inputLayout);
         m_renderStates.bindProgram(program);
-        m_renderStates.bindConstantBuffer(viewConstantBuffer, 0);
     }
  
     virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
     {
+        // Clear the frame before rendering
         m_renderFrame.clear();
         
+        // Get an entry point command buffer as usual
         RenderCommandBuffer& commands = m_renderFrame.entryPoint();
+        
+        // Here we take a reference to a render state stack...
         StateStack& stateStack = m_renderFrame.stateStack();
         
+        // ...and then push a default state block
         StateScope global = stateStack.push(&m_renderStates);
 
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
         
         f32 time = currentTime() * 0.001f;
         
+        // Now render cubes
         for (s32 y = 0; y < 11; ++y)
         {
             for (s32 x = 0; x < 11; ++x)
             {
-                s_instance.transform = Matrix4::translation(x * 3.0f - 15.0f, y * 3.0f - 15.0f, 0.0f) *
-                                       Matrix4::rotateXY(time + x*0.21f, time + y*0.37f);
+                // Construct an instance data from a transform matrix
+                Examples::Instance instance = Examples::Instance::fromTransform(Matrix4::translation(x * 3.0f - 15.0f, y * 3.0f - 15.0f, 0.0f) *
+                                                                                Matrix4::rotateXY(time + x*0.21f, time + y*0.37f));
 
-                StateScope instance = stateStack.newScope();
-                instance->bindConstantBuffer(m_instanceConstantBuffer, 1);
-                commands.uploadConstantBuffer(m_instanceConstantBuffer, &s_instance, sizeof(s_instance));
+                // Now push a new state scope to a stack, which will be automatically poped from stack
+                StateScope instanceStates = stateStack.newScope();
+                instanceStates->bindConstantBuffer(m_instanceConstantBuffer, 2);
+                
+                // Upload instance data and render a cube
+                commands.uploadConstantBuffer(m_instanceConstantBuffer, &instance, sizeof(instance));
                 commands.drawIndexed(0, Renderer::PrimTriangles, 0, sizeof(s_indices) / sizeof(u16), stateStack);
             }
         }
@@ -179,4 +193,4 @@ class Cubes : public RenderingApplicationDelegate
     }
 };
 
-dcDeclareApplication(new Cubes)
+dcDeclareApplication(new RenderStateStack)
