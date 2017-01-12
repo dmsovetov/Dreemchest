@@ -57,6 +57,7 @@ namespace Examples
     {
         Matrix4                     transform;          //!< A camera view matrix.
         Matrix4                     inverseTranspose;   //!< An inverse transpose matrix.
+        Matrix4                     rotation;           //!< A camera rotation matrix.
         Vec3                        position;           //!< A camera position.
         
         static const UniformElement Layout[];   //!< A constant buffer layout.
@@ -111,6 +112,7 @@ namespace Examples
     {
           { "transform", UniformElement::Matrix4, offsetof(Camera, transform) }
         , { "inverseTranspose", UniformElement::Matrix4, offsetof(Camera, inverseTranspose) }
+        , { "rotation", UniformElement::Matrix4, offsetof(Camera, rotation) }
         , { "position",  UniformElement::Vec3,    offsetof(Camera, position)  }
         , { NULL }
     };
@@ -130,6 +132,7 @@ namespace Examples
     {
         Camera camera;
         camera.position = position;
+        camera.rotation = quat;
         camera.transform = Matrix4(quat) * Matrix4::translation(position);
         camera.inverseTranspose = camera.transform.inversed().transposed();
         return camera;
@@ -195,6 +198,51 @@ namespace Examples
         0.5f, -0.5f, 0.0f,   1.0f, 0.0f,
         0.5f,  0.5f, 0.0f,   1.0f, 1.0f,
         -0.5f,  0.5f, 0.0f,   0.0f, 1.0f,
+    };
+    
+    const f32 UnitCube[] =
+    {
+        -1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        
+        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+        
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+        
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+        
+        -1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
+        
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f
     };
     
     const u16 TriangulatedQuadIndices[6] =
@@ -292,6 +340,114 @@ namespace Examples
         states.setDepthState(LessEqual, false);
         return states;
     }
+    
+    //! A rendering application delegate with camera and arc ball rotations.
+    class ViewerApplicationDelegate : public RenderingApplicationDelegate
+    {
+    public:
+        
+        virtual void handleRenderFrame(const RenderFrame& frame, RenderCommandBuffer& commands) NIMBLE_ABSTRACT;
+        
+    protected:
+        
+        void setCameraPosition(const Vec3& value)
+        {
+            m_camera.position = value;
+        }
+        
+        virtual bool initialize(s32 width, s32 height) NIMBLE_OVERRIDE
+        {
+            if (!RenderingApplicationDelegate::initialize(width, height))
+            {
+                return false;
+            }
+            
+            memset(&m_camera, 0, sizeof(m_camera));
+
+            StateBlock& defaultStates = m_renderingContext->defaultStateBlock();
+            
+            // Configure projection constant buffer
+            {
+                Examples::Projection projection = Examples::Projection::perspective(90.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
+                
+                UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Projection", Examples::Projection::Layout);
+                ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&projection, sizeof(projection), uniformLayout);
+                defaultStates.bindConstantBuffer(constantBuffer, 0);
+            }
+            
+            // Configure camera constant buffer
+            {
+                UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Camera", Examples::Camera::Layout);
+                m_camera.constantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Examples::Camera), uniformLayout);
+                defaultStates.bindConstantBuffer(m_camera.constantBuffer, 1);
+            }
+            
+            return true;
+        }
+
+        virtual void handleTouchBegan(const Platform::Window::TouchBegan& e) NIMBLE_OVERRIDE
+        {
+            m_camera.active = true;
+        }
+
+        virtual void handleTouchEnded(const Platform::Window::TouchEnded& e) NIMBLE_OVERRIDE
+        {
+            m_camera.active = false;
+        }
+
+        virtual void handleTouchMoved(const Platform::Window::TouchMoved& e) NIMBLE_OVERRIDE
+        {
+            static s32 prevX = -1;
+            static s32 prevY = -1;
+            
+            if (!m_camera.active)
+            {
+                prevX = -1;
+                prevY = -1;
+                return;
+            }
+            
+            if (prevX == -1 || prevY == -1)
+            {
+                prevX = e.x;
+                prevY = e.y;
+            }
+            
+            s32 dx = e.x - prevX;
+            s32 dy = e.y - prevY;
+            
+            m_camera.yaw   += dx * 0.25f;
+            m_camera.pitch += dy * 0.25f;
+            
+            prevX = e.x;
+            prevY = e.y;
+        }
+        
+        virtual void handleRenderFrame(const Platform::Window::Update& e) NIMBLE_OVERRIDE
+        {
+            RenderFrame frame(m_renderingContext->defaultStateBlock());
+            RenderCommandBuffer& commands = frame.entryPoint();
+            
+            // Update the camera constant buffer
+            Quat rotation = Quat::rotateAroundAxis(m_camera.pitch, Vec3::axisX()) * Quat::rotateAroundAxis(m_camera.yaw, Vec3::axisY());
+            Examples::Camera camera = Examples::Camera::fromQuat(m_camera.position, rotation);
+            commands.uploadConstantBuffer(m_camera.constantBuffer, &camera, sizeof(camera));
+            
+            handleRenderFrame(frame, commands);
+            m_renderingContext->display(frame);
+        }
+        
+    private:
+
+        struct
+        {
+            f32             yaw;
+            f32             pitch;
+            bool            active;
+            Vec3            position;
+            ConstantBuffer_ constantBuffer;
+        } m_camera;
+    };
     
 } // namespace Examples
 

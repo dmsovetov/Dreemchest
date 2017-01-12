@@ -78,21 +78,21 @@ f32 s_cubeVertices[] =
      1.0f, -1.0f,  1.0f
 };
 
-// Now let's define a vertex ubershader with F_Transform, F_TexCoord and
-// F_NormalAsColor feature options.
 static String s_vertexShader =
     "cbuffer Projection projection : 0;                         \n"
+    "cbuffer Camera     camera     : 1;                         \n"
 
     "varying vec3 v_texCoord;                                   \n"
 
     "void main()                                                \n"
     "{                                                          \n"
-    "   gl_Position = projection.transform * gl_Vertex;         \n"
+    "   gl_Position = projection.transform                      \n"
+    "               * camera.rotation                           \n"
+    "               * gl_Vertex;                                \n"
     "   v_texCoord  = gl_Vertex.xyz;                            \n"
     "}                                                          \n"
     ;
 
-// And the same for a fragment shader
 static String s_fragmentShader =
     "uniform samplerCube Texture0;                              \n"
 
@@ -104,7 +104,8 @@ static String s_fragmentShader =
     "}                                                          \n"
     ;
 
-class Cubemaps : public RenderingApplicationDelegate
+// Application delegate is now subclassed from a Examples::ViewerApplicationDelegate to add camera and arcball functionality.
+class Cubemaps : public Examples::ViewerApplicationDelegate
 {
     StateBlock8 m_renderStates;
     
@@ -112,7 +113,7 @@ class Cubemaps : public RenderingApplicationDelegate
     {
         Logger::setStandardLogger();
 
-        if (!initialize(800, 600))
+        if (!initialize(800 / 4, 600 / 4))
         {
             application->quit(-1);
         }
@@ -126,27 +127,17 @@ class Cubemaps : public RenderingApplicationDelegate
             m_renderStates.bindInputLayout(inputLayout);
         }
         
-        // Create a projection constant buffer
-        {
-            Examples::Projection projection     = Examples::Projection::perspective(120.0f, m_window->width(), m_window->height(), 0.01f, 100.0f);
-            UniformLayout        layout         = m_renderingContext->requestUniformLayout("Projection", Examples::Projection::Layout);
-            ConstantBuffer_      constantBuffer = m_renderingContext->requestConstantBuffer(&projection, sizeof(projection), layout);
-            
-            // Bind this constant buffer to the slot #0
-            m_renderStates.bindConstantBuffer(constantBuffer, 0);
-        }
-        
         // Load a cubemap texture and bind it to a sampler #0
         {
             const String envName = "MonValley_DirtRoad";
             const String files[] =
             {
-                  "Assets/Textures/Environments/" + envName + "/right.tga"
-                , "Assets/Textures/Environments/" + envName + "/left.tga"
+                  "Assets/Textures/Environments/" + envName + "/back.tga"
+                , "Assets/Textures/Environments/" + envName + "/front.tga"
                 , "Assets/Textures/Environments/" + envName + "/top.tga"
                 , "Assets/Textures/Environments/" + envName + "/bottom.tga"
-                , "Assets/Textures/Environments/" + envName + "/front.tga"
-                , "Assets/Textures/Environments/" + envName + "/back.tga"
+                , "Assets/Textures/Environments/" + envName + "/right.tga"
+                , "Assets/Textures/Environments/" + envName + "/left.tga"
             };
             
             Examples::Surface pixels;
@@ -166,17 +157,12 @@ class Cubemaps : public RenderingApplicationDelegate
         Program program = m_renderingContext->requestProgram(s_vertexShader, s_fragmentShader);
         m_renderStates.bindProgram(program);
     }
- 
-    virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
+    
+    // This method is declared inside the Examples::ViewerApplicationDelegate.
+    virtual void handleRenderFrame(const RenderFrame& frame, RenderCommandBuffer& commands) NIMBLE_OVERRIDE
     {
-        RenderFrame frame(m_renderingContext->defaultStateBlock());
-        
-        RenderCommandBuffer& commands = frame.entryPoint();
-        
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
         commands.drawPrimitives(0, PrimTriangles, 0, 36, m_renderStates);
-
-        m_renderingContext->display(frame);
     }
 };
 
