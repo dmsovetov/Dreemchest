@@ -165,7 +165,7 @@ void Window::notifyMouseDown( u32 x, u32 y, int touchId )
 // ** Window::notifyMouseMove
 void Window::notifyMouseMove( u32 sx, u32 sy, u32 ex, u32 ey, int touchId )
 {
-    notify<TouchMoved>( TouchMoved( this, sx, sx, touchId ) );
+    notify<TouchMoved>( TouchMoved( this, sx, sy, touchId ) );
 }
 
 // ** Window::notifyKeyDown
