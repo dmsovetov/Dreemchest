@@ -63,6 +63,9 @@ namespace Examples
         
         //! Creates a Camera constant buffer with a camera looking at the specified target.
         static Camera               lookAt(const Vec3& position, const Vec3& target, const Vec3& up = Vec3::axisY());
+        
+        //! Creates a Camera constant buffer from a quaternion and a position.
+        static Camera               fromQuat(const Vec3& position, const Quat& quat);
     };
     
     //! A constant buffer definition that contains instance info.
@@ -118,6 +121,16 @@ namespace Examples
         Camera camera;
         camera.position = position;
         camera.transform = Matrix4::lookAt(position, target, up);
+        camera.inverseTranspose = camera.transform.inversed().transposed();
+        return camera;
+    }
+    
+    // ** Camera::fromQuat
+    Camera Camera::fromQuat(const Vec3& position, const Quat& quat)
+    {
+        Camera camera;
+        camera.position = position;
+        camera.transform = Matrix4(quat) * Matrix4::translation(position);
         camera.inverseTranspose = camera.transform.inversed().transposed();
         return camera;
     }
