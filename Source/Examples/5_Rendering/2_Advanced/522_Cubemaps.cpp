@@ -32,52 +32,6 @@ DC_USE_DREEMCHEST
 using namespace Platform;
 using namespace Renderer;
 
-// Declare a skybox unit cube
-f32 s_cubeVertices[] =
-{
-    -1.0f,  1.0f, -1.0f,
-    -1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-     1.0f,  1.0f, -1.0f,
-    -1.0f,  1.0f, -1.0f,
-    
-    -1.0f, -1.0f,  1.0f,
-    -1.0f, -1.0f, -1.0f,
-    -1.0f,  1.0f, -1.0f,
-    -1.0f,  1.0f, -1.0f,
-    -1.0f,  1.0f,  1.0f,
-    -1.0f, -1.0f,  1.0f,
-    
-     1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-    
-    -1.0f, -1.0f,  1.0f,
-    -1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f, -1.0f,  1.0f,
-    -1.0f, -1.0f,  1.0f,
-    
-    -1.0f,  1.0f, -1.0f,
-     1.0f,  1.0f, -1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-    -1.0f,  1.0f,  1.0f,
-    -1.0f,  1.0f, -1.0f,
-    
-    -1.0f, -1.0f, -1.0f,
-    -1.0f, -1.0f,  1.0f,
-     1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-    -1.0f, -1.0f,  1.0f,
-     1.0f, -1.0f,  1.0f
-};
-
 static String s_vertexShader =
     "cbuffer Projection projection : 0;                         \n"
     "cbuffer Camera     camera     : 1;                         \n"
@@ -113,7 +67,7 @@ class Cubemaps : public Examples::ViewerApplicationDelegate
     {
         Logger::setStandardLogger();
 
-        if (!initialize(800 / 4, 600 / 4))
+        if (!initialize(800, 600))
         {
             application->quit(-1);
         }
@@ -121,7 +75,7 @@ class Cubemaps : public Examples::ViewerApplicationDelegate
         // Create a cube vertex buffer and bind it to a render state block
         {
             InputLayout   inputLayout  = m_renderingContext->requestInputLayout(VertexFormat::Position);
-            VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(s_cubeVertices, sizeof(s_cubeVertices));
+            VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(Examples::UnitCube, sizeof(Examples::UnitCube));
             
             m_renderStates.bindVertexBuffer(vertexBuffer);
             m_renderStates.bindInputLayout(inputLayout);
@@ -129,15 +83,15 @@ class Cubemaps : public Examples::ViewerApplicationDelegate
         
         // Load a cubemap texture and bind it to a sampler #0
         {
-            const String envName = "MonValley_DirtRoad";
+            const String envName = "Sierra_Madre_B";
             const String files[] =
             {
-                  "Assets/Textures/Environments/" + envName + "/back.tga"
-                , "Assets/Textures/Environments/" + envName + "/front.tga"
-                , "Assets/Textures/Environments/" + envName + "/top.tga"
-                , "Assets/Textures/Environments/" + envName + "/bottom.tga"
-                , "Assets/Textures/Environments/" + envName + "/right.tga"
-                , "Assets/Textures/Environments/" + envName + "/left.tga"
+                  "Assets/Textures/Environments/" + envName + "/posx.tga"
+                , "Assets/Textures/Environments/" + envName + "/negx.tga"
+                , "Assets/Textures/Environments/" + envName + "/posy.tga"
+                , "Assets/Textures/Environments/" + envName + "/negy.tga"
+                , "Assets/Textures/Environments/" + envName + "/posz.tga"
+                , "Assets/Textures/Environments/" + envName + "/negz.tga"
             };
             
             Examples::Surface pixels;
