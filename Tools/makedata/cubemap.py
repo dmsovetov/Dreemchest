@@ -131,7 +131,7 @@ for file in files:
     img_out = Image.new("RGB", (in_size[0], in_size[0]*3/4), "black")
     panorama_to_cross(img_in, img_out)
 
-    file_names = ['left', 'front', 'right', 'back', 'top', 'bottom']
+    file_names = ['negz', 'negx', 'posz', 'posx', 'posy', 'negy']
 
     index = 0
     for face in cross_to_faces(img_out):
