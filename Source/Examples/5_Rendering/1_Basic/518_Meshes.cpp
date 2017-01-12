@@ -60,16 +60,10 @@ static String s_fragmentShader =
     "}                                                  \n"
     ;
 
-// Construct required constant buffers from presets.
-// See the 'Constant Buffers' example for detailed explanation how constant buffers work.
-static Examples::Projection s_projection;
-static Examples::Camera     s_camera     = Examples::Camera::lookAt(Vec3(0.0f, 2.0f, -2.0f), Vec3(0.0f, 0.6f, 0.0f));
-static Examples::Instance   s_instance;
-
 class Meshes : public RenderingApplicationDelegate
 {
     StateBlock8 m_renderStates;
-    Examples::Mesh mesh;
+    RenderItem m_renderItem;
     ConstantBuffer_ m_instanceConstantBuffer;
     
     virtual void handleLaunched(Application* application) NIMBLE_OVERRIDE
@@ -82,47 +76,57 @@ class Meshes : public RenderingApplicationDelegate
         }
         
         // First load a mesh from a file
-        mesh = Examples::objFromFile("Assets/Meshes/bunny.obj");
+        Examples::Mesh mesh = Examples::objFromFile("Assets/Meshes/bunny.obj");
         
         if (!mesh)
         {
             application->quit(-1);
         }
         
-        // Now configure a mesh rendering states
-        VertexFormat vertexFormat = mesh.vertexFormat;
-        InputLayout inputLayout = m_renderingContext->requestInputLayout(vertexFormat);
+        // Now configure a render item from a loaded mesh
+        VertexFormat vertexFormat  = mesh.vertexFormat;
+        InputLayout inputLayout    = m_renderingContext->requestInputLayout(vertexFormat);
         VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(&mesh.vertices[0], mesh.vertices.size());
         
-        m_renderStates.bindInputLayout(inputLayout);
-        m_renderStates.bindVertexBuffer(vertexBuffer);
+        m_renderItem.primitives = mesh.primitives;
+        m_renderItem.first      = 0;
+        m_renderItem.count      = mesh.vertices.size();
+        m_renderItem.states.bindInputLayout(inputLayout);
+        m_renderItem.states.bindVertexBuffer(vertexBuffer);
 
         if (mesh.indices.size())
         {
             IndexBuffer_ indexBuffer = m_renderingContext->requestIndexBuffer(&mesh.indices[0], sizeof(u16) * mesh.indices.size());
-            m_renderStates.bindIndexBuffer(indexBuffer);
+            m_renderItem.states.bindIndexBuffer(indexBuffer);
+            m_renderItem.indexed = true;
+        }
+        else
+        {
+            m_renderItem.indexed = false;
         }
         
         // Configure projection constant buffer
         {
-            s_projection = Examples::Projection::perspective(60.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
+            Examples::Projection projection = Examples::Projection::perspective(60.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
             
             UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Projection", Examples::Projection::Layout);
-            ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&s_projection, sizeof(s_projection), uniformLayout);
+            ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&projection, sizeof(projection), uniformLayout);
             m_renderStates.bindConstantBuffer(constantBuffer, 0);
         }
         
         // Configure camera constant buffer
         {
+            Examples::Camera camera = Examples::Camera::lookAt(Vec3(0.0f, 2.0f, -2.0f), Vec3(0.0f, 0.6f, 0.0f));
+
             UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Camera", Examples::Camera::Layout);
-            ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&s_camera, sizeof(s_camera), uniformLayout);
+            ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&camera, sizeof(camera), uniformLayout);
             m_renderStates.bindConstantBuffer(constantBuffer, 1);
         }
         
         // Configure instance constant buffer
         {
             UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Instance", Examples::Instance::Layout);
-            m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(&s_instance, sizeof(s_instance), uniformLayout);
+            m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Examples::Instance), uniformLayout);
             m_renderStates.bindConstantBuffer(m_instanceConstantBuffer, 2);
         }
         
@@ -141,11 +145,14 @@ class Meshes : public RenderingApplicationDelegate
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
         
         // Update an instance constant buffer
-        s_instance = Examples::Instance::fromTransform(Matrix4::rotateXY(0.0f, currentTime() * 0.001f));
-        commands.uploadConstantBuffer(m_instanceConstantBuffer, &s_instance, sizeof(s_instance));
+        Examples::Instance instance = Examples::Instance::fromTransform(Matrix4::rotateXY(0.0f, currentTime() * 0.001f));
+        commands.uploadConstantBuffer(m_instanceConstantBuffer, &instance, sizeof(instance));
         
-        // Render the mesh
-        commands.drawPrimitives(0, mesh.primitives, 0, mesh.vertices.size(), m_renderStates);
+        // Push root rendering state block
+        StateScope scope = frame.stateStack().push(&m_renderStates);
+        
+        // Render the item
+        commands.drawItem(0, m_renderItem);
     
         m_renderingContext->display(frame);
     }
