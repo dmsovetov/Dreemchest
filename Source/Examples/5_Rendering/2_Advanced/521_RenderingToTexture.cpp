@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
-#include "Examples.h"
+#include "../Examples.h"
 
 DC_USE_DREEMCHEST
 
@@ -202,6 +202,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
         StateStack&    stateStack = m_renderFrame.stateStack();
         RenderCommandBuffer& commands  = m_renderFrame.entryPoint();
         
+        StateScope def = stateStack.push(&m_renderingContext->defaultStateBlock());
         StateScope defaults = stateStack.push(&m_renderStates);
         
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);

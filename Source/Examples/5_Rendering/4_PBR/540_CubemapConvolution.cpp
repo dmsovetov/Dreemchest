@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
-#include "Examples.h"
+#include "../Examples.h"
 
 DC_USE_DREEMCHEST
 
@@ -236,7 +236,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
         m_renderFrame.clear();
         
         StateStack&         stateStack = m_renderFrame.stateStack();
-        RenderCommandBuffer& commands   = m_renderFrame.entryPoint();
+        RenderCommandBuffer& commands  = m_renderFrame.entryPoint();
         
         StateScope defaults = stateStack.push(&m_renderStates);
         
@@ -272,7 +272,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
     {
         verbose("convolution", "performing with cosine kernel of power %2.2f with %d samples in %d iterations...\n", power, Kernel::MaxSamples, iterations);
         
-        RenderFrame    frame(1024 * 1024);
+        RenderFrame    frame(1024 * 1024 * 2);
         StateStack&    stateStack = frame.stateStack();
         Kernel         kernel;
 
@@ -281,9 +281,6 @@ class RenderingToTexture : public RenderingApplicationDelegate
         // Create an output cube map texture
         Texture_ output = m_renderingContext->requestTextureCube(NULL, size, 1, PixelRgba32F, FilterLinear);
         
-        // Create a convolution program instance
-        Program program = m_renderingContext->requestProgram(s_vertexConvolution, s_fragmentConvolution);
-        
         // Create the convolution cbuffer
         UniformLayout convolutionLayout    = m_renderingContext->requestUniformLayout("Convolution", Convolution::Layout);
         ConstantBuffer_ convolutionCBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Convolution), convolutionLayout);
@@ -291,6 +288,11 @@ class RenderingToTexture : public RenderingApplicationDelegate
         // Create the kernel cbuffer
         UniformLayout kernelLayout    = m_renderingContext->requestUniformLayout("Kernel", Kernel::Layout);
         ConstantBuffer_ kernelCBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Kernel), kernelLayout);
+        
+        // Create a convolution program instance
+        Program program = m_renderingContext->requestProgram(s_vertexConvolution, s_fragmentConvolution);
+        m_renderingContext->precompilePermutations(program, FeatureLayout());
+        m_renderingContext->construct(frame);
         
         // Configure a convolution render pass
         StateScope convolutionPass = stateStack.newScope();
@@ -370,7 +372,13 @@ class RenderingToTexture : public RenderingApplicationDelegate
         m_renderingContext->deleteUniformLayout(convolutionLayout);
         m_renderingContext->deleteProgram(program);
         
+        const RenderingContext::FrameCounters& counters = m_renderingContext->frameCounters();
         verbose("convolution", "\tfinished in %d ms, allocated %d/%d bytes [command buffer generated in %d ms, rendered in %d ms]\n", commandBufferTime + renderingTime, frame.allocatedBytes(), frame.allocationCapacity(), commandBufferTime, renderingTime);
+        verbose("convolution", "\tuniforms updated %d\n", counters.uniformsUploaded);
+        verbose("convolution", "\tpermutations compiled %d\n", counters.permutationsCompiled);
+        verbose("convolution", "\tprograms switched %d\n", counters.programSwitches);
+        verbose("convolution", "\tinput layouts switched %d\n", counters.inputLayoutSwitches);
+        verbose("convolution", "\tstates switched %d\n", counters.stateSwitches);
         
         return output;
     }

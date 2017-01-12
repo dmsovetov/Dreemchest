@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
-#include "Examples.h"
+#include "../Examples.h"
 
 DC_USE_DREEMCHEST
 

@@ -25,39 +25,50 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
-#include "Examples.h"
+#include "../Examples.h"
 
 DC_USE_DREEMCHEST
 
 using namespace Platform;
 using namespace Renderer;
 
-// A fragment shader that takes data from a passed constant buffer
+// A ubershader is a regular shader with a set of options that dictate
+// what features should be used in a compile time. Each set of options
+// produces a unique shader permutation that is used during rendering.
+
+// Here we define a shader that has a single option - F_Pink
+// that controlls an output color of all fragments output
+// by a shader program.
 static String s_fragmentShader =
-    "cbuffer Material material : 0;                                     \n" // This line declares a constant buffer of type 'Material' that is bound to unit 0
-    "                                                                   \n"
-    "void main()                                                        \n"
-    "{                                                                  \n"
-    "   gl_FragColor = vec4(material.color * material.brightness, 1.0); \n"
-    "}                                                                  \n"
+    "void main()                                    \n"
+    "{                                              \n"
+    "#if defined( F_Pink )                          \n"
+    "    gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);   \n"
+    "#else                                          \n"
+    "    gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);   \n"
+    "#endif  // F_Pink                              \n"
+    "}"
     ;
 
-// Declare a C structure of our constant buffer
-struct Material
-{
-    Vec3    color;
-    f32     brightness;
-} s_material;
+// The last one thing we need is a feature layout that tells
+// a rendering context how to map from pipeline features to
+// actual shader options.
 
-// Every constant buffer should have an associated layout
-static UniformElement s_bufferLayout[] =
+// Declare a user-defined feature constant
+PipelineFeatures Pink = BIT(0);
+
+static PipelineFeature s_features[] =
 {
-      { "color",      UniformElement::Vec3,  offsetof(Material, color)       }
-    , { "brightness", UniformElement::Float, offsetof(Material, brightness)  }
-    , { NULL }
+    // This item tells a rendering context that 'F_Pink' option
+    // should be passed to a shader program each time the 'Pink'
+    // option was set by user.
+    { "F_Pink", PipelineFeature::user(Pink) },
+    
+    // A sentinel item
+    { NULL }
 };
 
-class ConstantBuffers : public RenderingApplicationDelegate
+class FirstUbershader : public RenderingApplicationDelegate
 {
     StateBlock8 m_renderStates;
     RenderFrame m_renderFrame;
@@ -65,49 +76,41 @@ class ConstantBuffers : public RenderingApplicationDelegate
     virtual void handleLaunched(Application* application) NIMBLE_OVERRIDE
     {
         Logger::setStandardLogger();
-        
+
         if (!initialize(800, 600))
         {
             application->quit(-1);
         }
 
-        InputLayout inputLayout  = m_renderingContext->requestInputLayout(VertexFormat::Position);
+        InputLayout inputLayout = m_renderingContext->requestInputLayout(VertexFormat::Position);
         
-        // Initialize a vertex buffer from a preset data.
+        // Create a vertex buffer from a triangle vertex buffer preset.
         VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(Examples::Triangle, sizeof(Examples::Triangle));
         
-        // To not bother with vertex shader we are using an identity vertex shader
-        // preset here, that just passes an input to an ouput.
+        // Create a shader program. Nothing special in vertex shader, so use a preset.
         Program program = m_renderingContext->requestProgram(Examples::VertexIdentity, s_fragmentShader);
         
-        // Initialize a material constant buffer
-        s_material.color = Vec4(1.0f, 0.5f, 0.25f, 1.0f);
-        s_material.brightness = 0.75f;
-        
-        // Construct the material uniform layout from an array of UniformElement items
-        // and register it with an identifier 'Material'.
-        UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Material", s_bufferLayout);
-        
-        // Create the constant buffer.
-        ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&s_material, sizeof(s_material), uniformLayout);
+        // Create a feature layout
+        FeatureLayout featureLayout = m_renderingContext->requestPipelineFeatureLayout(s_features);
         
         m_renderStates.bindVertexBuffer(vertexBuffer);
         m_renderStates.bindInputLayout(inputLayout);
         m_renderStates.bindProgram(program);
         
-        // Bind a created constant buffer to a rendering states block
-        m_renderStates.bindConstantBuffer(constantBuffer, 0);
+        // Bind feature layout and set a 'Pink' option
+        m_renderStates.bindFeatureLayout(featureLayout);
+        m_renderStates.enableFeatures(Pink);
     }
 
     virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
     {
         RenderCommandBuffer& commands = m_renderFrame.entryPoint();
-        
-        commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
-        commands.drawPrimitives(0, PrimTriangles, 0, 3, &m_renderStates);
 
+        commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
+        commands.drawPrimitives(0, Renderer::PrimTriangles, 0, 3, &m_renderStates);
+        
         m_renderingContext->display(m_renderFrame);
     }
 };
 
-dcDeclareApplication(new ConstantBuffers)
+dcDeclareApplication(new FirstUbershader)

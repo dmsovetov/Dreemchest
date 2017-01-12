@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
-#include "Examples.h"
+#include "../Examples.h"
 
 DC_USE_DREEMCHEST
 
@@ -106,7 +106,7 @@ class StencilBuffer : public RenderingApplicationDelegate
     {
         Logger::setStandardLogger();
 
-        if (!initialize(800 / 4, 600 / 4))
+        if (!initialize(800, 600))
         {
             application->quit(-1);
         }

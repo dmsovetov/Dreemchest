@@ -40,8 +40,9 @@ using namespace Sound;
 class SoundPlayback : public ApplicationDelegate {
 
     // This method will be called once an application is launched.
-    virtual void handleLaunched( Application* application ) {
-        Sound::log::setStandardHandler();
+    virtual void handleLaunched( Application* application )
+    {
+        Logger::setStandardLogger();
 
         // Create the SoundFx instance
         SoundFxPtr sfx = SoundFx::create();
