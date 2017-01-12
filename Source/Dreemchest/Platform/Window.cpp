@@ -151,21 +151,21 @@ void Window::notifyUpdate( void )
 }
 
 // ** Window::notifyMouseUp
-void Window::notifyMouseUp( u32 x, u32 y, int touchId )
+void Window::notifyMouseUp( MouseButton button, u32 x, u32 y, int touchId )
 {
-    notify<TouchEnded>( TouchEnded( this, x, y, touchId ) );
+    notify<TouchEnded>( TouchEnded( this, button, x, y, touchId ) );
 }
 
 // ** Window::notifyMouseDown
-void Window::notifyMouseDown( u32 x, u32 y, int touchId )
+void Window::notifyMouseDown( MouseButton button, u32 x, u32 y, int touchId )
 {
-    notify<TouchBegan>( TouchBegan( this, x, y, touchId ) );
+    notify<TouchBegan>( TouchBegan( this, button, x, y, touchId ) );
 }
 
 // ** Window::notifyMouseMove
-void Window::notifyMouseMove( u32 sx, u32 sy, u32 ex, u32 ey, int touchId )
+void Window::notifyMouseMove( MouseButton button, u32 sx, u32 sy, u32 ex, u32 ey, int touchId )
 {
-    notify<TouchMoved>( TouchMoved( this, sx, sy, touchId ) );
+    notify<TouchMoved>( TouchMoved( this, button, sx, sy, touchId ) );
 }
 
 // ** Window::notifyKeyDown

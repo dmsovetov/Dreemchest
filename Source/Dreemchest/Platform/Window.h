@@ -70,6 +70,13 @@ namespace Platform {
     //! A platform-specific work with windows.
     class Window : public InjectEventEmitter<RefCounted> {
     public:
+        
+        //! A pressed mouse button 
+        enum MouseButton
+        {
+              LeftMouseButton
+            , RightMouseButton
+        };
 
         virtual                 ~Window( void );
 
@@ -106,13 +113,13 @@ namespace Platform {
         void                    notifyUpdate( void );
 
         //! Notifies window that mouse was pressed.
-        void                    notifyMouseDown( u32 x, u32 y, s32 touchId = -1 );
+        void                    notifyMouseDown( MouseButton button, u32 x, u32 y, s32 touchId = -1 );
 
         //! Notifies window that mouse was released.
-        void                    notifyMouseUp( u32 x, u32 y, s32 touchId = -1 );
+        void                    notifyMouseUp( MouseButton button, u32 x, u32 y, s32 touchId = -1 );
 
         //! Notifies window that mouse was moved.
-        void                    notifyMouseMove( u32 sx, u32 sy, u32 ex, u32 ey, s32 touchId = -1 );
+        void                    notifyMouseMove( MouseButton button, u32 sx, u32 sy, u32 ex, u32 ey, s32 touchId = -1 );
 
         //! Notifies window that key was pressed.
         void                    notifyKeyDown( Key key );
@@ -139,33 +146,34 @@ namespace Platform {
         //! Base class for all touch events.
         struct TouchEvent : public Event {
                         //! Constructs TouchEvent instance.
-                        TouchEvent( WindowWPtr window, s32 x, s32 y, s32 id = -1 )
-                            : Event( window ), x( x ), y( y ), id( id ) {}
+                        TouchEvent( WindowWPtr window, MouseButton button, s32 x, s32 y, s32 id = -1 )
+                            : Event( window ), button( button ), x( x ), y( y ), id( id ) {}
 
-            s32            x;    //!< Touch X window coordinate.
-            s32            y;    //!< Touch Y window coordinate.
-            s32            id;    //!< Touch identifier.
+            MouseButton button;  //!< A mouse button id.
+            s32         x;       //!< Touch X window coordinate.
+            s32         y;       //!< Touch Y window coordinate.
+            s32         id;      //!< Touch identifier.
         };
 
         //! This event is emitted when user touches the window.
         struct TouchBegan : public TouchEvent {
                         //! Constructs TouchBegan instance.
-                        TouchBegan( WindowWPtr window, s32 x, s32 y, s32 id = -1 )
-                            : TouchEvent( window, x, y, id ) {}
+                        TouchBegan( WindowWPtr window, MouseButton button, s32 x, s32 y, s32 id = -1 )
+                            : TouchEvent( window, button, x, y, id ) {}
         };
 
         //! This event is emitted when user's touch was ended.
         struct TouchEnded : public TouchEvent {
                         //! Constructs TouchEnded instance.
-                        TouchEnded( WindowWPtr window, s32 x, s32 y, s32 id = -1 )
-                            : TouchEvent( window, x, y, id ) {}
+                        TouchEnded( WindowWPtr window, MouseButton button, s32 x, s32 y, s32 id = -1 )
+                            : TouchEvent( window, button, x, y, id ) {}
         };
 
         //! This event is emitted when user's touch was moved.
         struct TouchMoved : public TouchEvent {
                         //! Constructs TouchMoved instance.
-                        TouchMoved( WindowWPtr window, s32 x, s32 y, s32 id = -1 )
-                            : TouchEvent( window, x, y, id ) {}
+                        TouchMoved( WindowWPtr window, MouseButton button, s32 x, s32 y, s32 id = -1 )
+                            : TouchEvent( window, button, x, y, id ) {}
         };
 
     #if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_MACOS )

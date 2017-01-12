@@ -60,7 +60,7 @@
     NSPoint point = [self transformPoint: event];
 
     if( point.y >= 0 ) {
-        m_window->owner()->notifyMouseDown( point.x, point.y );
+        m_window->owner()->notifyMouseDown( Platform::Window::LeftMouseButton, point.x, point.y );
     }
 
     [super mouseDown:event];
@@ -72,7 +72,7 @@
     NSPoint point = [self transformPoint: event];
 
     if( point.y >= 0 ) {
-        m_window->owner()->notifyMouseUp( point.x, point.y );
+        m_window->owner()->notifyMouseUp( Platform::Window::LeftMouseButton, point.x, point.y );
     }
 
     [super mouseUp:event];
@@ -85,7 +85,7 @@
     NSPoint point = [self transformPoint: event];
 
     if( point.y >= 0 && NSPointInRect( [NSEvent mouseLocation], rect ) ) {
-        m_window->owner()->notifyMouseMove( m_prevMousePos.x, m_prevMousePos.y, point.x, point.y );
+        m_window->owner()->notifyMouseMove( Platform::Window::LeftMouseButton, m_prevMousePos.x, m_prevMousePos.y, point.x, point.y );
         m_prevMousePos = point;
     }
 
@@ -98,11 +98,51 @@
     NSPoint point = [self transformPoint: event];
 
     if( point.y >= 0 ) {
-        m_window->owner()->notifyMouseMove( m_prevMousePos.x, m_prevMousePos.y, point.x, point.y );
+        m_window->owner()->notifyMouseMove( Platform::Window::LeftMouseButton, m_prevMousePos.x, m_prevMousePos.y, point.x, point.y );
         m_prevMousePos = point;
     }
 
     [super mouseDragged:event];
+}
+
+// ** rightMouseDown
+- ( void )rightMouseDown : ( NSEvent* )event
+{
+    NSPoint point = [self transformPoint: event];
+    
+    if (point.y >= 0)
+    {
+        m_window->owner()->notifyMouseDown(Platform::Window::RightMouseButton, point.x, point.y);
+    }
+    
+    [super rightMouseDown:event];
+}
+
+// ** rightMouseUp
+- ( void )rightMouseUp : ( NSEvent* )event
+{
+    NSPoint point = [self transformPoint: event];
+    
+    if (point.y >= 0)
+    {
+        m_window->owner()->notifyMouseUp(Platform::Window::RightMouseButton, point.x, point.y);
+    }
+    
+    [super rightMouseUp:event];
+}
+
+// ** rightMouseDragged
+- ( void )rightMouseDragged : ( NSEvent* )event
+{
+    NSPoint point = [self transformPoint: event];
+    
+    if (point.y >= 0)
+    {
+        m_window->owner()->notifyMouseMove(Platform::Window::RightMouseButton, m_prevMousePos.x, m_prevMousePos.y, point.x, point.y);
+        m_prevMousePos = point;
+    }
+    
+    [super rightMouseDragged:event];
 }
 
 // ** keyDown
