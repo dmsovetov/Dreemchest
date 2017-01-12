@@ -100,7 +100,7 @@ OpenGL2RenderingContext::OpenGL2RenderingContext(RenderViewPtr view)
     , m_activeInputLayout(NULL)
 #if DEV_RENDERER_PROGRAM_CACHING
     , m_activePermutation(NULL)
-    , m_activeProgram(0)
+    , m_activeProgram(-1)
     , m_activeFeatures(0)
 #endif  //  #if DEV_RENDERER_PROGRAM_CACHING
 {
