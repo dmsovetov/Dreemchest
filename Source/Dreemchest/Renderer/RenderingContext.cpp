@@ -256,13 +256,13 @@ void RenderingContext::setDefaultStateBlock(const StateBlock12& value)
 }
     
 // ** RenderingContext::defaultStateBlock
-const StateBlock12& RenderingContext::defaultStateBlock() const
+const StateBlock& RenderingContext::defaultStateBlock() const
 {
     return m_defaultStateBlock;
 }
     
 // ** RenderingContext::defaultStateBlock
-StateBlock12& RenderingContext::defaultStateBlock()
+StateBlock& RenderingContext::defaultStateBlock()
 {
     return m_defaultStateBlock;
 }

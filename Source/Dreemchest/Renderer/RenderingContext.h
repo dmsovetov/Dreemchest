@@ -57,8 +57,8 @@ namespace Renderer
         void                                    setDefaultStateBlock(const StateBlock12& value);
         
         //! Returns a default state block.
-        const StateBlock12&                     defaultStateBlock() const;
-        StateBlock12&                           defaultStateBlock();
+        const StateBlock&                       defaultStateBlock() const;
+        StateBlock&                             defaultStateBlock();
         
         //! Returns last frame rendering counters.
         const FrameCounters&                    frameCounters() const;
