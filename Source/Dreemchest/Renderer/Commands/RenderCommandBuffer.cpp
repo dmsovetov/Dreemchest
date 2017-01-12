@@ -193,6 +193,18 @@ void RenderCommandBuffer::drawPrimitives(u32 sorting, PrimitiveType primitives, 
 {
     emitDrawCall(OpCode::DrawPrimitives, sorting, primitives, first, count, m_stateStack.states(), m_stateStack.size(), &stateBlock);
 }
+    
+// ** RenderCommandBuffer::drawItem
+void RenderCommandBuffer::drawItem(u32 sorting, const RenderItem& item)
+{
+    emitDrawCall(item.indexed ? OpCode::DrawIndexed : OpCode::DrawPrimitives, sorting, item.primitives, item.first, item.count, m_stateStack.states(), m_stateStack.size(), &item.states);
+}
+
+// ** RenderCommandBuffer::drawItem
+void RenderCommandBuffer::drawItem(u32 sorting, const RenderItem& item, const StateBlock& stateBlock)
+{
+    NIMBLE_NOT_IMPLEMENTED
+}
 
 // ** RenderCommandBuffer::emitDrawCall
 void RenderCommandBuffer::emitDrawCall(OpCode::Type type, u32 sorting, PrimitiveType primitives, s32 first, s32 count, const StateBlock** stateBlocks, s32 stateBlockCount, const StateBlock* overrideStateBlock)
