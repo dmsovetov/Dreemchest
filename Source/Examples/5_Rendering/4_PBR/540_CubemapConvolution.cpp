@@ -165,7 +165,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
     ConstantBuffer_ m_cameraCBuffer;
     ConstantBuffer_ m_projectionCBuffer;
     ConstantBuffer_ m_instanceCBuffer;
-    Examples::MeshStateBlock m_mesh;
+    RenderItem m_mesh;
     StateBlock8 m_fullscreenQuad;
     Texture_ m_envmap;
     Texture_ m_diffuse;
@@ -187,7 +187,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
         }
 
         // Load mesh from a file
-        m_mesh = Examples::createMeshRenderingStates(m_renderingContext, "Assets/Meshes/bunny.obj");
+        m_mesh = Examples::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/bunny.obj");
         m_envmap = Examples::createEnvFromFiles(m_renderingContext, "Assets/Textures/Environments/Arches_E_PineTree_512");
 
         // Projection cbuffer
@@ -262,7 +262,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
         StateScope meshStates = stateStack.push(&m_mesh.states);
         s_instance = Examples::Instance::fromTransform(Matrix4::rotateXY(currentTime() * 0.0003f * 0.0f, currentTime() * 0.0003f));
         commands.uploadConstantBuffer(m_instanceCBuffer, &s_instance, sizeof(s_instance));
-        commands.drawPrimitives(0, m_mesh.primitives, 0, m_mesh.size);
+        commands.drawItem(0, m_mesh);
 
         m_renderingContext->display(frame);
     }
