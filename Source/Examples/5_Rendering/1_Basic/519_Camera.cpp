@@ -181,7 +181,7 @@ class Camera : public RenderingApplicationDelegate
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
         
         // Update the camera constant buffer
-        Quat rotation = Quat::rotateAroundAxis(m_yaw, Vec3::axisY()) * Quat::rotateAroundAxis(m_pitch, Vec3::axisX());
+        Quat rotation = Quat::rotateAroundAxis(m_pitch, Vec3::axisX()) * Quat::rotateAroundAxis(m_yaw, Vec3::axisY());
         Examples::Camera camera = Examples::Camera::fromQuat(Vec3(0.0f, 0.0f, -2.0f), rotation);
         commands.uploadConstantBuffer(m_cameraConstantBuffer, &camera, sizeof(camera));
 
