@@ -113,7 +113,7 @@ class Cubemaps : public Examples::ViewerApplicationDelegate
     }
     
     // This method is declared inside the Examples::ViewerApplicationDelegate.
-    virtual void handleRenderFrame(const RenderFrame& frame, RenderCommandBuffer& commands) NIMBLE_OVERRIDE
+    virtual void handleRenderFrame(RenderFrame& frame, StateStack& stateStack, RenderCommandBuffer& commands) NIMBLE_OVERRIDE
     {
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
         commands.drawPrimitives(0, PrimTriangles, 0, 36, m_renderStates);
