@@ -67,6 +67,7 @@ static PFNGLGETPROGRAMINFOLOGPROC       glGetProgramInfoLog     = NULL;
 static PFNGLGETSHADERIVPROC             glGetShaderiv           = NULL;
 static PFNGLGETPROGRAMIVPROC            glGetProgramiv          = NULL;
 static PFNGLGETUNIFORMLOCATIONARBPROC   glGetUniformLocation    = NULL;
+static PFNGLGETACTIVEUNIFORMPROC        glGetActiveUniform      = NULL;
 static PFNGLUNIFORM4FARBPROC            glUniform4f             = NULL;
 static PFNGLUNIFORM3FARBPROC            glUniform3f             = NULL;
 static PFNGLUNIFORM2FARBPROC            glUniform2f             = NULL;
@@ -547,6 +548,7 @@ bool OpenGL2::initialize()
     glGetProgramiv          = ( PFNGLGETPROGRAMIVPROC )             wglGetProcAddress( "glGetProgramiv" );
     glGetShaderiv           = ( PFNGLGETSHADERIVPROC )              wglGetProcAddress( "glGetShaderiv" );
     glGetUniformLocation    = ( PFNGLGETUNIFORMLOCATIONARBPROC )    wglGetProcAddress( "glGetUniformLocationARB" );
+    glGetActiveUniform      = ( PFNGLGETACTIVEUNIFORMPROC )         wglGetProcAddress( "glGetActiveUniform" );
     glUniform4f             = ( PFNGLUNIFORM4FARBPROC )             wglGetProcAddress( "glUniform4fARB" );
     glUniform3f             = ( PFNGLUNIFORM3FARBPROC )             wglGetProcAddress( "glUniform3fARB" );
     glUniform2f             = ( PFNGLUNIFORM2FARBPROC )             wglGetProcAddress( "glUniform2fARB" );
