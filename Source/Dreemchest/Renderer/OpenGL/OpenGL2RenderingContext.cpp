@@ -97,6 +97,7 @@ String OpenGL2RenderingContext::ShaderPreprocessor::generateBufferDefinition(con
 OpenGL2RenderingContext::OpenGL2RenderingContext(RenderViewPtr view)
     : OpenGLRenderingContext(view)
     , m_requestedFeatureLayout(NULL)
+    , m_requestedProgram(0)
     , m_activeInputLayout(NULL)
 #if DEV_RENDERER_PROGRAM_CACHING
     , m_activePermutation(NULL)
