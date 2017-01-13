@@ -91,6 +91,7 @@ namespace Renderer
         const PipelineFeatureLayout*    m_requestedFeatureLayout;
     #if DEV_RENDERER_INPUT_LAYOUT_CACHING
         const VertexBufferLayout*   m_activeInputLayout;    //!< An active input layout.
+        GLuint                      m_activeVertexBuffer;   //!< An active vertex buffer.
     #endif  //  #if DEV_RENDERER_INPUT_LAYOUT_CACHING
         
     #if DEV_RENDERER_PROGRAM_CACHING

@@ -102,6 +102,7 @@ OpenGL2RenderingContext::OpenGL2RenderingContext(RenderViewPtr view)
     , m_activePermutation(NULL)
     , m_activeProgram(-1)
     , m_activeFeatures(0)
+    , m_activeVertexBuffer(0)
 #endif  //  #if DEV_RENDERER_PROGRAM_CACHING
 {
     if (m_view.valid())
@@ -411,7 +412,10 @@ void OpenGL2RenderingContext::executeCommandBuffer(const CommandBuffer& commands
 // ** OpenGL2RenderingContext::compilePipelineState
 void OpenGL2RenderingContext::compilePipelineState(const State* states, s32 count)
 {
-    const VertexBufferLayout* changeInputLayout = NULL;
+    const VertexBufferLayout* inputLayout        = m_activeInputLayout;
+    GLuint                    vertexBuffer       = m_activeVertexBuffer;
+    bool                      changeInputLayout  = false;
+    bool                      changeVertexBuffer = false;
     
     for (s32 i = 0; i < count; i++)
     {
@@ -431,7 +435,8 @@ void OpenGL2RenderingContext::compilePipelineState(const State* states, s32 coun
         switch (state.type)
         {
             case State::BindVertexBuffer:
-                OpenGL2::Buffer::bind(GL_ARRAY_BUFFER, m_vertexBuffers[state.resourceId]);
+                vertexBuffer        = m_vertexBuffers[state.resourceId];
+                changeVertexBuffer  = true;
                 break;
                 
             case State::BindIndexBuffer:
@@ -439,7 +444,8 @@ void OpenGL2RenderingContext::compilePipelineState(const State* states, s32 coun
                 break;
                 
             case State::SetInputLayout:
-                changeInputLayout = m_inputLayouts[state.resourceId].get();
+                inputLayout         = m_inputLayouts[state.resourceId].get();
+                changeInputLayout   = true;
                 break;
                 
             case State::BindProgram:
@@ -507,8 +513,16 @@ void OpenGL2RenderingContext::compilePipelineState(const State* states, s32 coun
         }
     }
     
+    // Change the vertex buffer binding
+    if (changeVertexBuffer)
+    {
+        OpenGL2::Buffer::bind(GL_ARRAY_BUFFER, vertexBuffer);
+        m_activeVertexBuffer = vertexBuffer;
+        changeInputLayout = true;
+    }
+    
 #if DEV_RENDERER_INPUT_LAYOUT_CACHING
-    if (m_activeInputLayout != changeInputLayout && changeInputLayout)
+    if (changeInputLayout)
 #endif  //  #if DEV_RENDERER_INPUT_LAYOUT_CACHING
     {
         // Disable the previous input layout
@@ -518,12 +532,12 @@ void OpenGL2RenderingContext::compilePipelineState(const State* states, s32 coun
         }
      
         // Now enable a new one
-        OpenGL2::enableInputLayout(NULL, *changeInputLayout);
+        OpenGL2::enableInputLayout(NULL, *inputLayout);
      
         // Track this switch
         m_counters.inputLayoutSwitches++;
     #if DEV_RENDERER_INPUT_LAYOUT_CACHING
-        m_activeInputLayout = changeInputLayout;
+        m_activeInputLayout = inputLayout;
     #endif  //  #if DEV_RENDERER_INPUT_LAYOUT_CACHING
     }
 }
