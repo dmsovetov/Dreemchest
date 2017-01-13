@@ -218,18 +218,20 @@ LRESULT WindowsWindow::windowProc( HWND hWnd, UINT message, WPARAM wParam, LPARA
 	case WM_KEYUP:			window->owner()->notifyKeyUp( translateKey( ( u32 )wParam ) );
 							break;
 
-	case WM_LBUTTONDOWN:	window->owner()->notifyMouseDown( LOWORD( lParam ), HIWORD( lParam ) );
+    case WM_LBUTTONDOWN:	window->owner()->notifyMouseDown( Window::LeftMouseButton, LOWORD( lParam ), HIWORD( lParam ) );
 							break;
 
-	case WM_LBUTTONUP:		window->owner()->notifyMouseUp( LOWORD( lParam ), HIWORD( lParam ) );
+	case WM_LBUTTONUP:		window->owner()->notifyMouseUp(Window::LeftMouseButton,  LOWORD( lParam ), HIWORD( lParam ) );
 							break;
 
-	case WM_MOUSEMOVE:		window->owner()->notifyMouseMove( LOWORD( lParam ), HIWORD( lParam ), LOWORD( lParam ), HIWORD( lParam ) );
+	case WM_MOUSEMOVE:		window->owner()->notifyMouseMove( Window::LeftMouseButton, LOWORD( lParam ), HIWORD( lParam ), LOWORD( lParam ), HIWORD( lParam ) );
 							break;
 
-	case WM_RBUTTONDOWN:	break;
+	case WM_RBUTTONDOWN:	window->owner()->notifyMouseDown( Window::RightMouseButton, LOWORD( lParam ), HIWORD( lParam ) );
+							break;
 
-	case WM_RBUTTONUP:		break;
+	case WM_RBUTTONUP:		window->owner()->notifyMouseDown( Window::RightMouseButton, LOWORD( lParam ), HIWORD( lParam ) );
+							break;
 
 	case WM_CHAR:			break;
 
