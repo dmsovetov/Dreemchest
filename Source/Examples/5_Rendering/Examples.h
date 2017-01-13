@@ -274,33 +274,6 @@ namespace Examples
         , -Vec3::axisZ()
     };
     
-    /*struct MeshStateBlock
-    {
-        StateBlock4     states;
-        PrimitiveType   primitives;
-        s32             size;
-    };
-    
-    // Creates a rendering states block from a mesh file
-    MeshStateBlock createMeshRenderingStates(RenderingContextWPtr renderingContext, const String& fileName)
-    {
-        Mesh mesh = objFromFile(fileName);
-        NIMBLE_ABORT_IF(!mesh, "failed to load a mesh");
-        
-        MeshStateBlock meshStates;
-        
-        VertexFormat vertexFormat = mesh.vertexFormat;
-        VertexBuffer_ vertexBuffer = renderingContext->requestVertexBuffer(&mesh.vertices[0], mesh.vertices.size());
-        InputLayout inputLayout = renderingContext->requestInputLayout(vertexFormat);
-
-        meshStates.states.bindVertexBuffer(vertexBuffer);
-        meshStates.states.bindInputLayout(inputLayout);
-        meshStates.primitives = mesh.primitives;
-        meshStates.size       = mesh.vertices.size() / vertexFormat.vertexSize();
-        
-        return meshStates;
-    }*/
-    
     RenderItem createRenderItemFromMesh(RenderingContextWPtr renderingContext, const String& fileName)
     {
         Examples::Mesh mesh = Examples::objFromFile(fileName);
