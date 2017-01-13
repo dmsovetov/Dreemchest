@@ -317,12 +317,12 @@ namespace Examples
         Image images[6];
         String fileNames[] =
         {
-              path + "/right.tga"
-            , path + "/left.tga"
-            , path + "/top.tga"
-            , path + "/bottom.tga"
-            , path + "/front.tga"
-            , path + "/back.tga"
+              path + "/posx.tga"
+            , path + "/negx.tga"
+            , path + "/posy.tga"
+            , path + "/negy.tga"
+            , path + "/posz.tga"
+            , path + "/negz.tga"
         };
         
         Surface pixels;

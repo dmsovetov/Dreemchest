@@ -97,7 +97,7 @@ static String s_vertexConvolution =
 
     "void main()                                                                \n"
     "{                                                                          \n"
-    "   v_ray         = camera.transform * vec4(gl_Vertex.xy, -1.0, 1.0); \n"
+    "   v_ray         = camera.transform * vec4(gl_Vertex.xy, -1.0, 1.0);       \n"
     "   gl_Position   = gl_Vertex;                                              \n"
     "}                                                                          \n"
     ;
@@ -188,7 +188,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
 
         // Load mesh from a file
         m_mesh = Examples::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/bunny.obj");
-        m_envmap = Examples::createEnvFromFiles(m_renderingContext, "Assets/Textures/Environments/Arches_E_PineTree_512");
+        m_envmap = Examples::createEnvFromFiles(m_renderingContext, "Assets/Textures/Environments/MonValley_DirtRoad");
 
         // Projection cbuffer
         {
