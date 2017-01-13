@@ -41,3 +41,4 @@ Build/Composer
 Projects
 tools/cmake
 Build/LogFile.txt
+Build/Examples/LogFile.txt
