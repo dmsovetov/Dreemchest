@@ -74,11 +74,12 @@ namespace Examples
     {
         Matrix4                     transform;          //!< An instance transformation matrix.
         Matrix4                     inverseTranspose;   //!< An inverse transpose matrix.
+        f32                         alpha;              //!< An instance alpha.
         
         static const UniformElement Layout[];           //!< A constant buffer layout.
         
         //! Creates an Instance constant buffer with a specified affine transform.
-        static Instance              fromTransform(const Matrix4& transform);
+        static Instance              fromTransform(const Matrix4& transform, f32 alpha = 1.0f);
     };
     
     // ** Projection::Layout
@@ -143,15 +144,17 @@ namespace Examples
     {
           { "transform",        UniformElement::Matrix4, offsetof(Instance, transform)        }
         , { "inverseTranspose", UniformElement::Matrix4, offsetof(Instance, inverseTranspose) }
+        , { "alpha",            UniformElement::Float,   offsetof(Instance, alpha)            }
         , { NULL }
     };
     
     // ** Instance::fromTransform
-    Instance Instance::fromTransform(const Matrix4& transform)
+    Instance Instance::fromTransform(const Matrix4& transform, f32 alpha)
     {
         Instance instance;
         instance.transform = transform;
         instance.inverseTranspose = transform.inversed().transposed();
+        instance.alpha = alpha;
         return instance;
     }
     
@@ -271,7 +274,7 @@ namespace Examples
         , -Vec3::axisZ()
     };
     
-    struct MeshStateBlock
+    /*struct MeshStateBlock
     {
         StateBlock4     states;
         PrimitiveType   primitives;
@@ -296,6 +299,36 @@ namespace Examples
         meshStates.size       = mesh.vertices.size() / vertexFormat.vertexSize();
         
         return meshStates;
+    }*/
+    
+    RenderItem createRenderItemFromMesh(RenderingContextWPtr renderingContext, const String& fileName)
+    {
+        Examples::Mesh mesh = Examples::objFromFile(fileName);
+        NIMBLE_ABORT_IF(!mesh, "failed to load mesh");
+        
+        VertexFormat vertexFormat  = mesh.vertexFormat;
+        InputLayout inputLayout    = renderingContext->requestInputLayout(vertexFormat);
+        VertexBuffer_ vertexBuffer = renderingContext->requestVertexBuffer(&mesh.vertices[0], mesh.vertices.size());
+        
+        RenderItem renderItem;
+        renderItem.primitives = mesh.primitives;
+        renderItem.first      = 0;
+        renderItem.count      = mesh.vertices.size();
+        renderItem.states.bindInputLayout(inputLayout);
+        renderItem.states.bindVertexBuffer(vertexBuffer);
+        
+        if (mesh.indices.size())
+        {
+            IndexBuffer_ indexBuffer = renderingContext->requestIndexBuffer(&mesh.indices[0], sizeof(u16) * mesh.indices.size());
+            renderItem.states.bindIndexBuffer(indexBuffer);
+            renderItem.indexed = true;
+        }
+        else
+        {
+            renderItem.indexed = false;
+        }
+        
+        return renderItem;
     }
     
     // Creates an environment map from a texture
