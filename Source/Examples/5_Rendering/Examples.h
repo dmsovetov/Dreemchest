@@ -134,7 +134,7 @@ namespace Examples
         Camera camera;
         camera.position = position;
         camera.rotation = quat;
-        camera.transform = Matrix4(quat) * Matrix4::translation(position);
+        camera.transform = Matrix4(quat) * Matrix4::translation(-position);
         camera.inverseTranspose = camera.transform.inversed().transposed();
         return camera;
     }
@@ -352,7 +352,7 @@ namespace Examples
     {
     public:
         
-        virtual void handleRenderFrame(const RenderFrame& frame, RenderCommandBuffer& commands) NIMBLE_ABSTRACT;
+        virtual void handleRenderFrame(RenderFrame& frame, StateStack& stateStack, RenderCommandBuffer& commands) NIMBLE_ABSTRACT;
         
     protected:
         
@@ -439,7 +439,7 @@ namespace Examples
             Examples::Camera camera = Examples::Camera::fromQuat(m_camera.position, rotation);
             commands.uploadConstantBuffer(m_camera.constantBuffer, &camera, sizeof(camera));
             
-            handleRenderFrame(frame, commands);
+            handleRenderFrame(frame, frame.stateStack(), commands);
             m_renderingContext->display(frame);
         }
         
