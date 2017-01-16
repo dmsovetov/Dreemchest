@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "OpenGLRenderingContext.h"
+#include "OpenGLFramebufferCache.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -57,8 +58,8 @@ OpenGLRenderingContext::OpenGLRenderingContext(RenderViewPtr view)
         m_view->makeCurrent();
     }
     
-    m_framebuffers.push(Framebuffer());
-    
+    m_framebuffers = new OpenGLFramebufferCache;
+
     glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &m_caps.maxRenderTargets);
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &m_caps.maxTextures);
     glGetIntegerv(GL_MAX_CUBE_MAP_TEXTURE_SIZE, &m_caps.maxCubeMapSize);
@@ -74,6 +75,7 @@ OpenGLRenderingContext::OpenGLRenderingContext(RenderViewPtr view)
 // ** OpenGLRenderingContext::~OpenGLRenderingContext
 OpenGLRenderingContext::~OpenGLRenderingContext()
 {
+    delete m_framebuffers;
     delete[]m_drawBuffers;
 }
 
@@ -157,40 +159,6 @@ const OpenGLRenderingContext::Permutation* OpenGLRenderingContext::savePermutati
     
     m_permutations[program][features] = permutation;
     return &m_permutations[program][features];
-}
-
-// ** OpenGLRenderingContext::acquireFramebuffer
-s32 OpenGLRenderingContext::acquireFramebuffer(u16 width, u16 height, u32 options)
-{
-    for (s32 i = 0, n = m_framebuffers.count(); i < n; i++)
-    {
-        if (!m_framebuffers[i].acquired && m_framebuffers[i].width == width && m_framebuffers[i].height == height && m_framebuffers[i].options == options)
-        {
-            m_framebuffers[i].acquired = true;
-            return i;
-        }
-    }
-    
-    return 0;
-}
-    
-// ** OpenGLRenderingContext::releaseFramebuffer
-void OpenGLRenderingContext::releaseFramebuffer(s32 index)
-{
-    m_framebuffers[index].acquired = false;
-}
-
-// ** OpenGLRenderingContext::allocateFramebuffer
-s32 OpenGLRenderingContext::allocateFramebuffer(GLuint id, GLuint depth, u16 width, u16 height, u32 options)
-{
-    Framebuffer framebuffer;
-    framebuffer.id = id;
-    framebuffer.depth = depth;
-    framebuffer.width = width;
-    framebuffer.height = height;
-    framebuffer.acquired = true;
-    framebuffer.options = options;
-    return m_framebuffers.push(framebuffer);
 }
     
 } // namespace Renderer
