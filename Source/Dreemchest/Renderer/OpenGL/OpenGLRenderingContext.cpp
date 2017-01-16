@@ -52,9 +52,31 @@ bool OpenGLRenderingContext::ShaderVersionPreprocessor::preprocess(const Renderi
 OpenGLRenderingContext::OpenGLRenderingContext(RenderViewPtr view)
     : RenderingContext(view)
 {
-    m_framebuffers.push(Framebuffer());
-}
+    if (m_view.valid())
+    {
+        m_view->makeCurrent();
+    }
     
+    m_framebuffers.push(Framebuffer());
+    
+    glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &m_caps.maxRenderTargets);
+    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &m_caps.maxTextures);
+    glGetIntegerv(GL_MAX_CUBE_MAP_TEXTURE_SIZE, &m_caps.maxCubeMapSize);
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &m_caps.maxTextureSize);
+    
+    if (m_caps.maxRenderTargets)
+    {
+        m_drawBuffers = DC_NEW GLuint[m_caps.maxRenderTargets];
+        memset(m_drawBuffers, 0, sizeof(GLuint) * m_caps.maxRenderTargets);
+    }
+}
+
+// ** OpenGLRenderingContext::~OpenGLRenderingContext
+OpenGLRenderingContext::~OpenGLRenderingContext()
+{
+    delete[]m_drawBuffers;
+}
+
 // ** OpenGLRenderingContext::deleteProgram
 void OpenGLRenderingContext::deleteProgram(ResourceId id)
 {

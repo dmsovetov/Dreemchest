@@ -78,6 +78,7 @@ namespace Renderer
         
                                                 //! Constructs an OpenGLRenderingContext instance.
                                                 OpenGLRenderingContext(RenderViewPtr view);
+        virtual                                 ~OpenGLRenderingContext();
         
         //! Searches for a suitable shader program permutation.
         bool                                    lookupPermutation(ResourceId program, PipelineFeatures features, const Permutation** permutation) const;

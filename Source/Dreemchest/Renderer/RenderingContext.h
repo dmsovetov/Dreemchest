@@ -50,6 +50,15 @@ namespace Renderer
             s32                                 stateSwitches;          //!< Recorded number of state changes.
         };
         
+        //! Rendering context capabilities
+        struct Caps
+        {
+            s32                                 maxRenderTargets;       //!< A maximum number of render targets that can be rendered simultaneously.
+            s32                                 maxTextures;            //!< A maximum number of textures that can be bound simultaneously.
+            s32                                 maxCubeMapSize;         //!< A maximum supported cube map size.
+            s32                                 maxTextureSize;         //!< A maximum supported texture size.
+        };
+        
         //! Cleans all allocated resources.
         virtual                                 ~RenderingContext( void );
         
@@ -62,6 +71,9 @@ namespace Renderer
         
         //! Returns last frame rendering counters.
         const FrameCounters&                    frameCounters() const;
+        
+        //! Returns a device capabilities.
+        const Caps&                             caps() const;
         
         //! Sets a default program.
         void                                    setDefaultProgram(Program value);
@@ -185,6 +197,7 @@ namespace Renderer
         ShaderLibrary                           m_shaderLibrary;                                        //!< A shader library.
         FrameCounters                           m_counters;                                             //!< Performance counters.
         State                                   m_activeStates[32];                                     //!< Active rendering states.
+        Caps                                    m_caps;                                                 //!< Rendering context capabilities.
     };
     
     // ** RenderingContext::allocateIdentifier

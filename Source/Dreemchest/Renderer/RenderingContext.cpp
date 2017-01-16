@@ -157,6 +157,7 @@ RenderingContext::RenderingContext(RenderViewPtr view)
     // Reset input layout cache
     memset(m_inputLayoutCache, 0, sizeof(m_inputLayoutCache));
     memset(&m_counters, 0, sizeof(m_counters));
+    memset(&m_caps, 0, sizeof(m_caps));
     
     // Resize all resource index managers
     for (s32 i = 0; i < RenderResourceType::TotalTypes; i++)
@@ -277,6 +278,12 @@ void RenderingContext::setDefaultProgram(Program value)
 const RenderingContext::FrameCounters& RenderingContext::frameCounters() const
 {
     return m_counters;
+}
+    
+// ** RenderingContext::caps
+const RenderingContext::Caps& RenderingContext::caps() const
+{
+    return m_caps;
 }
 
 // ** RenderingContext::display

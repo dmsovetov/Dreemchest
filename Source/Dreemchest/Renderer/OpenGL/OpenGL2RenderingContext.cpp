@@ -106,11 +106,6 @@ OpenGL2RenderingContext::OpenGL2RenderingContext(RenderViewPtr view)
     , m_activeFeatures(0)
 #endif  //  #if DEV_RENDERER_PROGRAM_CACHING
 {
-    if (m_view.valid())
-    {
-        m_view->makeCurrent();
-    }
-
     m_shaderLibrary.addPreprocessor(DC_NEW ShaderPreprocessor);
     m_shaderLibrary.addPreprocessor(DC_NEW ShaderVersionPreprocessor(110));
     
