@@ -211,7 +211,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
         // Now render an object to a texture target
         {
             // Construct a nested command buffer to render to texture
-            RenderCommandBuffer& renderToTarget = commands.renderToTexture(renderTarget);
+            RenderCommandBuffer& renderToTarget = commands.renderToTexture(renderTarget, TextureD16);
 
             StateScope instanceStates = stateStack.push(&m_meshStates);
             s_transform.instance = Matrix4::rotateXY(0.0f, currentTime() * 0.001f);

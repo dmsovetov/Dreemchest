@@ -55,7 +55,7 @@ void RenderCommandBuffer::clear(const Rgba& clearColor, u8 clearMask)
 }
 
 // ** RenderCommandBuffer::renderToTexture
-RenderCommandBuffer& RenderCommandBuffer::renderToTexture(TransientTexture id, const Rect& viewport)
+RenderCommandBuffer& RenderCommandBuffer::renderToTexture(TransientTexture id, u32 options, const Rect& viewport)
 {
     RenderCommandBuffer& commands = m_frame.createCommandBuffer();
     
@@ -63,8 +63,11 @@ RenderCommandBuffer& RenderCommandBuffer::renderToTexture(TransientTexture id, c
     opCode.type = OpCode::RenderToTransientTexture;
     opCode.sorting = 0;
     opCode.renderToTextures.commands = &commands;
-    opCode.renderToTextures.id = static_cast<u8>(id);
+    opCode.renderToTextures.id = (ResourceId*)m_frame.allocate(sizeof(ResourceId));
+    opCode.renderToTextures.count = 1;
+    *opCode.renderToTextures.id = static_cast<u8>(id);
     opCode.renderToTextures.side = 255;
+    opCode.renderToTextures.options = options;
     opCode.renderToTextures.viewport.x = viewport.min().x;
     opCode.renderToTextures.viewport.y = viewport.min().y;
     opCode.renderToTextures.viewport.width = viewport.width();
@@ -75,7 +78,7 @@ RenderCommandBuffer& RenderCommandBuffer::renderToTexture(TransientTexture id, c
 }
 
 // ** RenderCommandBuffer::renderToCubeMap
-RenderCommandBuffer& RenderCommandBuffer::renderToCubeMap(TransientTexture id, u8 side, const Rect& viewport)
+RenderCommandBuffer& RenderCommandBuffer::renderToCubeMap(TransientTexture id, u8 side, u32 options, const Rect& viewport)
 {
     RenderCommandBuffer& commands = m_frame.createCommandBuffer();
     
@@ -83,8 +86,11 @@ RenderCommandBuffer& RenderCommandBuffer::renderToCubeMap(TransientTexture id, u
     opCode.type = OpCode::RenderToTransientTexture;
     opCode.sorting = 0;
     opCode.renderToTextures.commands = &commands;
-    opCode.renderToTextures.id = static_cast<u8>(id);
+    opCode.renderToTextures.id = (ResourceId*)m_frame.allocate(sizeof(ResourceId));
+    opCode.renderToTextures.count = 1;
+    *opCode.renderToTextures.id = static_cast<u8>(id);
     opCode.renderToTextures.side = side;
+    opCode.renderToTextures.options = options;
     opCode.renderToTextures.viewport.x = viewport.min().x;
     opCode.renderToTextures.viewport.y = viewport.min().y;
     opCode.renderToTextures.viewport.width = viewport.width();
@@ -95,7 +101,7 @@ RenderCommandBuffer& RenderCommandBuffer::renderToCubeMap(TransientTexture id, u
 }
 
 // ** RenderCommandBuffer::renderToCubeMap
-RenderCommandBuffer& RenderCommandBuffer::renderToCubeMap(Texture_ id, u8 side, const Rect& viewport)
+RenderCommandBuffer& RenderCommandBuffer::renderToCubeMap(Texture_ id, u8 side, u32 options, const Rect& viewport)
 {
     RenderCommandBuffer& commands = m_frame.createCommandBuffer();
     
@@ -103,8 +109,11 @@ RenderCommandBuffer& RenderCommandBuffer::renderToCubeMap(Texture_ id, u8 side, 
     opCode.type = OpCode::RenderToTexture;
     opCode.sorting = 0;
     opCode.renderToTextures.commands = &commands;
-    opCode.renderToTextures.id = id;
+    opCode.renderToTextures.id = (ResourceId*)m_frame.allocate(sizeof(ResourceId));
+    opCode.renderToTextures.count = 1;
+    *opCode.renderToTextures.id = static_cast<ResourceId>(id);
     opCode.renderToTextures.side = side;
+    opCode.renderToTextures.options = options;
     opCode.renderToTextures.viewport.x = viewport.min().x;
     opCode.renderToTextures.viewport.y = viewport.min().y;
     opCode.renderToTextures.viewport.width = viewport.width();
@@ -115,9 +124,9 @@ RenderCommandBuffer& RenderCommandBuffer::renderToCubeMap(Texture_ id, u8 side, 
 }
 
 // ** RenderCommandBuffer::renderToTarget
-RenderCommandBuffer& RenderCommandBuffer::renderToTarget(const Rect& viewport)
+RenderCommandBuffer& RenderCommandBuffer::renderToTarget(u32 options, const Rect& viewport)
 {
-    return renderToTexture(TransientTexture(), viewport);
+    return renderToTexture(TransientTexture(), options, viewport);
 }
 
 // ** RenderCommandBuffer::acquireTexture2D

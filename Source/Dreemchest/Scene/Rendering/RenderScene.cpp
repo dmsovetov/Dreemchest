@@ -269,7 +269,7 @@ Renderer::RenderFrameUPtr RenderScene::captureFrame( void )
     {
         const CameraNode& camera = cameras[i];
         entryPoint
-            .renderToTarget(camera.viewport->denormalize(camera.camera->ndc()))
+            .renderToTarget(0, camera.viewport->denormalize(camera.camera->ndc()))
             .clear(camera.camera->clearColor(), camera.camera->clearMask());
     }
 

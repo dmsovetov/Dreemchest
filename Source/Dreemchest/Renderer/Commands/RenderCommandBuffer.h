@@ -62,16 +62,16 @@ namespace Renderer
         void                        releaseTexture(TransientTexture id);
         
         //! Emits a rendering to a viewport of a specified render target command.
-        RenderCommandBuffer&        renderToTexture(TransientTexture id, const Rect& viewport = Rect(0.0f, 0.0f, 1.0f, 1.0f));
+        RenderCommandBuffer&        renderToTexture(TransientTexture id, u32 options = 0, const Rect& viewport = Rect(0.0f, 0.0f, 1.0f, 1.0f));
         
         //! Emits a command to start rendering to a viewport of a specified cube map side.
-        RenderCommandBuffer&        renderToCubeMap(TransientTexture id, u8 side, const Rect& viewport = Rect(0.0f, 0.0f, 1.0f, 1.0f));
+        RenderCommandBuffer&        renderToCubeMap(TransientTexture id, u8 side, u32 options = 0, const Rect& viewport = Rect(0.0f, 0.0f, 1.0f, 1.0f));
         
         //! Emits a command to start rendering to a viewport of a specified cube map side.
-        RenderCommandBuffer&        renderToCubeMap(Texture_ id, u8 side, const Rect& viewport = Rect(0.0f, 0.0f, 1.0f, 1.0f));
+        RenderCommandBuffer&        renderToCubeMap(Texture_ id, u8 side, u32 options = 0, const Rect& viewport = Rect(0.0f, 0.0f, 1.0f, 1.0f));
         
         //! Emits a rendering to a viewport.
-        RenderCommandBuffer&        renderToTarget(const Rect& viewport = Rect(0.0f, 0.0f, 1.0f, 1.0f));
+        RenderCommandBuffer&        renderToTarget(u32 options = 0, const Rect& viewport = Rect(0.0f, 0.0f, 1.0f, 1.0f));
         
         //! Emits a draw indexed command that inherits all rendering states from a state stack.
         void                        drawIndexed(u32 sorting, PrimitiveType primitives, s32 first, s32 count);

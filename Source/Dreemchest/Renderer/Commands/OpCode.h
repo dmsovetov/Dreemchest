@@ -105,9 +105,11 @@ namespace Renderer
             
             struct
             {
-                ResourceId                  id;                         //!< A render target resource to be activated.
+                ResourceId*                 id;                         //!< A render target identifiers
+                u8                          count;                      //!< A total number of render targets.
                 NormalizedViewport          viewport;                   //!< A viewport value to be set.
                 u8                          side;                       //!< A side of a cube map to render to.
+                u32                         options;                    //!< A render target options.
                 const CommandBuffer*        commands;                   //!< A command buffer to be executed after setting a viewport.
             } renderToTextures;
             

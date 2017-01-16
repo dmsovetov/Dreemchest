@@ -87,13 +87,13 @@ namespace Renderer
         const Permutation*                      savePermutation(ResourceId program, PipelineFeatures features, GLuint id);
         
         //! Searches for a framebuffer and marks it a used.
-        s32                                     acquireFramebuffer(u16 width, u16 height);
+        s32                                     acquireFramebuffer(u16 width, u16 height, u32 options);
         
         //! Releases a framebuffer.
         void                                    releaseFramebuffer(s32 index);
         
         //! Adds a new framebuffer.
-        s32                                     allocateFramebuffer(GLuint id, GLuint depth, u16 width, u16 height);
+        s32                                     allocateFramebuffer(GLuint id, GLuint depth, u16 width, u16 height, u32 options);
         
         //! Deletes a program and all it's permutations.
         void                                    deleteProgram(ResourceId id);
@@ -131,6 +131,7 @@ namespace Renderer
             GLuint              depth;          //!< An attached depth renderbuffer.
             u16                 width;          //!< A framebuffer width.
             u16                 height;         //!< A framebuffer height.
+            u32                 options;        //!< A framebuffer options.
             bool                acquired;       //!< Indicates that a framebuffer is in use now.
         };
 
@@ -159,6 +160,7 @@ namespace Renderer
         List<Texture_>                          m_transientTextures;    //!< A list of free textures.
         FixedArray<Framebuffer>                 m_framebuffers;         //!< An array of allocated framebuffers.
         mutable FixedArray<ProgramPermutations> m_permutations;         //!< Available program permutations.
+        GLuint*                                 m_drawBuffers;
     };
     
 } // namespace Renderer

@@ -160,11 +160,11 @@ const OpenGLRenderingContext::Permutation* OpenGLRenderingContext::savePermutati
 }
 
 // ** OpenGLRenderingContext::acquireFramebuffer
-s32 OpenGLRenderingContext::acquireFramebuffer(u16 width, u16 height)
+s32 OpenGLRenderingContext::acquireFramebuffer(u16 width, u16 height, u32 options)
 {
     for (s32 i = 0, n = m_framebuffers.count(); i < n; i++)
     {
-        if (!m_framebuffers[i].acquired && m_framebuffers[i].width == width && m_framebuffers[i].height == height)
+        if (!m_framebuffers[i].acquired && m_framebuffers[i].width == width && m_framebuffers[i].height == height && m_framebuffers[i].options == options)
         {
             m_framebuffers[i].acquired = true;
             return i;
@@ -181,7 +181,7 @@ void OpenGLRenderingContext::releaseFramebuffer(s32 index)
 }
 
 // ** OpenGLRenderingContext::allocateFramebuffer
-s32 OpenGLRenderingContext::allocateFramebuffer(GLuint id, GLuint depth, u16 width, u16 height)
+s32 OpenGLRenderingContext::allocateFramebuffer(GLuint id, GLuint depth, u16 width, u16 height, u32 options)
 {
     Framebuffer framebuffer;
     framebuffer.id = id;
@@ -189,6 +189,7 @@ s32 OpenGLRenderingContext::allocateFramebuffer(GLuint id, GLuint depth, u16 wid
     framebuffer.width = width;
     framebuffer.height = height;
     framebuffer.acquired = true;
+    framebuffer.options = options;
     return m_framebuffers.push(framebuffer);
 }
     

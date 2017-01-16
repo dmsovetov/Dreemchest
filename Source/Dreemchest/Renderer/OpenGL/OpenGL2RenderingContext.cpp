@@ -313,39 +313,87 @@ void OpenGL2RenderingContext::executeCommandBuffer(const CommandBuffer& commands
                 DC_CHECK_GL_CONTEXT;
                 DC_CHECK_GL;
                 
-                // Get a transient resource id by a slot
-                ResourceId id = opCode.type == OpCode::RenderToTexture ? opCode.renderToTextures.id : transientResource(opCode.renderToTextures.id);
-                NIMBLE_ABORT_IF(!id, "invalid transient identifier");
+                NIMBLE_ABORT_IF(opCode.renderToTextures.count > m_caps.maxRenderTargets, "to much render targets");
                 
-                // Get a render target by an id.
-                const Texture&     texture = m_textures[id];
-                const TextureInfo& info    = m_textureInfo[id];
+                s32  width    = 0;
+                s32  height   = 0;
+                
+                GLuint ids[32];
+                
+                // Initialize draw buffers
+                for (s32 i = 0; i < opCode.renderToTextures.count; i++)
+                {
+                    // Get a transient resource id by a slot
+                    ResourceId id = opCode.type == OpCode::RenderToTexture ? opCode.renderToTextures.id[i] : transientResource(opCode.renderToTextures.id[i]);
+                    NIMBLE_ABORT_IF(!id, "invalid transient identifier");
+                    
+                    // Get a render target by an id.
+                    const Texture&     texture = m_textures[id];
+                    const TextureInfo& info    = m_textureInfo[id];
+                    
+                    if (Private::pixelFormatFromOptions(info.options) != PixelUnknown)
+                    {
+                        m_drawBuffers[i] = GL_COLOR_ATTACHMENT0 + i;
+                    }
+                    else
+                    {
+                        m_drawBuffers[i] = GL_NONE;
+                    }
+                    
+                    width    = info.width;
+                    height   = info.height;
+                    ids[i]   = texture.id;
+                }
 
                 // Acquire the framebuffer
-                s32 framebufferIndex = acquireFramebuffer(info.width, info.height);
+                s32 framebufferIndex = acquireFramebuffer(width, height, opCode.renderToTextures.options);
                 
                 if (!framebufferIndex)
                 {
-                    LogVerbose("opengl2", "allocating a framebuffer of size %dx%d\n", info.width, info.height);
+                    LogVerbose("opengl2", "allocating a framebuffer of size %dx%d\n", width, height);
                     GLuint id = OpenGL2::Framebuffer::create();
-                    GLuint depth = OpenGL2::Framebuffer::renderbuffer(id, info.width, info.height, GL_DEPTH_ATTACHMENT, GL_DEPTH_COMPONENT);
-                    framebufferIndex = allocateFramebuffer(id, depth, info.width, info.height);
+                    
+                    s32 depthBits = Private::depthBitsFromOptions(opCode.renderToTextures.options);
+                    GLuint depth = 0;
+                    if (depthBits)
+                    {
+                        depth = OpenGL2::Framebuffer::renderbuffer(id, width, height, GL_DEPTH_ATTACHMENT, GL_DEPTH_COMPONENT);
+                    }
+                    
+                    framebufferIndex = allocateFramebuffer(id, depth, width, height, opCode.renderToTextures.options);
                 }
 
                 OpenGL2::Framebuffer::bind(m_framebuffers[framebufferIndex].id);
                 
-                if (opCode.renderToTextures.side == 255)
+                for (u8 i = 0; i < opCode.renderToTextures.count; i++)
                 {
-                    OpenGL2::Framebuffer::texture2D(texture.id, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0);
+                    // Get a transient resource id by a slot
+                    ResourceId id = opCode.type == OpCode::RenderToTexture ? opCode.renderToTextures.id[i] : transientResource(opCode.renderToTextures.id[i]);
+                    NIMBLE_ABORT_IF(!id, "invalid transient identifier");
+                     
+                    // Get a render target by an id.
+                    const Texture&     texture = m_textures[id];
+                    const TextureInfo& info    = m_textureInfo[id];
+                     
+                    if (opCode.renderToTextures.side == 255)
+                    {
+                        s32 depthBits = Private::depthBitsFromOptions(info.options);
+                        OpenGL2::Framebuffer::texture2D(texture.id, depthBits ? GL_DEPTH_ATTACHMENT : GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0);
+                    }
+                    else
+                    {
+                        OpenGL2::Framebuffer::texture2D(texture.id, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + opCode.renderToTextures.side, 0);
+                    }
                 }
-                else
-                {
-                    OpenGL2::Framebuffer::texture2D(texture.id, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + opCode.renderToTextures.side, 0);
-                }
+                //glDrawBuffer(GL_NONE);
+                glDrawBuffers(opCode.renderToTextures.count, m_drawBuffers);
+                glReadBuffer(GL_NONE);
+                NIMBLE_ABORT_IF(!OpenGL2::Framebuffer::check(m_framebuffers[framebufferIndex].id), "invalid framebuffer configuration");
+                OpenGL2::Framebuffer::bind(m_framebuffers[framebufferIndex].id);
 
                 // Set a viewport before executing an attached command buffer
                 const NormalizedViewport& viewport = opCode.renderToTextures.viewport;
-                glViewport(viewport.x * info.width, viewport.y * info.height, viewport.width * info.width, viewport.height * info.height);
+                glViewport(viewport.x * width, viewport.y * height, viewport.width * width, viewport.height * height);
                 
                 // Execute an attached command buffer
                 execute(*opCode.renderToTextures.commands);
@@ -355,6 +403,7 @@ void OpenGL2RenderingContext::executeCommandBuffer(const CommandBuffer& commands
                 
                 // Restore the previous framebuffer
                 OpenGL2::Framebuffer::restore(activeFramebuffer, activeViewport);
+                glDrawBuffer(GL_BACK);
             }
                 break;
 
