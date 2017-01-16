@@ -161,19 +161,17 @@ ResourceId OpenGL2RenderingContext::allocateTexture(u8 type, const void* data, u
     }
     
     Texture texture;
-    PixelFormat   format        = Private::pixelFormatFromOptions(options);
-    TextureFilter textureFilter = Private::textureFilterFromOptions(options);
-    
+
     // Create a texture instance according to a type.
     switch (type)
     {
         case TextureType2D:
-            texture.id     = OpenGL2::Texture::create2D(data, width, width, mipLevels, format, textureFilter);
+            texture.id = OpenGL2::Texture::create2D(data, width, width, mipLevels, options);
             texture.target = GL_TEXTURE_2D;
             break;
             
         case TextureTypeCube:
-            texture.id     = OpenGL2::Texture::createCube(data, width, mipLevels, format, textureFilter);
+            texture.id     = OpenGL2::Texture::createCube(data, width, mipLevels, options);
             texture.target = GL_TEXTURE_CUBE_MAP;
             break;
             
