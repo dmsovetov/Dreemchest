@@ -516,6 +516,18 @@ Program RenderingContext::requestProgram(const String& vertex, const String& fra
     
     return id;
 }
+    
+// ** RenderingContext::requestProgram
+Program RenderingContext::requestProgram(const String& vertex)
+{
+    // Create vertex and fragment shaders
+    VertexShader vertexShader = m_shaderLibrary.addVertexShader(vertex);
+    
+    // Now request a program.
+    Program id = requestProgram(vertexShader, FragmentShader());
+    
+    return id;
+}
 
 // ** RenderingContext::deleteConstantBuffer
 void RenderingContext::deleteConstantBuffer(ConstantBuffer_ id)
