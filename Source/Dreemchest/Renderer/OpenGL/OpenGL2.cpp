@@ -585,11 +585,20 @@ GLsizei OpenGL2::Texture::texImage(GLenum target, const GLbyte* data, u16 width,
 }
     
 // ** OpenGL2::Texture::bind
-void OpenGL2::Texture::bind(GLenum target, GLuint id, GLuint sampler)
+void OpenGL2::Texture::bind(TextureType type, GLuint id, GLuint sampler)
 {
     DC_CHECK_GL;
+    
+    GLenum targets[TotalTextureTypes] =
+    {
+          GL_TEXTURE_1D
+        , GL_TEXTURE_2D
+        , GL_TEXTURE_3D
+        , GL_TEXTURE_CUBE_MAP
+    };
+    
     glActiveTexture(GL_TEXTURE0 + sampler);
-    glBindTexture(target, id);
+    glBindTexture(targets[type], id);
 }
 
 // ** OpenGL2::Texture::destroy

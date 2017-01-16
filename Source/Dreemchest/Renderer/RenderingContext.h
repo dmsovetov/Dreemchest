@@ -123,6 +123,9 @@ namespace Renderer
         //! Queues a program instance creation and returns it's index.
         Program                                 requestProgram(const String& vertex);
         
+        //! Returns a texture info by it's identifier.
+        const TextureInfo&                      textureInfo(Texture_ id) const;
+        
         //! Queues a command to precompile a shader program permutation.
         void                                    precompilePermutations(Program id, FeatureLayout features);
         
@@ -174,6 +177,9 @@ namespace Renderer
         //! Releases an allocated persistent identifier of specified type.
         void                                    releaseIdentifier(RenderResourceType::Enum type, ResourceId id);
         
+        //! Sets a texture info for a specified resource id.
+        void                                    setTextureInfo(Texture_ id, TextureType type, u16 width, u16 height, u32 options);
+        
     protected:
 
         //! A forward declaration of a stack type to store intermediate render targets.
@@ -188,6 +194,7 @@ namespace Renderer
         FixedArray<VertexBufferLayoutUPtr>      m_inputLayouts;                                         //!< Allocated input layouts.
         FixedArray<ShaderProgramDescriptor>     m_programs;                                             //!< Allocated shader programs.
         FixedArray<UniformBufferLayout>         m_uniformLayouts;                                       //!< Allocated uniform layouts.
+        FixedArray<TextureInfo>                 m_textures;                                             //!< Allocated textures.
         BidMap<String, UniformLayout>           m_uniformLayoutByName;                                  //!< Maps from a name to a uniform layout id.
         InputLayout                             m_inputLayoutCache[MaxInputLayouts];                    //!< A lookup table for input layout types.
         ResourceCommandBuffer*                  m_resourceCommandBuffer;                                //!< A command buffer that is used for resource construction commands.

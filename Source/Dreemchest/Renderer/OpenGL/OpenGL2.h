@@ -194,7 +194,7 @@ namespace Renderer
             static GLsizei  texImage(GLenum target, const GLbyte* data, u16 width, u16 height, s32 mipLevels, PixelFormat pixelFormat);
             
             //! Binds a texture object to a pipeline.
-            static void     bind(GLenum target, GLuint id, GLuint sampler);
+            static void     bind(TextureType type, GLuint id, GLuint sampler);
             
             //! Deletes a texture object by an id.
             static void     destroy(GLuint id);

@@ -92,30 +92,6 @@ namespace Renderer
         
     protected:
         
-        //! A texture instance descriptor.
-        struct Texture
-        {
-            GLuint              id;             //!< A texture OpenGL id.
-            GLenum              target;         //!< A texture target (1D, 2D, 3D, Cube).
-            
-                                //! Constructs an instance of texture
-                                Texture()
-                                    : id(0), target(0) {}
-            
-                                //! Constructs an instance of texture
-                                Texture(GLuint id, GLenum target)
-                                    : id(id), target(target) {}
-        };
-        
-        //! A texture instance info.
-        struct TextureInfo
-        {
-            u16                 width;          //!< A texture width.
-            u16                 height;         //!< A texture height.
-            u32                 options;        //!< A texture options.
-            TextureType         type;           //!< A texture type.
-        };
-        
         //! Adds a version directive to a shader source code
         class ShaderVersionPreprocessor : public ShaderPreprocessor
         {
@@ -136,8 +112,7 @@ namespace Renderer
         
         FixedArray<GLuint>                      m_vertexBuffers;        //!< Allocated vertex buffers.
         FixedArray<GLuint>                      m_indexBuffers;         //!< Allocated index buffers.
-        FixedArray<Texture>                     m_textures;             //!< Allocated textures.
-        FixedArray<TextureInfo>                 m_textureInfo;          //!< A corresponding texture info array.
+        FixedArray<GLuint>                      m_textures;             //!< Allocated textures.
         List<Texture_>                          m_transientTextures;    //!< A list of free textures.
         mutable FixedArray<ProgramPermutations> m_permutations;         //!< Available program permutations.
         GLuint*                                 m_drawBuffers;

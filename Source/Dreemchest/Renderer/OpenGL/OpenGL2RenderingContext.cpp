@@ -110,7 +110,7 @@ OpenGL2RenderingContext::OpenGL2RenderingContext(RenderViewPtr view)
     m_shaderLibrary.addPreprocessor(DC_NEW ShaderPreprocessor);
     m_shaderLibrary.addPreprocessor(DC_NEW ShaderVersionPreprocessor(110));
     
-    m_textures.emplace(0, Texture());
+    m_textures.emplace(0, 0);
     m_constantBuffers.emplace(0, ConstantBuffer());
     m_vertexBuffers.emplace(0, 0);
     m_indexBuffers.emplace(0, 0);
@@ -123,7 +123,7 @@ ResourceId OpenGL2RenderingContext::acquireTexture(u8 type, u16 width, u16 heigh
     for (List<Texture_>::const_iterator i = m_transientTextures.begin(), end = m_transientTextures.end(); i != end; ++i)
     {
         // Get a texture info by id
-        const TextureInfo& info = m_textureInfo[*i];
+        const TextureInfo& info = textureInfo(*i);
         
         // Does the render target format match the requested one?
         if (type == info.type && info.width == width && info.height == height && info.options == options)
@@ -153,38 +153,30 @@ ResourceId OpenGL2RenderingContext::allocateTexture(u8 type, const void* data, u
     // Allocate a resource identifier if it was not passed
     if (!id)
     {
-        id = allocateIdentifier<Texture_>();
+        Texture_ textureId = allocateIdentifier<Texture_>();
+        setTextureInfo(textureId, static_cast<TextureType>(type), width, height, options);
+        id = textureId;
     }
     
-    Texture texture;
+    GLuint textureId;
 
     // Create a texture instance according to a type.
     switch (type)
     {
         case TextureType2D:
-            texture.id = OpenGL2::Texture::create2D(data, width, width, mipLevels, options);
-            texture.target = GL_TEXTURE_2D;
+            textureId = OpenGL2::Texture::create2D(data, width, width, mipLevels, options);
             break;
             
         case TextureTypeCube:
-            texture.id     = OpenGL2::Texture::createCube(data, width, mipLevels, options);
-            texture.target = GL_TEXTURE_CUBE_MAP;
+            textureId = OpenGL2::Texture::createCube(data, width, mipLevels, options);
             break;
             
         default:
             NIMBLE_NOT_IMPLEMENTED
     }
     
-    // Construct a texture info
-    TextureInfo textureInfo;
-    textureInfo.width   = width;
-    textureInfo.height  = height;
-    textureInfo.options = options;
-    textureInfo.type    = static_cast<TextureType>(type);
-    
-    // Save a created texture identifier and a texture info
-    m_textures.emplace(id, texture);
-    m_textureInfo.emplace(id, textureInfo);
+    // Save a created texture identifier
+    m_textures.emplace(id, textureId);
     
     return id;
 }
@@ -329,12 +321,11 @@ void OpenGL2RenderingContext::executeCommandBuffer(const CommandBuffer& commands
                     NIMBLE_ABORT_IF(!id, "invalid transient identifier");
                     
                     // Get a render target by an id.
-                    const Texture&     texture = m_textures[id];
-                    const TextureInfo& info    = m_textureInfo[id];
+                    const TextureInfo& info = RenderingContext::m_textures[id];
                     
                     width    = info.width;
                     height   = info.height;
-                    ids[i]   = texture.id;
+                    ids[i]   = m_textures[id];
                 }
 
                 // Acquire the framebuffer
@@ -350,7 +341,7 @@ void OpenGL2RenderingContext::executeCommandBuffer(const CommandBuffer& commands
                     NIMBLE_ABORT_IF(!id, "invalid transient identifier");
                      
                     // Get a render target by an id.
-                    const TextureInfo& info     = m_textureInfo[id];
+                    const TextureInfo& info     = RenderingContext::m_textures[id];
                     bool               hasColor = Private::pixelFormatFromOptions(info.options) != PixelUnknown;
                      
                     if (opCode.renderToTextures.side == 255)
@@ -476,13 +467,13 @@ void OpenGL2RenderingContext::compilePipelineState(const State* states, s32 coun
                 break;
                 
             case State::BindTexture:
-                OpenGL2::Texture::bind(m_textures[state.resourceId].target, m_textures[state.resourceId].id, state.samplerIndex());
+                OpenGL2::Texture::bind(RenderingContext::m_textures[state.resourceId].type, m_textures[state.resourceId], state.samplerIndex());
                 break;
                 
             case State::BindTransientTexture:
             {
                 ResourceId id = transientResource(state.resourceId);
-                OpenGL2::Texture::bind(m_textures[id].target, m_textures[id].id, state.samplerIndex());
+                OpenGL2::Texture::bind(RenderingContext::m_textures[id].type, m_textures[id], state.samplerIndex());
             }
                 break;
                 

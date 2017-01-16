@@ -284,6 +284,24 @@ const RenderingContext::Caps& RenderingContext::caps() const
 {
     return m_caps;
 }
+    
+// ** RenderingContext::textureInfo
+const TextureInfo& RenderingContext::textureInfo(Texture_ id) const
+{
+    NIMBLE_ABORT_IF(!id, "invalid texture id");
+    return m_textures[id];
+}
+    
+// ** RenderingContext::setTextureInfo
+void RenderingContext::setTextureInfo(Texture_ id, TextureType type, u16 width, u16 height, u32 options)
+{
+    TextureInfo textureInfo;
+    textureInfo.width   = width;
+    textureInfo.height  = height;
+    textureInfo.options = options;
+    textureInfo.type    = type;
+    m_textures.emplace(id, textureInfo);
+}
 
 // ** RenderingContext::display
 void RenderingContext::display(RenderFrame& frame, bool wait)
@@ -467,14 +485,31 @@ ConstantBuffer_ RenderingContext::requestConstantBuffer(const void* data, s32 si
 // ** RenderingContext::requestTexture2D
 Texture_ RenderingContext::requestTexture2D(const void* data, u16 width, u16 height, u32 options)
 {
+    // Allocate an identifier
     Texture_ id = allocateIdentifier(RenderResourceType::Texture);
+    
+    // Set a texture info
+    setTextureInfo(id, TextureType2D, width, height, options);
+    
+    // Create a construction command
     return m_resourceCommandBuffer->createTexture2D(id, data, width, height, options);
 }
     
 // ** RenderingContext::requestTextureCube
 Texture_ RenderingContext::requestTextureCube(const void* data, u16 size, u16 mipLevels, u32 options)
 {
+    // Allocate an identifier
     Texture_ id = allocateIdentifier(RenderResourceType::Texture);
+    
+    // Construct a texture info
+    TextureInfo textureInfo;
+    textureInfo.width   = size;
+    textureInfo.height  = size;
+    textureInfo.options = options;
+    textureInfo.type    = TextureTypeCube;
+    m_textures.emplace(id, textureInfo);
+    
+    // Create a construction command
     return m_resourceCommandBuffer->createTextureCube(id, data, size, mipLevels, options);
 }
     

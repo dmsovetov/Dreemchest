@@ -640,6 +640,15 @@ namespace Renderer {
         f32     height;         //!< Height of the viewport.
     };
     
+    //! A texture instance info.
+    struct TextureInfo
+    {
+        u16                 width;          //!< A texture width.
+        u16                 height;         //!< A texture height.
+        u32                 options;        //!< A texture options.
+        TextureType         type;           //!< A texture type.
+    };
+    
     //! Base class for windowed applications.
     class RenderingApplicationDelegate : public Platform::WindowedApplicationDelegate
     {
