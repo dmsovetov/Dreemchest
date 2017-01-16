@@ -189,6 +189,32 @@ bool OpenGL2::Framebuffer::check(GLuint id)
     glBindFramebuffer(GL_FRAMEBUFFER, id);
     GLenum status = glCheckFramebufferStatus( GL_FRAMEBUFFER );
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    
+    switch(status){
+        case GL_FRAMEBUFFER_COMPLETE:
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+            LogError("opengl2", "%s", "glCheckFramebufferStatus returned GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT\n");
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+            LogError("opengl2", "%s", "glCheckFramebufferStatus returned GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT\n");
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+            LogError("opengl2", "%s", "glCheckFramebufferStatus returned GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER\n");
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+            LogError("opengl2", "%s", "glCheckFramebufferStatus returned GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER\n");
+            break;
+        case GL_FRAMEBUFFER_UNSUPPORTED:
+            LogError("opengl2", "%s", "glCheckFramebufferStatus returned GL_FRAMEBUFFER_UNSUPPORTED\n");
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+            LogError("opengl2", "%s", "glCheckFramebufferStatus returned GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE\n");
+            break;           
+        case GL_FRAMEBUFFER_UNDEFINED :
+            LogError("opengl2", "%s", "glCheckFramebufferStatus returned GL_FRAMEBUFFER_UNDEFINED\n");
+            break;
+    }
 
     return status == GL_FRAMEBUFFER_COMPLETE;
 }
