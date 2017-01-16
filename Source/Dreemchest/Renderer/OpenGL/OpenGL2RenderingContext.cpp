@@ -201,6 +201,10 @@ void OpenGL2RenderingContext::executeCommandBuffer(const CommandBuffer& commands
     GLuint             id;
     const Permutation* permutation = NULL;
     
+    // Save an active framebuffer configuration
+    GLint  activeViewport[4];
+    GLuint activeFramebuffer = OpenGL2::Framebuffer::save(activeViewport);
+    
     for (s32 i = 0, n = commands.size(); i < n; i++)
     {
         // Get a render operation at specified index
@@ -324,15 +328,7 @@ void OpenGL2RenderingContext::executeCommandBuffer(const CommandBuffer& commands
                 // Get a render target by an id.
                 const Texture&     texture = m_textures[id];
                 const TextureInfo& info    = m_textureInfo[id];
-                
-                // Save current viewport
-                GLint prevViewport[4];
-                glGetIntegerv(GL_VIEWPORT, prevViewport);
-                
-                // Save the bound framebuffer
-                GLint prevFramebuffer;
-                glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prevFramebuffer);
-                
+
                 // Acquire the framebuffer
                 s32 framebufferIndex = acquireFramebuffer(info.width, info.height);
                 
@@ -365,11 +361,8 @@ void OpenGL2RenderingContext::executeCommandBuffer(const CommandBuffer& commands
                 // Release an acquired framebuffer
                 releaseFramebuffer(framebufferIndex);
                 
-                // Disable the framebuffer
-                OpenGL2::Framebuffer::bind(prevFramebuffer);
-                
-                // Restore the previous viewport
-                glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
+                // Restore the previous framebuffer
+                OpenGL2::Framebuffer::restore(activeFramebuffer, activeViewport);
             }
                 break;
 

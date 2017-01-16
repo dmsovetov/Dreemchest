@@ -209,6 +209,28 @@ void OpenGL2::Framebuffer::destroy(GLuint id)
     glDeleteFramebuffers(1, &id);
 }
 
+// ** OpenGL2::Framebuffer::save
+GLuint OpenGL2::Framebuffer::save(GLint viewport[4])
+{
+    DC_CHECK_GL_CONTEXT;
+    DC_CHECK_GL;
+    
+    GLint id;
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &id);
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    return id;
+}
+    
+// ** OpenGL2::Framebuffer::restore
+void OpenGL2::Framebuffer::restore(GLuint id, GLint viewport[4])
+{
+    DC_CHECK_GL_CONTEXT;
+    DC_CHECK_GL;
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, id);
+    glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+}
+
 // ----------------------------------------------------------- OpenGL2::Program ---------------------------------------------------------- //
 
 // ** OpenGL2::Program::deleteProgram

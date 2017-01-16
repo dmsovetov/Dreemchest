@@ -201,6 +201,12 @@ namespace Renderer
             
             //! Destroys a framebuffer object.
             static void     destroy(GLuint id);
+            
+            //! Saves current framebuffer.
+            static GLuint   save(GLint viewport[4]);
+            
+            //! Restores current framebuffer.
+            static void     restore(GLuint id, GLint viewport[4]);
         };
         
         //! An internal class that contains all stencil buffer related functions.
