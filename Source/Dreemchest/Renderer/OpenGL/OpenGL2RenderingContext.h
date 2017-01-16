@@ -58,13 +58,13 @@ namespace Renderer
         void                        updateUniforms(const Permutation* permutation);
 
         //! Acquires a transient texture.
-        ResourceId                  acquireTexture(u8 type, u16 width, u16 height, PixelFormat format);
+        ResourceId                  acquireTexture(u8 type, u16 width, u16 height, u32 options);
         
         //! Releases a transient texture.
         void                        releaseTexture(ResourceId id);
         
         //! Allocates a new texture of specified type.
-        ResourceId                  allocateTexture(u8 type, const void* data, u16 width, u16 height, u16 mipLevels, u16 pixelFormat, u8 filter, ResourceId id = 0);
+        ResourceId                  allocateTexture(u8 type, const void* data, u16 width, u16 height, u16 mipLevels, u32 options, ResourceId id = 0);
         
     private:
         

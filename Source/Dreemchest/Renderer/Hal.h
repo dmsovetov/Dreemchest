@@ -283,7 +283,7 @@ namespace Renderer {
          \param window Platform-specific window handle (like HWND or NSWindow).
          \return OpenGLView instance.
          */
-        static RenderView*          createOpenGLView( void* window, PixelFormat depthStencil = PixelD24S8 );
+        static RenderView*          createOpenGLView( void* window, PixelFormat depthStencil = PixelRgb8 );
 
     protected:
 

@@ -116,7 +116,7 @@ namespace Renderer
                 TransientResourceId         id;
                 u16                         width;
                 u16                         height;
-                PixelFormat                 format;
+                u32                         options;
                 u8                          type;
             } transientTexture;
             
@@ -151,9 +151,8 @@ namespace Renderer
                 u16                         width;                      //!< A texture width.
                 u16                         height;                     //!< A texture height.
                 u8                          mipLevels;                  //!< A total number of mip levels stored in a data buffer.
-                PixelFormat                 format;                     //!< A texture format.
+                u32                         options;                    //!< A texture creation options.
                 u8                          type;                       //!< A texture type to be created.
-                u8                          filter;                     //!< A requested texture filtering.
             } createTexture;
         };
     };

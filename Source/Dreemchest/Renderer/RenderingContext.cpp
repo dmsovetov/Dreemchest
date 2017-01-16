@@ -459,17 +459,17 @@ ConstantBuffer_ RenderingContext::requestConstantBuffer(const void* data, s32 si
 }
 
 // ** RenderingContext::requestTexture2D
-Texture_ RenderingContext::requestTexture2D(const void* data, u16 width, u16 height, PixelFormat format, TextureFilter filter)
+Texture_ RenderingContext::requestTexture2D(const void* data, u16 width, u16 height, u32 options)
 {
     Texture_ id = allocateIdentifier(RenderResourceType::Texture);
-    return m_resourceCommandBuffer->createTexture2D(id, data, width, height, format, filter);
+    return m_resourceCommandBuffer->createTexture2D(id, data, width, height, options);
 }
     
 // ** RenderingContext::requestTextureCube
-Texture_ RenderingContext::requestTextureCube(const void* data, u16 size, u16 mipLevels, PixelFormat format, TextureFilter filter)
+Texture_ RenderingContext::requestTextureCube(const void* data, u16 size, u16 mipLevels, u32 options)
 {
     Texture_ id = allocateIdentifier(RenderResourceType::Texture);
-    return m_resourceCommandBuffer->createTextureCube(id, data, size, mipLevels, format, filter);
+    return m_resourceCommandBuffer->createTextureCube(id, data, size, mipLevels, options);
 }
     
 // ** RenderingContext::requestProgram

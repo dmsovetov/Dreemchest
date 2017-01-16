@@ -91,10 +91,10 @@ namespace Renderer
         ConstantBuffer_                         deprecatedRequestConstantBuffer(const void* data, s32 size, const UniformElement* elements);
         
         //! Queues a 2D texture instance for creation and returns it's index.
-        Texture_                                requestTexture2D(const void* data, u16 width, u16 height, PixelFormat format, TextureFilter filter = FilterMipLinear);
+        Texture_                                requestTexture2D(const void* data, u16 width, u16 height, u32 options);
         
         //! Queues a cube texture instance for creation and returns it's index.
-        Texture_                                requestTextureCube(const void* data, u16 size, u16 mipLevels, PixelFormat format, TextureFilter filter = FilterMipLinear);
+        Texture_                                requestTextureCube(const void* data, u16 size, u16 mipLevels, u32 options);
         
         //! Queues a pipeline feature layout instance for creation and returns it's index.
         FeatureLayout                           requestPipelineFeatureLayout(const PipelineFeature* features);
@@ -196,7 +196,7 @@ namespace Renderer
     
 #ifdef DC_OPENGL_ENABLED
     //! Platform-specific OpenGL view constructor.
-    extern RenderViewPtr createOpenGLView(void* window, PixelFormat depthStencil);
+    extern RenderViewPtr createOpenGLView(void* window, u32 options);
     
     //! Creates a rendering context that uses an OpenGL 2 rendering API.
     RenderingContextPtr createOpenGL2RenderingContext(RenderViewPtr view);

@@ -370,8 +370,8 @@ namespace Renderer {
     {
         FilterNearest,      //!< The texture filtering is disabled.
         FilterLinear,       //!< Interpolate texels.
-        FilterMipNearest,   //!< Use texture mip-maps.
-        FilterMipLinear,    //!< Use texture mip-map and interpolate between the mip levels.
+        FilterBilinear,     //!< Use texture mip-maps.
+        FilterTrilinear,    //!< Use texture mip-map and interpolate between the mip levels.
     };
     
 #if DEV_DEPRECATED_HAL
@@ -515,33 +515,108 @@ namespace Renderer {
     //! Supported pixel format for textures and render targets.
     enum PixelFormat
     {
+        PixelUnknown,
         PixelLuminance8,    //!< 8-bit luminance.
         PixelRgb8,          //!< 8-bit RGB color.
         PixelRgba8,         //!< 8-bit RGBA color.
 
-        // ** Compressed
         // ** TODO: add ETC/ATITC/S3TC formats
-        PixelDxtc1,     //!< Compressed DXT format with 8 bytes per block with 1-bit alpha.
-        PixelDxtc3,     //!< Compressed DXT format with 16 bytes per block.
-        PixelDxtc5,     //!< Compressed DXT format with 16 bytes per block.
-        PixelPvrtc2,    //!< Compressed PVR format with 2-bits per pixel.
-        PixelPvrtc4,    //!< Compressed PVR format with 4-bits per pixel.
+        PixelDxtc1,         //!< Compressed DXT format with 8 bytes per block with 1-bit alpha.
+        PixelDxtc3,         //!< Compressed DXT format with 16 bytes per block.
+        PixelDxtc5,         //!< Compressed DXT format with 16 bytes per block.
+        PixelPvrtc2,        //!< Compressed PVR format with 2-bits per pixel.
+        PixelPvrtc4,        //!< Compressed PVR format with 4-bits per pixel.
 
-        // ** Floating point textures
-        PixelR16F,      //!< 16-bit floating point format with a single color channel.
-        PixelRg16F,     //!< 16-bit floating point format with two color channels.
-        PixelRgba16F,   //!< 16-bit floating point RGBA color.
-        PixelR32F,      //!< 32-bit floating point format with a single color channel.
-        PixelRg32F,     //!< 32-bit floating point RG color.
-        PixelRgb32F,    //!< 32-bit floating point RGB color.
-        PixelRgba32F,   //!< 32-bit floating point RGBA color.
-
-        // ** Depth-stencil formats
-        PixelD24X8,     //!< 32-bit depth stencil surface with 24-bit depth value and no stencil.
-        PixelD24S8,     //!< 32-bit depth stencil surface with 24-bit depth value and 8-bit stencil.
-
-        TotalPixelFormats
+        PixelR16F,          //!< 16-bit floating point format with a single color channel.
+        PixelRg16F,         //!< 16-bit floating point format with two color channels.
+        PixelRgba16F,       //!< 16-bit floating point RGBA color.
+        PixelR32F,          //!< 32-bit floating point format with a single color channel.
+        PixelRg32F,         //!< 32-bit floating point RG color.
+        PixelRgb32F,        //!< 32-bit floating point RGB color.
+        PixelRgba32F,       //!< 32-bit floating point RGBA color.
     };
+    
+    //! Enumeration of depth and stencil format bits.
+    enum DepthStencilFormat
+    {
+          Depth16 = 1   //!< Use a 16-bit depth buffer.
+        , Depth24       //!< Use a 24-bit depth buffer.
+        , Depth32       //!< Use a 32-bit depth buffer.
+        , Stencil8      //!< Enable an 8-bit stencil buffer.
+    };
+    
+    //! A texture/framebuffer creation options are packed into an integer as follows:
+    // [2-bits filter | 2-bits stencil type | 2-bits depth type | 4-bits pixel format]
+    enum TextureFormat
+    {
+          TextureLuminance8 = PixelLuminance8   << 0    //!< 8-bit luminance.
+        , TextureRgb8       = PixelRgb8         << 0    //!< 8-bit RGB color.
+        , TextureRgba8      = PixelRgba8        << 0    //!< 8-bit RGBA color.
+        , TextureDxtc1      = PixelDxtc1        << 0    //!< Compressed DXT format with 8 bytes per block with 1-bit alpha.
+        , TextureDxtc3      = PixelDxtc3        << 0    //!< Compressed DXT format with 16 bytes per block.
+        , TextureDxtc5      = PixelDxtc5        << 0    //!< Compressed DXT format with 16 bytes per block.
+        , TexturePvrtc2     = PixelPvrtc2       << 0    //!< Compressed PVR format with 2-bits per pixel.
+        , TexturePvrtc4     = PixelPvrtc4       << 0    //!< Compressed PVR format with 4-bits per pixel.
+        , TextureR16F       = PixelR16F         << 0    //!< 16-bit floating point format with a single color channel.
+        , TextureRg16F      = PixelRg16F        << 0    //!< 16-bit floating point format with two color channels.
+        , TextureRgba16F    = PixelRgba16F      << 0    //!< 16-bit floating point RGBA color.
+        , TextureR32F       = PixelR32F         << 0    //!< 32-bit floating point format with a single color channel.
+        , TextureRg32F      = PixelRg32F        << 0    //!< 32-bit floating point RG color.
+        , TextureRgb32F     = PixelRgb32F       << 0    //!< 32-bit floating point RGB color.
+        , TextureRgba32F    = PixelRgba32F      << 0    //!< 32-bit floating point RGBA color.
+        
+        , TextureD16        = Depth16           << 4    //!< A 16-bit depth buffer option.
+        , TextureD24        = Depth24           << 4    //!< A 24-bit depth buffer option.
+        , TextureD32        = Depth32           << 4    //!< A 32-bit depth buffer option.
+        , TextureS8         = Stencil8          << 6    //!< An 8-bit stencil buffer option.
+        
+        , TextureLinear     = FilterLinear      << 8    //!< Use a linear texture filtering.
+        , TextureBilinear   = FilterBilinear    << 8    //!< Use a bilinear texture filtering.
+        , TextureTrilinear  = FilterTrilinear   << 8    //!< Use a trilinear texture filtering.
+    };
+    
+    namespace Private
+    {
+        //! Returns a pixel format from options.
+        NIMBLE_INLINE PixelFormat pixelFormatFromOptions(u32 options)
+        {
+            return static_cast<PixelFormat>(options & 0xF);
+        }
+        
+        //! Returns a depth bits from options
+        NIMBLE_INLINE s32 depthBitsFromOptions(u32 options)
+        {
+            switch ((options >> 4) & 0x3)
+            {
+                case 0:         return 0;
+                case Depth16:   return 16;
+                case Depth24:   return 24;
+                case Depth32:   return 32;
+                default: NIMBLE_NOT_IMPLEMENTED;
+            }
+            
+            return 0;
+        }
+        
+        //! Returns a stencil bits from options
+        NIMBLE_INLINE s32 stencilBitsFromOptions(u32 options)
+        {
+            switch ((options >> 6) & 0x3)
+            {
+                case 0:         return 0;
+                case Stencil8:  return 8;
+                default: NIMBLE_NOT_IMPLEMENTED;
+            }
+            
+            return 0;
+        }
+        
+        //! Returns a texture filtering from options
+        NIMBLE_INLINE TextureFilter textureFilterFromOptions(u32 options)
+        {
+            return static_cast<TextureFilter>((options >> 8) & 0xF);
+        }
+    } // namespace Private
 
     //! A list of available primitive types.
     enum PrimitiveType {

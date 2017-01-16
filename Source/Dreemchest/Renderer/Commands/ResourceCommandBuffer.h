@@ -53,10 +53,10 @@ namespace Renderer
         ConstantBuffer_             createConstantBuffer(ConstantBuffer_ id, const void* data, s32 size, UniformLayout layout);
         
         //! Emits a texture creation command.
-        Texture_                    createTexture2D(Texture_ id, const void* data, u16 width, u16 height, PixelFormat format, TextureFilter filter);
+        Texture_                    createTexture2D(Texture_ id, const void* data, u16 width, u16 height, u32 options);
         
         //! Emits a cube texture creation command.
-        Texture_                    createTextureCube(Texture_ id, const void* data, u16 size, u16 mipLevels, PixelFormat format, TextureFilter filter);
+        Texture_                    createTextureCube(Texture_ id, const void* data, u16 size, u16 mipLevels, u32 options);
         
         //! Emits a constant buffer destruction command.
         void                        deleteConstantBuffer(ConstantBuffer_ id);

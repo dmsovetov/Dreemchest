@@ -96,14 +96,14 @@ String OpenGL2RenderingContext::ShaderPreprocessor::generateBufferDefinition(con
 // ** OpenGL2RenderingContext::OpenGL2RenderingContext
 OpenGL2RenderingContext::OpenGL2RenderingContext(RenderViewPtr view)
     : OpenGLRenderingContext(view)
-    , m_requestedFeatureLayout(NULL)
     , m_requestedProgram(0)
+    , m_requestedFeatureLayout(NULL)
     , m_activeInputLayout(NULL)
+    , m_activeVertexBuffer(0)
 #if DEV_RENDERER_PROGRAM_CACHING
     , m_activePermutation(NULL)
     , m_activeProgram(-1)
     , m_activeFeatures(0)
-    , m_activeVertexBuffer(0)
 #endif  //  #if DEV_RENDERER_PROGRAM_CACHING
 {
     if (m_view.valid())
@@ -121,7 +121,7 @@ OpenGL2RenderingContext::OpenGL2RenderingContext(RenderViewPtr view)
 }
     
 // ** OpenGL2RenderingContext::acquireTexture
-ResourceId OpenGL2RenderingContext::acquireTexture(u8 type, u16 width, u16 height, PixelFormat format)
+ResourceId OpenGL2RenderingContext::acquireTexture(u8 type, u16 width, u16 height, u32 options)
 {
     // First search for a free render target
     for (List<Texture_>::const_iterator i = m_transientTextures.begin(), end = m_transientTextures.end(); i != end; ++i)
@@ -130,7 +130,7 @@ ResourceId OpenGL2RenderingContext::acquireTexture(u8 type, u16 width, u16 heigh
         const TextureInfo& info = m_textureInfo[*i];
         
         // Does the render target format match the requested one?
-        if (type == info.type && info.width == width && info.height == height && info.pixelFormat == format)
+        if (type == info.type && info.width == width && info.height == height && info.options == options)
         {
             return *i;
         }
@@ -142,7 +142,7 @@ ResourceId OpenGL2RenderingContext::acquireTexture(u8 type, u16 width, u16 heigh
     };
     
     LogVerbose("renderingContext", "allocating a transient %s texture of size %dx%d\n", s_textureType[type], width, height);
-    return allocateTexture(type, NULL, width, height, 1, format, FilterLinear);
+    return allocateTexture(type, NULL, width, height, 1, options);
 }
 
 // ** OpenGL2RenderingContext::releaseTexture
@@ -152,7 +152,7 @@ void OpenGL2RenderingContext::releaseTexture(ResourceId id)
 }
     
 // ** OpenGL2RenderingContext::allocateTexture
-ResourceId OpenGL2RenderingContext::allocateTexture(u8 type, const void* data, u16 width, u16 height, u16 mipLevels, u16 pixelFormat, u8 filter, ResourceId id)
+ResourceId OpenGL2RenderingContext::allocateTexture(u8 type, const void* data, u16 width, u16 height, u16 mipLevels, u32 options, ResourceId id)
 {
     // Allocate a resource identifier if it was not passed
     if (!id)
@@ -161,8 +161,8 @@ ResourceId OpenGL2RenderingContext::allocateTexture(u8 type, const void* data, u
     }
     
     Texture texture;
-    PixelFormat   format        = static_cast<PixelFormat>(pixelFormat);
-    TextureFilter textureFilter = static_cast<TextureFilter>(filter);
+    PixelFormat   format        = Private::pixelFormatFromOptions(options);
+    TextureFilter textureFilter = Private::textureFilterFromOptions(options);
     
     // Create a texture instance according to a type.
     switch (type)
@@ -183,10 +183,10 @@ ResourceId OpenGL2RenderingContext::allocateTexture(u8 type, const void* data, u
     
     // Construct a texture info
     TextureInfo textureInfo;
-    textureInfo.width       = width;
-    textureInfo.height      = height;
-    textureInfo.pixelFormat = format;
-    textureInfo.type        = static_cast<TextureType>(type);
+    textureInfo.width   = width;
+    textureInfo.height  = height;
+    textureInfo.options = options;
+    textureInfo.type    = static_cast<TextureType>(type);
     
     // Save a created texture identifier and a texture info
     m_textures.emplace(id, texture);
@@ -246,8 +246,7 @@ void OpenGL2RenderingContext::executeCommandBuffer(const CommandBuffer& commands
                                 , opCode.createTexture.width
                                 , opCode.createTexture.height
                                 , opCode.createTexture.mipLevels
-                                , opCode.createTexture.format
-                                , opCode.createTexture.filter
+                                , opCode.createTexture.options
                                 , opCode.createTexture.id
                                 );
                 break;
@@ -302,7 +301,7 @@ void OpenGL2RenderingContext::executeCommandBuffer(const CommandBuffer& commands
                 
             case OpCode::AcquireTexture:
             {
-                ResourceId id = acquireTexture(opCode.transientTexture.type, opCode.transientTexture.width, opCode.transientTexture.height, opCode.transientTexture.format);
+                ResourceId id = acquireTexture(opCode.transientTexture.type, opCode.transientTexture.width, opCode.transientTexture.height, opCode.transientTexture.options);
                 loadTransientResource(opCode.transientTexture.id, id);
             }
                 break;
@@ -336,7 +335,7 @@ void OpenGL2RenderingContext::executeCommandBuffer(const CommandBuffer& commands
                 {
                     LogVerbose("opengl2", "allocating a framebuffer of size %dx%d\n", info.width, info.height);
                     GLuint id = OpenGL2::Framebuffer::create();
-                    GLuint depth = OpenGL2::Framebuffer::renderbuffer(id, info.width, info.height, GL_DEPTH_ATTACHMENT, OpenGL2::textureInternalFormat(PixelD24X8));
+                    GLuint depth = OpenGL2::Framebuffer::renderbuffer(id, info.width, info.height, GL_DEPTH_ATTACHMENT, GL_DEPTH_COMPONENT);
                     framebufferIndex = allocateFramebuffer(id, depth, info.width, info.height);
                 }
 

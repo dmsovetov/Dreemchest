@@ -51,22 +51,13 @@ static CVReturn displayCallback( CVDisplayLinkRef displayLink, const CVTimeStamp
 }
 
 // ** initWithWindow
--( id ) initWithWindow: ( NSWindow* )window depthStencil:( int )depthStencil;
+-( id ) initWithWindow: ( NSWindow* )window depthStencil:( unsigned int )options;
 {
     m_window        = window;
     m_displayLink   = nil;
 
-    int depth   = 24;
-    int stencil = 8;
-
-    switch( depthStencil ) {
-    case Renderer::PixelD24S8:  depth   = 24;
-                                stencil = 8;
-                                break;
-    case Renderer::PixelD24X8:  depth   = 24;
-                                stencil = 0;
-                                break;
-    }
+    int depth   = Renderer::Private::depthBitsFromOptions(options);
+    int stencil = Renderer::Private::stencilBitsFromOptions(options);
 
     NSOpenGLPixelFormatAttribute attrs[] =
     {

@@ -278,7 +278,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
         RenderCommandBuffer& commands = frame.entryPoint();
 
         // Create an output cube map texture
-        Texture_ output = m_renderingContext->requestTextureCube(NULL, size, 1, PixelRgba32F, FilterLinear);
+        Texture_ output = m_renderingContext->requestTextureCube(NULL, size, 1, TextureRgba32F | TextureLinear);
         
         // Create the convolution cbuffer
         UniformLayout convolutionLayout    = m_renderingContext->requestUniformLayout("Convolution", Convolution::Layout);

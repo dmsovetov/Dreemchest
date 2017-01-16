@@ -949,7 +949,6 @@ GLenum OpenGL2::textureInternalFormat(PixelFormat pixelFormat)
         case PixelRgba32F:      return GL_RGBA32F;
         case PixelRgb32F:       return GL_RGB32F;
     #endif
-        case PixelD24X8:        return GL_DEPTH_COMPONENT24;
         default:                NIMBLE_BREAK_IF( "Image format not implemented" );
     }
     
@@ -974,8 +973,6 @@ GLenum OpenGL2::textureType(PixelFormat pixelFormat)
         case PixelR32F:
         case PixelRgb32F:
         case PixelRgba32F:      return GL_FLOAT;
-        case PixelD24S8:
-        case PixelD24X8:        return GL_FLOAT;
         default:                NIMBLE_BREAK_IF( "Image format not implemented" );
     }
     
@@ -1000,8 +997,6 @@ GLenum OpenGL2::textureFormat(PixelFormat pixelFormat)
         case PixelRgba32F:      return GL_RGBA;
         case PixelR32F:
         case PixelR16F:         return GL_RED;
-        case PixelD24S8:
-        case PixelD24X8:        return GL_DEPTH_COMPONENT;
         default:                NIMBLE_BREAK_IF( "Image format not implemented" );
     }
     
@@ -1030,8 +1025,8 @@ GLenum OpenGL2::textureFilter(TextureFilter filter)
     {
         case FilterNearest:     return GL_NEAREST;
         case FilterLinear:      return GL_LINEAR;
-        case FilterMipNearest:  return GL_NEAREST_MIPMAP_NEAREST;
-        case FilterMipLinear:   return GL_LINEAR_MIPMAP_LINEAR;
+        case FilterBilinear:    return GL_NEAREST_MIPMAP_NEAREST;
+        case FilterTrilinear:   return GL_LINEAR_MIPMAP_LINEAR;
         default:                NIMBLE_NOT_IMPLEMENTED;
     }
     

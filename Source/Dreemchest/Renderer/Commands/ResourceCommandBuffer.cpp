@@ -84,8 +84,10 @@ ConstantBuffer_ ResourceCommandBuffer::createConstantBuffer(ConstantBuffer_ id, 
 }
 
 // ** ResourceCommandBuffer::createTexture2D
-Texture_ ResourceCommandBuffer::createTexture2D(Texture_ id, const void* data, u16 width, u16 height, PixelFormat format, TextureFilter filter)
+Texture_ ResourceCommandBuffer::createTexture2D(Texture_ id, const void* data, u16 width, u16 height, u32 options)
 {
+    PixelFormat format = Private::pixelFormatFromOptions(options);
+    
     OpCode opCode;
     opCode.type = OpCode::CreateTexture;
     opCode.createTexture.id = id;
@@ -94,25 +96,25 @@ Texture_ ResourceCommandBuffer::createTexture2D(Texture_ id, const void* data, u
     opCode.createTexture.height = height;
     opCode.createTexture.mipLevels = 1;
     opCode.createTexture.type = TextureType2D;
-    opCode.createTexture.format = format;
-    opCode.createTexture.filter = filter;
+    opCode.createTexture.options = options;
     push( opCode );
     return id;
 }
 
 // ** ResourceCommandBuffer::createTextureCube
-Texture_ ResourceCommandBuffer::createTextureCube(Texture_ id, const void* data, u16 size, u16 mipLevels, PixelFormat format, TextureFilter filter)
+Texture_ ResourceCommandBuffer::createTextureCube(Texture_ id, const void* data, u16 size, u16 mipLevels, u32 options)
 {
+    PixelFormat format = Private::pixelFormatFromOptions(options);
+        
     OpCode opCode;
     opCode.type = OpCode::CreateTexture;
     opCode.createTexture.id = id;
     opCode.createTexture.buffer = adoptDataBuffer(data, bytesPerMipChain(format, size, size, mipLevels) * 6);
     opCode.createTexture.width = size;
     opCode.createTexture.height = size;
-    opCode.createTexture.format = format;
+    opCode.createTexture.options = options;
     opCode.createTexture.type = TextureTypeCube;
     opCode.createTexture.mipLevels = mipLevels;
-    opCode.createTexture.filter = filter;
     push( opCode );
     return id;
 }

@@ -121,7 +121,7 @@ RenderCommandBuffer& RenderCommandBuffer::renderToTarget(const Rect& viewport)
 }
 
 // ** RenderCommandBuffer::acquireTexture2D
-TransientTexture RenderCommandBuffer::acquireTexture2D(u16 width, u16 height, PixelFormat format)
+TransientTexture RenderCommandBuffer::acquireTexture2D(u16 width, u16 height, u32 options)
 {
     NIMBLE_ABORT_IF( m_transientResourceIndex + 1 >= 255, "too transient resources used" );
     
@@ -133,7 +133,7 @@ TransientTexture RenderCommandBuffer::acquireTexture2D(u16 width, u16 height, Pi
     opCode.transientTexture.id     = id;
     opCode.transientTexture.width  = width;
     opCode.transientTexture.height = height;
-    opCode.transientTexture.format = format;
+    opCode.transientTexture.options = options;
     opCode.transientTexture.type = TextureType2D;
     push( opCode );
     
@@ -141,7 +141,7 @@ TransientTexture RenderCommandBuffer::acquireTexture2D(u16 width, u16 height, Pi
 }
 
 // ** RenderCommandBuffer::acquireTextureCube
-TransientTexture RenderCommandBuffer::acquireTextureCube(u16 size, PixelFormat format)
+TransientTexture RenderCommandBuffer::acquireTextureCube(u16 size, u32 options)
 {
     NIMBLE_ABORT_IF( m_transientResourceIndex + 1 >= 255, "too transient resources used" );
     
@@ -153,7 +153,7 @@ TransientTexture RenderCommandBuffer::acquireTextureCube(u16 size, PixelFormat f
     opCode.transientTexture.id     = id;
     opCode.transientTexture.width  = size;
     opCode.transientTexture.height = size;
-    opCode.transientTexture.format = format;
+    opCode.transientTexture.options = options;
     opCode.transientTexture.type = TextureTypeCube;
     push( opCode );
     

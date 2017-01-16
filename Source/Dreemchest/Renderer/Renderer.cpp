@@ -45,7 +45,7 @@ bool RenderingApplicationDelegate::initialize(s32 width, s32 height)
     }
     
     // Create a rendering view.
-    RenderViewPtr view = createOpenGLView(m_window->handle(), Renderer::PixelD24S8);
+    RenderViewPtr view = createOpenGLView(m_window->handle(), TextureD24 | TextureS8);
     
     // Now create a rendering context that is attached to a created window instance
 #if 0

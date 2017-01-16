@@ -750,8 +750,8 @@ GLenum OpenGLHal::textureFilter( u32 filter )
     switch( filter ) {
     case FilterNearest:     return GL_NEAREST;                  break;
     case FilterLinear:      return GL_LINEAR;                   break;
-    case FilterMipNearest:  return GL_NEAREST_MIPMAP_NEAREST;   break;
-    case FilterMipLinear:   return GL_LINEAR_MIPMAP_LINEAR;     break;
+    case FilterBilinear:    return GL_NEAREST_MIPMAP_NEAREST;   break;
+    case FilterTrilinear:   return GL_LINEAR_MIPMAP_LINEAR;     break;
     }
 
     NIMBLE_BREAK_IF( true );
@@ -811,7 +811,6 @@ GLenum OpenGLHal::internalImageFormat( u32 pixelFormat )
     case PixelRgba32F:      return GL_RGBA32F;
     case PixelRgb32F:       return GL_RGB32F;
 #endif
-    case PixelD24X8:        return GL_DEPTH_COMPONENT24;
     default:                NIMBLE_BREAK_IF( "Image format not implemented" );
     }
 
@@ -835,8 +834,6 @@ GLenum OpenGLHal::imageFormat( u32 pixelFormat )
     case PixelRgba32F:      return GL_RGBA;
     case PixelR32F:
     case PixelR16F:         return GL_RED;
-    case PixelD24S8:
-    case PixelD24X8:        return GL_DEPTH_COMPONENT;
     default:                NIMBLE_BREAK_IF( "Image format not implemented" );
     }
     
@@ -860,8 +857,6 @@ GLenum OpenGLHal::imageDataType( u32 pixelFormat )
     case PixelR32F:
     case PixelRgb32F:
     case PixelRgba32F:      return GL_FLOAT;
-    case PixelD24S8:
-    case PixelD24X8:        return GL_FLOAT;
     default:                NIMBLE_BREAK_IF( "Image format not implemented" );
     }
     

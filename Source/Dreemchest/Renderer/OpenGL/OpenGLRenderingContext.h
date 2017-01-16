@@ -119,7 +119,7 @@ namespace Renderer
         {
             u16                 width;          //!< A texture width.
             u16                 height;         //!< A texture height.
-            PixelFormat         pixelFormat;    //!< A pixel format.
+            u32                 options;        //!< A texture options.
             TextureType         type;           //!< A texture type.
         };
         

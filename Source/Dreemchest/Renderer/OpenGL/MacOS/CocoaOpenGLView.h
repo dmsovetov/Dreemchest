@@ -35,7 +35,7 @@
         CVDisplayLinkRef        m_displayLink;
         NSWindow*               m_window;
     }
-    - ( id )    initWithWindow: ( NSWindow* )window depthStencil:( int )depthStencil;
+    - ( id )    initWithWindow: ( NSWindow* )window depthStencil:( unsigned int )options;
     - ( BOOL )  beginFrame;
     - ( void )  endFrame;
     - ( BOOL )  makeCurrent;

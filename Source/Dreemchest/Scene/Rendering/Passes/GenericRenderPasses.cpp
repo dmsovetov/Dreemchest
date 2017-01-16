@@ -74,7 +74,7 @@ TransientTexture ShadowPass::render( RenderFrame& frame, RenderCommandBuffer& co
     // Acquire a shadow render target
     s32 dimensions  = static_cast<s32>( 1.0f / parameters.invSize );
 
-    TransientTexture renderTarget = commands.acquireTexture2D( dimensions, dimensions, Renderer::PixelD24X8 );
+    TransientTexture renderTarget = commands.acquireTexture2D( dimensions, dimensions, TextureD24);
 
     // Render scene from a light's point of view
     RenderCommandBuffer& cmd = commands.renderToTexture(renderTarget);

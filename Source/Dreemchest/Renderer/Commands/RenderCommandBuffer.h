@@ -53,10 +53,10 @@ namespace Renderer
         void                        clear(const Rgba& clearColor, u8 clearMask);
         
         //! Emits an acquire transient texture 2D command.
-        TransientTexture            acquireTexture2D(u16 width, u16 height, PixelFormat format);
+        TransientTexture            acquireTexture2D(u16 width, u16 height, u32 options);
         
         //! Emits an acquire transient cube texture command.
-        TransientTexture            acquireTextureCube(u16 size, PixelFormat format);
+        TransientTexture            acquireTextureCube(u16 size, u32 options);
         
         //! Emits a release an transient render target command.
         void                        releaseTexture(TransientTexture id);
