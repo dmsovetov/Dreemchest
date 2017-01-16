@@ -29,9 +29,6 @@
 
 #include "Emitter.h"
 
-#include "../Renderer/Hal.h"
-#include "../Renderer/Renderer2D.h"
-
 DC_BEGIN_DREEMCHEST
 
 namespace Fx {

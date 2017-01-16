@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include "Renderer2D.h"
-#include "Hal.h"
+//#include "Hal.h"
 
 #define        SET_VERTEX( vtx, _x, _y, color )    \
                 vtx.x = ceilf( _x );            \

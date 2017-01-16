@@ -27,7 +27,7 @@
 #ifndef __DC_Renderer_MacOSOpenGLView_H__
 #define __DC_Renderer_MacOSOpenGLView_H__
 
-#include "../OpenGLHal.h"
+#include "../OpenGL2.h"
 #include "CocoaOpenGLView.h"
 
 DC_BEGIN_DREEMCHEST

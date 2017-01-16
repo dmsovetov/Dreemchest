@@ -28,7 +28,22 @@
 #define __DC_Renderer_OpenGL2_H__
 
 #include "../Renderer.h"
-#include "OpenGLHal.h"
+
+#ifdef DC_DEBUG
+    #ifdef DC_THREADS_ENABLED
+        #define CHECK_THREAD DC_ASSERT( m_renderThread == thread::Thread::currentThread(), "Accessing OpenGL from another thread" )
+    #else
+        #define CHECK_THREAD
+    #endif  //  DC_DEBUG
+
+    #define DC_CHECK_GL_CONTEXT DC_ASSERT( glGetString( GL_EXTENSIONS ) != NULL, "OpenGL context should be initialized" )
+    #define DC_CHECK_GL         sOpenGLErrorCheck __gl_check; CHECK_THREAD
+    #define DC_CHECK_GL_ERROR   DC_EXPECT( glGetError() == GL_NO_ERROR, "Unexpected OpenGL error occured" )
+#else
+    #define DC_CHECK_GL_CONTEXT
+    #define DC_CHECK_GL
+    #define DC_CHECK_GL_ERROR
+#endif
 
 // ** OpenGL headers and libraries
 #if defined( DC_PLATFORM_WINDOWS )
@@ -75,6 +90,12 @@ DC_BEGIN_DREEMCHEST
 
 namespace Renderer
 {
+    // ** class OpenGLView
+    class OpenGLView : public RenderView {
+    public:
+        
+    };
+    
     //! An OpenGL 2 API wrapper.
     class OpenGL2
     {

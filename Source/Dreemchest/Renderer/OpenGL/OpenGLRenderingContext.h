@@ -28,7 +28,6 @@
 #define __DC_Renderer_OpenGLRenderingContext_H__
 
 #include "../RenderingContext.h"
-#include "OpenGLHal.h"
 #include "OpenGL2.h"
 
 DC_BEGIN_DREEMCHEST

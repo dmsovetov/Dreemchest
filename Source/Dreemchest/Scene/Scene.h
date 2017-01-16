@@ -39,7 +39,6 @@
 #include <Platform/Time.h>
 
 #include <Renderer/Renderer.h>
-#include <Renderer/Hal.h>
 #include <Renderer/Renderer2D.h>
 #include <Renderer/VertexFormat.h>
 #include <Renderer/RenderFrame.h>

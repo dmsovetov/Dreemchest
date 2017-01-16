@@ -25,7 +25,6 @@
  **************************************************************************/
 
 #include "RenderingContext.h"
-#include "RenderingContextHal.h"
 #include "Commands/RenderCommandBuffer.h"
 #include "Commands/ResourceCommandBuffer.h"
 #include "VertexFormat.h"

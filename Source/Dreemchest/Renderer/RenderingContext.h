@@ -207,9 +207,6 @@ namespace Renderer
         return allocateIdentifier(static_cast<RenderResourceType::Enum>(TResourceIdentifier::ResourceType));
     }
     
-    //! Creates a rendering context that uses a deprecated rendering HAL interface.
-    RenderingContextPtr createDeprecatedRenderingContext(RenderViewPtr view, HalPtr hal);
-    
 #ifdef DC_OPENGL_ENABLED
     //! Platform-specific OpenGL view constructor.
     extern RenderViewPtr createOpenGLView(void* window, u32 options);
