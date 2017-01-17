@@ -186,17 +186,18 @@ class PointLights : public Examples::ViewerApplicationDelegate
         m_programConstantColor = m_renderingContext->requestProgram(s_vertexConstantColor, s_fragmentConstantColor);
     }
  
-    virtual void handleRenderFrame(RenderFrame& frame, StateStack& stateStack, RenderCommandBuffer& commands) NIMBLE_OVERRIDE
+    virtual void handleRenderFrame(RenderFrame& frame, StateStack& stateStack, RenderCommandBuffer& commands, f32 dt) NIMBLE_OVERRIDE
     {
         // Push the default state
         StateScope defaultScope = stateStack.push(&m_renderStates);
         
-        f32 time = currentTime() * 0.001f;
+        static f32 s_time = 0.0f;
+        s_time += dt;
         
         // Update light parameters
         {
-            f32 st              = sinf(time);
-            f32 ct              = cosf(time);
+            f32 st              = sinf(s_time);
+            f32 ct              = cosf(s_time);
             s_light.position    = Vec3(st, 1.5f, ct) * 0.7f;
             s_light.attenuation = Vec4(0.0f, 0.0f, 1.0f);
             s_light.color       = Rgb(1.0f, 1.0f, 1.0f);

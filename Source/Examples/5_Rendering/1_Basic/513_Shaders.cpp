@@ -77,9 +77,9 @@ class Shaders : public RenderingApplicationDelegate
         m_renderStates.bindProgram(program);
     }
 
-    virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
+    virtual void handleRenderFrame(f32 dt) NIMBLE_OVERRIDE
     {
-        RenderFrame frame(m_renderingContext->defaultStateBlock());
+        RenderFrame& frame = m_renderingContext->allocateFrame();
         
         // Note, that a shader program was bound to a rendering states block
         // upon initialization, so this method stays same as in a

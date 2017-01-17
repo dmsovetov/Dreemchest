@@ -171,9 +171,9 @@ class Camera : public RenderingApplicationDelegate
         prevY = e.y;
     }
  
-    virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
+    virtual void handleRenderFrame(f32 dt) NIMBLE_OVERRIDE
     {
-        RenderFrame frame(m_renderingContext->defaultStateBlock());
+        RenderFrame& frame = m_renderingContext->allocateFrame();
         
         RenderCommandBuffer& commands = frame.entryPoint();
         

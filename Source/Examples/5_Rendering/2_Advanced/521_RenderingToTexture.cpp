@@ -194,9 +194,12 @@ class RenderingToTexture : public RenderingApplicationDelegate
         m_renderStates.bindFeatureLayout(features);
     }
  
-    virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
+    virtual void handleRenderFrame(f32 dt) NIMBLE_OVERRIDE
     {
-        RenderFrame frame(m_renderingContext->defaultStateBlock());
+        static f32 s_time = 0.0f;
+        s_time += dt;
+        
+        RenderFrame& frame = m_renderingContext->allocateFrame();
         
         StateStack&          stateStack = frame.stateStack();
         RenderCommandBuffer& commands   = frame.entryPoint();
@@ -214,7 +217,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
             RenderCommandBuffer& renderToTarget = commands.renderToTexture(renderTarget, TextureD16);
 
             StateScope instanceStates = stateStack.push(&m_meshStates);
-            s_transform.instance = Matrix4::rotateXY(0.0f, currentTime() * 0.001f);
+            s_transform.instance = Matrix4::rotateXY(0.0f, s_time);
             renderToTarget.clear(Rgba(0.0f, 1.0f, 0.0f), ClearAll);
             renderToTarget.uploadConstantBuffer(m_transformCBuffer, &s_transform, sizeof(s_transform));
             renderToTarget.drawPrimitives(0, m_mesh.primitives, 0, m_mesh.vertices.size());

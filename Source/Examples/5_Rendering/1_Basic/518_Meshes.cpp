@@ -27,6 +27,8 @@
 #include <Dreemchest.h>
 #include "../Examples.h"
 
+#include <OpenGL/gl.h>
+
 DC_USE_DREEMCHEST
 
 using namespace Platform;
@@ -135,17 +137,20 @@ class Meshes : public RenderingApplicationDelegate
         m_renderStates.bindProgram(program);
     }
  
-    virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
+    virtual void handleRenderFrame(f32 dt) NIMBLE_OVERRIDE
     {
-        RenderFrame frame(m_renderingContext->defaultStateBlock());
+        RenderFrame& frame = m_renderingContext->allocateFrame();
         
         RenderCommandBuffer& commands = frame.entryPoint();
         
+        static f32 s_rotation = 0.0f;
+        s_rotation += dt;
+
         // Clear the viewport
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
         
         // Update an instance constant buffer
-        Examples::Instance instance = Examples::Instance::fromTransform(Matrix4::rotateXY(0.0f, currentTime() * 0.001f));
+        Examples::Instance instance = Examples::Instance::fromTransform(Matrix4::rotateXY(0.0f, s_rotation));
         commands.uploadConstantBuffer(m_instanceConstantBuffer, &instance, sizeof(instance));
         
         // Push root rendering state block

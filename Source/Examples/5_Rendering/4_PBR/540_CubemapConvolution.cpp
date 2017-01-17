@@ -230,9 +230,12 @@ class RenderingToTexture : public RenderingApplicationDelegate
         m_diffuse  = convolve(m_envmap, 128, 160);
     }
  
-    virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
+    virtual void handleRenderFrame(f32 dt) NIMBLE_OVERRIDE
     {
-        RenderFrame frame(m_renderingContext->defaultStateBlock());
+        static f32 s_time = 0.0f;
+        s_time += dt;
+        
+        RenderFrame& frame = m_renderingContext->allocateFrame();
         
         StateStack&          stateStack = frame.stateStack();
         RenderCommandBuffer& commands   = frame.entryPoint();
@@ -260,7 +263,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
         meshPass->bindTexture(m_specular, 1);
         
         StateScope meshStates = stateStack.push(&m_mesh.states);
-        s_instance = Examples::Instance::fromTransform(Matrix4::rotateXY(currentTime() * 0.0003f * 0.0f, currentTime() * 0.0003f));
+        s_instance = Examples::Instance::fromTransform(Matrix4::rotateXY(0.0f, s_time));
         commands.uploadConstantBuffer(m_instanceCBuffer, &s_instance, sizeof(s_instance));
         commands.drawItem(0, m_mesh);
 
@@ -271,9 +274,9 @@ class RenderingToTexture : public RenderingApplicationDelegate
     {
         verbose("convolution", "performing with cosine kernel of power %2.2f with %d samples in %d iterations...\n", power, Kernel::MaxSamples, iterations);
         
-        RenderFrame    frame(m_renderingContext->defaultStateBlock(), 1024 * 1024 * 2);
-        StateStack&    stateStack = frame.stateStack();
-        Kernel         kernel;
+        RenderFrame& frame = m_renderingContext->allocateFrame(1024 * 1024 * 2);
+        StateStack&  stateStack = frame.stateStack();
+        Kernel       kernel;
 
         RenderCommandBuffer& commands = frame.entryPoint();
 

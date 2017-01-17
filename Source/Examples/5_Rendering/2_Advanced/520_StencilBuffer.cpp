@@ -119,11 +119,14 @@ class StencilBuffer : public RenderingApplicationDelegate
         }
     }
  
-    virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
+    virtual void handleRenderFrame(f32 dt) NIMBLE_OVERRIDE
     {
-        RenderFrame frame(m_renderingContext->defaultStateBlock());
+        RenderFrame& frame = m_renderingContext->allocateFrame();
         
         RenderCommandBuffer& commands = frame.entryPoint();
+        
+        static f32 s_time = 0.0f;
+        s_time += dt;
         
         // In this sample we will use a state stack
         StateStack& states = frame.stateStack();
@@ -157,11 +160,11 @@ class StencilBuffer : public RenderingApplicationDelegate
             reflection->setCullFace(TriangleFaceFront);
             reflection->setBlend(BlendSrcAlpha, BlendInvSrcAlpha);
             
-            renderItem(commands, m_object, Matrix4::scale(1.0f, -1.0f, 1.0f) * Matrix4::rotateXY(0.0f, currentTime() * 0.001f) * Matrix4::translation(position) * Matrix4::scale(scale), 0.3f);
+            renderItem(commands, m_object, Matrix4::scale(1.0f, -1.0f, 1.0f) * Matrix4::rotateXY(0.0f, s_time) * Matrix4::translation(position) * Matrix4::scale(scale), 0.3f);
         }
 
         // Finally render the stanford bunny
-        renderItem(commands, m_object, Matrix4::rotateXY(0.0f, currentTime() * 0.001f) * Matrix4::translation(position) * Matrix4::scale(scale));
+        renderItem(commands, m_object, Matrix4::rotateXY(0.0f, s_time) * Matrix4::translation(position) * Matrix4::scale(scale));
 
         m_renderingContext->display(frame);
     }

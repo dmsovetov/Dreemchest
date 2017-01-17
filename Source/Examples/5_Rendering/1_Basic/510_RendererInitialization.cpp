@@ -50,10 +50,10 @@ class RendererInitialization : public ApplicationDelegate
         Window* window = Window::create(800, 600);
 
         // Create a rendering view.
-        RenderViewPtr view = createOpenGLView(window->handle(), PixelD24S8);
-
+        m_view = createOpenGLView(window->handle(), TextureD24 | TextureS8);
+        
         // Now create the main renderer interface called HAL (hardware abstraction layer).
-        m_hal = Hal::create(OpenGL, view);
+    //    m_hal = Hal::create(OpenGL, view);
 
         // Finally subscribe to updates events.
         window->subscribe<Window::Update>(dcThisMethod(RendererInitialization::handleWindowUpdate));
@@ -63,13 +63,14 @@ class RendererInitialization : public ApplicationDelegate
     virtual void handleWindowUpdate(const Window::Update& e)
     {
         // First clear a viewport with a color
-        m_hal->clear(Rgba(0.3f, 0.3f, 0.3f));
+     //   m_hal->clear(Rgba(0.3f, 0.3f, 0.3f));
 
         // And now just present all rendered data to the screen
-        m_hal->present();
+    //    m_hal->present();
     }
 
-    HalPtr m_hal;   //!< Rendering HAL.
+    RenderViewPtr m_view;
+    //HalPtr m_hal;   //!< Rendering HAL.
 };
 
 // Now declare an application entry point with RendererInitialization application delegate.

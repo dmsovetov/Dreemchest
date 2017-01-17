@@ -352,7 +352,7 @@ namespace Examples
     {
     public:
         
-        virtual void handleRenderFrame(RenderFrame& frame, StateStack& stateStack, RenderCommandBuffer& commands) NIMBLE_ABSTRACT;
+        virtual void handleRenderFrame(RenderFrame& frame, StateStack& stateStack, RenderCommandBuffer& commands, f32 dt) NIMBLE_ABSTRACT;
         
     protected:
         
@@ -429,9 +429,9 @@ namespace Examples
             prevY = e.y;
         }
         
-        virtual void handleRenderFrame(const Platform::Window::Update& e) NIMBLE_OVERRIDE
+        virtual void handleRenderFrame(f32 dt)
         {
-            RenderFrame frame(m_renderingContext->defaultStateBlock());
+            RenderFrame& frame = m_renderingContext->allocateFrame();
             RenderCommandBuffer& commands = frame.entryPoint();
             
             // Update the camera constant buffer
@@ -439,7 +439,7 @@ namespace Examples
             Examples::Camera camera = Examples::Camera::fromQuat(m_camera.position, rotation);
             commands.uploadConstantBuffer(m_camera.constantBuffer, &camera, sizeof(camera));
             
-            handleRenderFrame(frame, frame.stateStack(), commands);
+            handleRenderFrame(frame, frame.stateStack(), commands, dt);
             m_renderingContext->display(frame);
         }
         

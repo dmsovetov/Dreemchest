@@ -151,9 +151,9 @@ class RenderStateStack : public RenderingApplicationDelegate
         m_renderStates.bindProgram(program);
     }
  
-    virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
+    virtual void handleRenderFrame(f32 dt) NIMBLE_OVERRIDE
     {
-        RenderFrame frame(m_renderingContext->defaultStateBlock());
+        RenderFrame& frame = m_renderingContext->allocateFrame();
         
         // Get an entry point command buffer as usual
         RenderCommandBuffer& commands = frame.entryPoint();
@@ -166,7 +166,8 @@ class RenderStateStack : public RenderingApplicationDelegate
 
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
         
-        f32 time = currentTime() * 0.001f;
+        static f32 s_time = 0.0f;
+        s_time += dt;
         
         // Now render cubes
         for (s32 y = 0; y < 11; ++y)
@@ -175,7 +176,7 @@ class RenderStateStack : public RenderingApplicationDelegate
             {
                 // Construct an instance data from a transform matrix
                 Examples::Instance instance = Examples::Instance::fromTransform(Matrix4::translation(x * 3.0f - 15.0f, y * 3.0f - 15.0f, 0.0f) *
-                                                                                Matrix4::rotateXY(time + x*0.21f, time + y*0.37f));
+                                                                                Matrix4::rotateXY(s_time + x*0.21f, s_time + y*0.37f));
 
                 // Now push a new state scope to a stack, which will be automatically poped from stack
                 StateScope instanceStates = stateStack.newScope();

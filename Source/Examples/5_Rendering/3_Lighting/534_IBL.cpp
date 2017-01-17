@@ -204,9 +204,12 @@ class IBL : public RenderingApplicationDelegate
         m_renderStates.setCullFace(TriangleFaceBack);
     }
  
-    virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
+    virtual void handleRenderFrame(f32 dt) NIMBLE_OVERRIDE
     {
-        RenderFrame frame(m_renderingContext->defaultStateBlock());
+        static f32 s_time = 0.0f;
+        s_time += dt;
+        
+        RenderFrame& frame = m_renderingContext->allocateFrame();
         
         RenderCommandBuffer& commands = frame.entryPoint();
         
@@ -220,12 +223,10 @@ class IBL : public RenderingApplicationDelegate
         StateScope lightScope = states.newScope();
         lightScope->bindConstantBuffer(m_lightConstantBuffer, 2);
         
-        f32 time = currentTime() * 0.0002f;
-        
         // Update light parameters
         {
-            f32 st           = sinf(time);
-            f32 ct           = cosf(time);
+            f32 st           = sinf(s_time);
+            f32 ct           = cosf(s_time);
             s_light.color    = Rgb(st, 1.0f, ct);
             commands.uploadConstantBuffer(m_lightConstantBuffer, &s_light, sizeof(s_light));
         }
@@ -245,7 +246,7 @@ class IBL : public RenderingApplicationDelegate
         const Vec3 scale    = Vec3(0.9f, 0.9f, 0.9f);
         
         // Finally render the stanford bunny
-        renderObject(commands, m_bunny, Matrix4::rotateXY(0.0f, time * 0.5f) * Matrix4::translation(position) * Matrix4::scale(scale));
+        renderObject(commands, m_bunny, Matrix4::rotateXY(0.0f, s_time) * Matrix4::translation(position) * Matrix4::scale(scale));
 
         m_renderingContext->display(frame);
     }

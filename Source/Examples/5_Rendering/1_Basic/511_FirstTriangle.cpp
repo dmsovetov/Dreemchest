@@ -73,11 +73,11 @@ class FirstTriangle : public RenderingApplicationDelegate
 
     // This method should be implemented in a subclass of RenderingApplicationDelegate to
     // actually render a frame each time the window is updated.
-    virtual void handleRenderFrame(const Window::Update& e) NIMBLE_OVERRIDE
+    virtual void handleRenderFrame(f32 dt) NIMBLE_OVERRIDE
     {
         // A render frame instance records all data and commands required
         // to render a single frame.
-        RenderFrame frame(m_renderingContext->defaultStateBlock());
+        RenderFrame& frame = m_renderingContext->allocateFrame();
         
         // A process of rendering a frame consist from a command buffer generation
         // and then submitting it to a device.
@@ -90,7 +90,7 @@ class FirstTriangle : public RenderingApplicationDelegate
         // Now emit a drawPrimitives command with a render state block configured upon initialization
         // as a last argument.
         commands.drawPrimitives(0, PrimTriangles, 0, 3, m_renderStates);
-        
+       
         // Rendering frame is now ready, so pass it to a rendering context to display it on a screen.
         m_renderingContext->display(frame);
     }
