@@ -236,18 +236,18 @@ const  RenderScene::CameraNode& RenderScene::findCameraNode( Ecs::EntityWPtr cam
 }
 
 // ** RenderScene::captureFrame
-Renderer::RenderFrameUPtr RenderScene::captureFrame( void )
+Renderer::RenderFrame& RenderScene::captureFrame( void )
 {
-    Renderer::RenderFrameUPtr frame( DC_NEW Renderer::RenderFrame(m_context->defaultStateBlock()) );
+    Renderer::RenderFrame& frame = m_context->allocateFrame();
 
     // Update active constant buffers
-    updateConstantBuffers( *frame.get() );
+    updateConstantBuffers( frame );
 
     // Get a state stack
-    Renderer::StateStack& stateStack = frame->stateStack();
+    Renderer::StateStack& stateStack = frame.stateStack();
 
     // Gen a frame entry point command buffer
-    Renderer::RenderCommandBuffer& entryPoint = frame->entryPoint();
+    Renderer::RenderCommandBuffer& entryPoint = frame.entryPoint();
 
     // Push a default state block
     Renderer::StateScope defaults = stateStack.newScope();
@@ -276,7 +276,7 @@ Renderer::RenderFrameUPtr RenderScene::captureFrame( void )
     // Process all render systems
     for( s32 i = 0, n = static_cast<s32>( m_renderSystems.size() ); i < n; i++ )
     {
-        m_renderSystems[i]->render( *frame.get(), entryPoint );
+        m_renderSystems[i]->render( frame, entryPoint );
     }
 
     return frame;

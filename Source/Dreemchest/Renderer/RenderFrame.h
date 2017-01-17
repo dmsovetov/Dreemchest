@@ -36,10 +36,8 @@ namespace Renderer
     //! Render frame contains all required frame data captured by a render scene.
     class RenderFrame
     {
+    friend class RenderingContext;
     public:
-                        
-                                                //! Constructs a RenderFrame instance.
-                                                RenderFrame(StateBlock& defaults, s32 size = 1024 * 100);
 
         //! Returns a total number of captured command buffers.
         s32                                     commandBufferCount() const;
@@ -71,6 +69,14 @@ namespace Renderer
         
         //! Clears all data recorded by this frame.
         void                                    clear();
+        
+    private:
+        
+                                                //! Constructs a RenderFrame instance.
+                                                RenderFrame(RenderingContext& renderingContext, s32 size = 1024 * 100);
+        
+        //! Sets a rendering frame maximum capacity.
+        void                                    setAllocationCapacity(s32 value);
 
     private:
 

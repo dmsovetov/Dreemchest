@@ -225,7 +225,7 @@ namespace Scene
         void                                    addRenderSystem( const TArgs& ... args );
 
         //! Captures scene rendering state and returns an array of resulting command buffers.
-        Renderer::RenderFrameUPtr               captureFrame( void );
+        Renderer::RenderFrame&                  captureFrame( void );
 
         //! Creates a new render scene.
         static RenderScenePtr                   create( SceneWPtr scene, Renderer::RenderingContextWPtr context, RenderCacheWPtr cache );

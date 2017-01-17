@@ -140,6 +140,7 @@ void RenderingContext::TransientResourceStack::unload(TransientResourceId index)
 RenderingContext::RenderingContext(RenderViewPtr view)
     : m_view(view)
     , m_shaderLibrary(*this)
+    , m_frame(*this)
 {
     LogDebug("renderingContext", "rendering context size is %d bytes\n", sizeof(RenderingContext));
     LogDebug("renderingContext", "rendering state size is %d bytes\n", sizeof(State));
@@ -301,6 +302,17 @@ void RenderingContext::setTextureInfo(Texture_ id, TextureType type, u16 width, 
     textureInfo.options = options;
     textureInfo.type    = type;
     m_textures.emplace(id, textureInfo);
+}
+    
+// ** RenderingContext::allocateFrame
+RenderFrame& RenderingContext::allocateFrame(s32 size)
+{
+    if (m_frame.allocationCapacity() != size)
+    {
+        m_frame.setAllocationCapacity(size);
+    }
+    m_frame.clear();
+    return m_frame;
 }
 
 // ** RenderingContext::display

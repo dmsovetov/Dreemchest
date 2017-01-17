@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "RenderFrame.h"
+#include "RenderingContext.h"
 #include "Commands/RenderCommandBuffer.h"
 
 DC_BEGIN_DREEMCHEST
@@ -33,13 +34,12 @@ namespace Renderer
 {
 
 // ** RenderFrame::RenderFrame
-RenderFrame::RenderFrame(StateBlock& defaults, s32 size)
-    : m_defaults(defaults)
+RenderFrame::RenderFrame(RenderingContext& renderingContext, s32 size)
+    : m_defaults(renderingContext.defaultStateBlock())
     , m_stateStack(4096, MaxStateStackDepth)
     , m_allocator(size)
 {
-    m_stateStack.push(m_defaults);
-    m_entryPoint = &createCommandBuffer();
+    setAllocationCapacity(size);
 }
 
 // ** RenderFrame::internBuffer
@@ -67,6 +67,20 @@ s32 RenderFrame::allocatedBytes() const
 s32 RenderFrame::allocationCapacity() const
 {
     return m_allocator.size();
+}
+    
+// **  RenderFrame::setAllocationCapacity
+void RenderFrame::setAllocationCapacity(s32 value)
+{
+    if (value == allocationCapacity())
+    {
+        return;
+    }
+    
+    m_allocator.resize(value);
+
+    m_stateStack.push(m_defaults);
+    m_entryPoint = &createCommandBuffer();
 }
 
 // ** RenderFrame::entryPoint
@@ -107,7 +121,7 @@ void RenderFrame::clear()
 
     m_allocator.reset();
     m_stateStack.reset();
-    m_stateStack.push(&m_defaults);
+    m_stateStack.push(m_defaults);
     
     m_entryPoint = &createCommandBuffer();
 }

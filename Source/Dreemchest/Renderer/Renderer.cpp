@@ -45,23 +45,29 @@ bool RenderingApplicationDelegate::initialize(s32 width, s32 height)
     }
     
     // Create a rendering view.
-    RenderViewPtr view = createOpenGLView(m_window->handle(), TextureD24 | TextureS8);
+    m_view = createOpenGLView(m_window->handle(), TextureD24 | TextureS8);
+    m_view->subscribe<RenderView::Update>(dcThisMethod(RenderingApplicationDelegate::handleViewUpdate));
     
     // Now create a rendering context that is attached to a created window instance
-#if 0
-    // Now create the main renderer interface called HAL (hardware abstraction layer).
-    m_renderingContext = createDeprecatedRenderingContext(view, Hal::create(OpenGL, view));
-#else
-    m_renderingContext = createOpenGL2RenderingContext(view);
-#endif
+    m_renderingContext = createOpenGL2RenderingContext(m_view);
+    m_lastFrameTime = -1;
     
     return m_renderingContext.valid();
 }
 
-// ** RenderingApplicationDelegate::handleWindowUpdate
-void RenderingApplicationDelegate::handleWindowUpdate(const Platform::Window::Update& e)
+// ** RenderingApplicationDelegate::handleViewUpdate
+void RenderingApplicationDelegate::handleViewUpdate(const RenderView::Update& e)
 {
-    handleRenderFrame(e);
+    if (m_lastFrameTime == -1)
+    {
+        m_lastFrameTime = Platform::currentTime();
+    }
+    
+    u64 time = Platform::currentTime();
+    u32 dt   = time - m_lastFrameTime;
+    m_lastFrameTime = time;
+    
+    handleRenderFrame(dt * 0.001f);
 }
     
 // ** bytesPerBlock

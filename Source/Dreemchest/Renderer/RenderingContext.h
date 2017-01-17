@@ -28,6 +28,7 @@
 #define __DC_Renderer_RenderingContext_H__
 
 #include "RenderState.h"
+#include "RenderFrame.h"
 #include "PipelineFeatureLayout.h"
 #include "ShaderLibrary.h"
 
@@ -78,8 +79,11 @@ namespace Renderer
         //! Sets a default program.
         void                                    setDefaultProgram(Program value);
         
+        //! Allocates a rendering frame instance.
+        RenderFrame&                            allocateFrame(s32 size = 1024 * 100);
+        
         //! Displays a frame captured by a render scene.
-        void                                    display(RenderFrame& frame, bool wait = false);
+        void                                    display(RenderFrame& frame, bool wait = true);
         
         //! Forces a rendering context to construct all queued resources.
         void                                    construct();
@@ -205,6 +209,7 @@ namespace Renderer
         FrameCounters                           m_counters;                                             //!< Performance counters.
         State                                   m_activeStates[32];                                     //!< Active rendering states.
         Caps                                    m_caps;                                                 //!< Rendering context capabilities.
+        RenderFrame                             m_frame;                                                //!< A shared rendering frame.
     };
     
     // ** RenderingContext::allocateIdentifier

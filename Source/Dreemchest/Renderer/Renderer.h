@@ -349,7 +349,7 @@ namespace Renderer {
     typedef Array<UniformElement> UniformBufferLayout;
     
     //! Rendering viewport interface that is exposed to a rendering context
-    class RenderView : public RefCounted
+    class RenderView : public InjectEventEmitter<RefCounted>
     {
     public:
         
@@ -363,6 +363,20 @@ namespace Renderer {
         
         //! Ends a frame rendering.
         virtual void                endFrame( bool wait ) {}
+        
+        //! Notifies view about a frame update.
+        void                        notifyUpdate( void )
+        {
+            notify<Update>(Update(this));
+        }
+        
+        //! This event is emitted each frame.
+        struct Update
+        {
+            //! Constructs Update instance.
+            Update(RenderViewWPtr view) : view(view) {}
+            RenderViewWPtr  view;
+        };
     };
     
     //! Available texture filtering modes.
@@ -658,16 +672,18 @@ namespace Renderer {
         virtual bool            initialize(s32 width, s32 height) NIMBLE_OVERRIDE;
         
         //! Renders a single frame.
-        virtual void            handleRenderFrame(const Platform::Window::Update& e) NIMBLE_ABSTRACT;
+        virtual void            handleRenderFrame(f32 dt) NIMBLE_ABSTRACT;
         
     private:
         
         //! Handles a window update event and renders a single frame.
-        virtual void            handleWindowUpdate(const Platform::Window::Update& e) NIMBLE_OVERRIDE;
+        void                    handleViewUpdate(const RenderView::Update& e);
         
     protected:
         
+        RenderViewPtr           m_view;             //!< A target view.
         RenderingContextPtr     m_renderingContext; //!< A rendering context instance.
+        u64                     m_lastFrameTime;    //!< Used to measure the rendering time.
     };
     
     u32 bytesPerBlock(PixelFormat format);
