@@ -570,9 +570,9 @@ namespace Renderer {
         , TextureD32        = Depth32           << 4    //!< A 32-bit depth buffer option.
         , TextureS8         = Stencil8          << 6    //!< An 8-bit stencil buffer option.
         
-        , TextureLinear     = FilterLinear      << 8    //!< Use a linear texture filtering.
-        , TextureBilinear   = FilterBilinear    << 8    //!< Use a bilinear texture filtering.
-        , TextureTrilinear  = FilterTrilinear   << 8    //!< Use a trilinear texture filtering.
+        , TextureLinear     = FilterLinear      << 9    //!< Use a linear texture filtering.
+        , TextureBilinear   = FilterBilinear    << 9    //!< Use a bilinear texture filtering.
+        , TextureTrilinear  = FilterTrilinear   << 9    //!< Use a trilinear texture filtering.
     };
     
     namespace Private
@@ -601,7 +601,7 @@ namespace Renderer {
         //! Returns a stencil bits from options
         NIMBLE_INLINE s32 stencilBitsFromOptions(u32 options)
         {
-            switch ((options >> 6) & 0x3)
+            switch ((options >> 6) & 0x4)
             {
                 case 0:         return 0;
                 case Stencil8:  return 8;
@@ -614,7 +614,7 @@ namespace Renderer {
         //! Returns a texture filtering from options
         NIMBLE_INLINE TextureFilter textureFilterFromOptions(u32 options)
         {
-            return static_cast<TextureFilter>((options >> 8) & 0xF);
+            return static_cast<TextureFilter>((options >> 9) & 0xF);
         }
     } // namespace Private
 
