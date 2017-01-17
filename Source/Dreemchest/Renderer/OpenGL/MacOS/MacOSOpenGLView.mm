@@ -49,6 +49,7 @@ MacOSOpenGLView::~MacOSOpenGLView( void )
 bool MacOSOpenGLView::initialize( NSWindow* window, u32 options, id delegate )
 {
     m_view = [[CocoaOpenGLView alloc] initWithWindow: window depthStencil:options];
+    [m_view setOwner: this];
     [window setContentView: m_view];
     return true;
 }

@@ -27,18 +27,30 @@
 #ifndef __DC_Renderer_CocoaOpenGLView_H__
 #define __DC_Renderer_CocoaOpenGLView_H__
 
+#include "../../Renderer.h"
 #include <Cocoa/Cocoa.h>
 #include <QuartzCore/CVDisplayLink.h>
+
+DC_BEGIN_DREEMCHEST
+namespace Renderer
+{
+    class RenderView;
+}
+DC_END_DREEMCHEST
+
+DC_USE_DREEMCHEST
 
 // ** CocoaOpenGLView
 @interface CocoaOpenGLView : NSOpenGLView {
         CVDisplayLinkRef        m_displayLink;
         NSWindow*               m_window;
+        Renderer::RenderView*   m_owner;
     }
     - ( id )    initWithWindow: ( NSWindow* )window depthStencil:( unsigned int )options;
     - ( BOOL )  beginFrame;
     - ( void )  endFrame;
     - ( BOOL )  makeCurrent;
+    - ( void )  setOwner: ( Renderer::RenderView* )view;
 @end
 
 #endif /*   !defined( __DC_Renderer_CocoaOpenGLView_H__ ) */

@@ -27,34 +27,41 @@
 #include "CocoaOpenGLView.h"
 #include "../../Renderer.h"
 
+#include <OpenGL/gl.h>
+#include <OpenGL/glext.h>
+
 DC_USE_DREEMCHEST
 
 // ** CocoaOpenGLView
 @implementation CocoaOpenGLView
 
-// ** getFrameForTime
-- ( CVReturn ) getFrameForTime : ( const CVTimeStamp* )outputTime
-{
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    
-    [self setNeedsDisplay: YES];
-    [pool release];
-
-    return kCVReturnSuccess;
-}
-
 // ** displayCallback
 static CVReturn displayCallback( CVDisplayLinkRef displayLink, const CVTimeStamp* now, const CVTimeStamp* outputTime, CVOptionFlags flagsIn, CVOptionFlags* flagsOut, void* displayLinkContext )
 {
-    CVReturn result = [(CocoaOpenGLView*)displayLinkContext getFrameForTime:outputTime];
-    return result;
+    CocoaOpenGLView* view = reinterpret_cast<CocoaOpenGLView*>(displayLinkContext);
+    [view renderForTime];
+    return kCVReturnSuccess;
+}
+
+// ** renderForTime
+- (void)renderForTime
+{
+    @autoreleasepool
+    {
+    //    [self setNeedsDisplay: YES];
+        if (m_owner)
+        {
+            m_owner->notifyUpdate();
+        }
+    }
 }
 
 // ** initWithWindow
--( id ) initWithWindow: ( NSWindow* )window depthStencil:( unsigned int )options;
+-( id ) initWithWindow: ( NSWindow* )window depthStencil:( unsigned int )options
 {
     m_window        = window;
     m_displayLink   = nil;
+    m_owner         = NULL;
 
     int depth   = Renderer::Private::depthBitsFromOptions(options);
     int stencil = Renderer::Private::stencilBitsFromOptions(options);
@@ -86,7 +93,8 @@ static CVReturn displayCallback( CVDisplayLinkRef displayLink, const CVTimeStamp
         return NO;
     }
 
-    [self makeCurrent];
+    [[self openGLContext] makeCurrentContext];
+    
     CGLError error = CGLLockContext( ( CGLContextObj )[[self openGLContext] CGLContextObj] );
     if( error != kCGLNoError ) {
         NSLog( @"CocoaOpenGLView::beginFrame : CGLLockContext error %x\n", error );
@@ -161,11 +169,19 @@ static CVReturn displayCallback( CVDisplayLinkRef displayLink, const CVTimeStamp
     [[self openGLContext] setValues:&swapInt forParameter:NSOpenGLCPSwapInterval];
 }
 
-// ** drawRect
-- ( void ) drawRect : ( NSRect )rect
+- ( void ) setOwner: ( Renderer::RenderView* )view
 {
-    [m_window update];
+    m_owner = view;
 }
+
+// ** drawRect
+//- ( void ) drawRect : ( NSRect )rect
+//{
+//    if (m_owner)
+//   {
+//        m_owner->notifyUpdate();
+//    }
+//}
 
 // ** dealoc
 - ( void ) dealloc
