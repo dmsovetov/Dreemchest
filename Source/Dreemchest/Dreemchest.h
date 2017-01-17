@@ -82,7 +82,7 @@ DC_BEGIN_DREEMCHEST
     namespace Platform {
     
         //! Returns current time in milliseconds.
-        extern u32 currentTime( void );
+        extern u64 currentTime( void );
 
     } // namespace Platform
 

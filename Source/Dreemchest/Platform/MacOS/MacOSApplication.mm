@@ -47,11 +47,11 @@ IApplication* createServiceApplication( void )
 }
     
 // ** currentTime
-u32 currentTime( void )
+u64 currentTime( void )
 {
     timeval time;
     gettimeofday(&time, NULL);
-    return static_cast<u32>(((time.tv_sec) * 1000 + time.tv_usec/1000.0) + 0.5);
+    return static_cast<u64>(((time.tv_sec) * 1000 + time.tv_usec/1000.0) + 0.5);
 }
 
 // ** MacOSApplication::quit
