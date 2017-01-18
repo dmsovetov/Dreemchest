@@ -172,6 +172,32 @@ namespace Examples
         "}                                              \n"
         ;
     
+    const String VertexSkyBox =
+        "cbuffer Projection projection : 0;                         \n"
+        "cbuffer Camera     camera     : 1;                         \n"
+        
+        "varying vec3 v_texCoord;                                   \n"
+        
+        "void main()                                                \n"
+        "{                                                          \n"
+        "   gl_Position = projection.transform                      \n"
+        "               * camera.rotation                           \n"
+        "               * gl_Vertex;                                \n"
+        "   v_texCoord  = gl_Vertex.xyz;                            \n"
+        "}                                                          \n"
+        ;
+        
+    const String FragmentSkyBox =
+        "uniform samplerCube Texture0;                              \n"
+        
+        "varying vec3 v_texCoord;                                   \n"
+        
+        "void main()                                                \n"
+        "{                                                          \n"
+        "   gl_FragColor = textureCube(Texture0, v_texCoord);       \n"
+        "}                                                          \n"
+        ;
+    
     const f32 Triangle[9] =
     {
         -1.0f, -1.0f, 0.0f,
@@ -274,6 +300,27 @@ namespace Examples
         , -Vec3::axisZ()
     };
     
+    RenderItem createSkyBox(RenderingContextWPtr renderingContext, Texture_ texture)
+    {
+        RenderItem renderItem;
+        
+        InputLayout   inputLayout  = renderingContext->requestInputLayout(VertexFormat::Position);
+        VertexBuffer_ vertexBuffer = renderingContext->requestVertexBuffer(UnitCube, sizeof(UnitCube));
+        Program       program      = renderingContext->requestProgram(VertexSkyBox, FragmentSkyBox);
+        
+        renderItem.primitives = PrimTriangles;
+        renderItem.first      = 0;
+        renderItem.count      = 36;
+        renderItem.indexed    = false;
+        renderItem.states.bindVertexBuffer(vertexBuffer);
+        renderItem.states.bindInputLayout(inputLayout);
+        renderItem.states.bindTexture(texture, 0);
+        renderItem.states.bindProgram(program);
+        renderItem.states.setDepthState(LessEqual, false);
+        
+        return renderItem;
+    }
+    
     RenderItem createRenderItemFromMesh(RenderingContextWPtr renderingContext, const String& fileName)
     {
         Examples::Mesh mesh = Examples::objFromFile(fileName);
@@ -325,7 +372,7 @@ namespace Examples
             pixels.insert(pixels.end(), images[i].pixels.begin(), images[i].pixels.end());
         }
         
-        return renderingContext->requestTextureCube(&pixels[0], images[0].width, 1, images[0].format);
+        return renderingContext->requestTextureCube(&pixels[0], images[0].width, 1, images[0].format | TextureTrilinear);
     }
     
     //! Creates a fullscreen quad rendering states
