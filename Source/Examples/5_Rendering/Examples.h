@@ -304,13 +304,6 @@ namespace Examples
         return renderItem;
     }
     
-    // Creates an environment map from a texture
-    Texture_ createEnvTexture(RenderingContextWPtr renderingContext, const String& fileName)
-    {
-        CubeMap cubeMap = cubeFromDds(fileName);
-        return renderingContext->requestTextureCube(&cubeMap.pixels[0], cubeMap.size, cubeMap.mipLevels, cubeMap.format);
-    }
-    
     // Creates an environment map from a set of cube map faces.
     Texture_ createEnvFromFiles(RenderingContextWPtr renderingContext, const String& path)
     {
