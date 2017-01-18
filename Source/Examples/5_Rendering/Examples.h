@@ -401,6 +401,11 @@ namespace Examples
             m_camera.position = value;
         }
         
+        f32 time() const
+        {
+            return m_time;
+        }
+        
         virtual bool initialize(s32 width, s32 height) NIMBLE_OVERRIDE
         {
             if (!RenderingApplicationDelegate::initialize(width, height))
@@ -427,6 +432,8 @@ namespace Examples
                 m_camera.constantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Examples::Camera), uniformLayout);
                 defaultStates.bindConstantBuffer(m_camera.constantBuffer, 1);
             }
+            
+            m_time = 0.0f;
             
             return true;
         }
@@ -471,6 +478,8 @@ namespace Examples
         
         virtual void handleRenderFrame(f32 dt)
         {
+            m_time += dt;
+            
             RenderFrame& frame = m_renderingContext->allocateFrame();
             RenderCommandBuffer& commands = frame.entryPoint();
             
@@ -484,6 +493,8 @@ namespace Examples
         }
         
     private:
+        
+        f32                 m_time;
 
         struct
         {
