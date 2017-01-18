@@ -493,6 +493,13 @@ ConstantBuffer_ RenderingContext::requestConstantBuffer(const void* data, s32 si
     ConstantBuffer_ id = allocateIdentifier(RenderResourceType::ConstantBuffer);
     return m_resourceCommandBuffer->createConstantBuffer(id, data, size, layout);
 }
+    
+// ** RenderingContext::requestConstantBuffer
+ConstantBuffer_ RenderingContext::requestConstantBuffer(const void* data, s32 size, const String& name, const UniformElement* elements)
+{
+    UniformLayout layout = requestUniformLayout(name, elements);
+    return requestConstantBuffer(data, size, layout);
+}
 
 // ** RenderingContext::requestTexture2D
 Texture_ RenderingContext::requestTexture2D(const void* data, u16 width, u16 height, u32 options)

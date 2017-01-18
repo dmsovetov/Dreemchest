@@ -102,6 +102,9 @@ namespace Renderer
         
         //! Queues a constant buffer instance for creation and returns it's index.
         ConstantBuffer_                         requestConstantBuffer(const void* data, s32 size, UniformLayout layout);
+        
+        //! Queues a constant buffer instance for creation and returns it's index.
+        ConstantBuffer_                         requestConstantBuffer(const void* data, s32 size, const String& name, const UniformElement* elements);
 
         //! Queues a constant buffer instance for creation and returns it's index.
         ConstantBuffer_                         deprecatedRequestConstantBuffer(const void* data, s32 size, const UniformElement* elements);
