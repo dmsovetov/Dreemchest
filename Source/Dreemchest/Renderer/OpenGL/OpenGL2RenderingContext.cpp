@@ -35,6 +35,10 @@ DC_BEGIN_DREEMCHEST
 namespace Renderer
 {
 
+#if defined(DC_PLATFORM_WINDOWS)
+    extern PFNGLDRAWBUFFERSPROC glDrawBuffers;
+#endif
+
 // ** createOpenGL2RenderingContext
 RenderingContextPtr createOpenGL2RenderingContext(RenderViewPtr view)
 {
@@ -107,6 +111,7 @@ OpenGL2RenderingContext::OpenGL2RenderingContext(RenderViewPtr view)
     , m_activeFeatures(0)
 #endif  //  #if DEV_RENDERER_PROGRAM_CACHING
 {
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     m_shaderLibrary.addPreprocessor(DC_NEW ShaderPreprocessor);
     m_shaderLibrary.addPreprocessor(DC_NEW ShaderVersionPreprocessor(110));
     

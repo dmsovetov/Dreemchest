@@ -28,14 +28,17 @@
 
 DC_BEGIN_DREEMCHEST
 
+Renderer::RenderViewWPtr renderView;
+
 namespace Renderer {
 
 // ** createOpenGLView
-RenderViewPtr createOpenGLView(void* window, PixelFormat depthStencil)
+RenderViewPtr createOpenGLView(void* window, u32 options)
 {
     WindowsOpenGLView* view = DC_NEW WindowsOpenGLView;
-    view->initialize( reinterpret_cast<HWND>( window ), depthStencil );
+    view->initialize( reinterpret_cast<HWND>( window ), options );
     LogVerbose( "opengl", "Windows OpenGL viewport created\n" );
+    renderView = view;
     return view;
 }
 
@@ -48,22 +51,13 @@ WindowsOpenGLView::~WindowsOpenGLView( void )
 }
 
 // ** WindowsOpenGLView::initialize
-bool WindowsOpenGLView::initialize( HWND window, PixelFormat depthStencil )
+bool WindowsOpenGLView::initialize( HWND window, u32 options )
 {
 	PIXELFORMATDESCRIPTOR   pfd;
 	int                     pixelFormat;
 
-	int stencil = 8;
-	int depth   = 24;
-
-	switch( depthStencil ) {
-	case PixelD24X8:	depth = 24;
-						stencil = 0;
-						break;
-	case PixelD24S8:	depth = 24;
-						stencil = 8;
-						break;
-	}
+	int stencil = Private::stencilBitsFromOptions(options);
+	int depth   = Private::depthBitsFromOptions(options);
 
 	memset( &pfd, 0, sizeof( pfd ) );
 	pfd.nSize           = sizeof( pfd );

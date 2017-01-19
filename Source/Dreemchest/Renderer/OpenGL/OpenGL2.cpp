@@ -80,6 +80,7 @@ static PFNGLUNIFORM4FVARBPROC           glUniform4fv            = NULL;
 static PFNGLUNIFORMMATRIX4FVARBPROC     glUniformMatrix4fv      = NULL;
 
 // GL_framebuffer_object
+PFNGLDRAWBUFFERSPROC             glDrawBuffers               = NULL;
 static PFNGLDELETEFRAMEBUFFERSPROC      glDeleteFramebuffers        = NULL;
 static PFNGLFRAMEBUFFERTEXTURE2DPROC    glFramebufferTexture2D      = NULL;
 static PFNGLGENFRAMEBUFFERSPROC         glGenFramebuffers           = NULL;
@@ -677,6 +678,7 @@ bool OpenGL2::initialize()
     glUniform4fv            = ( PFNGLUNIFORM4FVARBPROC )            wglGetProcAddress( "glUniform4fvARB" );
     glUniformMatrix4fv      = ( PFNGLUNIFORMMATRIX4FVARBPROC )      wglGetProcAddress( "glUniformMatrix4fvARB" );
 
+    glDrawBuffers               = ( PFNGLDRAWBUFFERSPROC )              wglGetProcAddress( "glDrawBuffers" );        
     glDeleteFramebuffers        = ( PFNGLDELETEFRAMEBUFFERSPROC )       wglGetProcAddress( "glDeleteFramebuffers" );
     glFramebufferTexture2D      = ( PFNGLFRAMEBUFFERTEXTURE2DPROC )     wglGetProcAddress( "glFramebufferTexture2D" );
     glGenFramebuffers           = ( PFNGLGENFRAMEBUFFERSPROC )          wglGetProcAddress( "glGenFramebuffers" );

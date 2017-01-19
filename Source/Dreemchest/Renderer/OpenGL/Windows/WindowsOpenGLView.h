@@ -27,7 +27,7 @@
 #ifndef __DC_Renderer_WindowsOpenGLView_H__
 #define __DC_Renderer_WindowsOpenGLView_H__
 
-#include "../OpenGLHal.h"
+#include "../OpenGL2.h"
 
 #include <windows.h>
 
@@ -47,7 +47,7 @@ namespace Renderer {
         virtual void        endFrame(bool wait) NIMBLE_OVERRIDE;
 
         // ** WindowsOpenGLView
-        bool                initialize( HWND window, PixelFormat depthStencil );
+        bool                initialize( HWND window, u32 options );
 
     private:
 
