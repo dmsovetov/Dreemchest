@@ -467,50 +467,16 @@ GLuint OpenGL2::Texture::create2D(const void* data, u16 width, u16 height, u16 m
     }
     else
     {
-        glDeleteTextures(1, &id);
-        id = createDepthStencil(width, height, options);
+        texDepthStencil(GL_TEXTURE_2D, width, height, options);
     }
     glBindTexture(GL_TEXTURE_2D, 0);
-    return id;
-}
-    
-// ** OpenGL2::Texture::createDepthStencil
-GLuint OpenGL2::Texture::createDepthStencil(u16 width, u16 height, u32 options)
-{
-    DC_CHECK_GL;
-    
-    s32           depth   = Private::depthBitsFromOptions(options);
-    s32           stencil = Private::stencilBitsFromOptions(options);
-    TextureFilter filter  = Private::textureFilterFromOptions(options);
-    
-    NIMBLE_ABORT_IF(stencil, "stencil buffer is not implemented");
-
-    GLenum format = 0;
-        
-    switch (depth)
-    {
-        case 16: format = GL_DEPTH_COMPONENT16;
-            break;
-        case 24: format = GL_DEPTH_COMPONENT24;
-            break;
-        case 32: format = GL_DEPTH_COMPONENT32;
-            break;
-    }
-    
-    GLuint id;
-    glGenTextures(1, &id);
-    glBindTexture(GL_TEXTURE_2D, id);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, textureFilter(filter));
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, textureFilter(filter));
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT/*GL_UNSIGNED_BYTE*/, NULL);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    
     return id;
 }
 
 // ** OpenGL2::Texture::createCube
 GLuint OpenGL2::Texture::createCube(const void* data, u16 size, u16 mipLevels, u32 options)
 {
+    DC_CHECK_GL_CONTEXT;
     DC_CHECK_GL;
     
     TextureFilter filter = Private::textureFilterFromOptions(options);
@@ -523,7 +489,11 @@ GLuint OpenGL2::Texture::createCube(const void* data, u16 size, u16 mipLevels, u
     glBindTexture(GL_TEXTURE_CUBE_MAP, id);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, textureFilter(filter));
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, textureFilter(filter));
-    glPixelStorei(GL_UNPACK_ALIGNMENT, align);
+    
+    if (align)
+    {
+        glPixelStorei(GL_UNPACK_ALIGNMENT, align);
+    }
     
     if (filter != FilterNearest && filter != FilterLinear && mipLevels == 1)
     {
@@ -533,7 +503,14 @@ GLuint OpenGL2::Texture::createCube(const void* data, u16 size, u16 mipLevels, u
     const GLbyte* pixels = reinterpret_cast<const GLbyte*>(data);
     for (s32 i = 0; i < 6; i++)
     {
-        pixels += texImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, pixels, size, size, mipLevels, format);
+        if (format != PixelUnknown)
+        {
+            pixels += texImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, pixels, size, size, mipLevels, format);
+        }
+        else
+        {
+            texDepthStencil(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, size, size, options);
+        }
     }
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
@@ -582,6 +559,35 @@ GLsizei OpenGL2::Texture::texImage(GLenum target, const GLbyte* data, u16 width,
     }
     
     return bytesConsumed;
+}
+   
+// ** OpenGL2::Texture::texDepthStencil
+void OpenGL2::Texture::texDepthStencil(GLenum target, u16 width, u16 height, u32 options)
+{
+    DC_CHECK_GL_CONTEXT;
+    DC_CHECK_GL;
+    
+    s32 depth   = Private::depthBitsFromOptions(options);
+    s32 stencil = Private::stencilBitsFromOptions(options);
+    
+    NIMBLE_ABORT_IF(stencil, "stencil buffer is not implemented");
+    
+    GLenum format = 0;
+    
+    switch (depth)
+    {
+        case 16:
+            format = GL_DEPTH_COMPONENT16;
+            break;
+        case 24:
+            format = GL_DEPTH_COMPONENT24;
+            break;
+        case 32:
+            format = GL_DEPTH_COMPONENT32;
+            break;
+    }
+    
+    glTexImage2D(target, 0, format, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT/*GL_UNSIGNED_BYTE*/, NULL);
 }
     
 // ** OpenGL2::Texture::bind

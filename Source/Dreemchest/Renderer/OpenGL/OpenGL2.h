@@ -183,15 +183,15 @@ namespace Renderer
             
             //! Creates a 2D texture object with a specified type and returns it's identifier.
             static GLuint   create2D(const void* data, u16 width, u16 height, u16 mipLevels, u32 options);
-            
-            //! Creates a depth-stencil texture.
-            static GLuint   createDepthStencil(u16 width, u16 height, u32 options);
-            
+
             //! Creates a cube texture object with a specified type and returns it's identifier.
             static GLuint   createCube(const void* data, u16 size, u16 mipLevels, u32 options);
             
             //! Uploads a image data to a texture.
             static GLsizei  texImage(GLenum target, const GLbyte* data, u16 width, u16 height, s32 mipLevels, PixelFormat pixelFormat);
+            
+            //! Constructs a depth stencil texture.
+            static void     texDepthStencil(GLenum target, u16 width, u16 height, u32 options);
             
             //! Binds a texture object to a pipeline.
             static void     bind(TextureType type, GLuint id, GLuint sampler);
