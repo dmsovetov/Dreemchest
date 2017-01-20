@@ -1,6 +1,7 @@
 # This path should be added to all targets as a source
 set(ASSETS ${CMAKE_CURRENT_SOURCE_DIR}/../../../Build/Examples/Assets)
 
+add_subdirectory(Framework)
 add_subdirectory(1_Basic)
 add_subdirectory(2_Advanced)
 add_subdirectory(3_Lighting)

@@ -28,6 +28,7 @@
 #ifndef __Examples_H__
 #define __Examples_H__
 
+#include "ApplicationDelegate.h"
 #include "MeshLoader.h"
 #include "TextureLoader.h"
 
@@ -386,125 +387,6 @@ namespace Examples
         states.setDepthState(LessEqual, false);
         return states;
     }
-    
-    //! A rendering application delegate with camera and arc ball rotations.
-    class ViewerApplicationDelegate : public RenderingApplicationDelegate
-    {
-    public:
-        
-        virtual void handleRenderFrame(RenderFrame& frame, StateStack& stateStack, RenderCommandBuffer& commands, f32 dt) NIMBLE_ABSTRACT;
-        
-    protected:
-        
-        void setCameraPosition(const Vec3& value)
-        {
-            m_camera.position = value;
-        }
-        
-        f32 time() const
-        {
-            return m_time;
-        }
-        
-        virtual bool initialize(s32 width, s32 height) NIMBLE_OVERRIDE
-        {
-            if (!RenderingApplicationDelegate::initialize(width, height))
-            {
-                return false;
-            }
-            
-            memset(&m_camera, 0, sizeof(m_camera));
-
-            StateBlock& defaultStates = m_renderingContext->defaultStateBlock();
-            
-            // Configure projection constant buffer
-            {
-                Examples::Projection projection = Examples::Projection::perspective(90.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
-                
-                UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Projection", Examples::Projection::Layout);
-                ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&projection, sizeof(projection), uniformLayout);
-                defaultStates.bindConstantBuffer(constantBuffer, 0);
-            }
-            
-            // Configure camera constant buffer
-            {
-                UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Camera", Examples::Camera::Layout);
-                m_camera.constantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Examples::Camera), uniformLayout);
-                defaultStates.bindConstantBuffer(m_camera.constantBuffer, 1);
-            }
-            
-            m_time = 0.0f;
-            
-            return true;
-        }
-
-        virtual void handleTouchBegan(const Platform::Window::TouchBegan& e) NIMBLE_OVERRIDE
-        {
-            m_camera.active = true;
-        }
-
-        virtual void handleTouchEnded(const Platform::Window::TouchEnded& e) NIMBLE_OVERRIDE
-        {
-            m_camera.active = false;
-        }
-
-        virtual void handleTouchMoved(const Platform::Window::TouchMoved& e) NIMBLE_OVERRIDE
-        {
-            static s32 prevX = -1;
-            static s32 prevY = -1;
-            
-            if (!m_camera.active)
-            {
-                prevX = -1;
-                prevY = -1;
-                return;
-            }
-            
-            if (prevX == -1 || prevY == -1)
-            {
-                prevX = e.x;
-                prevY = e.y;
-            }
-            
-            s32 dx = e.x - prevX;
-            s32 dy = e.y - prevY;
-            
-            m_camera.yaw   += dx * 0.25f;
-            m_camera.pitch += dy * 0.25f;
-            
-            prevX = e.x;
-            prevY = e.y;
-        }
-        
-        virtual void handleRenderFrame(f32 dt)
-        {
-            m_time += dt;
-            
-            RenderFrame& frame = m_renderingContext->allocateFrame();
-            RenderCommandBuffer& commands = frame.entryPoint();
-            
-            // Update the camera constant buffer
-            Quat rotation = Quat::rotateAroundAxis(m_camera.pitch, Vec3::axisX()) * Quat::rotateAroundAxis(m_camera.yaw, Vec3::axisY());
-            Examples::Camera camera = Examples::Camera::fromQuat(m_camera.position, rotation);
-            commands.uploadConstantBuffer(m_camera.constantBuffer, &camera, sizeof(camera));
-            
-            handleRenderFrame(frame, frame.stateStack(), commands, dt);
-            m_renderingContext->display(frame);
-        }
-        
-    private:
-        
-        f32                 m_time;
-
-        struct
-        {
-            f32             yaw;
-            f32             pitch;
-            bool            active;
-            Vec3            position;
-            ConstantBuffer_ constantBuffer;
-        } m_camera;
-    };
     
 } // namespace Examples
 
