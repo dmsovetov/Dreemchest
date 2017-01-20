@@ -70,6 +70,12 @@ OpenGLRenderingContext::OpenGLRenderingContext(RenderViewPtr view)
         m_drawBuffers = DC_NEW GLuint[m_caps.maxRenderTargets];
         memset(m_drawBuffers, 0, sizeof(GLuint) * m_caps.maxRenderTargets);
     }
+    
+    //StringArray extensions = split(reinterpret_cast<CString>(glGetString(GL_EXTENSIONS)), " ");
+    //for (size_t i = 0, n = extensions.size(); i < n; i++)
+    //{
+    //    LogVerbose("opengl", "%s\n", extensions[i].c_str());
+    //}
 }
 
 // ** OpenGLRenderingContext::~OpenGLRenderingContext
