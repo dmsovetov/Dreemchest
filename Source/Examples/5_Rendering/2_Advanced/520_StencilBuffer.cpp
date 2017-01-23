@@ -63,11 +63,10 @@ static String s_fragmentShader =
     "}                                                  \n"
     ;
 
-class StencilBuffer : public RenderingApplicationDelegate
+class StencilBuffer : public Framework::ApplicationDelegate
 {
     RenderItem      m_platform;
     RenderItem      m_object;
-    ConstantBuffer_ m_instanceConstantBuffer;
     
     virtual void handleLaunched(Application* application) NIMBLE_OVERRIDE
     {
@@ -79,8 +78,8 @@ class StencilBuffer : public RenderingApplicationDelegate
         }
         
         // First initialize render items from mesh files
-        m_platform = Framework::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/platform.obj");
-        m_object   = Framework::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/column.obj");
+        m_platform = createMesh("Assets/Meshes/platform.obj");
+        m_object   = createMesh("Assets/Meshes/column.obj");
 
         // Create a simple shader program
         Program program = m_renderingContext->requestProgram(s_vertexShader, s_fragmentShader);
@@ -108,29 +107,10 @@ class StencilBuffer : public RenderingApplicationDelegate
             // And bind it to a default state block
             defaults.bindConstantBuffer(constantBuffer, 1);
         }
-        
-        // Configure instance constant buffer
-        {
-            UniformLayout layout     = m_renderingContext->requestUniformLayout("Instance", Framework::Instance::Layout);
-            m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Framework::Instance), layout);
-            
-            // And bind it to a default state block
-            defaults.bindConstantBuffer(m_instanceConstantBuffer, 2);
-        }
     }
  
-    virtual void handleRenderFrame(f32 dt) NIMBLE_OVERRIDE
+    virtual void handleRenderFrame(RenderFrame& frame, StateStack& stateStack, RenderCommandBuffer& commands, f32 dt) NIMBLE_OVERRIDE
     {
-        RenderFrame& frame = m_renderingContext->allocateFrame();
-        
-        RenderCommandBuffer& commands = frame.entryPoint();
-        
-        static f32 s_time = 0.0f;
-        s_time += dt;
-        
-        // In this sample we will use a state stack
-        StateStack& states = frame.stateStack();
-
         // Clear the viewport
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
         
@@ -142,7 +122,7 @@ class StencilBuffer : public RenderingApplicationDelegate
         
         // Write a platform to the stencil buffer to create a reflection mask.
         {
-            StateScope mask = states.newScope();
+            StateScope mask = stateStack.newScope();
             mask->setDepthState(LessEqual, false);
             mask->setColorMask(0);
             mask->setStencilFunction(Always, 1);
@@ -154,26 +134,19 @@ class StencilBuffer : public RenderingApplicationDelegate
         // Now render the reflection
         {
             commands.clear(Rgba(), ClearDepth);
-            StateScope reflection = states.newScope();
+            StateScope reflection = stateStack.newScope();
             reflection->setStencilFunction(Equal, 1);
             reflection->setStencilOp(StencilKeep, StencilKeep, StencilKeep);
             reflection->setCullFace(TriangleFaceFront);
             reflection->setBlend(BlendSrcAlpha, BlendInvSrcAlpha);
             
-            renderItem(commands, m_object, Matrix4::scale(1.0f, -1.0f, 1.0f) * Matrix4::rotateXY(0.0f, s_time) * Matrix4::translation(position) * Matrix4::scale(scale), 0.3f);
+            renderItem(commands, m_object, Matrix4::scale(1.0f, -1.0f, 1.0f) * Matrix4::rotateXY(0.0f, time()) * Matrix4::translation(position) * Matrix4::scale(scale), 0.3f);
         }
 
         // Finally render the stanford bunny
-        renderItem(commands, m_object, Matrix4::rotateXY(0.0f, s_time) * Matrix4::translation(position) * Matrix4::scale(scale));
+        renderItem(commands, m_object, Matrix4::rotateXY(0.0f, time()) * Matrix4::translation(position) * Matrix4::scale(scale));
 
         m_renderingContext->display(frame);
-    }
-    
-    void renderItem(RenderCommandBuffer& commands, const RenderItem& item, const Matrix4& transform = Matrix4(), f32 alpha = 1.0f)
-    {
-        Framework::Instance instance = Framework::Instance::fromTransform(transform, alpha);
-        commands.uploadConstantBuffer(m_instanceConstantBuffer, &instance, sizeof(instance));
-        commands.drawItem(0, item);
     }
 };
 

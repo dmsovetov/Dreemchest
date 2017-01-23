@@ -110,28 +110,6 @@ static String s_fragmentShader =
     "}                                                                                      \n"
     ;
 
-static String s_vertexConstantColor =
-    "cbuffer Projection projection : 0;                                         \n"
-    "cbuffer Camera     camera     : 1;                                         \n"
-    "cbuffer Instance   instance   : 2;                                         \n"
-
-    "void main()                                                                \n"
-    "{                                                                          \n"
-    "   gl_Position = projection.transform                                      \n"
-    "               * camera.transform                                          \n"
-    "               * instance.transform                                        \n"
-    "               * gl_Vertex                                                 \n"
-    "               ;                                                           \n"
-    "}                                                                          \n"
-    ;
-
-static String s_fragmentConstantColor =
-    "void main()                                                                \n"
-    "{                                                                          \n"
-    "   gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);                                \n"
-    "}                                                                          \n"
-    ;
-
 static String s_vertexShadow =
     "cbuffer Instance instance  : 2;                                            \n"
     "cbuffer Shadow   shadow    : 4;                                            \n"
@@ -198,17 +176,10 @@ UniformElement Shadow::Layout[] =
 class PointLights : public Framework::ApplicationDelegate
 {
     StateBlock8     m_renderStates;
-    RenderItem      m_platform;
-    RenderItem      m_object;
-    RenderItem      m_column;
-    RenderItem      m_sphere;
-    ConstantBuffer_ m_instanceConstantBuffer;
     ConstantBuffer_ m_lightConstantBuffer;
     ConstantBuffer_ m_shadowConstantBuffer;
-    Program         m_programConstantColor;
     Program         m_programShadow;
     Texture_        m_envmap;
-    RenderItem      m_skyBox;
     
     virtual void handleLaunched(Application* application) NIMBLE_OVERRIDE
     {
@@ -221,21 +192,8 @@ class PointLights : public Framework::ApplicationDelegate
         
         m_envmap = m_renderingContext->requestTextureCube(NULL, 512, 1, TextureRgba8);
         
-        // First initialize objects that will be rendered
-        m_platform = Framework::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/platform.obj");
-        m_object   = Framework::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/bunny_decimated.obj");
-        m_column   = Framework::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/column.obj");
-        m_sphere   = Framework::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/sphere.obj");
-        m_skyBox   = Framework::createSkyBox(m_renderingContext, m_envmap);
-        
         setCameraPosition(Vec3(0.0f, 2.0f, -2.0f));
-        
-        // Configure instance constant buffer
-        {
-            m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Framework::Instance), "Instance", Framework::Instance::Layout);
-            m_renderStates.bindConstantBuffer(m_instanceConstantBuffer, 2);
-        }
-        
+
         // Configure a light constant buffer
         {
             m_lightConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Light), "Light", Light::Layout);
@@ -251,8 +209,7 @@ class PointLights : public Framework::ApplicationDelegate
         // Create a simple shader program
         Program program = m_renderingContext->requestProgram(s_vertexShader, s_fragmentShader);
         m_renderStates.bindProgram(program);
-        
-        m_programConstantColor = m_renderingContext->requestProgram(s_vertexConstantColor, s_fragmentConstantColor);
+
         m_programShadow = m_renderingContext->requestProgram(s_vertexShadow, s_fragmentShadow);
     }
     
@@ -274,20 +231,16 @@ class PointLights : public Framework::ApplicationDelegate
         
         // Clear the viewport
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
-        
-        commands.drawItem(0, m_skyBox);
-        
+
         TransientTexture shadow = renderShadow(commands, stateStack, 512, s_light.position);
         StateScope shadowScope = stateStack.newScope();
         shadowScope->bindTexture(shadow, 0);
-        renderScene(commands);
+        renderColumnsScene(commands);
         commands.releaseTexture(shadow);
         
         // Render light sources for debugging
-        StateScope constantColorScope = stateStack.newScope();
-        constantColorScope->bindProgram(m_programConstantColor);
-        renderItem(commands, m_sphere, Matrix4::translation(s_light.position) * Matrix4::scale(0.05f, 0.05f, 0.05f));
-        
+        renderPinkItem(commands, stateStack, m_sphere, Matrix4::translation(s_light.position) * Matrix4::scale(0.05f, 0.05f, 0.05f));
+
         m_renderingContext->display(frame);
     }
     
@@ -336,35 +289,10 @@ class PointLights : public Framework::ApplicationDelegate
             
             renderShadow.clear(Rgba(0.0f, 0.0f, 0.0f), ClearAll);
             renderShadow.uploadConstantBuffer(m_shadowConstantBuffer, &shadow, sizeof(shadow));
-            renderScene(renderShadow);
+            renderColumnsScene(renderShadow);
         }
         
         return shadow;
-    }
-    
-    void renderScene(RenderCommandBuffer& commands)
-    {
-        // Render the platform
-        renderItem(commands, m_platform, Matrix4::scale(1.5f, 1.0f, 1.5f));
-        
-        // Now the stanford bunny
-        renderItem(commands, m_object, Matrix4::scale(0.5f, 0.5f, 0.5f));
-        
-        // And finally columns
-        for (s32 x = -1; x <= 1; x++)
-        {
-            for (s32 z = -1; z <= 1; z++)
-            {
-                renderItem(commands, m_column, Matrix4::scale(0.1f, 0.1f, 0.1f) * Matrix4::translation(x * 10.0f, 1.0f, z * 10.0f));
-            }
-        }
-    }
-    
-    void renderItem(RenderCommandBuffer& commands, const RenderItem& item, const Matrix4& transform = Matrix4())
-    {
-        Framework::Instance instance = Framework::Instance::fromTransform(transform);
-        commands.uploadConstantBuffer(m_instanceConstantBuffer, &instance, sizeof(instance));
-        commands.drawItem(0, item);
     }
 };
 

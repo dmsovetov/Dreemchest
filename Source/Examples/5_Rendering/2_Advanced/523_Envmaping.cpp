@@ -97,7 +97,6 @@ class Envmapping : public Framework::ApplicationDelegate
     StateBlock8     m_renderStates;
     RenderItem      m_object;
     RenderItem      m_skyBox;
-    ConstantBuffer_ m_instanceConstantBuffer;
     
     virtual void handleLaunched(Application* application) NIMBLE_OVERRIDE
     {
@@ -109,20 +108,14 @@ class Envmapping : public Framework::ApplicationDelegate
         }
         
         // Create environment map
-        Texture_ envmap = Framework::createEnvFromFiles(m_renderingContext, "Assets/Textures/Environments/MonValley_DirtRoad");
+        Texture_ envmap = createCubeMap("Assets/Textures/Environments/MonValley_DirtRoad");
 
         // Now initialize objects that will be rendered
-        m_object   = Framework::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/bunny_decimated.obj");
-        m_skyBox   = Framework::createSkyBox(m_renderingContext, envmap);
+        m_object   = createMesh("Assets/Meshes/bunny_decimated.obj");
+        m_skyBox   = createSkyBox(envmap);
         
         setCameraPosition(Vec3(0.0f, 2.0f, -1.5f));
         
-        // Configure instance constant buffer
-        {
-            m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Framework::Instance), "Instance", Framework::Instance::Layout);
-            m_renderStates.bindConstantBuffer(m_instanceConstantBuffer, 2);
-        }
-
         // Create a simple shader program
         Program program = m_renderingContext->requestProgram(s_vertexShader, s_fragmentShader);
         m_renderStates.bindProgram(program);
@@ -144,13 +137,6 @@ class Envmapping : public Framework::ApplicationDelegate
         renderItem(commands, m_object, Matrix4::rotateXY(0.0f, time()) * Matrix4::translation(Vec3(0.0f, 1.0f, 0.0f)));
 
         m_renderingContext->display(frame);
-    }
-    
-    void renderItem(RenderCommandBuffer& commands, const RenderItem& item, const Matrix4& transform = Matrix4())
-    {
-        Framework::Instance instance = Framework::Instance::fromTransform(transform);
-        commands.uploadConstantBuffer(m_instanceConstantBuffer, &instance, sizeof(instance));
-        commands.drawItem(0, item);
     }
 };
 

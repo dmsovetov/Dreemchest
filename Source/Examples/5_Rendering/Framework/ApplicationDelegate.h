@@ -52,9 +52,27 @@ namespace Framework
         virtual void        handleTouchMoved(const Platform::Window::TouchMoved& e) NIMBLE_OVERRIDE;
         virtual void        handleRenderFrame(f32 dt) NIMBLE_OVERRIDE;
         
+        void                renderColumnsScene(RenderCommandBuffer& commands);
+        void                renderPinkItem(RenderCommandBuffer& commands, StateStack& stateStack, const RenderItem& item, const Matrix4& transform = Matrix4(), f32 alpha = 1.0f);
+        void                renderItem(RenderCommandBuffer& commands, const RenderItem& item, const Matrix4& transform = Matrix4(), f32 alpha = 1.0f);
+        
+        RenderItem          createSkyBox(Texture_ texture);
+        RenderItem          createMesh(const String& fileName);
+        RenderItem          createFullscreenQuad();
+        Texture_            createCubeMap(const String& path);
+        
+    protected:
+        
+        RenderItem          m_sphere;
+        
     private:
         
         f32                 m_time;
+        RenderItem          m_platform;
+        RenderItem          m_object;
+        RenderItem          m_column;
+        ConstantBuffer_     m_instanceConstantBuffer;
+        Program             m_programPink;
         
         struct
         {

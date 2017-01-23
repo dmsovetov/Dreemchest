@@ -159,14 +159,14 @@ const UniformElement Kernel::Layout[] =
     , { NULL }
 };
 
-class RenderingToTexture : public RenderingApplicationDelegate
+class RenderingToTexture : public Framework::ApplicationDelegate
 {
     StateBlock8 m_renderStates;
     ConstantBuffer_ m_cameraCBuffer;
     ConstantBuffer_ m_projectionCBuffer;
     ConstantBuffer_ m_instanceCBuffer;
     RenderItem m_mesh;
-    StateBlock8 m_fullscreenQuad;
+    RenderItem m_fullscreenQuad;
     Texture_ m_envmap;
     Texture_ m_diffuse;
     Texture_ m_specular;
@@ -187,8 +187,8 @@ class RenderingToTexture : public RenderingApplicationDelegate
         }
 
         // Load mesh from a file
-        m_mesh = Framework::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/bunny.obj");
-        m_envmap = Framework::createEnvFromFiles(m_renderingContext, "Assets/Textures/Environments/MonValley_DirtRoad");
+        m_mesh = createMesh("Assets/Meshes/bunny.obj");
+        m_envmap = createCubeMap("Assets/Textures/Environments/MonValley_DirtRoad");
 
         // Projection cbuffer
         {
@@ -212,7 +212,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
             m_instanceCBuffer = m_renderingContext->requestConstantBuffer(&s_instance, sizeof(s_instance), layout);
         }
         
-        m_fullscreenQuad = Framework::createFullscreenRenderingStates(m_renderingContext);
+        m_fullscreenQuad = createFullscreenQuad();
         
         // Create a program that consists from a vertex and fragment shaders.
         m_renderStates.disableBlending();
@@ -230,16 +230,8 @@ class RenderingToTexture : public RenderingApplicationDelegate
         m_diffuse  = convolve(m_envmap, 128, 160);
     }
  
-    virtual void handleRenderFrame(f32 dt) NIMBLE_OVERRIDE
+    virtual void handleRenderFrame(RenderFrame& frame, StateStack& stateStack, RenderCommandBuffer& commands, f32 dt) NIMBLE_OVERRIDE
     {
-        static f32 s_time = 0.0f;
-        s_time += dt;
-        
-        RenderFrame& frame = m_renderingContext->allocateFrame();
-        
-        StateStack&          stateStack = frame.stateStack();
-        RenderCommandBuffer& commands   = frame.entryPoint();
-        
         StateScope defaults = stateStack.push(&m_renderStates);
         
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
@@ -247,12 +239,11 @@ class RenderingToTexture : public RenderingApplicationDelegate
         
         {
             s_projection.viewport = Vec4(0, 0, (f32)m_window->width(), (f32)m_window->height());
-            StateScope backgroundPass = stateStack.push(&m_fullscreenQuad);
             StateScope backgroundProgram = stateStack.newScope();
             backgroundProgram->bindProgram(m_backgroundProgram);
             backgroundProgram->bindTexture(m_envmap, 0);
             commands.uploadConstantBuffer(m_projectionCBuffer, &s_projection, sizeof(s_projection));
-            commands.drawPrimitives(1, PrimQuads, 0, 4);
+            commands.drawItem(0, m_fullscreenQuad);
         }
         
         StateScope meshPass = stateStack.newScope();
@@ -263,7 +254,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
         meshPass->bindTexture(m_specular, 1);
         
         StateScope meshStates = stateStack.push(&m_mesh.states);
-        s_instance = Framework::Instance::fromTransform(Matrix4::rotateXY(0.0f, s_time));
+        s_instance = Framework::Instance::fromTransform(Matrix4::rotateXY(0.0f, time()));
         commands.uploadConstantBuffer(m_instanceCBuffer, &s_instance, sizeof(s_instance));
         commands.drawItem(0, m_mesh);
 
@@ -341,8 +332,6 @@ class RenderingToTexture : public RenderingApplicationDelegate
         u32 commandBufferTime = currentTime();
         for (s32 j = 0; j < iterations; j++)
         {
-            StateScope quadStates = stateStack.push(&m_fullscreenQuad);
-            
             // Generate and upload a convolution kernel for this iteration
             commands.uploadConstantBuffer(kernelCBuffer, persistentPointer(&kernels[j]), sizeof(Kernel));
             
@@ -357,7 +346,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
                 
                 Framework::Camera camera = Framework::Camera::lookAt(Vec3::zero(), target[i], up[i]);
                 renderToCubeMap.uploadConstantBuffer(m_cameraCBuffer, &camera, sizeof(camera));
-                renderToCubeMap.drawPrimitives(0, PrimQuads, 0, 4);
+                renderToCubeMap.drawItem(0, m_fullscreenQuad);
             }
         }
         commandBufferTime = currentTime() - commandBufferTime;

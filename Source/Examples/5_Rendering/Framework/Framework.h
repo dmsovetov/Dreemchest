@@ -171,6 +171,21 @@ namespace Framework
         "}                                                          \n"
         ;
     
+    const String VertexFixedTransform =
+        "cbuffer Projection projection : 0;                                         \n"
+        "cbuffer Camera     camera     : 1;                                         \n"
+        "cbuffer Instance   instance   : 2;                                         \n"
+        
+        "void main()                                                                \n"
+        "{                                                                          \n"
+        "   gl_Position = projection.transform                                      \n"
+        "               * camera.transform                                          \n"
+        "               * instance.transform                                        \n"
+        "               * gl_Vertex                                                 \n"
+        "               ;                                                           \n"
+        "}                                                                          \n"
+        ;
+    
     const f32 Triangle[9] =
     {
         -1.0f, -1.0f, 0.0f,
@@ -272,93 +287,6 @@ namespace Framework
         ,  Vec3::axisZ()
         , -Vec3::axisZ()
     };
-    
-    inline RenderItem createSkyBox(RenderingContextWPtr renderingContext, Texture_ texture)
-    {
-        RenderItem renderItem;
-        
-        InputLayout   inputLayout  = renderingContext->requestInputLayout(VertexFormat::Position);
-        VertexBuffer_ vertexBuffer = renderingContext->requestVertexBuffer(UnitCube, sizeof(UnitCube));
-        Program       program      = renderingContext->requestProgram(VertexSkyBox, FragmentSkyBox);
-        
-        renderItem.primitives = PrimTriangles;
-        renderItem.first      = 0;
-        renderItem.count      = 36;
-        renderItem.indexed    = false;
-        renderItem.states.bindVertexBuffer(vertexBuffer);
-        renderItem.states.bindInputLayout(inputLayout);
-        renderItem.states.bindTexture(texture, 0);
-        renderItem.states.bindProgram(program);
-        renderItem.states.setDepthState(LessEqual, false);
-        
-        return renderItem;
-    }
-    
-    inline RenderItem createRenderItemFromMesh(RenderingContextWPtr renderingContext, const String& fileName)
-    {
-        Mesh mesh = objFromFile(fileName);
-        NIMBLE_ABORT_IF(!mesh, "failed to load mesh");
-        
-        VertexFormat vertexFormat  = mesh.vertexFormat;
-        InputLayout inputLayout    = renderingContext->requestInputLayout(vertexFormat);
-        VertexBuffer_ vertexBuffer = renderingContext->requestVertexBuffer(&mesh.vertices[0], mesh.vertices.size());
-        
-        RenderItem renderItem;
-        renderItem.primitives = mesh.primitives;
-        renderItem.first      = 0;
-        renderItem.count      = mesh.vertices.size();
-        renderItem.states.bindInputLayout(inputLayout);
-        renderItem.states.bindVertexBuffer(vertexBuffer);
-        
-        if (mesh.indices.size())
-        {
-            IndexBuffer_ indexBuffer = renderingContext->requestIndexBuffer(&mesh.indices[0], sizeof(u16) * mesh.indices.size());
-            renderItem.states.bindIndexBuffer(indexBuffer);
-            renderItem.indexed = true;
-        }
-        else
-        {
-            renderItem.indexed = false;
-        }
-        
-        return renderItem;
-    }
-    
-    // Creates an environment map from a set of cube map faces.
-    inline Texture_ createEnvFromFiles(RenderingContextWPtr renderingContext, const String& path)
-    {
-        Image images[6];
-        String fileNames[] =
-        {
-              path + "/posx.tga"
-            , path + "/negx.tga"
-            , path + "/posy.tga"
-            , path + "/negy.tga"
-            , path + "/posz.tga"
-            , path + "/negz.tga"
-        };
-        
-        Surface pixels;
-        for (s32 i = 0; i < 6; i++)
-        {
-            images[i] = tgaFromFile(fileNames[i]);
-            pixels.insert(pixels.end(), images[i].pixels.begin(), images[i].pixels.end());
-        }
-        
-        return renderingContext->requestTextureCube(&pixels[0], images[0].width, 1, images[0].format | TextureTrilinear);
-    }
-    
-    //! Creates a fullscreen quad rendering states
-    inline StateBlock8 createFullscreenRenderingStates(RenderingContextWPtr renderingContext)
-    {
-        StateBlock8 states;
-        InputLayout   il = renderingContext->requestInputLayout(0);
-        VertexBuffer_ vb = renderingContext->requestVertexBuffer(FullscreenQuad, sizeof(FullscreenQuad));
-        states.bindInputLayout(il);
-        states.bindVertexBuffer(vb);
-        states.setDepthState(LessEqual, false);
-        return states;
-    }
     
 } // namespace Framework
 
