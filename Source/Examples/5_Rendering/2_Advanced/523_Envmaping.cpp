@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
-#include "../Examples.h"
+#include <Framework.h>
 
 DC_USE_DREEMCHEST
 
@@ -92,7 +92,7 @@ static String s_fragmentShader =
     "}                                                                                      \n"
     ;
 
-class Envmapping : public Examples::ViewerApplicationDelegate
+class Envmapping : public Framework::ApplicationDelegate
 {
     StateBlock8     m_renderStates;
     RenderItem      m_object;
@@ -109,17 +109,17 @@ class Envmapping : public Examples::ViewerApplicationDelegate
         }
         
         // Create environment map
-        Texture_ envmap = Examples::createEnvFromFiles(m_renderingContext, "Assets/Textures/Environments/MonValley_DirtRoad");
+        Texture_ envmap = Framework::createEnvFromFiles(m_renderingContext, "Assets/Textures/Environments/MonValley_DirtRoad");
 
         // Now initialize objects that will be rendered
-        m_object   = Examples::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/bunny_decimated.obj");
-        m_skyBox   = Examples::createSkyBox(m_renderingContext, envmap);
+        m_object   = Framework::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/bunny_decimated.obj");
+        m_skyBox   = Framework::createSkyBox(m_renderingContext, envmap);
         
         setCameraPosition(Vec3(0.0f, 2.0f, -1.5f));
         
         // Configure instance constant buffer
         {
-            m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Examples::Instance), "Instance", Examples::Instance::Layout);
+            m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Framework::Instance), "Instance", Framework::Instance::Layout);
             m_renderStates.bindConstantBuffer(m_instanceConstantBuffer, 2);
         }
 
@@ -148,7 +148,7 @@ class Envmapping : public Examples::ViewerApplicationDelegate
     
     void renderItem(RenderCommandBuffer& commands, const RenderItem& item, const Matrix4& transform = Matrix4())
     {
-        Examples::Instance instance = Examples::Instance::fromTransform(transform);
+        Framework::Instance instance = Framework::Instance::fromTransform(transform);
         commands.uploadConstantBuffer(m_instanceConstantBuffer, &instance, sizeof(instance));
         commands.drawItem(0, item);
     }

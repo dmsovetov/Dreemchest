@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
-#include "../Examples.h"
+#include <Framework.h>
 
 DC_USE_DREEMCHEST
 
@@ -64,7 +64,7 @@ class Shaders : public RenderingApplicationDelegate
         Renderer::InputLayout inputLayout = m_renderingContext->requestInputLayout(VertexFormat::Position);
         
         // This time we will use a predefined vertex buffer to make this example shorter
-        Renderer::VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(Examples::Triangle, sizeof(Examples::Triangle));
+        Renderer::VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(Framework::Triangle, sizeof(Framework::Triangle));
         
         // Create a program that consists from a vertex and fragment shaders.
         Renderer::Program program = m_renderingContext->requestProgram(s_vertexShader, s_fragmentShader);

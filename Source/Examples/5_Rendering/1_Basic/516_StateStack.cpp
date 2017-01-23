@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
-#include "../Examples.h"
+#include <Framework.h>
 
 DC_USE_DREEMCHEST
 
@@ -122,8 +122,8 @@ class RenderStateStack : public RenderingApplicationDelegate
         
         // Create projection constant buffer
         {
-            Examples::Projection projection     = Examples::Projection::perspective(60.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
-            UniformLayout        layout         = m_renderingContext->requestUniformLayout("Projection", Examples::Projection::Layout);
+            Framework::Projection projection    = Framework::Projection::perspective(60.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
+            UniformLayout        layout         = m_renderingContext->requestUniformLayout("Projection", Framework::Projection::Layout);
             ConstantBuffer_      constantBuffer = m_renderingContext->requestConstantBuffer(&projection, sizeof(projection), layout);
             
             // And bind it to a state block
@@ -132,8 +132,8 @@ class RenderStateStack : public RenderingApplicationDelegate
         
         // Create a camera constant buffer
         {
-            Examples::Camera camera         = Examples::Camera::lookAt(Vec3(0.0f, 0.0f, -35.0f), Vec3(0.0f, 0.6f, 0.0f));
-            UniformLayout    layout         = m_renderingContext->requestUniformLayout("Camera", Examples::Camera::Layout);
+            Framework::Camera camera        = Framework::Camera::lookAt(Vec3(0.0f, 0.0f, -35.0f), Vec3(0.0f, 0.6f, 0.0f));
+            UniformLayout    layout         = m_renderingContext->requestUniformLayout("Camera", Framework::Camera::Layout);
             ConstantBuffer_ constantBuffer  = m_renderingContext->requestConstantBuffer(&camera, sizeof(camera), layout);
             
             // And bind it to a state block
@@ -142,8 +142,8 @@ class RenderStateStack : public RenderingApplicationDelegate
         
         // Finally create an empty instance constant buffer
         {
-            UniformLayout layout = m_renderingContext->requestUniformLayout("Instance", Examples::Instance::Layout);
-            m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Examples::Instance), layout);
+            UniformLayout layout = m_renderingContext->requestUniformLayout("Instance", Framework::Instance::Layout);
+            m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Framework::Instance), layout);
         }
         
         // Create and bind the default shader program
@@ -175,8 +175,8 @@ class RenderStateStack : public RenderingApplicationDelegate
             for (s32 x = 0; x < 11; ++x)
             {
                 // Construct an instance data from a transform matrix
-                Examples::Instance instance = Examples::Instance::fromTransform(Matrix4::translation(x * 3.0f - 15.0f, y * 3.0f - 15.0f, 0.0f) *
-                                                                                Matrix4::rotateXY(s_time + x*0.21f, s_time + y*0.37f));
+                Framework::Instance instance = Framework::Instance::fromTransform(Matrix4::translation(x * 3.0f - 15.0f, y * 3.0f - 15.0f, 0.0f) *
+                                                                                  Matrix4::rotateXY(s_time + x*0.21f, s_time + y*0.37f));
 
                 // Now push a new state scope to a stack, which will be automatically poped from stack
                 StateScope instanceStates = stateStack.newScope();

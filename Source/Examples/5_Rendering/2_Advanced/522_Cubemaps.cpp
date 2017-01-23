@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
-#include "../Examples.h"
+#include <Framework.h>
 
 DC_USE_DREEMCHEST
 
@@ -59,7 +59,7 @@ static String s_fragmentShader =
     ;
 
 // Application delegate is now subclassed from a Examples::ViewerApplicationDelegate to add camera and arcball functionality.
-class Cubemaps : public Examples::ViewerApplicationDelegate
+class Cubemaps : public Framework::ApplicationDelegate
 {
     StateBlock8 m_renderStates;
     
@@ -75,7 +75,7 @@ class Cubemaps : public Examples::ViewerApplicationDelegate
         // Create a cube vertex buffer and bind it to a render state block
         {
             InputLayout   inputLayout  = m_renderingContext->requestInputLayout(VertexFormat::Position);
-            VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(Examples::UnitCube, sizeof(Examples::UnitCube));
+            VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(Framework::UnitCube, sizeof(Framework::UnitCube));
             
             m_renderStates.bindVertexBuffer(vertexBuffer);
             m_renderStates.bindInputLayout(inputLayout);
@@ -94,12 +94,12 @@ class Cubemaps : public Examples::ViewerApplicationDelegate
                 , "Assets/Textures/Environments/" + envName + "/negz.tga"
             };
             
-            Examples::Surface pixels;
-            Examples::Image   faces[6];
+            Framework::Surface pixels;
+            Framework::Image   faces[6];
             
             for (s32 i = 0; i < 6; i++)
             {
-                faces[i] = Examples::tgaFromFile(files[i]);
+                faces[i] = Framework::tgaFromFile(files[i]);
                 pixels.insert(pixels.end(), faces[i].pixels.begin(), faces[i].pixels.end());
             }
             

@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
-#include "../Examples.h"
+#include <Framework.h>
 
 DC_USE_DREEMCHEST
 
@@ -173,9 +173,9 @@ class RenderingToTexture : public RenderingApplicationDelegate
     Program m_meshProgram;
     Program m_backgroundProgram;
     
-    Examples::Camera s_camera;
-    Examples::Projection s_projection;
-    Examples::Instance s_instance;
+    Framework::Camera s_camera;
+    Framework::Projection s_projection;
+    Framework::Instance s_instance;
 
     virtual void handleLaunched(Application* application) NIMBLE_OVERRIDE
     {
@@ -187,32 +187,32 @@ class RenderingToTexture : public RenderingApplicationDelegate
         }
 
         // Load mesh from a file
-        m_mesh = Examples::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/bunny.obj");
-        m_envmap = Examples::createEnvFromFiles(m_renderingContext, "Assets/Textures/Environments/MonValley_DirtRoad");
+        m_mesh = Framework::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/bunny.obj");
+        m_envmap = Framework::createEnvFromFiles(m_renderingContext, "Assets/Textures/Environments/MonValley_DirtRoad");
 
         // Projection cbuffer
         {
-            s_projection = Examples::Projection::perspective(60.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
+            s_projection = Framework::Projection::perspective(60.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
             
-            UniformLayout layout = m_renderingContext->requestUniformLayout("Projection", Examples::Projection::Layout);
+            UniformLayout layout = m_renderingContext->requestUniformLayout("Projection", Framework::Projection::Layout);
             m_projectionCBuffer = m_renderingContext->requestConstantBuffer(&s_projection, sizeof(s_projection), layout);
         }
         
         // Camera cbuffer
         {
-            s_camera = Examples::Camera::lookAt(Vec3(0.0f, 2.0f, -2.0f), Vec3(0.0f, 0.5f, 0.0f));
+            s_camera = Framework::Camera::lookAt(Vec3(0.0f, 2.0f, -2.0f), Vec3(0.0f, 0.5f, 0.0f));
             
-            UniformLayout layout = m_renderingContext->requestUniformLayout("Camera", Examples::Camera::Layout);
+            UniformLayout layout = m_renderingContext->requestUniformLayout("Camera", Framework::Camera::Layout);
             m_cameraCBuffer = m_renderingContext->requestConstantBuffer(&s_camera, sizeof(s_camera), layout);
         }
         
         // Camera cbuffer
         {
-            UniformLayout layout = m_renderingContext->requestUniformLayout("Instance", Examples::Instance::Layout);
+            UniformLayout layout = m_renderingContext->requestUniformLayout("Instance", Framework::Instance::Layout);
             m_instanceCBuffer = m_renderingContext->requestConstantBuffer(&s_instance, sizeof(s_instance), layout);
         }
         
-        m_fullscreenQuad = Examples::createFullscreenRenderingStates(m_renderingContext);
+        m_fullscreenQuad = Framework::createFullscreenRenderingStates(m_renderingContext);
         
         // Create a program that consists from a vertex and fragment shaders.
         m_renderStates.disableBlending();
@@ -220,7 +220,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
         m_renderStates.bindConstantBuffer(m_projectionCBuffer, 0);
         
         m_meshProgram        = m_renderingContext->requestProgram(s_vertexMesh, s_fragmentMesh);
-        m_backgroundProgram  = m_renderingContext->requestProgram(Examples::VertexIdentity, s_fragmentBackground);
+        m_backgroundProgram  = m_renderingContext->requestProgram(Framework::VertexIdentity, s_fragmentBackground);
         
         // Force a rendering context to construct all queued resources
         m_renderingContext->construct();
@@ -263,7 +263,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
         meshPass->bindTexture(m_specular, 1);
         
         StateScope meshStates = stateStack.push(&m_mesh.states);
-        s_instance = Examples::Instance::fromTransform(Matrix4::rotateXY(0.0f, s_time));
+        s_instance = Framework::Instance::fromTransform(Matrix4::rotateXY(0.0f, s_time));
         commands.uploadConstantBuffer(m_instanceCBuffer, &s_instance, sizeof(s_instance));
         commands.drawItem(0, m_mesh);
 
@@ -355,7 +355,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
                     renderToCubeMap.clear(Rgba(0.0f, 0.0f, 0.0f, 0.0f), ClearAll);
                 }
                 
-                Examples::Camera camera = Examples::Camera::lookAt(Vec3::zero(), target[i], up[i]);
+                Framework::Camera camera = Framework::Camera::lookAt(Vec3::zero(), target[i], up[i]);
                 renderToCubeMap.uploadConstantBuffer(m_cameraCBuffer, &camera, sizeof(camera));
                 renderToCubeMap.drawPrimitives(0, PrimQuads, 0, 4);
             }

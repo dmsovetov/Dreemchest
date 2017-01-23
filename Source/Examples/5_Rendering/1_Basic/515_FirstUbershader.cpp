@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
-#include "../Examples.h"
+#include <Framework.h>
 
 DC_USE_DREEMCHEST
 
@@ -84,10 +84,10 @@ class FirstUbershader : public RenderingApplicationDelegate
         InputLayout inputLayout = m_renderingContext->requestInputLayout(VertexFormat::Position);
         
         // Create a vertex buffer from a triangle vertex buffer preset.
-        VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(Examples::Triangle, sizeof(Examples::Triangle));
+        VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(Framework::Triangle, sizeof(Framework::Triangle));
         
         // Create a shader program. Nothing special in vertex shader, so use a preset.
-        Program program = m_renderingContext->requestProgram(Examples::VertexIdentity, s_fragmentShader);
+        Program program = m_renderingContext->requestProgram(Framework::VertexIdentity, s_fragmentShader);
         
         // Create a feature layout
         FeatureLayout featureLayout = m_renderingContext->requestPipelineFeatureLayout(s_features);

@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
-#include "../Examples.h"
+#include <Framework.h>
 
 #include <OpenGL/gl.h>
 
@@ -78,7 +78,7 @@ class Meshes : public RenderingApplicationDelegate
         }
         
         // First load a mesh from a file
-        Examples::Mesh mesh = Examples::objFromFile("Assets/Meshes/bunny.obj");
+        Framework::Mesh mesh = Framework::objFromFile("Assets/Meshes/bunny.obj");
         
         if (!mesh)
         {
@@ -109,26 +109,26 @@ class Meshes : public RenderingApplicationDelegate
         
         // Configure projection constant buffer
         {
-            Examples::Projection projection = Examples::Projection::perspective(60.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
+            Framework::Projection projection = Framework::Projection::perspective(60.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
             
-            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Projection", Examples::Projection::Layout);
+            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Projection", Framework::Projection::Layout);
             ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&projection, sizeof(projection), uniformLayout);
             m_renderStates.bindConstantBuffer(constantBuffer, 0);
         }
         
         // Configure camera constant buffer
         {
-            Examples::Camera camera = Examples::Camera::lookAt(Vec3(0.0f, 2.0f, -2.0f), Vec3(0.0f, 0.6f, 0.0f));
+            Framework::Camera camera = Framework::Camera::lookAt(Vec3(0.0f, 2.0f, -2.0f), Vec3(0.0f, 0.6f, 0.0f));
 
-            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Camera", Examples::Camera::Layout);
+            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Camera", Framework::Camera::Layout);
             ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&camera, sizeof(camera), uniformLayout);
             m_renderStates.bindConstantBuffer(constantBuffer, 1);
         }
         
         // Configure instance constant buffer
         {
-            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Instance", Examples::Instance::Layout);
-            m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Examples::Instance), uniformLayout);
+            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Instance", Framework::Instance::Layout);
+            m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Framework::Instance), uniformLayout);
             m_renderStates.bindConstantBuffer(m_instanceConstantBuffer, 2);
         }
         
@@ -150,7 +150,7 @@ class Meshes : public RenderingApplicationDelegate
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);
         
         // Update an instance constant buffer
-        Examples::Instance instance = Examples::Instance::fromTransform(Matrix4::rotateXY(0.0f, s_rotation));
+        Framework::Instance instance = Framework::Instance::fromTransform(Matrix4::rotateXY(0.0f, s_rotation));
         commands.uploadConstantBuffer(m_instanceConstantBuffer, &instance, sizeof(instance));
         
         // Push root rendering state block

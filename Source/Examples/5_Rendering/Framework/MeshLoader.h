@@ -25,12 +25,12 @@
  **************************************************************************/
 
 
-#ifndef __Examples_MeshLoader_H__
-#define __Examples_MeshLoader_H__
+#ifndef __Framework_MeshLoader_H__
+#define __Framework_MeshLoader_H__
 
 #include <fstream>
 
-namespace Examples
+namespace Framework
 {
     DC_USE_DREEMCHEST
     using namespace Renderer;
@@ -50,7 +50,7 @@ namespace Examples
     };
     
     //! Loads an OBJ mesh from a file.
-    Mesh objFromFile(const String& fileName)
+    inline Mesh objFromFile(const String& fileName)
     {
         std::ifstream in(Platform::Application::sharedInstance()->pathForResource(fileName));
         
@@ -213,6 +213,6 @@ namespace Examples
         return mesh;
     }
     
-} // namespace MeshLoader
+} // namespace Framework
 
-#endif  //  __Examples_MeshLoader_H__
+#endif  //  __Framework_MeshLoader_H__

@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
-#include "../Examples.h"
+#include <Framework.h>
 
 DC_USE_DREEMCHEST
 
@@ -60,10 +60,10 @@ static String s_fragmentShader =
     "}                                                  \n"
     ;
 
-class Camera : public RenderingApplicationDelegate
+class Camera : public Framework::ApplicationDelegate
 {
     StateBlock8 m_renderStates;
-    Examples::Mesh mesh;
+    Framework::Mesh mesh;
     ConstantBuffer_ m_instanceConstantBuffer;
     
     // An object rotation quaternion.
@@ -86,7 +86,7 @@ class Camera : public RenderingApplicationDelegate
         }
         
         // First load a mesh from a file
-        mesh = Examples::objFromFile("Assets/Meshes/bunny.obj");
+        mesh = Framework::objFromFile("Assets/Meshes/bunny.obj");
         
         if (!mesh)
         {
@@ -112,26 +112,26 @@ class Camera : public RenderingApplicationDelegate
         
         // Configure projection constant buffer
         {
-            Examples::Projection projection = Examples::Projection::perspective(60.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
+            Framework::Projection projection = Framework::Projection::perspective(60.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
             
-            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Projection", Examples::Projection::Layout);
+            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Projection", Framework::Projection::Layout);
             ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&projection, sizeof(projection), uniformLayout);
             m_renderStates.bindConstantBuffer(constantBuffer, 0);
         }
         
         // Configure camera constant buffer
         {
-            Examples::Camera camera = Examples::Camera::lookAt(Vec3(0.0f, 2.0f, -2.0f), Vec3(0.0f, 0.6f, 0.0f));
+            Framework::Camera camera = Framework::Camera::lookAt(Vec3(0.0f, 2.0f, -2.0f), Vec3(0.0f, 0.6f, 0.0f));
             
-            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Camera", Examples::Camera::Layout);
+            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Camera", Framework::Camera::Layout);
             ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&camera, sizeof(camera), uniformLayout);
             m_renderStates.bindConstantBuffer(constantBuffer, 1);
         }
         
         // Configure instance constant buffer
         {
-            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Instance", Examples::Instance::Layout);
-            m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Examples::Instance), uniformLayout);
+            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Instance", Framework::Instance::Layout);
+            m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Framework::Instance), uniformLayout);
             m_renderStates.bindConstantBuffer(m_instanceConstantBuffer, 2);
         }
 
@@ -190,14 +190,10 @@ class Camera : public RenderingApplicationDelegate
         return insideCircle;
     }
  
-    virtual void handleRenderFrame(f32 dt) NIMBLE_OVERRIDE
+    virtual void handleRenderFrame(RenderFrame& frame, StateStack& stateStack, RenderCommandBuffer& commands, f32 dt) NIMBLE_OVERRIDE
     {
-        RenderFrame& frame = m_renderingContext->allocateFrame();
-        
-        RenderCommandBuffer& commands = frame.entryPoint();
-        
         // Upload an instance transform
-        Examples::Instance instance = Examples::Instance::fromTransform(m_rotation);
+        Framework::Instance instance = Framework::Instance::fromTransform(m_rotation);
         commands.uploadConstantBuffer(m_instanceConstantBuffer, &instance, sizeof(instance));
         
         commands.clear(Rgba(0.3f, 0.3f, 0.3f), ClearAll);

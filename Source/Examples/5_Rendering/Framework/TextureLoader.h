@@ -25,10 +25,10 @@
  **************************************************************************/
 
 
-#ifndef __Examples_TextureLoader_H__
-#define __Examples_TextureLoader_H__
+#ifndef __Framework_TextureLoader_H__
+#define __Framework_TextureLoader_H__
 
-namespace Examples
+namespace Framework
 {
     DC_USE_DREEMCHEST
     using namespace Renderer;
@@ -57,7 +57,7 @@ namespace Examples
     };
         
     // ** convertRgbToBgr
-    void convertBgrToRgb(Array<u8>& image, s32 channels)
+    inline void convertBgrToRgb(Array<u8>& image, s32 channels)
     {
         for (size_t i = 0, n = image.size(); i < n; i += channels)
         {
@@ -68,7 +68,7 @@ namespace Examples
     }
     
     // ** calculateImageSize
-    u32 calculateImageSize(u16 width, u16 height, s32 totalMipLevels, PixelFormat format)
+    inline u32 calculateImageSize(u16 width, u16 height, s32 totalMipLevels, PixelFormat format)
     {
         u32 size = 0;
         
@@ -96,7 +96,7 @@ namespace Examples
     }
     
     // ** tgaFromFile
-    Image tgaFromFile(const String& fileName)
+    inline Image tgaFromFile(const String& fileName)
     {
         // Open the file
         FILE* file = fopen(Platform::Application::sharedInstance()->pathForResource(fileName).c_str(), "rb");
@@ -170,6 +170,6 @@ namespace Examples
         return image;
     }
     
-} // namespace Examples
+} // namespace Framework
 
-#endif  //  __Examples_TextureLoader_H__
+#endif  /*  !__Framework_TextureLoader_H__  */

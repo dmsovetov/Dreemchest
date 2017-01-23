@@ -25,15 +25,14 @@
  **************************************************************************/
 
 
-#ifndef __Examples_H__
-#define __Examples_H__
+#ifndef __Framework_H__
+#define __Framework_H__
 
 #include "ApplicationDelegate.h"
 #include "MeshLoader.h"
 #include "TextureLoader.h"
 
-//! A namespace that contains declarations for commonly used constant buffer, shader and vertex buffer types.
-namespace Examples
+namespace Framework
 {
     DC_USE_DREEMCHEST
     using namespace Renderer;
@@ -83,16 +82,8 @@ namespace Examples
         static Instance              fromTransform(const Matrix4& transform, f32 alpha = 1.0f);
     };
     
-    // ** Projection::Layout
-    const UniformElement Projection::Layout[] =
-    {
-        { "transform", UniformElement::Matrix4, offsetof(Projection, transform) }
-        , { "viewport",  UniformElement::Vec4,    offsetof(Projection, viewport)  }
-        , { NULL }
-    };
-    
     // ** Projection::ortho
-    Projection Projection::ortho(s32 left, s32 right, s32 bottom, s32 top, f32 zNear, f32 zFar)
+    inline Projection Projection::ortho(s32 left, s32 right, s32 bottom, s32 top, f32 zNear, f32 zFar)
     {
         Projection projection;
         projection.transform = Matrix4::ortho(left, right, bottom, top, zNear, zFar);
@@ -101,7 +92,7 @@ namespace Examples
     }
     
     // ** Projection::perspective
-    Projection Projection::perspective(f32 fov, s32 width, s32 height, f32 zNear, f32 zFar)
+    inline Projection Projection::perspective(f32 fov, s32 width, s32 height, f32 zNear, f32 zFar)
     {
         Projection projection;
         projection.transform = Matrix4::perspective(fov, static_cast<f32>(width) / height, zNear, zFar);
@@ -109,18 +100,8 @@ namespace Examples
         return projection;
     }
     
-    // ** Camera::Layout
-    const UniformElement Camera::Layout[] =
-    {
-          { "transform", UniformElement::Matrix4, offsetof(Camera, transform) }
-        , { "inverseTranspose", UniformElement::Matrix4, offsetof(Camera, inverseTranspose) }
-        , { "rotation", UniformElement::Matrix4, offsetof(Camera, rotation) }
-        , { "position",  UniformElement::Vec3,    offsetof(Camera, position)  }
-        , { NULL }
-    };
-    
     // ** Camera::lookAt
-    Camera Camera::lookAt(const Vec3& position, const Vec3& target, const Vec3& up)
+    inline Camera Camera::lookAt(const Vec3& position, const Vec3& target, const Vec3& up)
     {
         Camera camera;
         camera.position = position;
@@ -130,7 +111,7 @@ namespace Examples
     }
     
     // ** Camera::fromQuat
-    Camera Camera::fromQuat(const Vec3& position, const Quat& quat)
+    inline Camera Camera::fromQuat(const Vec3& position, const Quat& quat)
     {
         Camera camera;
         camera.position = position;
@@ -140,17 +121,8 @@ namespace Examples
         return camera;
     }
     
-    // ** Instance::Layout
-    const UniformElement Instance::Layout[] =
-    {
-          { "transform",        UniformElement::Matrix4, offsetof(Instance, transform)        }
-        , { "inverseTranspose", UniformElement::Matrix4, offsetof(Instance, inverseTranspose) }
-        , { "alpha",            UniformElement::Float,   offsetof(Instance, alpha)            }
-        , { NULL }
-    };
-    
     // ** Instance::fromTransform
-    Instance Instance::fromTransform(const Matrix4& transform, f32 alpha)
+    inline Instance Instance::fromTransform(const Matrix4& transform, f32 alpha)
     {
         Instance instance;
         instance.transform = transform;
@@ -281,7 +253,7 @@ namespace Examples
         0, 2, 3,
     };
     
-    Rgba CubeFaceColors[] =
+    static Rgba CubeFaceColors[] =
     {
           Rgba(1.0f, 0.0f, 0.0f)
         , Rgba(0.0f, 1.0f, 0.0f)
@@ -291,7 +263,7 @@ namespace Examples
         , Rgba(1.0f, 0.0f, 1.0f)
     };
     
-    Vec3 CubeFaceNormals[] =
+    static Vec3 CubeFaceNormals[] =
     {
            Vec3::axisX()
         , -Vec3::axisX()
@@ -301,7 +273,7 @@ namespace Examples
         , -Vec3::axisZ()
     };
     
-    RenderItem createSkyBox(RenderingContextWPtr renderingContext, Texture_ texture)
+    inline RenderItem createSkyBox(RenderingContextWPtr renderingContext, Texture_ texture)
     {
         RenderItem renderItem;
         
@@ -322,9 +294,9 @@ namespace Examples
         return renderItem;
     }
     
-    RenderItem createRenderItemFromMesh(RenderingContextWPtr renderingContext, const String& fileName)
+    inline RenderItem createRenderItemFromMesh(RenderingContextWPtr renderingContext, const String& fileName)
     {
-        Examples::Mesh mesh = Examples::objFromFile(fileName);
+        Mesh mesh = objFromFile(fileName);
         NIMBLE_ABORT_IF(!mesh, "failed to load mesh");
         
         VertexFormat vertexFormat  = mesh.vertexFormat;
@@ -353,7 +325,7 @@ namespace Examples
     }
     
     // Creates an environment map from a set of cube map faces.
-    Texture_ createEnvFromFiles(RenderingContextWPtr renderingContext, const String& path)
+    inline Texture_ createEnvFromFiles(RenderingContextWPtr renderingContext, const String& path)
     {
         Image images[6];
         String fileNames[] =
@@ -377,7 +349,7 @@ namespace Examples
     }
     
     //! Creates a fullscreen quad rendering states
-    StateBlock8 createFullscreenRenderingStates(RenderingContextWPtr renderingContext)
+    inline StateBlock8 createFullscreenRenderingStates(RenderingContextWPtr renderingContext)
     {
         StateBlock8 states;
         InputLayout   il = renderingContext->requestInputLayout(0);
@@ -388,6 +360,6 @@ namespace Examples
         return states;
     }
     
-} // namespace Examples
+} // namespace Framework
 
-#endif  //  __Examples_H__
+#endif  /*  !__Framework_H__    */

@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
-#include "../Examples.h"
+#include <Framework.h>
 
 DC_USE_DREEMCHEST
 
@@ -61,7 +61,7 @@ static String s_fragmentShader =
 class OrbitCamera : public RenderingApplicationDelegate
 {
     StateBlock8 m_renderStates;
-    Examples::Mesh mesh;
+    Framework::Mesh mesh;
     ConstantBuffer_ m_cameraConstantBuffer;
     
     Vec2 m_polar;   //!< Camera polar coordinates.
@@ -79,7 +79,7 @@ class OrbitCamera : public RenderingApplicationDelegate
         }
         
         // First load a mesh from a file
-        mesh = Examples::objFromFile("Assets/Meshes/bunny.obj");
+        mesh = Framework::objFromFile("Assets/Meshes/bunny.obj");
         
         if (!mesh)
         {
@@ -106,17 +106,17 @@ class OrbitCamera : public RenderingApplicationDelegate
         
         // Configure projection constant buffer
         {
-            Examples::Projection projection = Examples::Projection::perspective(60.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
+            Framework::Projection projection = Framework::Projection::perspective(60.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
             
-            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Projection", Examples::Projection::Layout);
+            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Projection", Framework::Projection::Layout);
             ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&projection, sizeof(projection), uniformLayout);
             m_renderStates.bindConstantBuffer(constantBuffer, 0);
         }
         
         // Configure camera constant buffer
         {
-            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Camera", Examples::Camera::Layout);
-            m_cameraConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Examples::Camera), uniformLayout);
+            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Camera", Framework::Camera::Layout);
+            m_cameraConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Framework::Camera), uniformLayout);
             m_renderStates.bindConstantBuffer(m_cameraConstantBuffer, 1);
         }
 
@@ -179,7 +179,7 @@ class OrbitCamera : public RenderingApplicationDelegate
         Vec4 angles   = Vec4(cos(radians(m_polar.x)), sin(radians(m_polar.x)), cos(radians(m_polar.y)), sin(radians(m_polar.y)));
         Vec3 position = Vec3::axisX() * angles.x * angles.w + Vec3::axisZ() * angles.y * angles.w + Vec3::axisY() * angles.z;
         Vec3 target   = Vec3::zero();
-        Examples::Camera camera = Examples::Camera::lookAt(position * 2.0f, target, Vec3::axisY());
+        Framework::Camera camera = Framework::Camera::lookAt(position * 2.0f, target, Vec3::axisY());
         commands.uploadConstantBuffer(m_cameraConstantBuffer, &camera, sizeof(camera));
 
         // Render the mesh

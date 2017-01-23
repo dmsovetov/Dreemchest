@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
-#include "../Examples.h"
+#include <Framework.h>
 
 DC_USE_DREEMCHEST
 
@@ -146,7 +146,7 @@ UniformElement Transform::s_layout[] =
 class RenderingToTexture : public RenderingApplicationDelegate
 {
     StateBlock8 m_renderStates;
-    Examples::Mesh m_mesh;
+    Framework::Mesh m_mesh;
     StateBlock4 m_meshStates;
     ConstantBuffer_ m_transformCBuffer;
     
@@ -160,7 +160,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
         }
 
         // Load mesh from a file
-        m_mesh = Examples::objFromFile("Assets/Meshes/bunny_decimated.obj");
+        m_mesh = Framework::objFromFile("Assets/Meshes/bunny_decimated.obj");
         NIMBLE_ABORT_IF(!m_mesh, "failed to load mesh");
         
         {

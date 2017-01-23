@@ -25,9 +25,37 @@
  **************************************************************************/
 
 #include "ApplicationDelegate.h"
+#include "Framework.h"
 
 namespace Framework
 {
+    
+    // ** Camera::Layout
+    const UniformElement Camera::Layout[] =
+    {
+        { "transform", UniformElement::Matrix4, offsetof(Camera, transform) }
+        , { "inverseTranspose", UniformElement::Matrix4, offsetof(Camera, inverseTranspose) }
+        , { "rotation", UniformElement::Matrix4, offsetof(Camera, rotation) }
+        , { "position",  UniformElement::Vec3,    offsetof(Camera, position)  }
+        , { NULL }
+    };
+    
+    // ** Instance::Layout
+    const UniformElement Instance::Layout[] =
+    {
+        { "transform",        UniformElement::Matrix4, offsetof(Instance, transform)        }
+        , { "inverseTranspose", UniformElement::Matrix4, offsetof(Instance, inverseTranspose) }
+        , { "alpha",            UniformElement::Float,   offsetof(Instance, alpha)            }
+        , { NULL }
+    };
+    
+    // ** Projection::Layout
+    const UniformElement Projection::Layout[] =
+    {
+        { "transform", UniformElement::Matrix4, offsetof(Projection, transform) }
+        , { "viewport",  UniformElement::Vec4,    offsetof(Projection, viewport)  }
+        , { NULL }
+    };
     
 void ApplicationDelegate::setCameraPosition(const Vec3& value)
 {
@@ -52,17 +80,17 @@ bool ApplicationDelegate::initialize(s32 width, s32 height)
     
     // Configure projection constant buffer
     {
-        Examples::Projection projection = Examples::Projection::perspective(90.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
+        Projection projection = Projection::perspective(90.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
         
-        UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Projection", Examples::Projection::Layout);
+        UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Projection", Projection::Layout);
         ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&projection, sizeof(projection), uniformLayout);
         defaultStates.bindConstantBuffer(constantBuffer, 0);
     }
     
     // Configure camera constant buffer
     {
-        UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Camera", Examples::Camera::Layout);
-        m_camera.constantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Examples::Camera), uniformLayout);
+        UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Camera", Camera::Layout);
+        m_camera.constantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Camera), uniformLayout);
         defaultStates.bindConstantBuffer(m_camera.constantBuffer, 1);
     }
     
@@ -118,7 +146,7 @@ void ApplicationDelegate::handleRenderFrame(f32 dt)
     
     // Update the camera constant buffer
     Quat rotation = Quat::rotateAroundAxis(m_camera.pitch, Vec3::axisX()) * Quat::rotateAroundAxis(m_camera.yaw, Vec3::axisY());
-    Examples::Camera camera = Examples::Camera::fromQuat(m_camera.position, rotation);
+    Camera camera = Camera::fromQuat(m_camera.position, rotation);
     commands.uploadConstantBuffer(m_camera.constantBuffer, &camera, sizeof(camera));
     
     handleRenderFrame(frame, frame.stateStack(), commands, dt);

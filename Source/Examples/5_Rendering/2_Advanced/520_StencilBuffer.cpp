@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
-#include "../Examples.h"
+#include <Framework.h>
 
 DC_USE_DREEMCHEST
 
@@ -79,8 +79,8 @@ class StencilBuffer : public RenderingApplicationDelegate
         }
         
         // First initialize render items from mesh files
-        m_platform = Examples::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/platform.obj");
-        m_object   = Examples::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/column.obj");
+        m_platform = Framework::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/platform.obj");
+        m_object   = Framework::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/column.obj");
 
         // Create a simple shader program
         Program program = m_renderingContext->requestProgram(s_vertexShader, s_fragmentShader);
@@ -91,8 +91,8 @@ class StencilBuffer : public RenderingApplicationDelegate
         
         // Configure projection constant buffer
         {
-            Examples::Projection projection     = Examples::Projection::perspective(60.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
-            UniformLayout        layout         = m_renderingContext->requestUniformLayout("Projection", Examples::Projection::Layout);
+            Framework::Projection projection    = Framework::Projection::perspective(60.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
+            UniformLayout        layout         = m_renderingContext->requestUniformLayout("Projection", Framework::Projection::Layout);
             ConstantBuffer_      constantBuffer = m_renderingContext->requestConstantBuffer(&projection, sizeof(projection), layout);
             
             // And bind it to a default state block
@@ -101,8 +101,8 @@ class StencilBuffer : public RenderingApplicationDelegate
         
         // Configure camera constant buffer
         {
-            Examples::Camera camera         = Examples::Camera::lookAt(Vec3(0.0f, 2.0f, -3.0f), Vec3(0.0f, 0.6f, 0.0f));
-            UniformLayout    layout         = m_renderingContext->requestUniformLayout("Camera", Examples::Camera::Layout);
+            Framework::Camera camera         = Framework::Camera::lookAt(Vec3(0.0f, 2.0f, -3.0f), Vec3(0.0f, 0.6f, 0.0f));
+            UniformLayout    layout         = m_renderingContext->requestUniformLayout("Camera", Framework::Camera::Layout);
             ConstantBuffer_  constantBuffer = m_renderingContext->requestConstantBuffer(&camera, sizeof(camera), layout);
             
             // And bind it to a default state block
@@ -111,8 +111,8 @@ class StencilBuffer : public RenderingApplicationDelegate
         
         // Configure instance constant buffer
         {
-            UniformLayout layout     = m_renderingContext->requestUniformLayout("Instance", Examples::Instance::Layout);
-            m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Examples::Instance), layout);
+            UniformLayout layout     = m_renderingContext->requestUniformLayout("Instance", Framework::Instance::Layout);
+            m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Framework::Instance), layout);
             
             // And bind it to a default state block
             defaults.bindConstantBuffer(m_instanceConstantBuffer, 2);
@@ -171,7 +171,7 @@ class StencilBuffer : public RenderingApplicationDelegate
     
     void renderItem(RenderCommandBuffer& commands, const RenderItem& item, const Matrix4& transform = Matrix4(), f32 alpha = 1.0f)
     {
-        Examples::Instance instance = Examples::Instance::fromTransform(transform, alpha);
+        Framework::Instance instance = Framework::Instance::fromTransform(transform, alpha);
         commands.uploadConstantBuffer(m_instanceConstantBuffer, &instance, sizeof(instance));
         commands.drawItem(0, item);
     }

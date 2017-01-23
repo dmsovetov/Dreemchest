@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
-#include "../Examples.h"
+#include <Framework.h>
 
 DC_USE_DREEMCHEST
 
@@ -121,7 +121,7 @@ UniformElement Light::Layout[] =
     , { NULL }
 };
 
-class PointLights : public Examples::ViewerApplicationDelegate
+class PointLights : public Framework::ApplicationDelegate
 {
     StateBlock8     m_renderStates;
     RenderItem      m_platform;
@@ -142,17 +142,17 @@ class PointLights : public Examples::ViewerApplicationDelegate
         }
         
         // First initialize objects that will be rendered
-        m_platform = Examples::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/platform.obj");
-        m_object   = Examples::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/bunny_decimated.obj");
-        m_column   = Examples::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/column.obj");
-        m_sphere   = Examples::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/sphere.obj");
+        m_platform = Framework::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/platform.obj");
+        m_object   = Framework::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/bunny_decimated.obj");
+        m_column   = Framework::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/column.obj");
+        m_sphere   = Framework::createRenderItemFromMesh(m_renderingContext, "Assets/Meshes/sphere.obj");
 
         setCameraPosition(Vec3(0.0f, 2.0f, -2.0f));
         
         // Configure instance constant buffer
         {
-            UniformLayout layout = m_renderingContext->requestUniformLayout("Instance", Examples::Instance::Layout);
-            m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Examples::Instance), layout);
+            UniformLayout layout = m_renderingContext->requestUniformLayout("Instance", Framework::Instance::Layout);
+            m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Framework::Instance), layout);
             m_renderStates.bindConstantBuffer(m_instanceConstantBuffer, 2);
         }
         
@@ -218,7 +218,7 @@ class PointLights : public Examples::ViewerApplicationDelegate
     
     void renderItem(RenderCommandBuffer& commands, const RenderItem& item, const Matrix4& transform = Matrix4())
     {
-        Examples::Instance instance = Examples::Instance::fromTransform(transform);
+        Framework::Instance instance = Framework::Instance::fromTransform(transform);
         commands.uploadConstantBuffer(m_instanceConstantBuffer, &instance, sizeof(instance));
         commands.drawItem(0, item);
     }

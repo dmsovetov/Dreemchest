@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
-#include "../Examples.h"
+#include <Framework.h>
 
 DC_USE_DREEMCHEST
 
@@ -73,11 +73,11 @@ class ConstantBuffers : public RenderingApplicationDelegate
         InputLayout inputLayout  = m_renderingContext->requestInputLayout(VertexFormat::Position);
         
         // Initialize a vertex buffer from a preset data.
-        VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(Examples::Triangle, sizeof(Examples::Triangle));
+        VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(Framework::Triangle, sizeof(Framework::Triangle));
         
         // To not bother with vertex shader we are using an identity vertex shader
         // preset here, that just passes an input to an ouput.
-        Program program = m_renderingContext->requestProgram(Examples::VertexIdentity, s_fragmentShader);
+        Program program = m_renderingContext->requestProgram(Framework::VertexIdentity, s_fragmentShader);
         
         // Initialize a material constant buffer
         s_material.color = Vec4(1.0f, 0.5f, 0.25f, 1.0f);

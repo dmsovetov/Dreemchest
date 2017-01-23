@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
-#include "../Examples.h"
+#include <Framework.h>
 
 DC_USE_DREEMCHEST
 
@@ -58,10 +58,10 @@ static String s_fragmentShader =
     "}                                                  \n"
     ;
 
-class Camera : public RenderingApplicationDelegate
+class Camera : public Framework::RenderingApplicationDelegate
 {
     StateBlock8 m_renderStates;
-    Examples::Mesh mesh;
+    Framework::Mesh mesh;
     ConstantBuffer_ m_cameraConstantBuffer;
     
     // Yaw is a camera rotation around the Y axis
@@ -83,7 +83,7 @@ class Camera : public RenderingApplicationDelegate
         }
         
         // First load a mesh from a file
-        mesh = Examples::objFromFile("Assets/Meshes/bunny.obj");
+        mesh = Framework::objFromFile("Assets/Meshes/bunny.obj");
         
         if (!mesh)
         {
@@ -111,17 +111,17 @@ class Camera : public RenderingApplicationDelegate
         
         // Configure projection constant buffer
         {
-            Examples::Projection projection = Examples::Projection::perspective(60.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
+            Framework::Projection projection = Framework::Projection::perspective(60.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
             
-            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Projection", Examples::Projection::Layout);
+            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Projection", Framework::Projection::Layout);
             ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&projection, sizeof(projection), uniformLayout);
             m_renderStates.bindConstantBuffer(constantBuffer, 0);
         }
         
         // Configure camera constant buffer
         {
-            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Camera", Examples::Camera::Layout);
-            m_cameraConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Examples::Camera), uniformLayout);
+            UniformLayout uniformLayout = m_renderingContext->requestUniformLayout("Camera", Framework::Camera::Layout);
+            m_cameraConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Framework::Camera), uniformLayout);
             m_renderStates.bindConstantBuffer(m_cameraConstantBuffer, 1);
         }
 
@@ -182,7 +182,7 @@ class Camera : public RenderingApplicationDelegate
         
         // Update the camera constant buffer
         Quat rotation = Quat::rotateAroundAxis(m_pitch, Vec3::axisX()) * Quat::rotateAroundAxis(m_yaw, Vec3::axisY());
-        Examples::Camera camera = Examples::Camera::fromQuat(Vec3(0.0f, 0.0f, -2.0f), rotation);
+        Framework::Camera camera = Framework::Camera::fromQuat(Vec3(0.0f, 0.0f, -2.0f), rotation);
         commands.uploadConstantBuffer(m_cameraConstantBuffer, &camera, sizeof(camera));
 
         // Render the mesh
