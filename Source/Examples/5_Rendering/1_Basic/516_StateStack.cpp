@@ -25,7 +25,6 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
-#include <Framework.h>
 
 DC_USE_DREEMCHEST
 
@@ -68,9 +67,8 @@ static const u16 s_indices[] =
 };
 
 static String s_vertexShader =
-    "cbuffer Projection projection : 0;             \n"
-    "cbuffer Camera     camera     : 1;             \n"
-    "cbuffer Instance   instance   : 2;             \n"
+    "cbuffer View     projection : 0;              \n"
+    "cbuffer Instance instance   : 1;              \n"
 
     "varying vec4 v_color;                          \n"
 
@@ -78,7 +76,6 @@ static String s_vertexShader =
     "{                                              \n"
     "    v_color     = gl_Color;                    \n"
     "    gl_Position = projection.transform         \n"
-    "                * camera.transform             \n"
     "                * instance.transform           \n"
     "                * gl_Vertex                    \n"
     "                ;                              \n"
@@ -93,6 +90,18 @@ static String s_fragmentShader =
     "    gl_FragColor = v_color;                    \n"
     "}                                              \n"
     ;
+
+struct Transform
+{
+    Matrix4                     matrix;
+    static const UniformElement Layout[];   //!< A constant buffer layout.
+};
+
+const UniformElement Transform::Layout[] =
+{
+      { "transform", UniformElement::Matrix4, offsetof(Transform, matrix) }
+    , { NULL }
+};
 
 class RenderStateStack : public RenderingApplicationDelegate
 {
@@ -120,30 +129,25 @@ class RenderStateStack : public RenderingApplicationDelegate
             m_renderStates.bindInputLayout(inputLayout);
         }
         
-        // Create projection constant buffer
+        // Create a view transform constant buffer
         {
-            Framework::Projection projection    = Framework::Projection::perspective(60.0f, m_window->width(), m_window->height(), 0.1f, 100.0f);
-            UniformLayout        layout         = m_renderingContext->requestUniformLayout("Projection", Framework::Projection::Layout);
-            ConstantBuffer_      constantBuffer = m_renderingContext->requestConstantBuffer(&projection, sizeof(projection), layout);
+            Transform transform;
+            transform.matrix = Matrix4::perspective(60.0f, m_window->aspectRatio(), 0.1f, 100.0f)
+                             * Matrix4::lookAt(Vec3(0.0f, 0.0f, -35.0f), Vec3(0.0f, 0.6f, 0.0f), Vec3::axisY())
+                             ;
+            
+            // Create a uniform layout
+            UniformLayout   layout        = m_renderingContext->requestUniformLayout("View", Transform::Layout);
+            ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&transform, sizeof(transform), layout);
             
             // And bind it to a state block
             m_renderStates.bindConstantBuffer(constantBuffer, 0);
         }
         
-        // Create a camera constant buffer
+        // Create a instance constant buffer
         {
-            Framework::Camera camera        = Framework::Camera::lookAt(Vec3(0.0f, 0.0f, -35.0f), Vec3(0.0f, 0.6f, 0.0f));
-            UniformLayout    layout         = m_renderingContext->requestUniformLayout("Camera", Framework::Camera::Layout);
-            ConstantBuffer_ constantBuffer  = m_renderingContext->requestConstantBuffer(&camera, sizeof(camera), layout);
-            
-            // And bind it to a state block
-            m_renderStates.bindConstantBuffer(constantBuffer, 1);
-        }
-        
-        // Finally create an empty instance constant buffer
-        {
-            UniformLayout layout = m_renderingContext->requestUniformLayout("Instance", Framework::Instance::Layout);
-            m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Framework::Instance), layout);
+            UniformLayout   layout   = m_renderingContext->requestUniformLayout("Instance", Transform::Layout);
+            m_instanceConstantBuffer = m_renderingContext->requestConstantBuffer(NULL, sizeof(Transform), layout);
         }
         
         // Create and bind the default shader program
@@ -174,16 +178,17 @@ class RenderStateStack : public RenderingApplicationDelegate
         {
             for (s32 x = 0; x < 11; ++x)
             {
-                // Construct an instance data from a transform matrix
-                Framework::Instance instance = Framework::Instance::fromTransform(Matrix4::translation(x * 3.0f - 15.0f, y * 3.0f - 15.0f, 0.0f) *
-                                                                                  Matrix4::rotateXY(s_time + x*0.21f, s_time + y*0.37f));
+                Transform transform;
+                transform.matrix = Matrix4::translation(x * 3.0f - 15.0f, y * 3.0f - 15.0f, 0.0f)
+                                 * Matrix4::rotateXY(s_time + x*0.21f, s_time + y*0.37f)
+                                 ;
 
                 // Now push a new state scope to a stack, which will be automatically poped from stack
                 StateScope instanceStates = stateStack.newScope();
-                instanceStates->bindConstantBuffer(m_instanceConstantBuffer, 2);
+                instanceStates->bindConstantBuffer(m_instanceConstantBuffer, 1);
                 
                 // Upload instance data and render a cube
-                commands.uploadConstantBuffer(m_instanceConstantBuffer, &instance, sizeof(instance));
+                commands.uploadConstantBuffer(m_instanceConstantBuffer, &transform, sizeof(transform));
                 commands.drawIndexed(0, Renderer::PrimTriangles, 0, sizeof(s_indices) / sizeof(u16));
             }
         }

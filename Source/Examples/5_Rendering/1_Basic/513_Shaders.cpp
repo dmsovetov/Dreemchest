@@ -25,7 +25,6 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
-#include <Framework.h>
 
 DC_USE_DREEMCHEST
 
@@ -48,6 +47,14 @@ static String s_fragmentShader =
     "}                                              \n"
     ;
 
+// Triangle vertex buffer.
+const f32 Triangle[9] =
+{
+    -1.0f, -1.0f, 0.0f,
+     1.0f, -1.0f, 0.0f,
+     0.0f,  1.0f, 0.0f,
+};
+
 class Shaders : public RenderingApplicationDelegate
 {
     StateBlock8 m_renderStates;
@@ -63,8 +70,8 @@ class Shaders : public RenderingApplicationDelegate
 
         Renderer::InputLayout inputLayout = m_renderingContext->requestInputLayout(VertexFormat::Position);
         
-        // This time we will use a predefined vertex buffer to make this example shorter
-        Renderer::VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(Framework::Triangle, sizeof(Framework::Triangle));
+        // Create
+        Renderer::VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(Triangle, sizeof(Triangle));
         
         // Create a program that consists from a vertex and fragment shaders.
         Renderer::Program program = m_renderingContext->requestProgram(s_vertexShader, s_fragmentShader);

@@ -25,12 +25,18 @@
  **************************************************************************/
 
 #include <Dreemchest.h>
-#include <Framework.h>
 
 DC_USE_DREEMCHEST
 
 using namespace Platform;
 using namespace Renderer;
+
+static String s_vertexShader =
+    "void main()                    \n"
+    "{                              \n"
+    "   gl_Position = gl_Vertex;    \n"
+    "}                              \n"
+    ;
 
 // A ubershader is a regular shader with a set of options that dictate
 // what features should be used in a compile time. Each set of options
@@ -68,6 +74,14 @@ static PipelineFeature s_features[] =
     { NULL }
 };
 
+// Triangle vertex buffer.
+const f32 Triangle[9] =
+{
+    -1.0f, -1.0f, 0.0f,
+     1.0f, -1.0f, 0.0f,
+     0.0f,  1.0f, 0.0f,
+};
+
 class FirstUbershader : public RenderingApplicationDelegate
 {
     StateBlock8 m_renderStates;
@@ -84,10 +98,10 @@ class FirstUbershader : public RenderingApplicationDelegate
         InputLayout inputLayout = m_renderingContext->requestInputLayout(VertexFormat::Position);
         
         // Create a vertex buffer from a triangle vertex buffer preset.
-        VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(Framework::Triangle, sizeof(Framework::Triangle));
+        VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(Triangle, sizeof(Triangle));
         
         // Create a shader program. Nothing special in vertex shader, so use a preset.
-        Program program = m_renderingContext->requestProgram(Framework::VertexIdentity, s_fragmentShader);
+        Program program = m_renderingContext->requestProgram(s_vertexShader, s_fragmentShader);
         
         // Create a feature layout
         FeatureLayout featureLayout = m_renderingContext->requestPipelineFeatureLayout(s_features);
