@@ -52,7 +52,8 @@ namespace Framework
         virtual void        handleTouchMoved(const Platform::Window::TouchMoved& e) NIMBLE_OVERRIDE;
         virtual void        handleRenderFrame(f32 dt) NIMBLE_OVERRIDE;
         
-        void                renderColumnsScene(RenderCommandBuffer& commands);
+        void                renderSimpleScene(RenderCommandBuffer& commands, f32 x = 0.0f, f32 z = 0.0f);
+        void                renderColumnsScene(RenderCommandBuffer& commands, f32 x = 0.0f, f32 z = 0.0f);
         void                renderPinkItem(RenderCommandBuffer& commands, StateStack& stateStack, const RenderItem& item, const Matrix4& transform = Matrix4(), f32 alpha = 1.0f);
         void                renderItem(RenderCommandBuffer& commands, const RenderItem& item, const Matrix4& transform = Matrix4(), f32 alpha = 1.0f);
         
@@ -64,6 +65,7 @@ namespace Framework
     protected:
         
         RenderItem          m_sphere;
+        RenderItem          m_box;
         
     private:
         

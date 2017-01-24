@@ -251,24 +251,46 @@ RenderItem ApplicationDelegate::createFullscreenQuad()
     return renderItem;
 }
     
-void ApplicationDelegate::renderColumnsScene(RenderCommandBuffer& commands)
+void ApplicationDelegate::renderColumnsScene(RenderCommandBuffer& commands, f32 x, f32 z)
 {
     if (!m_platform) m_platform = createMesh("Assets/Meshes/platform.obj");
     if (!m_object) m_object = createMesh("Assets/Meshes/bunny_decimated.obj");
-    if (!m_column) m_column = createMesh("Assets/Meshes/column.obj");
+    if (!m_column) m_column = createMesh("Assets/Meshes/octahedron.obj");
     
     // Render the platform
-    renderItem(commands, m_platform, Matrix4::scale(1.5f, 1.0f, 1.5f));
+    renderItem(commands, m_platform, Matrix4::translation(x, 0.0f, z) * Matrix4::scale(1.5f, 1.0f, 1.5f));
     
     // Now the stanford bunny
-    renderItem(commands, m_object, Matrix4::scale(0.5f, 0.5f, 0.5f));
+    renderItem(commands, m_object, Matrix4::translation(x, 0.0f, z) * Matrix4::scale(0.5f, 0.5f, 0.5f));
     
     // And finally columns
-    for (s32 x = -1; x <= 1; x++)
+    for (s32 xx = -1; xx <= 1; xx++)
     {
-        for (s32 z = -1; z <= 1; z++)
+        for (s32 zz = -1; zz <= 1; zz++)
         {
-            renderItem(commands, m_column, Matrix4::scale(0.1f, 0.1f, 0.1f) * Matrix4::translation(x * 10.0f, 1.0f, z * 10.0f));
+            renderItem(commands, m_column, Matrix4::translation(xx + x, 0.15f, zz + z) * Matrix4::scale(0.1f, 0.1f, 0.1f));
+        }
+    }
+}
+    
+void ApplicationDelegate::renderSimpleScene(RenderCommandBuffer& commands, f32 x, f32 z)
+{
+    if (!m_platform) m_platform = createMesh("Assets/Meshes/platform.obj");
+    if (!m_sphere) m_sphere = createMesh("Assets/Meshes/sphere.obj");
+    if (!m_box) m_box = createMesh("Assets/Meshes/cube.obj");
+    
+    // Render the platform
+    renderItem(commands, m_platform, Matrix4::translation(x, 0.0f, z) * Matrix4::scale(1.5f, 1.0f, 1.5f));
+    
+    // Now the stanford bunny
+    renderItem(commands, m_sphere, Matrix4::translation(x, 1.0f, z) * Matrix4::scale(0.5f, 0.5f, 0.5f));
+    
+    // And finally columns
+    for (s32 xx = -1; xx <= 1; xx++)
+    {
+        for (s32 zz = -1; zz <= 1; zz++)
+        {
+            renderItem(commands, m_box, Matrix4::translation(xx + x, 1.0f, zz + z) * Matrix4::scale(0.1f, 0.1f, 0.1f));
         }
     }
 }
