@@ -588,7 +588,12 @@ void OpenGL2::Texture::texDepthStencil(GLenum target, u16 width, u16 height, u32
             break;
     }
     
+    GLfloat borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+    
     glTexImage2D(target, 0, format, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT/*GL_UNSIGNED_BYTE*/, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 }
     
 // ** OpenGL2::Texture::bind
