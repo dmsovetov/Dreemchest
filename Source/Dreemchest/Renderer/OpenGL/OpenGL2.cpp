@@ -72,6 +72,7 @@ static PFNGLUNIFORM4FARBPROC            glUniform4f             = NULL;
 static PFNGLUNIFORM3FARBPROC            glUniform3f             = NULL;
 static PFNGLUNIFORM2FARBPROC            glUniform2f             = NULL;
 static PFNGLUNIFORM1IARBPROC            glUniform1i             = NULL;
+static PFNGLUNIFORM1IVARBPROC           glUniform1iv            = NULL;
 static PFNGLUNIFORM1FARBPROC            glUniform1f             = NULL;
 static PFNGLUNIFORM1FVARBPROC           glUniform1fv            = NULL;
 static PFNGLUNIFORM2FVARBPROC           glUniform2fv            = NULL;
@@ -387,12 +388,19 @@ GLint OpenGL2::Program::uniformLocation(GLuint program, const FixedString& name)
 }
     
 // ** OpenGL2::Program::uniformMatrix4
-void OpenGL2::Program::uniformMatrix4(GLint location, const f32 value[16], GLboolean transpose)
+void OpenGL2::Program::uniformMatrix4(GLint location, const f32 value[16], s32 count, GLboolean transpose)
 {
     DC_CHECK_GL;
-    glUniformMatrix4fv(location - 1, 1, transpose, value);
+    glUniformMatrix4fv(location - 1, max2(1, count), transpose, value);
 }
 
+// ** OpenGL2::Program::uniform1i
+void OpenGL2::Program::uniform1i(GLint location, const s32* value, s32 count)
+{
+    DC_CHECK_GL;
+    glUniform1iv(location - 1, max2(1, count), value);
+}
+    
 // ** OpenGL2::Program::uniform1i
 void OpenGL2::Program::uniform1i(GLint location, s32 value)
 {
@@ -405,6 +413,13 @@ void OpenGL2::Program::uniform1f(GLint location, f32 value)
 {
     DC_CHECK_GL;
     glUniform1f(location - 1, value);
+}
+
+// ** OpenGL2::Program::uniform1f
+void OpenGL2::Program::uniform1f(GLint location, const f32* value, s32 count)
+{
+    DC_CHECK_GL;
+    glUniform1fv(location - 1, max2(1, count), value);
 }
 
 // ** OpenGL2::Program::uniform2f
@@ -676,6 +691,7 @@ bool OpenGL2::initialize()
     glUniform3f             = ( PFNGLUNIFORM3FARBPROC )             wglGetProcAddress( "glUniform3fARB" );
     glUniform2f             = ( PFNGLUNIFORM2FARBPROC )             wglGetProcAddress( "glUniform2fARB" );
     glUniform1i             = ( PFNGLUNIFORM1IARBPROC )             wglGetProcAddress( "glUniform1iARB" );
+    glUniform1iv            = ( PFNGLUNIFORM1IVARBPROC )            wglGetProcAddress( "glUniform1ivARB" );
     glUniform1f             = ( PFNGLUNIFORM1FARBPROC )             wglGetProcAddress( "glUniform1fARB" );
     glUniform1fv            = ( PFNGLUNIFORM1FVARBPROC )            wglGetProcAddress( "glUniform1fvARB" );
     glUniform2fv            = ( PFNGLUNIFORM2FVARBPROC )            wglGetProcAddress( "glUniform2fvARB" );

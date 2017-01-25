@@ -155,7 +155,10 @@ namespace Renderer
             static GLint    uniformLocation(GLuint program, const FixedString& name);
             
             //! Sets a mat4 uniform value.
-            static void     uniformMatrix4(GLint location, const f32 value[16], GLboolean transpose = GL_FALSE);
+            static void     uniformMatrix4(GLint location, const f32 value[16], s32 count = 1, GLboolean transpose = GL_FALSE);
+            
+            //! Sets an array of int uniform value.
+            static void     uniform1i(GLint location, const s32* value, s32 count = 1);
             
             //! Sets an int uniform value.
             static void     uniform1i(GLint location, s32 value);
@@ -163,14 +166,17 @@ namespace Renderer
             //! Sets an float uniform value.
             static void     uniform1f(GLint location, f32 value);
             
+            //! Sets an array of float uniform value.
+            static void     uniform1f(GLint location, const f32* value, s32 count = 1);
+            
             //! Sets an vec2 uniform value.
-            static void     uniform2f(GLint location, const f32* value, s32 count);
+            static void     uniform2f(GLint location, const f32* value, s32 count = 1);
             
             //! Sets an vec3 uniform value.
-            static void     uniform3f(GLint location, const f32* value, s32 count);
+            static void     uniform3f(GLint location, const f32* value, s32 count = 1);
             
             //! Sets an vec4 uniform value.
-            static void     uniform4f(GLint location, const f32* value, s32 count);
+            static void     uniform4f(GLint location, const f32* value, s32 count = 1);
 
             //! Binds a shader program.
             static void     use(GLuint program);

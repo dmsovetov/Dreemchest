@@ -650,12 +650,12 @@ void OpenGL2RenderingContext::updateUniforms(const Permutation* permutation)
         {
             case GL_INT:
                 pointer = UniformPointer::findByName(uniform, m_constantBuffers, m_requestedCBuffer);
-                OpenGL2::Program::uniform1i(uniform.location, *reinterpret_cast<const s32*>(pointer));
+                OpenGL2::Program::uniform1i(uniform.location, reinterpret_cast<const s32*>(pointer), uniform.size);
                 break;
                 
             case GL_FLOAT:
                 pointer = UniformPointer::findByName(uniform, m_constantBuffers, m_requestedCBuffer);
-                OpenGL2::Program::uniform1f(uniform.location, *reinterpret_cast<const f32*>(pointer));
+                OpenGL2::Program::uniform1f(uniform.location, reinterpret_cast<const f32*>(pointer), uniform.size);
                 break;
                 
             case GL_FLOAT_VEC2:
@@ -675,7 +675,7 @@ void OpenGL2RenderingContext::updateUniforms(const Permutation* permutation)
                 
             case GL_FLOAT_MAT4:
                 pointer = UniformPointer::findByName(uniform, m_constantBuffers, m_requestedCBuffer);
-                OpenGL2::Program::uniformMatrix4(uniform.location, reinterpret_cast<const f32*>(pointer));
+                OpenGL2::Program::uniformMatrix4(uniform.location, reinterpret_cast<const f32*>(pointer), uniform.size);
                 break;
                 
             default:
