@@ -356,7 +356,7 @@ GLuint OpenGL2::Program::createProgram(const GLuint* shaders, s32 count, s8* err
     if (errLogSize)
     {
         StringArray messages = split(error, "\n");
-        
+
         for (size_t i = 0; i < messages.size(); i++)
         {
             if (result == GL_FALSE)
@@ -370,8 +370,13 @@ GLuint OpenGL2::Program::createProgram(const GLuint* shaders, s32 count, s8* err
         }
     }
     
-    deleteProgram(program);
-    return 0;
+    if (result == GL_FALSE)
+    {
+        deleteProgram(program);
+        return 0;
+    }
+    
+    return program;
 }
     
 // ** OpenGL2::Program::uniformLocation
