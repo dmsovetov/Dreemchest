@@ -186,6 +186,31 @@ namespace Framework
         "}                                                                          \n"
         ;
     
+    const String VertexDebug =
+        "cbuffer Projection projection : 0;                                         \n"
+        "cbuffer Camera     camera     : 1;                                         \n"
+    
+        "varying vec4 v_color;                                                      \n"
+    
+        "void main()                                                                \n"
+        "{                                                                          \n"
+        "   v_color     = gl_Color;                                                 \n"
+        "   gl_Position = projection.transform                                      \n"
+        "               * camera.transform                                          \n"
+        "               * gl_Vertex                                                 \n"
+        "               ;                                                           \n"
+        "}                                                                          \n"
+        ;
+    
+    const String FragmentDebug =
+        "varying vec4 v_color;                                                      \n"
+        
+        "void main()                                                                \n"
+        "{                                                                          \n"
+        "   gl_FragColor = v_color;                                                 \n"
+        "}                                                                          \n"
+        ;
+    
     const f32 Triangle[9] =
     {
         -1.0f, -1.0f, 0.0f,
