@@ -31,7 +31,7 @@ import git
 import command_line
 
 
-class InstallCommand(cmake.Command):
+class BootstrapCommand(cmake.Command):
     """A base class for all installation commands"""
 
     def __init__(self, parser, generators=[]):
@@ -60,10 +60,10 @@ class InstallCommand(cmake.Command):
                             choices=['debug', 'release'],
                             default='release')
 
-        parser.set_defaults(function=self.install)
+        parser.set_defaults(function=self.bootstrap)
 
     @staticmethod
-    def install(options):
+    def bootstrap(options):
         install_path = os.path.abspath(options.output)
         binary_dir = os.path.abspath(os.path.join(options.source, 'Projects'))
         source_dir = os.path.abspath(options.source)
@@ -191,22 +191,22 @@ class InstallCommand(cmake.Command):
                             )
 
 
-class MacOSInstallCommand(InstallCommand):
+class MacOSBootstrapCommand(BootstrapCommand):
     """A command line tool to build and install third party libraries bundled with a source code distribution"""
 
     def __init__(self, parser):
         """Constructs a third party install command"""
 
-        InstallCommand.__init__(self, parser, generators=['Xcode'])
+        BootstrapCommand.__init__(self, parser, generators=['Xcode'])
 
 
-class WindowsInstallCommand(InstallCommand):
+class WindowsBootstrapCommand(BootstrapCommand):
     """A command line tool to build and install third party libraries bundled with a source code distribution"""
 
     def __init__(self, parser):
         """Constructs a third party install command"""
 
-        InstallCommand.__init__(self, parser, generators=['Visual Studio 12'])
+        BootstrapCommand.__init__(self, parser, generators=['Visual Studio 12'])
 
 
 class Command(command_line.Tool):
@@ -217,5 +217,5 @@ class Command(command_line.Tool):
 
         command_line.Tool.__init__(self, parser, 'available platforms')
 
-        self._add_command('windows', WindowsInstallCommand)
-        self._add_command('macos', MacOSInstallCommand)
+        self._add_command('windows', WindowsBootstrapCommand)
+        self._add_command('macos', MacOSBootstrapCommand)

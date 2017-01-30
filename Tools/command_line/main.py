@@ -27,8 +27,7 @@
 #################################################################################
 
 import argparse
-import install
-import checkout
+import bootstrap
 import configure
 import command_line
 
@@ -42,8 +41,7 @@ class Main(command_line.Tool):
         command_line.Tool.__init__(self, parser, 'available commands')
 
         self._add_command('configure', configure.Command)
-        self._add_command('checkout', checkout.Command)
-        self._add_command('install', install.Command)
+        self._add_command('bootstrap', bootstrap.Command)
 
 
 def main():

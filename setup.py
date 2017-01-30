@@ -185,6 +185,8 @@ class MacOSEnvironment(UnixEnvironment):
 
         UnixEnvironment.configure(self, paths)
 
+        self.add_path('$' + DREEMCHEST_HOME)
+
         if paths.cmake:
             self.set_variable(DREEMCHEST_CMAKE, os.path.join('$' + DREEMCHEST_HOME, paths.cmake, 'CMake.app/Contents/bin'))
             self.add_path('$' + DREEMCHEST_CMAKE)
@@ -203,13 +205,6 @@ def configure_environment(args, paths):
     environment.configure(paths)
 
     return environment
-
-    #print environment.cmake_path()
-
-    #if not environment.has_cmake():
-    #    print 'CMake is not available'
-    #else:
-    #    print 'CMake found!'
 
 
 def download(url, file_name):
@@ -309,117 +304,6 @@ def invoke(command):
         return False
 
 
-class Bootstrap:
-    """Checks out third party libraries and builds them"""
-
-    def __init__(self, env):
-        """Constructs the Bootstrap instance"""
-        self._env = env
-
-    def run(self):
-        """Starts the bootstrap process"""
-
-        ignore_list = ['Externals/Box2D/Contributions/Platforms/iPhone']
-        cmake_files = [path for path in self.list_cmake_files('Externals') if path not in ignore_list]
-
-        for external in cmake_files:
-            self.configure_and_build('Xcode', external, os.path.join(external, 'Project'))
-
-        # Checkout all submodules
-        self.checkout_submodules()
-
-    @staticmethod
-    def clone(url, directory, branch=None):
-        """Clones a remote repository to a specified directory and that switches to a desired branch"""
-
-        if branch:
-            return invoke('git clone %s --branch %s --single-branch %s' % (url, branch, directory))
-        else:
-            return invoke('git clone %s --single-branch %s' % (url, directory))
-
-    @staticmethod
-    def checkout_submodule(directory):
-        """Initializes and pulls a submodule in a specified directory"""
-
-        return invoke('git submodule update --init -- %s' % directory)
-
-    @staticmethod
-    def checkout_submodules():
-        """Initializes and pulls all submodules"""
-
-        return invoke('git submodule update --init --recursive')
-
-    @staticmethod
-    def list_cmake_files(path):
-        """Lists all folders that contain CMakeLists.txt file"""
-
-        cmake_files = []
-
-        if os.path.exists(os.path.join(path, 'CMakeLists.txt')):
-            return [path]
-
-        for nested_dir in [file_name for file_name in os.listdir(path) if os.path.isdir(os.path.join(path, file_name))]:
-            cmake_files += Bootstrap.list_cmake_files(os.path.join(path, nested_dir))
-
-        return cmake_files
-
-    def generate(self, generator, source, output, parameters, rest=''):
-        """Invokes a CMake command to generate a build system"""
-
-        # Create an output directory
-        if not os.path.exists(output):
-            os.makedirs(output)
-
-        # Generate CMake parameter string
-        cmd_args = ['-D%s=%s' % (key, parameters[key]) for key in parameters]
-
-        # Generate a command line string
-        command_line = GENERATE_COMMAND.format(
-            output=output,
-            source=os.path.abspath(source),
-            generator=generator,
-            args=' '.join(cmd_args),
-            rest=rest,
-            cmake=self._env.cmake_path()
-        )
-
-        subprocess.check_call(command_line, shell=True)
-
-    def build(self, source, target, configuration):
-        """Build a CMake-generated project binary tree."""
-
-        # Generate a command line string
-        command_line = '%s --build %s --target %s --config %s' % (self._env.cmake_path(), source, target, configuration)
-
-        subprocess.check_call(command_line, shell=True)
-
-    def configure_and_build(self, generator, source_dir, binary_dir,
-                            target='ALL_BUILD',
-                            configuration='Release',
-                            prefix=None,
-                            options=None):
-        """Generates a binary tree and then builds a specified target for requested configuration"""
-
-        if not options:
-            options = dict()
-
-        # Set the CMAKE_INSTALL_PREFIX variable
-        if prefix:
-            options['CMAKE_INSTALL_PREFIX:PATH'] = prefix
-
-        try:
-            # Generate a binary tree
-            self.generate(generator, source_dir, binary_dir, options, '-Wno-dev')
-
-            # Build a generated tree
-            self.build(binary_dir, target, configuration)
-
-        except subprocess.CalledProcessError:
-            print 'Failed to build %s' % source_dir
-
-        shutil.rmtree(binary_dir)
-
-
 def main():
     """A command line tool entry point"""
 
@@ -454,10 +338,6 @@ def main():
         print 'CMake is located at', cmake_install_path
     else:
         raise Exception('CMake installation could not be found')
-
-    # Now bootstrap
-    bootstrap = Bootstrap(env)
-    bootstrap.run()
 
 if __name__ == "__main__":
     main()
