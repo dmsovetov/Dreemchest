@@ -18,7 +18,7 @@
 	url = https://github.com/LuaDist/libtiff
 [submodule "Externals/lua"]
 	path = Externals/lua
-	url = https://github.com/LuaDist/lua
+url=https://github.com/dmsovetov/lua
 [submodule "Externals/OpenAL"]
 	path = Externals/OpenAL
 	url = https://github.com/kcat/openal-soft
