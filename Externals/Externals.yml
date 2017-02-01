@@ -24,26 +24,41 @@
 #
 #################################################################################
 
-- name: lua
-  options:
-    BUILD_SHARED_LIBS: False
-    LUA_USE_C89: True
-    ios:
-      options:
-        LUA_BUILD_EXECUTABLES: False
-
-- name: zlib
-  ios:
-    disabled: True
-  macos:
-    disabled: True
-- name: ogg
-- name: vorbis
-
 - name: curl
   options:
     BUILD_CURL_EXE: False
     CURL_STATICLIB: True
+  ios:
+    disabled: True
+  emscripten:
+    disabled: True
+
+- name: lua
+  options:
+    BUILD_SHARED_LIBS: False
+    LUA_USE_C89: True
+  ios:
+    options:
+      BUILD_EXECUTABLES: False
+  emscripten:
+    disabled: True
+
+- name: zlib
+  options:
+    BUILD_SHARED_LIBS: False
+  ios:
+    disabled: True
+  macos:
+    disabled: True
+
+- name: ogg
+- name: vorbis
+
+- name: libpng
+  options:
+    PNG_TESTS: False
+    PNG_STATIC: True
+    PNG_SHARED: False
 
 - name: Box2D
   source: Box2D/Box2D
@@ -61,6 +76,8 @@
   windows:
     options:
       gtest_force_shared_crt: True
+  emscripten:
+    disabled: True
 
 - name: OpenAL
   options:
@@ -71,6 +88,8 @@
     disabled: True
   macos:
     disabled: True
+  emscripten:
+    disabled: True
 
 - name: libtiff
   windows:
@@ -78,7 +97,5 @@
       CMAKE_CXX_FLAGS: -D_XKEYCHECK_H
   ios:
     disabled: True
-
-- name: libpng
-  options:
-    PNG_TESTS: False
+  emscripten:
+    disabled: True

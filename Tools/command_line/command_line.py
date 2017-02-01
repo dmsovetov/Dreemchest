@@ -38,21 +38,25 @@ class Tool:
         cls(self._commands.add_parser(name))
 
 
-def add_component(parser, name, description=None, options=[]):
+def add_component(parser, name, description=None, options=[], default=True):
     """Adds a library component option to a parser object"""
 
     option = parser.add_mutually_exclusive_group()
     option.add_argument('--no-%s' % name.lower(),
                         help=description,
                         action='store_true',
-                        default=False)
+                        default=False if default else True)
 
     if len(options) > 1:
-        option.add_argument('--renderer',
+        option.add_argument('--%s' % name.lower(),
                             help='specifies a rendering backend to be used.',
                             type=str,
                             choices=options,
                             default=options[0])
+    else:
+        option.add_argument('--%s' % name.lower(),
+                            action='store_true',
+                            default=True if default else False)
 
 
 def add_system_library(parser, name, versions=None):

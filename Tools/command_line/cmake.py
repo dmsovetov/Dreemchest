@@ -28,7 +28,7 @@ import os
 import subprocess
 import shutil
 
-GENERATE_COMMAND = 'cmake -E chdir {output} cmake {source} -G "{generator}" {args} {rest}'
+GENERATE_COMMAND = 'cmake -E chdir {output} cmake {source} -G "{generator}" {args} {rest} -Wno-dev'
 
 
 def enable_option(value):
@@ -48,15 +48,8 @@ def library_option(parameters, name, options):
     values = vars(options)
 
     # Convert a library name to lowercase
-    name = name.lower()
-
-    if values['no_%s' % name]:
-        return
-
-    if values['system_%s' % name]:
-        parameters['SYSTEM_%s' % name.upper()] = True
-    else:
-        parameters['BUNDLED_%s' % name.upper()] = True
+    if values['no_%s' % name.lower()]:
+        parameters['CMAKE_DISABLE_FIND_PACKAGE_%s' % name] = 'ON'
 
 
 def generate(generator, source, output, parameters, rest=''):
@@ -150,7 +143,7 @@ class Command:
                             help='specifies the C++ standard whose features that are required by a build system.',
                             type=int,
                             choices=[98, 11, 14],
-                            default=98)
+                            default=11)
         parser.add_argument('--generator',
                             help='build system generator to be used.',
                             choices=generators,

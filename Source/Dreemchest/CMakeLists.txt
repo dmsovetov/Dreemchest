@@ -5,17 +5,60 @@ add_definitions(-DDC_BUILD_LIBRARY)
 set(DC_PCH_NAME Dreemchest)
 
 # Locate all dependencies
-locate_dependency(OpenAL)
-locate_dependency(Zlib)
-locate_dependency(Curl)
-locate_dependency(Lua)
-locate_dependency(TIFF)
-locate_dependency(PNG)
-locate_dependency(JsonCpp)
-locate_dependency(GTest)
-locate_dependency(Box2D)
-locate_dependency(Ogg)
-locate_dependency(Vorbis)
+find_package(OpenAL)
+if (OPENAL_FOUND)
+    add_definitions(-DOPENAL_FOUND)
+endif ()
+
+find_package(Zlib)
+if (OPENAL_FOUND)
+    add_definitions(-DOPENAL_FOUND)
+endif ()
+
+find_package(cURL)
+if (CURL_FOUND)
+    add_definitions(-DCURL_FOUND)
+endif ()
+
+find_package(Lua)
+if (LUA_FOUND)
+    add_definitions(-DLUA_FOUND)
+endif ()
+
+find_package(TIFF)
+if (TIFF_FOUND)
+    add_definitions(-DTIFF_FOUND)
+endif ()
+
+find_package(PNG)
+if (PNG_FOUND)
+    add_definitions(-DPNG_FOUND)
+endif ()
+
+find_package(JsonCpp)
+if (JSONCPP_FOUND)
+    add_definitions(-DJSONCPP_FOUND)
+endif ()
+
+find_package(GTest)
+if (GTEST_FOUND)
+    add_definitions(-DGTEST_FOUND)
+endif ()
+
+find_package(Box2D)
+if (BOX2D_FOUND)
+    add_definitions(-DBOX2D_FOUND)
+endif ()
+
+find_package(Ogg)
+if (OGG_FOUND)
+    add_definitions(-DOGG_FOUND)
+endif ()
+
+find_package(Vorbis)
+if (VORBIS_FOUND)
+    add_definitions(-DVORBIS_FOUND)
+endif ()
 
 # Glob all source files
 add_directories(Base BASE_SRCS)
@@ -121,10 +164,6 @@ add_library(Dreemchest STATIC
     ${REFLECTION_SRCS}
     )
 
-# Link all requested libraries
-target_link_libraries(Dreemchest ${DEPENDENCIES})
-target_include_directories(Dreemchest PUBLIC ${DEPENDENCIES_INCLUDE_DIRS})
-
 if (WIN32)
     target_link_libraries(Dreemchest ws2_32)
 endif ()
@@ -149,3 +188,8 @@ target_include_directories(Dreemchest PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 # Generate a configuration hash constant
 file(MD5 ${CMAKE_CURRENT_BINARY_DIR}/BuildConfig.h DREEMCHEST_VERSION)
 configure_file(BuildConfig.in.h BuildConfig.h)
+
+# Link all requested libraries
+target_link_libraries(Dreemchest ${JSONCPP_LIBRARY} ${OPENAL_LIBRARY})
+target_include_directories(Dreemchest PRIVATE ${OPENAL_INCLUDE_DIR})
+target_include_directories(Dreemchest PUBLIC ${JSONCPP_INCLUDE_DIR})
