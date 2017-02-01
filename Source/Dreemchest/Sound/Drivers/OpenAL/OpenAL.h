@@ -29,8 +29,13 @@
 
 #include "../SoundEngine.h"
 
-#include <AL/al.h>
-#include <AL/alc.h>
+#ifdef DC_PLATFORM_MACOS
+    #include <al.h>
+    #include <alc.h>
+#else
+    #include <AL/al.h>
+    #include <AL/alc.h>
+#endif  //  #ifdef DC_PLATFORM_MACOS
 
 DC_BEGIN_DREEMCHEST
 
