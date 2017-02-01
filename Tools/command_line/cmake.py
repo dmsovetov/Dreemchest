@@ -25,76 +25,10 @@
 #################################################################################
 
 import os
-import sys
 import subprocess
 import shutil
-import urllib2
-import zipfile
-import tarfile
 
-GENERATE_COMMAND = '{cmake} -E chdir {output} {cmake} {source} -G "{generator}" {args} {rest}'
-
-
-def get_cmake_executable():
-    if sys.platform == 'darwin':
-        return os.path.abspath('Tools/cmake/CMake.app/Contents/bin/cmake')
-    else:
-        return os.path.abspath('Tools/cmake/bin/cmake.exe')
-
-try:
-    with open(os.devnull, 'wb') as devnull:
-        subprocess.check_call('cmake', shell=True, stdout=devnull, stderr=devnull)
-        cmake = 'cmake'
-except subprocess.CalledProcessError:
-    cmake = get_cmake_executable()
-
-
-def get_download_url():
-    if sys.platform == 'darwin':
-        return 'https://cmake.org/files/v3.6/cmake-3.6.3-Darwin-x86_64.tar.gz'
-    else:
-        return 'https://cmake.org/files/v3.6/cmake-3.6.3-win32-x86.zip'
-
-
-def download():
-    url = get_download_url()
-
-    file_name = url.split('/')[-1]
-    u = urllib2.urlopen(url)
-
-    f = open(file_name, 'wb')
-    meta = u.info()
-    file_size = int(meta.getheaders("Content-Length")[0])
-    print "Downloading: %s Bytes: %s" % (file_name, file_size)
-
-    file_size_dl = 0
-    block_sz = 8192
-    while True:
-        buffer = u.read(block_sz)
-        if not buffer:
-            break
-
-        file_size_dl += len(buffer)
-        f.write(buffer)
-        status = "\r%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
-        print status,
-        sys.stdout.flush()
-
-    f.close()
-
-    name, ext = os.path.splitext(file_name)
-
-    if ext == '.gz':
-        tar = tarfile.open(file_name, "r")
-        tar.extractall("Tools")
-        name, ext = os.path.splitext(name)
-    elif ext == '.zip':
-        with zipfile.ZipFile(file_name, "r") as z:
-            z.extractall("Tools")
-
-    os.rename(os.path.join('Tools', name), 'Tools/cmake')
-
-    os.remove(file_name)
+GENERATE_COMMAND = 'cmake -E chdir {output} cmake {source} -G "{generator}" {args} {rest}'
 
 
 def enable_option(value):
@@ -141,8 +75,7 @@ def generate(generator, source, output, parameters, rest=''):
         source=os.path.abspath(source),
         generator=generator,
         args=' '.join(cmd_args),
-        rest=rest,
-        cmake=cmake
+        rest=rest
         )
 
     subprocess.check_call(command_line, shell=True)
@@ -152,7 +85,7 @@ def build(source, target, configuration):
     """Build a CMake-generated project binary tree."""
 
     # Generate a command line string
-    command_line = '%s --build %s --target %s --config %s' % (cmake, source, target, configuration)
+    command_line = 'cmake --build %s --target %s --config %s' % (source, target, configuration)
 
     subprocess.check_call(command_line, shell=True)
 
@@ -160,16 +93,26 @@ def build(source, target, configuration):
 def configure_and_build(generator, source_dir, binary_dir,
                         target='ALL_BUILD',
                         configuration='Release',
+                        install_prefix=None,
                         prefix=None,
-                        options=None):
+                        options=None,
+                        toolchain=None):
     """Generates a binary tree and then builds a specified target for requested configuration"""
 
     if not options:
         options = dict()
 
     # Set the CMAKE_INSTALL_PREFIX variable
+    if install_prefix:
+        options['CMAKE_INSTALL_PREFIX'] = install_prefix
+
+    # Set the CMAKE_PREFIX_PATH
     if prefix:
-        options['CMAKE_INSTALL_PREFIX:PATH'] = prefix
+        options['CMAKE_PREFIX_PATH'] = prefix
+
+    # Set the CMAKE_TOOLCHAIN_FILE variable
+    if toolchain:
+        options['CMAKE_TOOLCHAIN_FILE'] = toolchain
 
     try:
         # Generate a binary tree
@@ -187,15 +130,19 @@ def configure_and_build(generator, source_dir, binary_dir,
 class Command:
     """A base class for all CMake commands"""
 
-    def __init__(self, parser, source_dir='.', output_dir='.', prefix_path='.'):
+    def __init__(self, parser, generators, source_dir='.', output_dir='.', prefix_path='.'):
         """Constructs a platform configuration command"""
 
-        parser.add_argument('--source',
-                            help='a source directory to generate build system.',
-                            default=source_dir)
-        parser.add_argument('--output',
-                            help='an output directory to place generated build system.',
-                            default=output_dir)
+        if source_dir is not None:
+            parser.add_argument('--source',
+                                help='a source directory to generate build system.',
+                                default=source_dir)
+
+        if output_dir is not None:
+            parser.add_argument('--output',
+                                help='an output directory to place generated build system.',
+                                default=output_dir)
+
         parser.add_argument('--prefix-path',
                             help='a path used for searching packages.',
                             default=prefix_path)
@@ -204,6 +151,14 @@ class Command:
                             type=int,
                             choices=[98, 11, 14],
                             default=98)
+        parser.add_argument('--generator',
+                            help='build system generator to be used.',
+                            choices=generators,
+                            default=generators[0])
+        parser.add_argument('--configuration',
+                            help='a configuration to be built.',
+                            choices=['debug', 'release'],
+                            default='release')
 
         parser.set_defaults(function=self.configure)
 

@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 #################################################################################
 #
 # The MIT License (MIT)
@@ -26,37 +24,61 @@
 #
 #################################################################################
 
-import argparse
-import bootstrap
-import configure
-import command_line
-import sys
+- name: lua
+  options:
+    BUILD_SHARED_LIBS: False
+    LUA_USE_C89: True
+    ios:
+      options:
+        LUA_BUILD_EXECUTABLES: False
 
+- name: zlib
+  ios:
+    disabled: True
+  macos:
+    disabled: True
+- name: ogg
+- name: vorbis
 
-class Main(command_line.Tool):
-    """An entry point to a command line tool"""
+- name: curl
+  options:
+    BUILD_CURL_EXE: False
+    CURL_STATICLIB: True
 
-    def __init__(self, parser):
-        """Constructs a command line tool."""
+- name: Box2D
+  source: Box2D/Box2D
+  options:
+    BOX2D_BUILD_EXAMPLES: False
+    BOX2D_INSTALL: True
 
-        command_line.Tool.__init__(self, parser, 'available commands')
+- name: jsoncpp
+  options:
+    JSONCPP_WITH_TESTS: False
+    JSONCPP_WITH_POST_BUILD_UNITTEST: False
 
-        self._add_command('configure', configure.Command)
+- name: gtest
+  source: GoogleTest
+  windows:
+    options:
+      gtest_force_shared_crt: True
 
-        if sys.platform == 'darwin':
-            self._add_command('bootstrap', bootstrap.MacOSBootstrapCommand)
-        elif sys.platform == 'nt':
-            self._add_command('bootstrap', bootstrap.WindowsBootstrapCommand)
+- name: OpenAL
+  options:
+    ALSOFT_EXAMPLES: False
+    ALSOFT_TESTS: False
+    LIBTYPE: Static
+  ios:
+    disabled: True
+  macos:
+    disabled: True
 
+- name: libtiff
+  windows:
+    options:
+      CMAKE_CXX_FLAGS: -D_XKEYCHECK_H
+  ios:
+    disabled: True
 
-def main():
-    root = argparse.ArgumentParser(prog='dreemchest', description='Dreemchest engine command line tool')
-
-    Main(root)
-
-    args = root.parse_args()
-    args.function(args)
-
-
-if __name__ == "__main__":
-    main()
+- name: libpng
+  options:
+    PNG_TESTS: False

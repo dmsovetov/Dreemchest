@@ -33,10 +33,10 @@ import command_line
 class PlatformConfigurationCommand(cmake.Command):
     """A base class for all platform configuration commands"""
 
-    def __init__(self, parser, rendering_backend):
+    def __init__(self, parser, generators, rendering_backend):
         """Constructs a platform configuration command"""
 
-        cmake.Command.__init__(self, parser, prefix_path='Build/Dependencies')
+        cmake.Command.__init__(self, parser, generators, prefix_path='Build/Dependencies')
 
         command_line.add_component(parser, 'pch', description='generate a build system that uses precompiled headers.')
         command_line.add_component(parser, 'composer', description='do not build the Composer tool.')
@@ -85,10 +85,10 @@ class PlatformConfigurationCommand(cmake.Command):
 class DesktopConfigureCommand(PlatformConfigurationCommand):
     """Performs desktop OS build system configuration"""
 
-    def __init__(self, parser, rendering_backend):
+    def __init__(self, parser, generators, rendering_backend):
         """Constructs desktop configuration command"""
 
-        PlatformConfigurationCommand.__init__(self, parser, rendering_backend)
+        PlatformConfigurationCommand.__init__(self, parser, generators, rendering_backend)
 
         # Add Qt library option
         command_line.add_system_library(parser, 'Qt', versions=['auto', 'qt4', 'qt5'])
@@ -104,7 +104,7 @@ class WindowsConfigureCommand(DesktopConfigureCommand):
     def __init__(self, parser):
         """Constructs Windows configuration command"""
 
-        DesktopConfigureCommand.__init__(self, parser, ['opengl', 'direct3d9', 'direct3d12'])
+        DesktopConfigureCommand.__init__(self, parser, ['Visual Studio 12'], ['opengl', 'direct3d9', 'direct3d12'])
 
     def configure(self, options):
         """Performs basic build system configuration"""
@@ -122,7 +122,7 @@ class MacOSConfigureCommand(DesktopConfigureCommand):
     def __init__(self, parser):
         """Constructs MacOS configuration command"""
 
-        DesktopConfigureCommand.__init__(self, parser, ['opengl'])
+        DesktopConfigureCommand.__init__(self, parser, ['Xcode'], ['opengl'])
 
     def configure(self, options):
         """Performs MacOS build system configuration"""

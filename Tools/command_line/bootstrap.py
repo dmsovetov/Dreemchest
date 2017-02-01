@@ -28,167 +28,96 @@ import shutil
 import os
 import cmake
 import git
-import command_line
+import yaml
 
 
 class BootstrapCommand(cmake.Command):
     """A base class for all installation commands"""
 
-    def __init__(self, parser, generators=[]):
+    def __init__(self, parser, platforms, generators=[]):
         """Constructs a third party install command"""
 
-        cmake.Command.__init__(self, parser, output_dir='Build/Dependencies', source_dir='Externals')
+        cmake.Command.__init__(self, parser, generators, output_dir=None, source_dir=None)
 
-        self._add_library(parser, 'zlib')
-        self._add_library(parser, 'Box2D')
-        self._add_library(parser, 'OpenAL')
-        self._add_library(parser, 'GTest')
-        self._add_library(parser, 'jsoncpp')
-        self._add_library(parser, 'libpng')
-        self._add_library(parser, 'libtiff')
-        self._add_library(parser, 'lua')
-        self._add_library(parser, 'ogg')
-        self._add_library(parser, 'vorbis')
-        self._add_library(parser, 'curl')
+        # Load home directory from environment
+        if 'DREEMCHEST_HOME' not in os.environ.keys():
+            raise Exception('DREEMCHEST_HOME environment variable was not set')
 
-        parser.add_argument('--generator',
-                            help='build system generator to be used.',
-                            choices=generators,
-                            default=generators[0])
-        parser.add_argument('--configuration',
-                            help='a configuration to be built.',
-                            choices=['debug', 'release'],
-                            default='release')
+        self._home = os.environ['DREEMCHEST_HOME']
+        self._platforms = platforms
+
+        # Load external libraries descriptor
+        with open(os.path.join(self._home, 'Externals', 'Externals.yml')) as fh:
+            self._externals = yaml.load(fh.read())
+
+        # Add libraries to command line options
+        for external in self._externals:
+            name = external['name']
+            parser.add_argument('--no-%s' % name.lower(),
+                                help='do not build a %s.' % name,
+                                action='store_true',
+                                default=False
+                                )
+
+        # Add platforms to command line options
+        for platform in platforms:
+            parser.add_argument('--no-%s' % platform.lower(),
+                                help='do not bootstrap for %s.' % platform,
+                                action='store_true',
+                                default=False
+                                )
 
         parser.set_defaults(function=self.bootstrap)
 
-    @staticmethod
-    def bootstrap(options):
-        install_path = os.path.abspath(options.output)
-        binary_dir = os.path.abspath(os.path.join(options.source, 'Projects'))
-        source_dir = os.path.abspath(options.source)
-        configuration = options.configuration.capitalize()
-
+    def bootstrap(self, options):
         # Make sure to pull all submodules before building them
         git.checkout_submodules()
 
-        if not options.no_zlib:
-            cmake.configure_and_build(options.generator,
-                                      os.path.join(source_dir, 'zlib'),
-                                      os.path.join(binary_dir, 'zlib'),
-                                      prefix=install_path,
-                                      target='install',
-                                      configuration=configuration
-                                      )
+        # Toolchain files for each platform
+        toolchains = dict(
+            iOS=os.path.join(self._home, 'CMake', 'Toolchains', 'iOS.cmake'),
+            Android=os.path.join(self._home, 'CMake', 'Toolchains', 'Android.cmake'),
+            macOS=None,
+            Windows=None,
+        )
 
-        if not options.no_curl:
-            cmake.configure_and_build(options.generator,
-                                      os.path.join(source_dir, 'curl'),
-                                      os.path.join(binary_dir, 'curl'),
-                                      prefix=install_path,
-                                      options=dict(BUILD_CURL_EXE=False, CURL_STATICLIB=True),
-                                      target='install',
-                                      configuration=configuration
-                                      )
+        # Now build each platform
+        for platform in self._platforms:
+            if getattr(options, 'no_' + platform.lower()):
+                continue
 
-        if not options.no_box2d:
-            cmake.configure_and_build(options.generator,
-                                      os.path.join(source_dir, 'Box2D/Box2D'),
-                                      os.path.join(binary_dir, 'Box2D'),
-                                      prefix=install_path,
-                                      options=dict(BOX2D_BUILD_EXAMPLES=False, BOX2D_INSTALL=True),
-                                      target='install',
-                                      configuration=configuration
-                                      )
+            install_path = os.path.join(self._home, 'Build/Dependencies', platform)
+            binary_dir = os.path.join(self._home, 'Externals/Projects')
+            source_dir = os.path.join(self._home, 'Externals')
 
-        if not options.no_jsoncpp:
-            cmake.configure_and_build(options.generator,
-                                      os.path.join(source_dir, 'jsoncpp'),
-                                      os.path.join(binary_dir, 'jsoncpp'),
-                                      prefix=install_path,
-                                      options=dict(JSONCPP_WITH_TESTS=False, JSONCPP_WITH_POST_BUILD_UNITTEST=False),
-                                      target='install',
-                                      configuration=configuration
-                                      )
+            # Build all external libraries
+            for external in self._externals:
+                name = external['name']
+                cmake_options = external['options'] if 'options' in external.keys() else dict()
+                source = external['source'] if 'source' in external.keys() else name
+                platform_name = platform.lower()
+                platform_options = external[platform_name] if platform_name in external.keys() else dict()
 
-        if not options.no_ogg:
-            cmake.configure_and_build(options.generator,
-                                      os.path.join(source_dir, 'ogg'),
-                                      os.path.join(binary_dir, 'ogg'),
-                                      prefix=install_path,
-                                      target='install',
-                                      configuration=configuration
-                                      )
+                if getattr(options, 'no_' + name.lower()):
+                    continue
 
-        if not options.no_vorbis:
-            cmake.configure_and_build(options.generator,
-                                      os.path.join(source_dir, 'vorbis'),
-                                      os.path.join(binary_dir, 'vorbis'),
-                                      prefix=install_path,
-                                      target='install',
-                                      configuration=configuration
-                                      )
+                if 'disabled' in platform_options.keys() and platform_options['disabled']:
+                    continue
 
-        if not options.no_gtest:
-            cmake.configure_and_build(options.generator,
-                                      os.path.join(source_dir, 'GoogleTest'),
-                                      os.path.join(binary_dir, 'GoogleTest'),
-                                      prefix=install_path,
-                                      target='install',
-                                      options=dict(gtest_force_shared_crt=True),
-                                      configuration=configuration
-                                      )
+                if 'options' in platform_options.keys():
+                    cmake_options.update(platform_options['options'])
 
-        if not options.no_libpng:
-            cmake.configure_and_build(options.generator,
-                                      os.path.join(source_dir, 'libpng'),
-                                      os.path.join(binary_dir, 'libpng'),
-                                      prefix=install_path,
-                                      options=dict(PNG_TESTS=False),
-                                      target='install',
-                                      configuration=configuration
-                                      )
+                cmake.configure_and_build(options.generator,
+                                          os.path.join(source_dir, source),
+                                          os.path.join(binary_dir, name),
+                                          prefix=install_path,
+                                          install_prefix=install_path,
+                                          target='install',
+                                          configuration='Release',
+                                          options=cmake_options,
+                                          toolchain=toolchains[platform])
 
-        if not options.no_libtiff:
-            cmake.configure_and_build(options.generator,
-                                      os.path.join(source_dir, 'libtiff'),
-                                      os.path.join(binary_dir, 'libtiff'),
-                                      prefix=install_path,
-                                      options=dict(CMAKE_CXX_FLAGS='-D_XKEYCHECK_H'),
-                                      target='install',
-                                      configuration=configuration
-                                      )
-
-        if not options.no_lua:
-            cmake.configure_and_build(options.generator,
-                                      os.path.join(source_dir, 'lua'),
-                                      os.path.join(binary_dir, 'lua'),
-                                      prefix=install_path,
-                                      options=dict(BUILD_SHARED_LIBS=False, LUA_USE_C89=True),
-                                      target='install',
-                                      configuration=configuration
-                                      )
-
-        if not options.no_openal:
-            cmake.configure_and_build(options.generator,
-                                      os.path.join(source_dir, 'OpenAL'),
-                                      os.path.join(binary_dir, 'OpenAL'),
-                                      prefix=install_path,
-                                      options=dict(ALSOFT_EXAMPLES=False, ALSOFT_TESTS=False, LIBTYPE='STATIC'),
-                                      target='install',
-                                      configuration=configuration
-                                      )
-
-        shutil.rmtree(binary_dir)
-
-    @staticmethod
-    def _add_library(parser, name):
-        """Adds a third party build options"""
-        parser.add_argument('--no-%s' % name.lower(),
-                            help='do not build a %s.' % name,
-                            action='store_true',
-                            default=False
-                            )
+            shutil.rmtree(binary_dir)
 
 
 class MacOSBootstrapCommand(BootstrapCommand):
@@ -197,7 +126,7 @@ class MacOSBootstrapCommand(BootstrapCommand):
     def __init__(self, parser):
         """Constructs a third party install command"""
 
-        BootstrapCommand.__init__(self, parser, generators=['Xcode'])
+        BootstrapCommand.__init__(self, parser, ['macOS', 'iOS', 'Android', 'Emscripten'], generators=['Xcode'])
 
 
 class WindowsBootstrapCommand(BootstrapCommand):
@@ -206,16 +135,4 @@ class WindowsBootstrapCommand(BootstrapCommand):
     def __init__(self, parser):
         """Constructs a third party install command"""
 
-        BootstrapCommand.__init__(self, parser, generators=['Visual Studio 12'])
-
-
-class Command(command_line.Tool):
-    """A command line tool to build and install dependencies for a specified target system"""
-
-    def __init__(self, parser):
-        """Constructs a configure command line tool"""
-
-        command_line.Tool.__init__(self, parser, 'available platforms')
-
-        self._add_command('windows', WindowsBootstrapCommand)
-        self._add_command('macos', MacOSBootstrapCommand)
+        BootstrapCommand.__init__(self, parser, ['Windows', 'Android', 'Emscripten'], generators=['Visual Studio 12'])
