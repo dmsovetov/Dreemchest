@@ -36,9 +36,6 @@ namespace Renderer
     //! VertexBufferLayout class instance is used to define a vertex buffer layout.
     class VertexBufferLayout
     {
-#if DEV_DEPRECATED_HAL
-    friend class Hal;
-#endif  /*  #if DEV_DEPRECATED_HAL  */
     public:
         
         //! Input layout element.

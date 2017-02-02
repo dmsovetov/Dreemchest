@@ -6,59 +6,16 @@ set(DC_PCH_NAME Dreemchest)
 
 # Locate all dependencies
 find_package(OpenAL)
-if (OPENAL_FOUND)
-    add_definitions(-DOPENAL_FOUND)
-endif ()
-
 find_package(Zlib)
-if (OPENAL_FOUND)
-    add_definitions(-DOPENAL_FOUND)
-endif ()
-
 find_package(cURL)
-if (CURL_FOUND)
-    add_definitions(-DCURL_FOUND)
-endif ()
-
 find_package(Lua)
-if (LUA_FOUND)
-    add_definitions(-DLUA_FOUND)
-endif ()
-
 find_package(TIFF)
-if (TIFF_FOUND)
-    add_definitions(-DTIFF_FOUND)
-endif ()
-
 find_package(PNG)
-if (PNG_FOUND)
-    add_definitions(-DPNG_FOUND)
-endif ()
-
 find_package(JsonCpp)
-if (JSONCPP_FOUND)
-    add_definitions(-DJSONCPP_FOUND)
-endif ()
-
 find_package(GTest)
-if (GTEST_FOUND)
-    add_definitions(-DGTEST_FOUND)
-endif ()
-
 find_package(Box2D)
-if (BOX2D_FOUND)
-    add_definitions(-DBOX2D_FOUND)
-endif ()
-
 find_package(Ogg)
-if (OGG_FOUND)
-    add_definitions(-DOGG_FOUND)
-endif ()
-
 find_package(Vorbis)
-if (VORBIS_FOUND)
-    add_definitions(-DVORBIS_FOUND)
-endif ()
 
 # Glob all source files
 add_directories(Base BASE_SRCS)

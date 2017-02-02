@@ -69,7 +69,7 @@ OpenALBuffer::OpenALBuffer( SoundDecoderPtr data, u32 chunks, u32 pcmSize ) : So
 OpenALBuffer::~OpenALBuffer( void )
 {
     NIMBLE_DELETE_ARRAY( m_pcm );
-    alDeleteBuffers( m_buffers.size(), &m_buffers[0] );
+    alDeleteBuffers( static_cast<ALsizei>(m_buffers.size()), &m_buffers[0] );
 
     OpenAL::dumpErrors( "OpenALBuffer::~OpenALBuffer" );
 }
@@ -81,7 +81,7 @@ void OpenALBuffer::attachToSource( SoundSourceWPtr target )
 
     ALuint source = static_cast<OpenALSource*>( target.get() )->m_id;
 
-    alSourceQueueBuffers( source, m_buffers.size(), &m_buffers[0] );
+    alSourceQueueBuffers( source, static_cast<ALsizei>(m_buffers.size()), &m_buffers[0] );
     OpenAL::dumpErrors( "OpenALBuffer::attachToSource" );
 }
 

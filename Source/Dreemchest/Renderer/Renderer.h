@@ -39,40 +39,6 @@ namespace Renderer {
 
     class RenderView;
     
-#if DEV_DEPRECATED_HAL
-    class Hal;
-    class BatchRenderer;
-    class BlendState;
-    class RasterizerState;
-    class DepthStencilState;
-    class RenderResource;
-        class Shader;
-        class VertexBuffer;
-        class IndexBuffer;
-        class VertexBufferLayout;
-        class Texture;
-            class Texture1D;
-            class Texture2D;
-                class RenderTarget;
-            class Texture3D;
-            class TextureCube;
-
-    //! Pointer types for renderer resources.
-    dcDeclarePtrs( Hal )
-    //dcDeclarePtrs( Renderer2D )
-    //dcDeclarePtrs( VertexBufferLayout )
-    dcDeclarePtrs( VertexBuffer )
-    dcDeclarePtrs( IndexBuffer )
-    dcDeclarePtrs( ConstantBuffer )
-    dcDeclarePtrs( Texture )
-    dcDeclarePtrs( Texture2D )
-    dcDeclarePtrs( Shader )
-    dcDeclarePtrs( RenderTarget )
-#else
-    struct Shader : public RefCounted {};
-    dcDeclarePtrs(Shader);
-#endif  /*  #if DEV_DEPRECATED_HAL  */
-    
     dcDeclarePtrs(RenderingContext)
     dcDeclarePtrs(RenderView);
     
@@ -387,16 +353,6 @@ namespace Renderer {
         FilterBilinear,     //!< Use texture mip-maps.
         FilterTrilinear,    //!< Use texture mip-map and interpolate between the mip levels.
     };
-    
-#if DEV_DEPRECATED_HAL
-    // ** class RenderResource
-    //! RenderResource is a base class for all render resources.
-    class dcInterface RenderResource : public RefCounted {
-    public:
-        
-        virtual                     ~RenderResource( void ) {}
-    };
-#endif  /*  #if DEV_DEPRECATED_HAL  */
     
     //! Render frame unique pointer type.
     typedef UPtr<class RenderFrame> RenderFrameUPtr;
