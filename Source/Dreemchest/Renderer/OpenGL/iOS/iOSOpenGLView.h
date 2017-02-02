@@ -27,23 +27,24 @@
 #ifndef __DC_Renderer_iOSOpenGLView_H__
 #define __DC_Renderer_iOSOpenGLView_H__
 
-#include "../OpenGLHal.h"
 #include "UIKitOpenGLView.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace renderer {
+namespace Renderer
+{
 
     // ** class iOSOpenGLView
-    class iOSOpenGLView : public OpenGLView {
+    class iOSOpenGLView : public OpenGLView
+    {
     public:
 
         virtual             ~iOSOpenGLView( void );
 
         // ** IView
         virtual bool        makeCurrent( void );
-        virtual void        beginFrame( void );
-        virtual void        endFrame( void );
+        virtual bool        beginFrame( void );
+        virtual bool        endFrame( void );
 
         // ** iOSOpenGLView
         bool                initialize( UIWindow* window, PixelFormat depthStencil, id delegate );
@@ -53,7 +54,7 @@ namespace renderer {
         UIKitOpenGLView*    m_view;
     };
 
-} // namespace renderer
+} // namespace Renderer
 
 DC_END_DREEMCHEST
 

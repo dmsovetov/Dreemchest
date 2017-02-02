@@ -176,6 +176,7 @@ void ApplicationDelegate::handleRenderFrame(f32 dt)
     m_renderingContext->display(frame);
 }
     
+#if !defined(DC_PLATFORM_IOS)
 void ApplicationDelegate::handleKeyPressed(const Platform::Window::KeyPressed& e)
 {
     Quat rotation /*= */;
@@ -215,6 +216,7 @@ void ApplicationDelegate::handleKeyReleased(const Platform::Window::KeyReleased&
             break;
     }
 }
+#endif  //  #if !defined(DC_PLATFORM_IOS)
 
 RenderItem ApplicationDelegate::createSkyBox(Texture_ texture)
 {

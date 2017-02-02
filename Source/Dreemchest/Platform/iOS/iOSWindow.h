@@ -32,10 +32,12 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace Platform
+{
 
     // ** class iOSWindow
-    class iOSWindow : public IWindow {
+    class iOSWindow : public IWindow
+    {
     public:
 
                             iOSWindow( void );
@@ -48,6 +50,7 @@ namespace platform {
         virtual String      caption( void ) const;
         virtual void        setCaption( const String& value );
         virtual void*       handle( void ) const;
+        virtual void        mapCursorToWindow( s32& x, s32& y ) const;
         void                setOwner( Window* value );
         Window*             owner( void ) const;
 
@@ -63,7 +66,7 @@ namespace platform {
         UIKitWindow*        m_window;
     };
 
-} // namespace platform
+} // namespace Platform
 
 DC_END_DREEMCHEST
 

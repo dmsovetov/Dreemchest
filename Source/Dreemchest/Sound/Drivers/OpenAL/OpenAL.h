@@ -29,7 +29,7 @@
 
 #include "../SoundEngine.h"
 
-#ifdef DC_PLATFORM_MACOS
+#if defined(DC_PLATFORM_MACOS) || defined(DC_PLATFORM_IOS)
     #include <al.h>
     #include <alc.h>
 #else

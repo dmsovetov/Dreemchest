@@ -32,7 +32,8 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace Platform
+{
     class iOSWindow;
 }
 
@@ -40,14 +41,15 @@ DC_END_DREEMCHEST
 
 DC_USE_DREEMCHEST
 
-@interface UIKitWindow : UIWindow {
+@interface UIKitWindow : UIWindow
+{
     enum { MaxTouches = 16 };
     CGPoint                 m_prevMousePos;
-    platform::iOSWindow*    m_window;
+    Platform::iOSWindow*    m_window;
     UITouch*                m_touches[MaxTouches];
 }
 
-- ( id )    initWithWindow: ( platform::iOSWindow* )window;
+- ( id )    initWithWindow: ( Platform::iOSWindow* )window;
 - ( float ) width;
 - ( float ) height;
 

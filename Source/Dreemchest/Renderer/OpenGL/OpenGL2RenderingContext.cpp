@@ -111,7 +111,9 @@ OpenGL2RenderingContext::OpenGL2RenderingContext(RenderViewPtr view)
     , m_activeFeatures(0)
 #endif  //  #if DEV_RENDERER_PROGRAM_CACHING
 {
+#if !defined(DC_PLATFORM_IOS)
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+#endif  //  #if !defined(DC_PLATFORM_IOS)
     m_shaderLibrary.addPreprocessor(DC_NEW ShaderPreprocessor);
     m_shaderLibrary.addPreprocessor(DC_NEW ShaderVersionPreprocessor(110));
     
@@ -362,8 +364,10 @@ void OpenGL2RenderingContext::executeCommandBuffer(const CommandBuffer& commands
                     m_drawBuffers[i] = hasColor ? GL_COLOR_ATTACHMENT0 + i : GL_NONE;
                 }
 
+            #if !defined(DC_PLATFORM_IOS)
                 glDrawBuffers(opCode.renderToTextures.count, m_drawBuffers);
                 glReadBuffer(GL_NONE);
+            #endif  //  #if !defined(DC_PLATFORM_IOS)
                 NIMBLE_ABORT_IF(!OpenGL2::Framebuffer::check(framebufferId), "invalid framebuffer configuration");
                 OpenGL2::Framebuffer::bind(framebufferId);
 
@@ -379,7 +383,9 @@ void OpenGL2RenderingContext::executeCommandBuffer(const CommandBuffer& commands
                 
                 // Restore the previous framebuffer
                 OpenGL2::Framebuffer::restore(activeFramebuffer, activeViewport);
+            #if !defined(DC_PLATFORM_IOS)
                 glDrawBuffer(GL_BACK);
+            #endif  //  #if !defined(DC_PLATFORM_IOS)
             }
                 break;
 

@@ -29,7 +29,8 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace Platform
+{
 
 // ** createApplication
 IApplication* createApplication( void )
@@ -46,11 +47,12 @@ void iOSApplication::quit( u32 exitCode )
 // ** iOSApplication::launch
 int iOSApplication::launch( Application* application )
 {
-    @autoreleasepool {
+    @autoreleasepool
+    {
         return UIApplicationMain( 0, nil, nil, NSStringFromClass( [iOSApplicationDelegate class] ) );
     }
 }
 
-} // namespace platform
+} // namespace Platform
 
 DC_END_DREEMCHEST

@@ -179,7 +179,9 @@ void Window::notifyKeyDown( Key key )
 // ** Window::notifyKeyUp
 void Window::notifyKeyUp( Key key )
 {
+#if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_MACOS )
     notify<KeyReleased>( KeyReleased( this, key ) );
+#endif  /*  #if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_MACOS )    */
 }
 
 } // namespace Platform

@@ -30,7 +30,7 @@
 @implementation UIKitWindow
 
 // ** initWithWindow
-- ( id )initWithWindow: ( platform::iOSWindow* )window
+- ( id )initWithWindow: ( Platform::iOSWindow* )window
 {
     m_window = window;
 
@@ -74,49 +74,54 @@
 // ** touchesBegan
 - ( void ) touchesBegan: ( NSSet* ) touches withEvent: ( UIEvent* ) event
 {
-    for( UITouch* touch in touches ) {
+    for( UITouch* touch in touches )
+    {
         CGPoint location    = [touch locationInView: self];
         CGPoint p           = [self transformTouch: location];
 
-        m_window->owner()->notifyMouseDown( p.x, p.y, [self addTouch:touch] );
+        m_window->owner()->notifyMouseDown( Platform::Window::LeftMouseButton, p.x, p.y, [self addTouch:touch] );
     }
 }
 
 // ** touchesEnded
 - ( void ) touchesEnded: ( NSSet* ) touches withEvent: ( UIEvent* ) event
 {
-    for( UITouch *touch in touches ) {
+    for( UITouch *touch in touches )
+    {
         CGPoint location    = [touch locationInView: self];
         CGPoint p           = [self transformTouch: location];
 
-        m_window->owner()->notifyMouseUp( p.x, p.y, [self removeTouch:touch] );
+        m_window->owner()->notifyMouseUp( Platform::Window::LeftMouseButton, p.x, p.y, [self removeTouch:touch] );
     }
 }
 
 // ** touchesMoved
 - ( void ) touchesMoved: ( NSSet* ) touches withEvent: ( UIEvent* ) event
 {
-    for( UITouch *touch in touches ) {
+    for( UITouch *touch in touches )
+    {
         CGPoint previous = [touch previousLocationInView: self];
         CGPoint current  = [touch locationInView: self];
 
         CGPoint start   = [self transformTouch: previous];
         CGPoint end     = [self transformTouch: current];
 
-        m_window->owner()->notifyMouseMove( start.x, start.y, end.x, end.y, [self getTouchId:touch] );
+        m_window->owner()->notifyMouseMove( Platform::Window::LeftMouseButton, start.x, start.y, end.x, end.y, [self getTouchId:touch] );
     }
 }
 
 // ** addTouch
 - ( int )addTouch : ( UITouch* )touch
 {
-    for( int i = 0; i < MaxTouches; i++ ) {
-        if( !m_touches[i] ) {
+    for( int i = 0; i < MaxTouches; i++ )
+    {
+        if( !m_touches[i] )
+        {
             m_touches[i] = touch;
             return i;
         }
 
-        DC_BREAK_IF( m_touches[i] == touch );
+        NIMBLE_BREAK_IF( m_touches[i] == touch );
     }
 
     return -1;
@@ -132,7 +137,7 @@
         }
     }
 
-    DC_BREAK_IF( true );
+    NIMBLE_BREAK_IF( true );
     return -1;
 }
 

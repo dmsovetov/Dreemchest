@@ -28,14 +28,16 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace Platform
+{
 
 // ** createWindow
 IWindow* createWindow( u32 width, u32 height )
 {
     iOSWindow* window = DC_NEW iOSWindow;
 
-    if( window->create() ) {
+    if( window->create() )
+    {
         return window;
     }
 
@@ -88,13 +90,19 @@ u32 iOSWindow::height( void ) const
 // ** iOSWindow::setCaption
 void iOSWindow::setCaption( const String& value )
 {
-    log::warn( "iOSWindow::setCaption : window caption is not supported on iOS\n" );
+    LogWarning( "window", "%s", "window caption is not supported on iOS\n" );
 }
 
 // ** iOSWindow::caption
 String iOSWindow::caption( void ) const
 {
     return "";
+}
+    
+// ** iOSWindow::mapCursorToWindow
+void iOSWindow::mapCursorToWindow( s32& x, s32& y ) const
+{
+    NIMBLE_NOT_IMPLEMENTED
 }
 
 // ** iOSWindow::handle
@@ -123,6 +131,6 @@ bool iOSWindow::create( void )
     return true;
 }
 
-} // namespace platform
+} // namespace Platform
 
 DC_END_DREEMCHEST

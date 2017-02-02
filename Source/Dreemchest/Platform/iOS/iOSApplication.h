@@ -31,18 +31,21 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace Platform
+{
 
     // ** class iOSApplication
-    class iOSApplication : public IApplication {
+    class iOSApplication : public IApplication
+    {
     public:
 
         // ** IApplication
         virtual void                quit( u32 exitCode );
         virtual int                 launch( Application* application );
+        virtual const String&       resourcePath( void ) const;
     };
 
-} // namespace platform
+} // namespace Platform
 
 DC_END_DREEMCHEST
 

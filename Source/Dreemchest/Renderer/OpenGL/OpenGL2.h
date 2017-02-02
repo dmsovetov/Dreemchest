@@ -78,6 +78,26 @@
     #include <OpenGLES/ES1/glext.h>
     #include <OpenGLES/ES2/gl.h>
     #include <OpenGLES/ES2/glext.h>
+
+    #define GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_APPLE
+    #define GL_DEPTH_COMPONENT24 GL_DEPTH_COMPONENT24_OES
+    #define GL_DEPTH_COMPONENT32 GL_DEPTH_COMPONENT32_OES
+    #define GL_POINT_SIZE_ARRAY GL_POINT_SIZE_ARRAY_OES
+    #define GL_LUMINANCE8 GL_LUMINANCE8_EXT
+    #define GL_R16F GL_R16F_EXT
+    #define GL_R32F GL_R32F_EXT
+    #define GL_RGBA16F GL_RGBA16F_EXT
+    #define GL_RGBA32F GL_RGBA32F_EXT
+    #define GL_RGB32F GL_RGB32F_EXT
+    #define GL_HALF_FLOAT GL_HALF_FLOAT_OES
+    #define GL_RED GL_RED_EXT
+    #define glClearDepth glClearDepthf
+    #define glPointSizePointer glPointSizePointerOES
+    #define GL_TEXTURE_1D 0
+    #define GL_TEXTURE_3D 0
+    #define GL_QUADS 0
+    #define GL_SAMPLER_1D 1
+    #define GL_SAMPLER_3D 2
 #endif  //  #if defined( DC_PLATFORM_IOS )
 
 #if defined( DC_PLATFORM_MACOS )
@@ -256,7 +276,7 @@ namespace Renderer
         static bool     initialize();
         
         //! Clears an active viewport.
-        static void     clear(const GLclampf* color, u8 mask, GLclampd depth, GLint stencil);
+        static void     clear(const GLclampf* color, u8 mask, GLclampf depth, GLint stencil);
         
         //! Sets an alpha test function.
         static void     setAlphaTest(Compare function, u8 ref);

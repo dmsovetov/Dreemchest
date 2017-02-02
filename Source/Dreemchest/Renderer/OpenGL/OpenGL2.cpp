@@ -201,21 +201,23 @@ bool OpenGL2::Framebuffer::check(GLuint id)
         case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
             LogError("opengl2", "%s", "glCheckFramebufferStatus returned GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT\n");
             break;
+        case GL_FRAMEBUFFER_UNSUPPORTED:
+            LogError("opengl2", "%s", "glCheckFramebufferStatus returned GL_FRAMEBUFFER_UNSUPPORTED\n");
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+            LogError("opengl2", "%s", "glCheckFramebufferStatus returned GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE\n");
+            break;
+    #if !defined(DC_PLATFORM_IOS)
         case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
             LogError("opengl2", "%s", "glCheckFramebufferStatus returned GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER\n");
             break;
         case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
             LogError("opengl2", "%s", "glCheckFramebufferStatus returned GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER\n");
             break;
-        case GL_FRAMEBUFFER_UNSUPPORTED:
-            LogError("opengl2", "%s", "glCheckFramebufferStatus returned GL_FRAMEBUFFER_UNSUPPORTED\n");
-            break;
-        case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
-            LogError("opengl2", "%s", "glCheckFramebufferStatus returned GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE\n");
-            break;           
         case GL_FRAMEBUFFER_UNDEFINED :
             LogError("opengl2", "%s", "glCheckFramebufferStatus returned GL_FRAMEBUFFER_UNDEFINED\n");
             break;
+    #endif  //  #if !defined(DC_PLATFORM_IOS)
     }
 
     return status == GL_FRAMEBUFFER_COMPLETE;
@@ -608,12 +610,15 @@ void OpenGL2::Texture::texDepthStencil(GLenum target, u16 width, u16 height, u32
             break;
     }
     
-    GLfloat borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
-    
     glTexImage2D(target, 0, format, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT/*GL_UNSIGNED_BYTE*/, NULL);
+#if defined(DC_PLATFORM_IOS)
+    LogWarning("opengl", "%s", "OpenGLES 2 has no GL_CLAMP_TO_BORDER parameter");
+#else
+    GLfloat borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+#endif  //  #if defined(DC_PLATFORM_IOS)
 }
     
 // ** OpenGL2::Texture::bind
@@ -629,6 +634,7 @@ void OpenGL2::Texture::bind(TextureType type, GLuint id, GLuint sampler)
         , GL_TEXTURE_CUBE_MAP
     };
     
+    NIMBLE_ABORT_IF(targets[type] == 0, "unsupported texture target");
     glActiveTexture(GL_TEXTURE0 + sampler);
     glBindTexture(targets[type], id);
 }
@@ -722,7 +728,7 @@ bool OpenGL2::initialize()
 }
 
 // ** OpenGL2::clear
-void OpenGL2::clear(const GLclampf* color, u8 mask, GLclampd depth, GLint stencil)
+void OpenGL2::clear(const GLclampf* color, u8 mask, GLclampf depth, GLint stencil)
 {
     DC_CHECK_GL;
     
@@ -890,6 +896,7 @@ void OpenGL2::setPolygonOffset(f32 factor, f32 units)
 // ** OpenGL2::setRasterization
 void OpenGL2::setRasterization(PolygonMode value)
 {
+#if !defined(DC_PLATFORM_IOS)
     switch (value)
     {
         case PolygonFill:
@@ -901,6 +908,7 @@ void OpenGL2::setRasterization(PolygonMode value)
         default:
             NIMBLE_NOT_IMPLEMENTED
     }
+#endif  //  #if !defined(DC_PLATFORM_IOS)
 }
 
 // ** OpenGL2::setBlending
@@ -948,7 +956,8 @@ void OpenGL2::drawElements(PrimitiveType primType, GLenum type, u32 firstIndex, 
         , GL_QUADS
         , GL_POINTS
     };
-
+    
+    NIMBLE_ABORT_IF(mode[primType] == 0, "unsupported primitive type");
     glDrawElements(mode[primType], count, type, static_cast<GLbyte*>(NULL) + firstIndex);
 #endif  //  #if !DEV_RENDERER_SKIP_DRAW_CALLS
 }
@@ -970,6 +979,7 @@ void OpenGL2::drawArrays(PrimitiveType primType, u32 offset, u32 count)
         , GL_POINTS
     };
     
+    NIMBLE_ABORT_IF(mode[primType] == 0, "unsupported primitive type");
     glDrawArrays(mode[primType], offset, count);
 #endif  //  #if !DEV_RENDERER_SKIP_DRAW_CALLS
 }

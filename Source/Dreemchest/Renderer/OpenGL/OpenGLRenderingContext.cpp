@@ -60,7 +60,11 @@ OpenGLRenderingContext::OpenGLRenderingContext(RenderViewPtr view)
     
     m_framebuffers = new OpenGLFramebufferCache;
 
+#if !defined(DC_PLATFORM_IOS)
     glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &m_caps.maxRenderTargets);
+#else
+    m_caps.maxRenderTargets = 1;
+#endif  /   /#if !defined(DC_PLATFORM_IOS)
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &m_caps.maxTextures);
     glGetIntegerv(GL_MAX_CUBE_MAP_TEXTURE_SIZE, &m_caps.maxCubeMapSize);
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &m_caps.maxTextureSize);

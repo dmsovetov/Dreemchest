@@ -28,14 +28,15 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace renderer {
+namespace Renderer
+{
 
 // ** createOpenGLView
 OpenGLView* createOpenGLView( void* window, PixelFormat depthStencil )
 {
     iOSOpenGLView* view = DC_NEW iOSOpenGLView;
     view->initialize( reinterpret_cast<UIWindow*>( window ), depthStencil, nil );
-    log::verbose( "iOS OpenGL viewport created\n" );
+    LogVerbose( "opengl", "%s", "iOS OpenGL viewport created\n" );
     return view;
 }
 
@@ -54,15 +55,17 @@ bool iOSOpenGLView::initialize( UIWindow* window, PixelFormat depthStencil, id d
 }
 
 // ** iOSOpenGLView::beginFrame
-void iOSOpenGLView::beginFrame( void )
+bool iOSOpenGLView::beginFrame( void )
 {
     [m_view beginFrame];
+    return true;
 }
 
 // ** iOSOpenGLView::endFrame
-void iOSOpenGLView::endFrame( void )
+bool iOSOpenGLView::endFrame( void )
 {
     [m_view endFrame];
+    return true;
 }
 
 // ** iOSOpenGLView::makeCurrent
@@ -71,6 +74,6 @@ bool iOSOpenGLView::makeCurrent( void )
     return [m_view makeCurrent];
 }
 
-} // namespace renderer
+} // namespace Renderer
 
 DC_END_DREEMCHEST

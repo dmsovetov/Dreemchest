@@ -28,11 +28,11 @@
 #define __DC_Renderer_UIKitOpenGLView_H__
 
 #include <UIKit/UIKit.h>
-
-#include "../OpenGLHal.h"
+#include "../OpenGL2.h"
 
 // ** UIKitOpenGLView
-@interface UIKitOpenGLView : UIView {
+@interface UIKitOpenGLView : UIView
+{
     @private
 
         UIWindow*       m_window;
