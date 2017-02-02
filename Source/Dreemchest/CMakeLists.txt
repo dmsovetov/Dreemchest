@@ -184,6 +184,12 @@ if (DC_PLATFORM MATCHES "MacOS")
     if (DC_OPENGL_ENABLED)
         target_link_libraries(Dreemchest "-framework CoreVideo")
     endif ()
+elseif (DC_PLATFORM MATCHES "iOS")
+    target_link_libraries(Dreemchest "-framework UIKit -framework Foundation")
+
+    if (DC_OPENGL_ENABLED)
+        target_link_libraries(Dreemchest "-framework QuartzCore")
+    endif ()
 endif ()
 
 # Generate configuration file

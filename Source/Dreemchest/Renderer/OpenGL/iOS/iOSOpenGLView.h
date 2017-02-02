@@ -44,10 +44,10 @@ namespace Renderer
         // ** IView
         virtual bool        makeCurrent( void );
         virtual bool        beginFrame( void );
-        virtual bool        endFrame( void );
+        virtual void        endFrame( void );
 
         // ** iOSOpenGLView
-        bool                initialize( UIWindow* window, PixelFormat depthStencil, id delegate );
+        bool                initialize( UIWindow* window, u32 options, id delegate );
 
     private:
 

@@ -39,7 +39,7 @@ DC_USE_DREEMCHEST
 }
 
 // ** initWithWindow
-- ( id ) initWithWindow: ( UIWindow* )window depthStencil:( int )depthStencil;
+- ( id ) initWithWindow: ( UIWindow* )window options:( unsigned int )options;
 {
     if( (self = [super initWithFrame: window.bounds]) )
     {
@@ -121,7 +121,7 @@ DC_USE_DREEMCHEST
 // ** createContext
 - ( BOOL ) createContext
 {
-    m_context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
+    m_context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
     if( !m_context ) {
         return NO;
     }
@@ -169,10 +169,18 @@ DC_USE_DREEMCHEST
 // ** drawView
 - (void) drawView: ( id )sender
 {
-    if( [m_window respondsToSelector:@selector(update)] ) {
-        [m_window update];
+    if (m_owner)
+    {
+        m_owner->notifyUpdate();
     }
 }
+
+// ** setOwner
+- ( void ) setOwner: ( Renderer::RenderView* )view
+{
+    m_owner = view;
+}
+
 
 // ** layoutSubviews
 - (void) layoutSubviews

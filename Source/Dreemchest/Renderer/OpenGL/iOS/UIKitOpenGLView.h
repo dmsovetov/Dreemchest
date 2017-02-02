@@ -30,24 +30,35 @@
 #include <UIKit/UIKit.h>
 #include "../OpenGL2.h"
 
+DC_BEGIN_DREEMCHEST
+namespace Renderer
+{
+    class RenderView;
+}
+DC_END_DREEMCHEST
+
+DC_USE_DREEMCHEST
+
 // ** UIKitOpenGLView
 @interface UIKitOpenGLView : UIView
 {
     @private
 
-        UIWindow*       m_window;
+        UIWindow*               m_window;
+        Renderer::RenderView*   m_owner;
 
-        BOOL            m_animating;
-        NSInteger       m_animationFrameInterval;
-        id              m_displayLink;
+        BOOL                    m_animating;
+        NSInteger               m_animationFrameInterval;
+        id                      m_displayLink;
 
-        EAGLContext*    m_context;
-        GLint           m_backingWidth;
-        GLint           m_backingHeight;
-        GLuint          m_defaultFramebuffer, m_colorRenderbuffer, m_depthBuffer;
+        EAGLContext*            m_context;
+        GLint                   m_backingWidth;
+        GLint                   m_backingHeight;
+        GLuint                  m_defaultFramebuffer, m_colorRenderbuffer, m_depthBuffer;
     }
 
-    - ( id )    initWithWindow: ( UIWindow* )window depthStencil:( int )depthStencil;
+    - ( id )    initWithWindow: ( UIWindow* )window options:( unsigned int )options;
+    - ( void )  setOwner: ( Renderer::RenderView* )view;
     - ( void )  beginFrame;
     - ( void )  endFrame;
     - ( BOOL )  makeCurrent;

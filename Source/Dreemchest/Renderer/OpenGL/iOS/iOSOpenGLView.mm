@@ -32,14 +32,14 @@ namespace Renderer
 {
 
 // ** createOpenGLView
-OpenGLView* createOpenGLView( void* window, PixelFormat depthStencil )
+RenderViewPtr createOpenGLView(void* window, u32 options)
 {
     iOSOpenGLView* view = DC_NEW iOSOpenGLView;
-    view->initialize( reinterpret_cast<UIWindow*>( window ), depthStencil, nil );
+    view->initialize( reinterpret_cast<UIWindow*>( window ), options, nil );
     LogVerbose( "opengl", "%s", "iOS OpenGL viewport created\n" );
     return view;
 }
-
+    
 // ** iOSOpenGLView::~iOSOpenGLView
 iOSOpenGLView::~iOSOpenGLView( void )
 {
@@ -47,10 +47,13 @@ iOSOpenGLView::~iOSOpenGLView( void )
 }
 
 // ** iOSOpenGLView::initialize
-bool iOSOpenGLView::initialize( UIWindow* window, PixelFormat depthStencil, id delegate )
+bool iOSOpenGLView::initialize( UIWindow* window, u32 options, id delegate )
 {
-    m_view = [[UIKitOpenGLView alloc] initWithWindow: window depthStencil:depthStencil];
-    [window setContentView: m_view];
+    m_view = [[UIKitOpenGLView alloc] initWithWindow: window options:options];
+    [m_view setOwner: this];
+    window.rootViewController.view = m_view;
+//    [window addSubview: m_view];
+//    [window setContentView: m_view];
     return true;
 }
 
@@ -62,10 +65,9 @@ bool iOSOpenGLView::beginFrame( void )
 }
 
 // ** iOSOpenGLView::endFrame
-bool iOSOpenGLView::endFrame( void )
+void iOSOpenGLView::endFrame( void )
 {
     [m_view endFrame];
-    return true;
 }
 
 // ** iOSOpenGLView::makeCurrent

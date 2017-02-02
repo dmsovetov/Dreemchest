@@ -43,13 +43,41 @@ void iOSApplication::quit( u32 exitCode )
 {
     exit( exitCode );
 }
+    
+// ** currentTime
+u64 currentTime( void )
+{
+    timeval time;
+    gettimeofday(&time, NULL);
+    return static_cast<u64>(((time.tv_sec) * 1000 + time.tv_usec/1000.0) + 0.5);
+}
+    
+// ** iOSApplication::resourcePath
+const String& iOSApplication::resourcePath( void ) const
+{
+    static const String s_prefix = "file://";
+    
+    if (m_resourcePath.empty())
+    {
+        m_resourcePath = [[[[NSBundle mainBundle] resourceURL] absoluteString] UTF8String];
+        size_t prefix = m_resourcePath.find(s_prefix);
+        
+        if (prefix != String::npos)
+        {
+            m_resourcePath.replace(prefix, s_prefix.length(), "");
+        }
+    }
+    
+    return m_resourcePath;
+}
 
 // ** iOSApplication::launch
 int iOSApplication::launch( Application* application )
 {
     @autoreleasepool
     {
-        return UIApplicationMain( 0, nil, nil, NSStringFromClass( [iOSApplicationDelegate class] ) );
+        NSString* str = NSStringFromClass([iOSApplicationDelegate class]);
+        return UIApplicationMain(0, nil, nil, str);
     }
 }
 

@@ -115,7 +115,10 @@ OpenGL2RenderingContext::OpenGL2RenderingContext(RenderViewPtr view)
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 #endif  //  #if !defined(DC_PLATFORM_IOS)
     m_shaderLibrary.addPreprocessor(DC_NEW ShaderPreprocessor);
+    
+#if !defined(DC_PLATFORM_IOS)
     m_shaderLibrary.addPreprocessor(DC_NEW ShaderVersionPreprocessor(110));
+#endif  //  #if !defined(DC_PLATFORM_IOS)
     
     m_textures.emplace(0, 0);
     m_constantBuffers.emplace(0, ConstantBuffer());

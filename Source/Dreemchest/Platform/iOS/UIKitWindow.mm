@@ -34,10 +34,11 @@
 {
     m_window = window;
 
-    UIScreen*       mainScreen  = [UIScreen mainScreen];
-    UIApplication*  app         = [UIApplication sharedApplication];
+    UIScreen* mainScreen = [UIScreen mainScreen];
+    //UIApplication*  app         = [UIApplication sharedApplication];
 
     self.contentScaleFactor = mainScreen.scale;
+    self.rootViewController = [[UIViewController alloc] initWithNibName:nil bundle:nil];
 
     return [super initWithFrame: [mainScreen bounds]];
 }

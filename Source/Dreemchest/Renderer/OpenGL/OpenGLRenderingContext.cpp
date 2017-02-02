@@ -64,7 +64,7 @@ OpenGLRenderingContext::OpenGLRenderingContext(RenderViewPtr view)
     glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &m_caps.maxRenderTargets);
 #else
     m_caps.maxRenderTargets = 1;
-#endif  /   /#if !defined(DC_PLATFORM_IOS)
+#endif  //  #if !defined(DC_PLATFORM_IOS)
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &m_caps.maxTextures);
     glGetIntegerv(GL_MAX_CUBE_MAP_TEXTURE_SIZE, &m_caps.maxCubeMapSize);
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &m_caps.maxTextureSize);
@@ -75,11 +75,14 @@ OpenGLRenderingContext::OpenGLRenderingContext(RenderViewPtr view)
         memset(m_drawBuffers, 0, sizeof(GLuint) * m_caps.maxRenderTargets);
     }
     
-    //StringArray extensions = split(reinterpret_cast<CString>(glGetString(GL_EXTENSIONS)), " ");
-    //for (size_t i = 0, n = extensions.size(); i < n; i++)
-    //{
-    //    LogVerbose("opengl", "%s\n", extensions[i].c_str());
-    //}
+    LogVerbose("opengl", "version %s\n", glGetString(GL_VERSION));
+    LogVerbose("opengl", "vendor %s\n", glGetString(GL_VENDOR));
+    
+//    StringArray extensions = split(reinterpret_cast<CString>(glGetString(GL_EXTENSIONS)), " ");
+//    for (size_t i = 0, n = extensions.size(); i < n; i++)
+//    {
+//        LogVerbose("opengl", "%s\n", extensions[i].c_str());
+//    }
 }
 
 // ** OpenGLRenderingContext::~OpenGLRenderingContext
