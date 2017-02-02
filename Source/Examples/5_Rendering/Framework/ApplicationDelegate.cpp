@@ -319,7 +319,7 @@ void ApplicationDelegate::renderColumnsScene(RenderCommandBuffer& commands, f32 
 {
     if (!m_platform) m_platform = createMesh("Assets/Meshes/platform.obj");
     if (!m_object) m_object = createMesh("Assets/Meshes/bunny_decimated.obj");
-    if (!m_column) m_column = createMesh("Assets/Meshes/octahedron.obj");
+    if (!m_column) m_column = createMesh("Assets/Meshes/column.obj");
     
     // Render the platform
     renderItem(commands, m_platform, Matrix4::translation(x, 0.0f, z) * Matrix4::scale(1.5f, 1.0f, 1.5f));
