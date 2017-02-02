@@ -91,6 +91,12 @@ class PlatformConfigurationCommand(cmake.Command):
         for lib in self._libraries:
             cmake.library_option(parameters, lib, options)
 
+        if hasattr(options, 'identifier'):
+            parameters['MACOSX_BUNDLE_GUI_IDENTIFIER'] = options.identifier
+
+        if hasattr(options, 'codesign'):
+            parameters['IOS_CODESIGN_IDENTITY'] = '"%s"' % ' '.join(options.codesign)
+
         return parameters
 
 
@@ -159,6 +165,9 @@ class IOSConfigureCommand(DesktopConfigureCommand):
         toolchain = os.path.join(os.environ['DREEMCHEST_HOME'], 'CMake', 'Toolchains', 'iOS.cmake')
 
         PlatformConfigurationCommand.__init__(self, 'iOS', parser, ['Xcode'], ['opengl'], toolchain=toolchain)
+
+        parser.add_argument('--identifier', help='a bundle identifier to be used.')
+        parser.add_argument('--codesign', nargs='+', help='code sign identity name')
 
     def configure(self, options):
         """Performs iOS build system configuration"""
