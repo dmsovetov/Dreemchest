@@ -36,14 +36,16 @@ static String s_vertexShader =
     "cbuffer Projection projection : 0;                         \n"
     "cbuffer Camera     camera     : 1;                         \n"
 
+    "attribute vec4 a_position;                                 \n"
+
     "varying vec3 v_texCoord;                                   \n"
 
     "void main()                                                \n"
     "{                                                          \n"
     "   gl_Position = projection.transform                      \n"
     "               * camera.rotation                           \n"
-    "               * gl_Vertex;                                \n"
-    "   v_texCoord  = gl_Vertex.xyz;                            \n"
+    "               * a_position;                               \n"
+    "   v_texCoord  = a_position.xyz;                           \n"
     "}                                                          \n"
     ;
 

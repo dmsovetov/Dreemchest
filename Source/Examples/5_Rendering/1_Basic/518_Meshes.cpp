@@ -39,17 +39,20 @@ static String s_vertexShader =
     "cbuffer Camera     camera     : 1;                 \n"
     "cbuffer Instance   instance   : 2;                 \n"
 
+    "attribute vec4 a_position;                         \n"
+    "attribute vec3 a_normal;                           \n"
+
     "varying vec3 v_color;                              \n"
 
     "void main()                                        \n"
     "{                                                  \n"
-    "   v_color     = gl_Normal * 0.5 + 0.5;            \n"
+    "   v_color     = a_normal * 0.5 + 0.5;             \n"
     "   mat4 mvp    = projection.transform              \n"
     "               * camera.transform                  \n"
     "               * instance.transform                \n"
     "               ;                                   \n"
 
-    "   gl_Position = mvp * gl_Vertex;                  \n"
+    "   gl_Position = mvp * a_position;                 \n"
     "}                                                  \n"
 ;
 

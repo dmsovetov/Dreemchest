@@ -194,8 +194,9 @@ ResourceId OpenGL2RenderingContext::allocateTexture(u8 type, const void* data, u
 // ** OpenGL2RenderingContext::executeCommandBuffer
 void OpenGL2RenderingContext::executeCommandBuffer(const CommandBuffer& commands)
 {
-    GLuint             id;
-    const Permutation* permutation = NULL;
+    GLuint                    id;
+    const Permutation*        permutation = NULL;
+    const VertexBufferLayout* vertexBufferLayout = NULL;
     
     // Save an active framebuffer configuration
     GLint  activeViewport[4];
@@ -394,7 +395,7 @@ void OpenGL2RenderingContext::executeCommandBuffer(const CommandBuffer& commands
 
             case OpCode::DrawIndexed:
                 // Now update the pipeline state
-                compilePipelineState(opCode.drawCall.stateBlock->states, opCode.drawCall.stateBlock->size);
+                vertexBufferLayout = compilePipelineState(opCode.drawCall.stateBlock->states, opCode.drawCall.stateBlock->size);
                 
                 // Finally select a matching shader permutation
                 permutation = applyProgramPermutation(m_requestedProgram, m_requestedFeatureLayout, opCode.drawCall.stateBlock->features | m_activeInputLayout->features());
@@ -403,13 +404,20 @@ void OpenGL2RenderingContext::executeCommandBuffer(const CommandBuffer& commands
                 // And update all uniforms
                 updateUniforms(permutation);
                 
+            #if !DEV_RENDERER_DEPRECATED_INPUT_LAYOUTS
+                if (vertexBufferLayout)
+                {
+                    OpenGL2::setInputLayout(permutation->attributes, *vertexBufferLayout);
+                }
+            #endif  //  #if !DEV_RENDERER_DEPRECATED_INPUT_LAYOUTS
+                
                 // Perform an actual draw call
                 OpenGL2::drawElements(opCode.drawCall.primitives, GL_UNSIGNED_SHORT, opCode.drawCall.first, opCode.drawCall.count);
                 break;
                 
             case OpCode::DrawPrimitives:
                 // Now update the pipeline state
-                compilePipelineState(opCode.drawCall.stateBlock->states, opCode.drawCall.stateBlock->size);
+                vertexBufferLayout = compilePipelineState(opCode.drawCall.stateBlock->states, opCode.drawCall.stateBlock->size);
 
                 // Finally select a matching shader permutation
                 NIMBLE_ABORT_IF(m_activeInputLayout == NULL, "no valid input layout set");
@@ -418,6 +426,13 @@ void OpenGL2RenderingContext::executeCommandBuffer(const CommandBuffer& commands
                 
                 // And update all uniforms
                 updateUniforms(permutation);
+                
+            #if !DEV_RENDERER_DEPRECATED_INPUT_LAYOUTS
+                if (vertexBufferLayout)
+                {
+                    OpenGL2::setInputLayout(permutation->attributes, *vertexBufferLayout);
+                }
+            #endif  //  #if !DEV_RENDERER_DEPRECATED_INPUT_LAYOUTS
                 
                 // Perform an actual draw call
                 OpenGL2::drawArrays(opCode.drawCall.primitives, opCode.drawCall.first, opCode.drawCall.count);
@@ -430,7 +445,7 @@ void OpenGL2RenderingContext::executeCommandBuffer(const CommandBuffer& commands
 }
 
 // ** OpenGL2RenderingContext::compilePipelineState
-void OpenGL2RenderingContext::compilePipelineState(const State* states, s32 count)
+const VertexBufferLayout* OpenGL2RenderingContext::compilePipelineState(const State* states, s32 count)
 {
     const VertexBufferLayout* inputLayout        = m_activeInputLayout;
     GLuint                    vertexBuffer       = m_activeVertexBuffer;
@@ -545,6 +560,7 @@ void OpenGL2RenderingContext::compilePipelineState(const State* states, s32 coun
     if (changeInputLayout)
 #endif  //  #if DEV_RENDERER_INPUT_LAYOUT_CACHING
     {
+    #if DEV_RENDERER_DEPRECATED_INPUT_LAYOUTS
         // Disable the previous input layout
         if (m_activeInputLayout)
         {
@@ -553,13 +569,17 @@ void OpenGL2RenderingContext::compilePipelineState(const State* states, s32 coun
      
         // Now enable a new one
         OpenGL2::enableInputLayout(NULL, *inputLayout);
+    #endif  //  #if DEV_RENDERER_DEPRECATED_INPUT_LAYOUTS
      
         // Track this switch
         m_counters.inputLayoutSwitches++;
     #if DEV_RENDERER_INPUT_LAYOUT_CACHING
         m_activeInputLayout = inputLayout;
     #endif  //  #if DEV_RENDERER_INPUT_LAYOUT_CACHING
+        return inputLayout;
     }
+    
+    return NULL;
 }
     
 // ** OpenGL2RenderingContext::applyProgramPermutation
@@ -603,6 +623,13 @@ const OpenGLRenderingContext::Permutation* OpenGL2RenderingContext::applyProgram
     
     // Switch the program one the pipeline state was changed
     OpenGL2::Program::use(permutation->program);
+    
+#if !DEV_RENDERER_DEPRECATED_INPUT_LAYOUTS
+    if (m_activeInputLayout)
+    {
+        OpenGL2::setInputLayout(permutation->attributes, *m_activeInputLayout);
+    }
+#endif  //  #if !DEV_RENDERER_DEPRECATED_INPUT_LAYOUTS
     
     // Track this program switch
     m_counters.programSwitches++;

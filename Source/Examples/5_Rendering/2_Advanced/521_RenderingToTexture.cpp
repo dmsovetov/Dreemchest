@@ -85,6 +85,10 @@ static PipelineFeature s_features[] =
 static String s_vertexShader =
     "cbuffer Transform transform : 0;                           \n"
     "                                                           \n"
+    "attribute vec4 a_position;                                 \n"
+    "attribute vec3 a_normal;                                   \n"
+    "attribute vec2 a_texCoord0;                                \n"
+    "                                                           \n"
     "varying vec2 v_texCoord;                                   \n"
     "varying vec3 v_color;                                      \n"
     "                                                           \n"
@@ -92,17 +96,17 @@ static String s_vertexShader =
     "{                                                          \n"
     "#if defined(F_Transform)                                   \n" // When F_Transform option is set
     "   mat4 vp = transform.projection * transform.view;        \n" // we should transform an input vertex
-    "   gl_Position = vp * transform.instance * gl_Vertex;      \n" // with a model view projection matrix,
+    "   gl_Position = vp * transform.instance * a_position;     \n" // with a model view projection matrix,
     "#else                                                      \n" // otherwise we just pass an input to
-    "   gl_Position = gl_Vertex;                                \n" // an output.
+    "   gl_Position = a_position;                               \n" // an output.
     "#endif // F_ViewProjection                                 \n"
     "                                                           \n"
     "#if defined(F_TexCoord)                                    \n" // Pass texture coordinates to a fragment
-    "   v_texCoord  = gl_MultiTexCoord0.xy;                     \n" // shader if F_TexCoord is set.
+    "   v_texCoord  = a_texCoord0;                              \n" // shader if F_TexCoord is set.
     "#endif // F_TexCoord                                       \n"
     "                                                           \n"
     "#if defined(F_NormalAsColor)                               \n" // Pack the vertex normal to a [0, 1]
-    "   v_color = gl_Normal * 0.5 + 0.5;                        \n" // range an output it as a diffuse color.
+    "   v_color = a_normal * 0.5 + 0.5;                         \n" // range an output it as a diffuse color.
     "#endif // F_NormalAsColor                                  \n"
     "}                                                          \n"
     ;

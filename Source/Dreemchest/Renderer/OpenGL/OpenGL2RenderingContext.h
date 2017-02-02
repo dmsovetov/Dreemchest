@@ -46,7 +46,7 @@ namespace Renderer
         virtual void                executeCommandBuffer(const CommandBuffer& commands) NIMBLE_OVERRIDE;
         
         //! Compiles the requested rendering state (activates a shader permuation that best matches active pipeline state, bind buffers, textures, etc.).
-        void                        compilePipelineState(const State* states, s32 count);
+        const VertexBufferLayout*   compilePipelineState(const State* states, s32 count);
         
         //! Compiles and sets a matching shader permutation.
         const Permutation*          applyProgramPermutation(ResourceId program, const PipelineFeatureLayout* layout, PipelineFeatures features);

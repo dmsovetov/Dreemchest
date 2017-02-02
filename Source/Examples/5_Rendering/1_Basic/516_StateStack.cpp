@@ -67,17 +67,20 @@ static const u16 s_indices[] =
 };
 
 static String s_vertexShader =
-    "cbuffer View     projection : 0;              \n"
-    "cbuffer Instance instance   : 1;              \n"
+    "cbuffer View     projection : 0;               \n"
+    "cbuffer Instance instance   : 1;               \n"
+
+    "attribute vec4 a_position;                     \n"
+    "attribute vec4 a_color;                        \n"
 
     "varying vec4 v_color;                          \n"
 
     "void main()                                    \n"
     "{                                              \n"
-    "    v_color     = gl_Color;                    \n"
+    "    v_color     = a_color;                     \n"
     "    gl_Position = projection.transform         \n"
     "                * instance.transform           \n"
-    "                * gl_Vertex                    \n"
+    "                * a_position                   \n"
     "                ;                              \n"
     "}                                              \n"
     ;

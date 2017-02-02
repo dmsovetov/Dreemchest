@@ -37,18 +37,21 @@ static String s_vertexShader =
     "cbuffer Camera     camera     : 1;                     \n"
     "cbuffer Instance   instance   : 2;                     \n"
 
+    "attribute vec4 a_position;                             \n"
+    "attribute vec3 a_normal;                               \n"
+
     "varying vec3 v_color;                                  \n"
 
     "void main()                                            \n"
     "{                                                      \n"
-    "   vec4  normal    = normalize(instance.inverseTranspose * vec4(gl_Normal, 1.0));    \n"
+    "   vec4  normal    = normalize(instance.inverseTranspose * vec4(a_normal, 1.0));    \n"
     "   vec3  light     = normalize(vec3(-1.0, 1.0, -1.0));   \n"
     "   float intensity = max(dot(light, normal.xyz), 0.0);  \n"
     "   v_color         = vec3(intensity);                  \n"
     "   gl_Position     = projection.transform              \n"
     "                   * camera.transform                  \n"
     "                   * instance.transform                \n"
-    "                   * gl_Vertex;                        \n"
+    "                   * a_position;                       \n"
     "}                                                      \n"
 ;
 

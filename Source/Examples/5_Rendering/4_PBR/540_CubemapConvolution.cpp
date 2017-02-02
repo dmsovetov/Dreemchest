@@ -50,21 +50,24 @@ static String s_vertexMesh =
     "cbuffer Camera     camera     : 1;                     \n"
     "cbuffer Instance   instance   : 2;                     \n"
 
+    "attribute vec4 a_position;                             \n"
+    "attribute vec3 a_normal;                               \n"
+
     "varying vec3 v_normal;                                 \n"
     "varying vec3 v_camera;                                 \n"
     "varying vec3 v_vertex;                                 \n"
 
     "void main()                                            \n"
     "{                                                      \n"
-    "   vec4 n   = vec4(gl_Normal, 1.0);                    \n"
+    "   vec4 n   = vec4(a_normal, 1.0);                     \n"
     "   v_normal = (instance.inverseTranspose * n).xyz;     \n"
-    "   v_vertex = (instance.transform * gl_Vertex).xyz;    \n"
+    "   v_vertex = (instance.transform * a_position).xyz;   \n"
     "   v_camera = camera.position;                         \n"
     "   mat4 mvp = projection.transform                     \n"
     "            * camera.transform                         \n"
     "            * instance.transform                       \n"
     "            ;                                          \n"
-    "   gl_Position = mvp * gl_Vertex;                      \n"
+    "   gl_Position = mvp * a_position;                     \n"
     "}                                                      \n"
     ;
 
@@ -93,12 +96,14 @@ static String s_fragmentMesh =
 static String s_vertexConvolution =
     "cbuffer Camera camera : 1;                                                 \n"
 
+    "attribute vec4 a_position;                                                 \n"
+
     "varying vec4 v_ray;                                                        \n"
 
     "void main()                                                                \n"
     "{                                                                          \n"
-    "   v_ray         = camera.transform * vec4(gl_Vertex.xy, -1.0, 1.0);       \n"
-    "   gl_Position   = gl_Vertex;                                              \n"
+    "   v_ray         = camera.transform * vec4(a_position.xy, -1.0, 1.0);      \n"
+    "   gl_Position   = a_position;                                             \n"
     "}                                                                          \n"
     ;
 

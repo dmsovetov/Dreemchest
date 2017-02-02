@@ -33,9 +33,11 @@ using namespace Renderer;
 
 // Declare a vertex shader code that will output a received vertex.
 static String s_vertexShader =
+    "attribute vec4 a_position;                     \n"
+    "                                               \n"
     "void main()                                    \n"
     "{                                              \n"
-    "   gl_Position = gl_Vertex;                    \n"
+    "   gl_Position = a_position;                   \n"
     "}                                              \n"
     ;
 

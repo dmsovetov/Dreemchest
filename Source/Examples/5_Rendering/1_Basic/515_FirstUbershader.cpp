@@ -32,9 +32,11 @@ using namespace Platform;
 using namespace Renderer;
 
 static String s_vertexShader =
+    "attribute vec4 a_position;     \n"
+    "                               \n"
     "void main()                    \n"
     "{                              \n"
-    "   gl_Position = gl_Vertex;    \n"
+    "   gl_Position = a_position;   \n"
     "}                              \n"
     ;
 

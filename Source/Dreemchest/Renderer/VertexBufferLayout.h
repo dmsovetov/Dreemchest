@@ -60,6 +60,9 @@ namespace Renderer
                                 //! Constructs an VertexBufferLayout instance.
                                 VertexBufferLayout( s32 vertexSize );
         
+        //! Returns a vertex attribute at specified index
+        const Element&          operator [](s32 index) const;
+        
         //! Returns a bitmask of available features.
         PipelineFeatures        features( void ) const;
         

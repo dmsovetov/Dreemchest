@@ -140,6 +140,7 @@ const OpenGLRenderingContext::Permutation* OpenGLRenderingContext::savePermutati
     OpenGL2::Program::Uniform uniformInfo;
     OpenGL2::Program::use(id);
     
+    // Process all active uniforms
     for (GLuint i = 0, n = OpenGL2::Program::uniformCount(id); i < n; i++)
     {
         OpenGL2::Program::uniformAt(id, i, uniformInfo);
@@ -169,6 +170,32 @@ const OpenGLRenderingContext::Permutation* OpenGLRenderingContext::savePermutati
         
         permutation.uniforms.push_back(uniform);
     }
+    
+#if !DEV_RENDERER_DEPRECATED_INPUT_LAYOUTS
+    static CString s_vertexAttributeName[MaxVertexAttributes] =
+    {
+          "a_position"
+        , "a_normal"
+        , "a_color"
+        , "a_texCoord0"
+        , "a_texCoord1"
+        , "a_texCoord2"
+        , "a_texCoord3"
+        , "a_texCoord4"
+        , "a_texCoord5"
+        , "a_texCoord6"
+        , "a_texCoord7"
+        , "a_tangent"
+        , "a_bitangent"
+        , "a_pointSize"
+    };
+    
+    // Locate all vertex attributes
+    for (s32 i = 0; i < MaxVertexAttributes; i++)
+    {
+        permutation.attributes[i] = OpenGL2::Program::attributeLocation(id, s_vertexAttributeName[i]);
+    }
+#endif  //  #if !DEV_RENDERER_DEPRECATED_INPUT_LAYOUTS
     
     m_permutations[program][features] = permutation;
     return &m_permutations[program][features];

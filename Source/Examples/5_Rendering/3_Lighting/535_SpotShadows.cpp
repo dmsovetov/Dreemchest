@@ -38,18 +38,21 @@ static String s_vertexShader =
     "cbuffer Instance   instance   : 2;                                         \n"
     "cbuffer Shadow     shadow     : 4;                                         \n"
     "                                                                           \n"
+    "attribute vec4 a_position;                                                 \n"
+    "attribute vec3 a_normal;                                                   \n"
+    "                                                                           \n"
     "varying vec3 v_wsVertex;                                                   \n"
     "varying vec3 v_wsNormal;                                                   \n"
     "varying vec4 v_lsVertex;                                                   \n"
     "                                                                           \n"
     "void main()                                                                \n"
     "{                                                                          \n"
-    "   v_wsNormal  = (instance.inverseTranspose                                 \n"
-    "               * vec4(gl_Normal, 1.0)).xyz                                 \n"
+    "   v_wsNormal  = (instance.inverseTranspose                                \n"
+    "               * vec4(a_normal, 1.0)).xyz                                  \n"
     "               ;                                                           \n"
 
-    "   v_wsVertex  = (instance.transform * gl_Vertex).xyz;                     \n"
-    "   v_lsVertex  = shadow.transform * instance.transform * gl_Vertex;        \n"
+    "   v_wsVertex  = (instance.transform * a_position).xyz;                    \n"
+    "   v_lsVertex  = shadow.transform * instance.transform * a_position;       \n"
 
     "   gl_Position = projection.transform                                      \n"
     "               * camera.transform                                          \n"
@@ -146,9 +149,11 @@ static String s_vertexShadow =
     "cbuffer Instance instance  : 2;                                            \n"
     "cbuffer Shadow   shadow    : 4;                                            \n"
 
+    "attribute vec4 a_position;                                                 \n"
+
     "void main()                                                                \n"
     "{                                                                          \n"
-    "   gl_Position = shadow.transform * instance.transform * gl_Vertex;        \n"
+    "   gl_Position = shadow.transform * instance.transform * a_position;       \n"
     "}                                                                          \n"
     ;
 

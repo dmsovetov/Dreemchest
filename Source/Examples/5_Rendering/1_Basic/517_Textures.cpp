@@ -34,12 +34,15 @@ using namespace Renderer;
 
 // Declare a vertex shader code that will output a received vertex.
 static String s_vertexShader =
+    "attribute vec4 a_position;                     \n"
+    "attribute vec2 a_texCoord0;                    \n"
+
     "varying vec2 v_texCoord;                       \n"
     "                                               \n"
     "void main()                                    \n"
     "{                                              \n"
-    "   v_texCoord  = gl_MultiTexCoord0.xy;         \n"
-    "   gl_Position = gl_Vertex;                    \n"
+    "   v_texCoord  = a_texCoord0;                  \n"
+    "   gl_Position = a_position;                   \n"
     "}                                              \n"
 ;
 

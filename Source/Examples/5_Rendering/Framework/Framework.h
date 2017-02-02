@@ -132,9 +132,10 @@ namespace Framework
     }
     
     const String VertexIdentity =
+        "attribute vec4 a_position;     \n"
         "void main()                    \n"
         "{                              \n"
-        "   gl_Position = gl_Vertex;    \n"
+        "   gl_Position = a_position;   \n"
         "}                              \n"
         ;
     
@@ -148,15 +149,17 @@ namespace Framework
     const String VertexSkyBox =
         "cbuffer Projection projection : 0;                         \n"
         "cbuffer Camera     camera     : 1;                         \n"
-        
+    
+        "attribute vec4 a_position;                                 \n"
+    
         "varying vec3 v_texCoord;                                   \n"
         
         "void main()                                                \n"
         "{                                                          \n"
         "   gl_Position = projection.transform                      \n"
         "               * camera.rotation                           \n"
-        "               * gl_Vertex;                                \n"
-        "   v_texCoord  = gl_Vertex.xyz;                            \n"
+        "               * a_position;                               \n"
+        "   v_texCoord  = a_position.xyz;                           \n"
         "}                                                          \n"
         ;
         
@@ -175,13 +178,15 @@ namespace Framework
         "cbuffer Projection projection : 0;                                         \n"
         "cbuffer Camera     camera     : 1;                                         \n"
         "cbuffer Instance   instance   : 2;                                         \n"
-        
+    
+        "attribute vec4 a_position;                                                 \n"
+    
         "void main()                                                                \n"
         "{                                                                          \n"
         "   gl_Position = projection.transform                                      \n"
         "               * camera.transform                                          \n"
         "               * instance.transform                                        \n"
-        "               * gl_Vertex                                                 \n"
+        "               * a_position                                                \n"
         "               ;                                                           \n"
         "}                                                                          \n"
         ;
@@ -190,6 +195,8 @@ namespace Framework
         "cbuffer Projection projection : 0;                                         \n"
         "cbuffer Camera     camera     : 1;                                         \n"
     
+        "attribute vec4 a_position;                                                 \n"
+    
         "varying vec4 v_color;                                                      \n"
     
         "void main()                                                                \n"
@@ -197,7 +204,7 @@ namespace Framework
         "   v_color     = gl_Color;                                                 \n"
         "   gl_Position = projection.transform                                      \n"
         "               * camera.transform                                          \n"
-        "               * gl_Vertex                                                 \n"
+        "               * a_position                                                \n"
         "               ;                                                           \n"
         "}                                                                          \n"
         ;

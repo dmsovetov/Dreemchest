@@ -73,8 +73,11 @@ namespace Renderer
             mutable Revision    buffers[State::MaxConstantBuffers];
         #endif  //  #if DEV_RENDERER_UNIFORM_CACHING
             
-            GLuint              program;            //!< An OpenGL program identifier.
-            Array<Uniform>      uniforms;           //!< Active uniforms extracted from a program by means of an introspection.
+            GLuint              program;                            //!< An OpenGL program identifier.
+            Array<Uniform>      uniforms;                           //!< Active uniforms extracted from a program by means of an introspection.
+        #if !DEV_RENDERER_DEPRECATED_INPUT_LAYOUTS
+            GLint               attributes[MaxVertexAttributes];    //!< An array of located vertex attributes.
+        #endif  //  #if !DEV_RENDERER_DEPRECATED_INPUT_LAYOUTS
         };
         
                                                 //! Constructs an OpenGLRenderingContext instance.

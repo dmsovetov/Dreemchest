@@ -38,6 +38,13 @@ VertexBufferLayout::VertexBufferLayout( s32 vertexSize )
     , m_vertexSize( vertexSize )
 {
 }
+    
+// ** VertexBufferLayout::operator []
+const VertexBufferLayout::Element& VertexBufferLayout::operator [](s32 index) const
+{
+    NIMBLE_ABORT_IF(index < 0 || index >= MaxVertexAttributes && "index is out of range");
+    return m_attributes[index];
+}
 
 // ** VertexBufferLayout::attributeLocation
 void VertexBufferLayout::attributeLocation(VertexAttribute attribute, s32 count, s32 offset)

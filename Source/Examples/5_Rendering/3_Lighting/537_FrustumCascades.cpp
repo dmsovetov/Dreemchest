@@ -38,6 +38,9 @@ static String s_vertexShader =
     "cbuffer Instance   instance   : 2;                                         \n"
     "cbuffer Cascades   cascades : 4;                                           \n"
 
+    "attribute vec4 a_position;                                                 \n"
+    "attribute vec3 a_normal;                                                   \n"
+
     "varying vec3  v_wsNormal;                                                  \n"
     "varying float v_depth;                                                     \n"
     "varying vec4  v_lsVertex[4];                                               \n"
@@ -45,10 +48,10 @@ static String s_vertexShader =
     "void main()                                                                \n"
     "{                                                                          \n"
     "   v_wsNormal  = (instance.inverseTranspose                                \n"
-    "               * vec4(gl_Normal, 1.0)).xyz                                 \n"
+    "               * vec4(a_normal, 1.0)).xyz                                  \n"
     "               ;                                                           \n"
 
-    "   vec4 wsVertex = instance.transform * gl_Vertex;                         \n"
+    "   vec4 wsVertex = instance.transform * a_position;                        \n"
     "   v_depth       = -(camera.transform * wsVertex).z;                       \n"
 
     "   for (int i = 0; i < cascades.count; i++)                                \n"

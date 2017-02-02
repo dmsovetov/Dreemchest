@@ -168,6 +168,9 @@ namespace Renderer
             //! Returns a uniform name.
             static void     uniformAt(GLuint program, GLuint index, Uniform& uniform);
             
+            //! Searches for an attribute location.
+            static GLint    attributeLocation(GLuint program, CString name);
+            
             //! Searches for a uniform location.
             static GLint    uniformLocation(GLuint program, CString name);
             
@@ -331,12 +334,17 @@ namespace Renderer
 
         //! Renders a batch of primitives.
         static void     drawArrays(PrimitiveType primType, u32 offset, u32 count);
-        
+
+    #if DEV_RENDERER_DEPRECATED_INPUT_LAYOUTS
         //! Enables a vertex buffer layout.
         static void     enableInputLayout(GLbyte* pointer, const VertexBufferLayout& layout);
         
         //! Disables a vertex buffer layout.
         static void     disableInputLayout(const VertexBufferLayout& layout);
+    #else
+        //! Enables a vertex buffer layout for a set of attribute locations.
+        static void     setInputLayout(const GLint* locations, const VertexBufferLayout& layout);
+    #endif  //  #if DEV_RENDERER_DEPRECATED_INPUT_LAYOUTS
     };
     
 } // namespace Renderer

@@ -381,6 +381,12 @@ GLuint OpenGL2::Program::createProgram(const GLuint* shaders, s32 count, s8* err
     return program;
 }
     
+// ** OpenGL2::Program::attributeLocation
+GLint OpenGL2::Program::attributeLocation(GLuint program, CString name)
+{
+    return glGetAttribLocation(program, name);
+}
+    
 // ** OpenGL2::Program::uniformLocation
 GLint OpenGL2::Program::uniformLocation(GLuint program, CString name)
 {
@@ -768,6 +774,7 @@ void OpenGL2::clear(const GLclampf* color, u8 mask, GLclampf depth, GLint stenci
     }
 }
     
+#if DEV_RENDERER_DEPRECATED_INPUT_LAYOUTS
 // ** OpenGL2::enableInputLayout
 void OpenGL2::enableInputLayout(GLbyte* pointer, const VertexBufferLayout& layout)
 {
@@ -849,6 +856,48 @@ void OpenGL2::disableInputLayout(const VertexBufferLayout& layout)
     
     glDisableClientState(GL_VERTEX_ARRAY);
 }
+#else
+// ** OpenGL2::setInputLayout
+void OpenGL2::setInputLayout(const GLint* locations, const VertexBufferLayout& layout)
+{
+    static GLenum s_attributeType[] =
+    {
+          GL_FLOAT
+        , GL_FLOAT
+        , GL_UNSIGNED_BYTE
+        , GL_FLOAT
+        , GL_FLOAT
+        , GL_FLOAT
+        , GL_FLOAT
+        , GL_FLOAT
+        , GL_FLOAT
+        , GL_FLOAT
+        , GL_FLOAT
+        , GL_FLOAT
+        , GL_FLOAT
+        , GL_FLOAT
+    };
+    
+    s32 stride = layout.vertexSize();
+    
+    for (s32 i = 0; i < MaxVertexAttributes; i++)
+    {
+        GLint location = locations[i];
+        
+        if (locations[i] == -1)
+        {
+            glDisableVertexAttribArray(location);
+        }
+        else
+        {
+            const VertexBufferLayout::Element& element = layout[i];
+            
+            glEnableVertexAttribArray(location);
+            glVertexAttribPointer(location, element.count, s_attributeType[i], i == 2 ? GL_TRUE : GL_FALSE, stride, static_cast<u8*>(NULL) + element.offset);
+        }
+    }
+}
+#endif  //  #if DEV_RENDERER_DEPRECATED_INPUT_LAYOUTS
     
 // ** OpenGL2::setAlphaTest
 void OpenGL2::setAlphaTest(Compare function, u8 ref)
