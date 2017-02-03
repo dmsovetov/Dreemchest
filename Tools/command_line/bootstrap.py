@@ -73,9 +73,9 @@ class BootstrapCommand(cmake.Command):
         # Make sure to pull all submodules before building them
         git.checkout_submodules()
 
-        #if not getattr(options, 'no_emscripten'):
-        #    if 'EMSCRIPTEN' not in os.environ.keys():
-        #        raise Exception('No EMSCRIPTEN environment variable set')
+        if not getattr(options, 'no_emscripten'):
+            if 'EMSCRIPTEN' not in os.environ.keys():
+                raise Exception('No EMSCRIPTEN environment variable set')
 
         # Toolchain files for each platform
         toolchains = dict(
@@ -83,7 +83,7 @@ class BootstrapCommand(cmake.Command):
             Android=os.path.join(self._home, 'CMake', 'Toolchains', 'Android.cmake'),
             macOS=None,
             Windows=None,
-        #    Emscripten=os.path.join(os.environ['EMSCRIPTEN'], 'cmake', 'Modules', 'Platform', 'Emscripten.cmake')
+            Emscripten=os.path.join(os.environ['EMSCRIPTEN'], 'cmake', 'Modules', 'Platform', 'Emscripten.cmake')
         )
 
         # Now build each platform
@@ -112,6 +112,9 @@ class BootstrapCommand(cmake.Command):
                 if 'options' in platform_options.keys():
                     cmake_options.update(platform_options['options'])
 
+                if platform == 'Android':
+                    cmake_options['ANDROID_NATIVE_API_LEVEL'] = 'android-%s' % options.api_level
+
                 cmake.configure_and_build(options.generator if platform in ['iOS', 'macOS'] else 'Unix Makefiles',
                                           os.path.join(source_dir, source),
                                           os.path.join(binary_dir, name),
@@ -131,7 +134,7 @@ class MacOSBootstrapCommand(BootstrapCommand):
     def __init__(self, parser):
         """Constructs a third party install command"""
 
-        BootstrapCommand.__init__(self, parser, ['macOS', 'iOS'], generators=['Xcode'])
+        BootstrapCommand.__init__(self, parser, ['macOS', 'iOS', 'Android', 'Emscripten'], generators=['Xcode'])
 
 
 class WindowsBootstrapCommand(BootstrapCommand):
@@ -140,4 +143,4 @@ class WindowsBootstrapCommand(BootstrapCommand):
     def __init__(self, parser):
         """Constructs a third party install command"""
 
-        BootstrapCommand.__init__(self, parser, ['Windows'], generators=['Visual Studio 12'])
+        BootstrapCommand.__init__(self, parser, ['Windows', 'Android', 'Emscripten'], generators=['Visual Studio 12'])
