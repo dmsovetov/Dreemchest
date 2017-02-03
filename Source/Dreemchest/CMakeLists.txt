@@ -158,6 +158,32 @@ file(MD5 ${CMAKE_CURRENT_BINARY_DIR}/BuildConfig.h DREEMCHEST_VERSION)
 configure_file(BuildConfig.in.h BuildConfig.h)
 
 # Link all requested libraries
-target_link_libraries(Dreemchest ${JSONCPP_LIBRARY} ${ZLIB_LIBRARY} ${OGG_LIBRARY} ${VORBIS_LIBRARY} ${BOX2D_LIBRARY} ${OPENAL_LIBRARY})
-target_include_directories(Dreemchest PRIVATE ${OPENAL_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR} ${OGG_INCLUDE_DIR} ${VORBIS_INCLUDE_DIR} ${BOX2D_INCLUDE_DIR})
-target_include_directories(Dreemchest PUBLIC ${JSONCPP_INCLUDE_DIR})
+if (BOX2D_FOUND)
+    target_link_libraries(Dreemchest ${BOX2D_LIBRARY})
+    target_include_directories(Dreemchest PRIVATE ${BOX2D_INCLUDE_DIR})
+endif ()
+
+if (JSONCPP_FOUND)
+    target_link_libraries(Dreemchest ${JSONCPP_LIBRARY})
+    target_include_directories(Dreemchest PUBLIC ${JSONCPP_INCLUDE_DIR})
+endif ()
+
+if (ZLIB_FOUND)
+    target_link_libraries(Dreemchest ${ZLIB_LIBRARY})
+    target_include_directories(Dreemchest PRIVATE ${ZLIB_INCLUDE_DIR})
+endif ()
+
+if (OGG_FOUND)
+    target_link_libraries(Dreemchest ${OGG_LIBRARY})
+    target_include_directories(Dreemchest PRIVATE ${OGG_INCLUDE_DIR})
+endif ()
+
+if (VORBIS_FOUND)
+    target_link_libraries(Dreemchest ${VORBIS_LIBRARY})
+    target_include_directories(Dreemchest PRIVATE ${VORBIS_INCLUDE_DIR})
+endif ()
+
+if (OPENAL_FOUND)
+    target_link_libraries(Dreemchest ${OPENAL_LIBRARY})
+    target_include_directories(Dreemchest PRIVATE ${OPENAL_INCLUDE_DIR})
+endif ()
