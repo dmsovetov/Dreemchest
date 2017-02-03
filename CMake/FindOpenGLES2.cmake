@@ -7,8 +7,11 @@
 #
 
 if (IOS)
-  find_library(OPENGLES2_LIBRARIES OpenGLES DOC "OpenGLES 2 library for iOS")
-  find_path(OPENGLES2_INCLUDE_DIR ES2/gl.h DOC "Include for OpenGLES 2")
+    find_library(OPENGLES2_LIBRARIES OpenGLES DOC "OpenGLES 2 library for iOS")
+    find_path(OPENGLES2_INCLUDE_DIR ES2/gl.h DOC "Include for OpenGLES 2")
+elseif (ANDROID)
+    find_path(OPENGLES2_INCLUDE_DIR GLES2/gl2.h)
+    find_library(OPENGLES2_LIBRARIES NAMES GLESv2)
 endif ()
 
 INCLUDE(FindPackageHandleStandardArgs)
