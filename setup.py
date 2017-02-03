@@ -244,13 +244,14 @@ def extract(file_name, path):
     if ext == '.gz':
         tar = tarfile.open(file_name, "r")
         tar.extractall(path)
+        name, ext = os.path.splitext(name)
     elif ext == '.zip':
         with zipfile.ZipFile(file_name, "r") as z:
             z.extractall(path)
 
     os.remove(file_name)
 
-    return os.path.join(path, name + ext)
+    return os.path.join(path, name)
 
 
 def download_cmake(version):
@@ -315,7 +316,7 @@ def main():
         '--no-cmake', help='skips a CMake installation', action='store_true', default=False
     )
     cmake_options.add_argument(
-        '--cmake', help='specifies a CMake version to be installed.', type=str, default='3.7.2'
+        '--cmake', help='specifies a CMake version to be installed.', type=str, default='3.4.3'
     )
 
     args = parser.parse_args()
@@ -324,9 +325,8 @@ def main():
     cmake_path = None
 
     if not args.no_cmake:
-        cmake_path = 'Tools/cmake-3.7.2-Darwin-x86_64'
-    #    cmake_path = download_cmake(args.cmake)
-    #    print 'Installed CMake to ' + cmake_path
+        cmake_path = download_cmake(args.cmake)
+        print 'Installed CMake to ' + cmake_path
 
     # First setup environment variables
     paths = EnvironmentPaths(os.getcwd(), cmake_path)
