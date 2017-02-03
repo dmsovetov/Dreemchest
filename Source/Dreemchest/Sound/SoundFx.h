@@ -28,6 +28,7 @@
 #define __DC_SoundFx_H__
 
 #include "Sound.h"
+#include "SoundStream.h"
 
 DC_BEGIN_DREEMCHEST
 

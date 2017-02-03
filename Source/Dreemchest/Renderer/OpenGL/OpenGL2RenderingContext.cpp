@@ -111,14 +111,14 @@ OpenGL2RenderingContext::OpenGL2RenderingContext(RenderViewPtr view)
     , m_activeFeatures(0)
 #endif  //  #if DEV_RENDERER_PROGRAM_CACHING
 {
-#if !defined(DC_PLATFORM_IOS)
+#if !defined(DC_OPENGLES2_ENABLED)
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-#endif  //  #if !defined(DC_PLATFORM_IOS)
+#endif  //  #if !defined(DC_OPENGLES2_ENABLED)
     m_shaderLibrary.addPreprocessor(DC_NEW ShaderPreprocessor);
     
-#if !defined(DC_PLATFORM_IOS)
+#if !defined(DC_OPENGLES2_ENABLED)
     m_shaderLibrary.addPreprocessor(DC_NEW ShaderVersionPreprocessor(110));
-#endif  //  #if !defined(DC_PLATFORM_IOS)
+#endif  //  #if !defined(DC_OPENGLES2_ENABLED)
     
     m_textures.emplace(0, 0);
     m_constantBuffers.emplace(0, ConstantBuffer());
@@ -368,10 +368,10 @@ void OpenGL2RenderingContext::executeCommandBuffer(const CommandBuffer& commands
                     m_drawBuffers[i] = hasColor ? GL_COLOR_ATTACHMENT0 + i : GL_NONE;
                 }
 
-            #if !defined(DC_PLATFORM_IOS)
+            #if !defined(DC_OPENGLES2_ENABLED)
                 glDrawBuffers(opCode.renderToTextures.count, m_drawBuffers);
                 glReadBuffer(GL_NONE);
-            #endif  //  #if !defined(DC_PLATFORM_IOS)
+            #endif  //  #if !defined(DC_OPENGLES2_ENABLED)
                 NIMBLE_ABORT_IF(!OpenGL2::Framebuffer::check(framebufferId), "invalid framebuffer configuration");
                 OpenGL2::Framebuffer::bind(framebufferId);
 
@@ -387,9 +387,9 @@ void OpenGL2RenderingContext::executeCommandBuffer(const CommandBuffer& commands
                 
                 // Restore the previous framebuffer
                 OpenGL2::Framebuffer::restore(activeFramebuffer, activeViewport);
-            #if !defined(DC_PLATFORM_IOS)
+            #if !defined(DC_OPENGLES2_ENABLED)
                 glDrawBuffer(GL_BACK);
-            #endif  //  #if !defined(DC_PLATFORM_IOS)
+            #endif  //  #if !defined(DC_OPENGLES2_ENABLED)
             }
                 break;
 

@@ -225,9 +225,6 @@ namespace Scene {
                         //! Constructs Resources instance.
                         Resources( void );
 
-    private:
-
-
         //! Calculates the total size allocated for mesh asset.
         static s32      bytesAllocatedForMesh( const Mesh& asset );
 

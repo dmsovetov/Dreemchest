@@ -253,10 +253,10 @@ bool WindowedApplicationDelegate::initialize(s32 width, s32 height)
     m_window->subscribe<Window::TouchBegan>(dcThisMethod(WindowedApplicationDelegate::handleTouchBegan));
     m_window->subscribe<Window::TouchEnded>(dcThisMethod(WindowedApplicationDelegate::handleTouchEnded));
     m_window->subscribe<Window::TouchMoved>(dcThisMethod(WindowedApplicationDelegate::handleTouchMoved));
-#if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_MACOS )
+#if defined( DC_PLATFORM_KEYBOARD )
     m_window->subscribe<Window::KeyPressed>(dcThisMethod(WindowedApplicationDelegate::handleKeyPressed));
     m_window->subscribe<Window::KeyReleased>(dcThisMethod(WindowedApplicationDelegate::handleKeyReleased));
-#endif  //  #if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_MACOS )
+#endif  //  #if defined( DC_PLATFORM_KEYBOARD )
     m_window->subscribe<Window::Update>(dcThisMethod(WindowedApplicationDelegate::handleWindowUpdate));
     
     return true;

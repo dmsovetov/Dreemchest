@@ -109,13 +109,13 @@ namespace Platform {
         // This method is called when mouse/touch is moved.
         virtual void            handleTouchMoved(const Window::TouchMoved& e) {}
         
-    #if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_MACOS )
+    #if defined( DC_PLATFORM_KEYBOARD )
         // This method is called when key is pressed.
         virtual void            handleKeyPressed(const Window::KeyPressed& e) {}
         
         // This method is called when key is released.
         virtual void            handleKeyReleased(const Window::KeyReleased& e) {}
-    #endif  //  #if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_MACOS )
+    #endif  //  #if defined( DC_PLATFORM_KEYBOARD )
         
         // This method is called each frame
         virtual void            handleWindowUpdate(const Window::Update& e) {}

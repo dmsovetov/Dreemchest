@@ -50,10 +50,10 @@ namespace Framework
         virtual void        handleTouchBegan(const Platform::Window::TouchBegan& e) NIMBLE_OVERRIDE;
         virtual void        handleTouchEnded(const Platform::Window::TouchEnded& e) NIMBLE_OVERRIDE;
         virtual void        handleTouchMoved(const Platform::Window::TouchMoved& e) NIMBLE_OVERRIDE;
-    #if !defined(DC_PLATFORM_IOS)
+    #if defined(DC_PLATFORM_KEYBOARD)
         virtual void        handleKeyPressed(const Platform::Window::KeyPressed& e) NIMBLE_OVERRIDE;
         virtual void        handleKeyReleased(const Platform::Window::KeyReleased& e) NIMBLE_OVERRIDE;
-    #endif  //  #if !defined(DC_PLATFORM_IOS)
+    #endif  //  #if defined(DC_PLATFORM_KEYBOARD)
         virtual void        handleRenderFrame(f32 dt) NIMBLE_OVERRIDE;
         
         void                renderSimpleScene(RenderCommandBuffer& commands, f32 x = 0.0f, f32 z = 0.0f);

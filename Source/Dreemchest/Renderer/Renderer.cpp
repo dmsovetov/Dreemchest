@@ -45,8 +45,12 @@ bool RenderingApplicationDelegate::initialize(s32 width, s32 height)
     }
     
     // Create a rendering view.
+#ifdef DC_OPENGL_ENABLED
     m_view = createOpenGLView(m_window->handle(), TextureD24 | TextureS8);
     m_view->subscribe<RenderView::Update>(dcThisMethod(RenderingApplicationDelegate::handleViewUpdate));
+#else
+    LogError("renderer", "%s", "built with no OpenGL support");
+#endif  //  #ifdef DC_OPENGL_ENABLED
     
     // Now create a rendering context that is attached to a created window instance
     m_renderingContext = createOpenGL2RenderingContext(m_view);

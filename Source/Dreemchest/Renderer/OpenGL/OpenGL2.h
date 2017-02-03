@@ -62,6 +62,8 @@
     #include <GLES/glext.h>
     #include <GLES2/gl2.h>
     #include <GLES2/gl2ext.h>
+
+    #define DC_OPENGLES2_ENABLED
 #endif  //  #if defined( DC_PLATFORM_ANDROID )
 
 #if defined( DC_PLATFORM_HTML5 )
@@ -79,6 +81,16 @@
     #include <OpenGLES/ES2/gl.h>
     #include <OpenGLES/ES2/glext.h>
 
+    #define DC_OPENGLES2_ENABLED
+#endif  //  #if defined( DC_PLATFORM_IOS )
+
+#if defined( DC_PLATFORM_MACOS )
+    #include <OpenGL/gl.h>
+    #include <OpenGL/OpenGL.h>
+    #include <OpenGL/glext.h>
+#endif  //  #if defined( DC_PLATFORM_MACOS )
+
+#ifdef DC_OPENGLES2_ENABLED
     #define GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_APPLE
     #define GL_DEPTH_COMPONENT24 GL_DEPTH_COMPONENT24_OES
     #define GL_DEPTH_COMPONENT32 GL_DEPTH_COMPONENT32_OES
@@ -94,17 +106,14 @@
     #define glClearDepth glClearDepthf
     #define glPointSizePointer glPointSizePointerOES
     #define GL_TEXTURE_1D 0
-    #define GL_TEXTURE_3D 0
+
+    #ifndef GL_TEXTURE_3D
+        #define GL_TEXTURE_3D 0
+    #endif  //  #ifndef GL_TEXTURE_3D
     #define GL_QUADS 0
     #define GL_SAMPLER_1D 1
     #define GL_SAMPLER_3D 2
-#endif  //  #if defined( DC_PLATFORM_IOS )
-
-#if defined( DC_PLATFORM_MACOS )
-    #include <OpenGL/gl.h>
-    #include <OpenGL/OpenGL.h>
-    #include <OpenGL/glext.h>
-#endif  //  #if defined( DC_PLATFORM_MACOS )
+#endif  //  #ifdef DC_OPENGLES2_ENABLED
 
 DC_BEGIN_DREEMCHEST
 

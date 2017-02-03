@@ -109,7 +109,7 @@ bool Network::requestHostName( String& name ) const
 bool Network::requestInterfaces( NetworkAddressArray& broadcast, NetworkAddressArray& host, NetworkAddressArray& mask ) const
 {
 #if defined( DC_PLATFORM_ANDROID )
-    LogError( "requestInterfaces", "not available on Android devices\n" );
+    LogError( "requestInterfaces", "%s", "not available on Android devices\n" );
     return false;
 #elif !defined( DC_PLATFORM_WINDOWS )
     ifaddrs *interfaces     = NULL;

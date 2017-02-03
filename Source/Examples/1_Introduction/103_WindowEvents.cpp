@@ -48,8 +48,10 @@ class WindowEvents : public Platform::ApplicationDelegate {
         window->subscribe<Platform::Window::TouchBegan>( dcThisMethod( WindowEvents::handleTouchBegan ) );
         window->subscribe<Platform::Window::TouchEnded>( dcThisMethod( WindowEvents::handleTouchEnded ) );
         window->subscribe<Platform::Window::TouchMoved>( dcThisMethod( WindowEvents::handleTouchMoved ) );
+    #ifdef DC_PLATFORM_KEYBOARD
         window->subscribe<Platform::Window::KeyPressed>( dcThisMethod( WindowEvents::handleKeyPressed ) );
         window->subscribe<Platform::Window::KeyReleased>( dcThisMethod( WindowEvents::handleKeyReleased ) );
+    #endif  //  #ifdef DC_PLATFORM_KEYBOARD
         window->subscribe<Platform::Window::Update>( dcThisMethod( WindowEvents::handleUpdate ) );
     }
 
@@ -68,6 +70,7 @@ class WindowEvents : public Platform::ApplicationDelegate {
         LogVerbose( "touchMoved", "%d %d\n", e.x, e.y );
     }
 
+#ifdef DC_PLATFORM_KEYBOARD
     // This method is called when key is pressed.
     void handleKeyPressed( const Platform::Window::KeyPressed& e ) {
         LogVerbose( "keyPressed", "%d\n", e.key );
@@ -77,6 +80,7 @@ class WindowEvents : public Platform::ApplicationDelegate {
     void handleKeyReleased( const Platform::Window::KeyReleased& e ) {
         LogVerbose( "keyReleased", "%d\n", e.key );
     }
+#endif  //  #ifdef DC_PLATFORM_KEYBOARD
 
     // This method is called each frame
    void handleUpdate( const Platform::Window::Update& e ) {

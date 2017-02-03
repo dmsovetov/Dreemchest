@@ -29,6 +29,10 @@
 
 #include "../Dreemchest.h"
 
+#if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_MACOS )
+    #define DC_PLATFORM_KEYBOARD
+#endif  //  #if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_MACOS )
+
 DC_BEGIN_DREEMCHEST
 
 namespace Platform {

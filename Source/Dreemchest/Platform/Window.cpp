@@ -171,17 +171,17 @@ void Window::notifyMouseMove( MouseButton button, u32 sx, u32 sy, u32 ex, u32 ey
 // ** Window::notifyKeyDown
 void Window::notifyKeyDown( Key key )
 {
-#if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_MACOS )
+#if defined( DC_PLATFORM_KEYBOARD )
     notify<KeyPressed>( KeyPressed( this, key ) );
-#endif  /*  #if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_MACOS )    */
+#endif  /*  #if defined( DC_PLATFORM_KEYBOARD )    */
 }
 
 // ** Window::notifyKeyUp
 void Window::notifyKeyUp( Key key )
 {
-#if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_MACOS )
+#if defined( DC_PLATFORM_KEYBOARD )
     notify<KeyReleased>( KeyReleased( this, key ) );
-#endif  /*  #if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_MACOS )    */
+#endif  /*  #if defined( DC_PLATFORM_KEYBOARD )    */
 }
 
 } // namespace Platform

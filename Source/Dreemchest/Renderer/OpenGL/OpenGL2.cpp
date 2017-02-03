@@ -207,7 +207,7 @@ bool OpenGL2::Framebuffer::check(GLuint id)
         case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
             LogError("opengl2", "%s", "glCheckFramebufferStatus returned GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE\n");
             break;
-    #if !defined(DC_PLATFORM_IOS)
+    #if !defined(DC_OPENGLES2_ENABLED)
         case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
             LogError("opengl2", "%s", "glCheckFramebufferStatus returned GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER\n");
             break;
@@ -217,7 +217,7 @@ bool OpenGL2::Framebuffer::check(GLuint id)
         case GL_FRAMEBUFFER_UNDEFINED :
             LogError("opengl2", "%s", "glCheckFramebufferStatus returned GL_FRAMEBUFFER_UNDEFINED\n");
             break;
-    #endif  //  #if !defined(DC_PLATFORM_IOS)
+    #endif  //  #if !defined(DC_OPENGLES2_ENABLED)
     }
 
     return status == GL_FRAMEBUFFER_COMPLETE;
@@ -617,14 +617,14 @@ void OpenGL2::Texture::texDepthStencil(GLenum target, u16 width, u16 height, u32
     }
     
     glTexImage2D(target, 0, format, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT/*GL_UNSIGNED_BYTE*/, NULL);
-#if defined(DC_PLATFORM_IOS)
+#if defined(DC_OPENGLES2_ENABLED)
     LogWarning("opengl", "%s", "OpenGLES 2 has no GL_CLAMP_TO_BORDER parameter");
 #else
     GLfloat borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-#endif  //  #if defined(DC_PLATFORM_IOS)
+#endif  //  #if defined(DC_OPENGLES2_ENABLED)
 }
     
 // ** OpenGL2::Texture::bind
@@ -945,7 +945,7 @@ void OpenGL2::setPolygonOffset(f32 factor, f32 units)
 // ** OpenGL2::setRasterization
 void OpenGL2::setRasterization(PolygonMode value)
 {
-#if !defined(DC_PLATFORM_IOS)
+#if !defined(DC_OPENGLES2_ENABLED)
     switch (value)
     {
         case PolygonFill:
@@ -957,7 +957,7 @@ void OpenGL2::setRasterization(PolygonMode value)
         default:
             NIMBLE_NOT_IMPLEMENTED
     }
-#endif  //  #if !defined(DC_PLATFORM_IOS)
+#endif  //  #if !defined(DC_OPENGLES2_ENABLED)
 }
 
 // ** OpenGL2::setBlending
@@ -1115,7 +1115,7 @@ GLenum OpenGL2::textureInternalFormat(PixelFormat pixelFormat)
         case PixelLuminance8:   return GL_LUMINANCE8;
         case PixelRgb8:         return GL_RGB;  // ** OpenGL ES doesnt accept GL_RGB8
         case PixelRgba8:        return GL_RGBA; // ** OpenGL ES doesnt accept GL_RGBA8
-    #if !defined( DC_PLATFORM_IOS ) && !defined( DC_PLATFORM_ANDROID ) && !defined( DC_PLATFORM_HTML5 )
+    #if !defined( DC_OPENGLES2_ENABLED ) && !defined( DC_PLATFORM_HTML5 )
         case PixelDxtc1:        return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
         case PixelDxtc3:        return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
         case PixelDxtc5:        return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;

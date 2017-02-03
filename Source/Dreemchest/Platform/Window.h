@@ -176,7 +176,7 @@ namespace Platform {
                             : TouchEvent( window, button, x, y, id ) {}
         };
 
-    #if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_MACOS )
+    #if defined( DC_PLATFORM_KEYBOARD )
         //! This event is emitted when user presses the key.
         struct KeyPressed : public Event {
                         //! Constructs KeyPressed instance.
@@ -194,7 +194,7 @@ namespace Platform {
 
             Key            key;    //!< Released key.    
         };
-    #endif    /*    DC_PLATFORM_WINDOWS || DC_PLATFORM_MACOS    */
+    #endif  //  #if defined( DC_PLATFORM_KEYBOARD )
 
     private:
 
