@@ -31,7 +31,11 @@
 
 #pragma comment( lib, "winmm.lib" )
 
+#include <Renderer/Renderer.h>
+
 DC_BEGIN_DREEMCHEST
+
+extern Renderer::RenderViewWPtr renderView;
 
 namespace Platform {
 
@@ -48,7 +52,7 @@ IApplication* createServiceApplication( void )
 }
 
 // ** currentTime
-u32 currentTime( void )
+u64 currentTime( void )
 {
 	return timeGetTime();
 }
@@ -93,6 +97,8 @@ void WindowsApplication::loop( void )
 		else {
             // Update an application
             m_application->notifyUpdate();
+
+            renderView->notifyUpdate();
 
             // Update all windows
 			for( WindowsWindow::Windows::iterator i = WindowsWindow::s_windows.begin(), end = WindowsWindow::s_windows.end(); i != end; ++i ) {
