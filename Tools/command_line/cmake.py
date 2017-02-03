@@ -152,6 +152,7 @@ class Command:
                             help='a configuration to be built.',
                             choices=['debug', 'release'],
                             default='release')
+        parser.add_argument('--api-level')
 
         parser.set_defaults(function=self.configure)
 
