@@ -30,6 +30,11 @@
     #pragma comment( lib, "../../../../lib/pthreadVC1.lib" )
 #endif
 
+#ifdef DC_PLATFORM_EMSCRIPTEN
+    #ifndef __EMSCRIPTEN_PTHREADS__
+        #error Emscripten makefile configured with no pthreads support.
+    #endif  //  #ifndef __EMSCRIPTEN_PTHREADS__
+#endif  //  #ifdef DC_PLATFORM_EMSCRIPTEN
 
 DC_BEGIN_DREEMCHEST
 
@@ -85,7 +90,7 @@ void PosixThread::wait( void ) const
 // ** PosixThread::threadYield
 void PosixThread::threadYield( void )
 {
-#if defined( DC_PLATFORM_ANDROID )
+#if defined( DC_PLATFORM_ANDROID ) || defined( DC_PLATFORM_EMSCRIPTEN )
     sched_yield();
 #elif defined( DC_PLATFORM_LINUX )
     pthread_yield();

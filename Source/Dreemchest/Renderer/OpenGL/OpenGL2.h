@@ -90,19 +90,60 @@
     #include <OpenGL/glext.h>
 #endif  //  #if defined( DC_PLATFORM_MACOS )
 
+#if defined( DC_PLATFORM_EMSCRIPTEN )
+    #define GL_GLEXT_PROTOTYPES
+
+    #include <GLES/gl.h>
+    #include <GLES/glext.h>
+    #include <GLES2/gl2.h>
+    #include <GLES2/gl2ext.h>
+    #include <GLES3/gl3.h>
+    #include <GLES3/gl2ext.h>
+
+    #define DC_OPENGLES2_ENABLED
+#endif  //  #if defined( DC_PLATFORM_EMSCRIPTEN )
+
 #ifdef DC_OPENGLES2_ENABLED
-    #define GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_APPLE
-    #define GL_DEPTH_COMPONENT24 GL_DEPTH_COMPONENT24_OES
+    #ifndef GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE
+        #define GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_APPLE
+    #endif  //  #ifndef GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE
+
+    #ifndef GL_DEPTH_COMPONENT24
+        #define GL_DEPTH_COMPONENT24 GL_DEPTH_COMPONENT24_OES
+    #endif  //  #ifndef GL_DEPTH_COMPONENT24
+
     #define GL_DEPTH_COMPONENT32 GL_DEPTH_COMPONENT32_OES
     #define GL_POINT_SIZE_ARRAY GL_POINT_SIZE_ARRAY_OES
     #define GL_LUMINANCE8 GL_LUMINANCE8_EXT
-    #define GL_R16F GL_R16F_EXT
-    #define GL_R32F GL_R32F_EXT
-    #define GL_RGBA16F GL_RGBA16F_EXT
-    #define GL_RGBA32F GL_RGBA32F_EXT
-    #define GL_RGB32F GL_RGB32F_EXT
-    #define GL_HALF_FLOAT GL_HALF_FLOAT_OES
-    #define GL_RED GL_RED_EXT
+
+    #ifndef GL_R16F
+        #define GL_R16F GL_R16F_EXT
+    #endif  //  #ifndef GL_R16F
+
+    #ifndef GL_R32F
+        #define GL_R32F GL_R32F_EXT
+    #endif  //  #ifndef GL_R32F
+
+    #ifndef GL_RGBA16F
+        #define GL_RGBA16F GL_RGBA16F_EXT
+    #endif  //  #ifndef GL_RGBA16F
+
+    #ifndef GL_RGBA32F
+        #define GL_RGBA32F GL_RGBA32F_EXT
+    #endif  //  #ifndef GL_RGBA32F
+
+    #ifndef GL_RGB32F
+        #define GL_RGB32F GL_RGB32F_EXT
+    #endif  //  #ifndef GL_RGB32F
+
+    #ifndef GL_HALF_FLOAT
+        #define GL_HALF_FLOAT GL_HALF_FLOAT_OES
+    #endif  //  #ifndef GL_HALF_FLOAT
+
+    #ifndef GL_RED
+        #define GL_RED GL_RED_EXT
+    #endif  //  #ifndef GL_RED
+
     #define glClearDepth glClearDepthf
     #define glPointSizePointer glPointSizePointerOES
     #define GL_TEXTURE_1D 0
@@ -112,7 +153,10 @@
     #endif  //  #ifndef GL_TEXTURE_3D
     #define GL_QUADS 0
     #define GL_SAMPLER_1D 1
-    #define GL_SAMPLER_3D 2
+
+    #ifndef GL_SAMPLER_3D
+        #define GL_SAMPLER_3D 2
+    #endif  //  #ifndef GL_SAMPLER_3D
 #endif  //  #ifdef DC_OPENGLES2_ENABLED
 
 DC_BEGIN_DREEMCHEST

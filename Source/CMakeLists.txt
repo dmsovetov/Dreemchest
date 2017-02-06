@@ -85,6 +85,12 @@ elseif (APPLE)
     set(DC_PLATFORM "MacOS")
     set(DC_THREADS "Posix")
     add_definitions(-DDC_PLATFORM_MACOS -DDC_THREADS_POSIX)
+elseif (EMSCRIPTEN)
+    set(DC_PLATFORM "Emscripten")
+    set(DC_THREADS "Posix")
+    add_definitions(-DDC_PLATFORM_EMSCRIPTEN -DDC_THREADS_POSIX)
+    set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-s USE_PTHREADS=1")
+    set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} "-s USE_PTHREADS=1")
 endif ()
 
 # Add child projects

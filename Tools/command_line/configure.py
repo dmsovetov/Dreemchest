@@ -184,7 +184,7 @@ class IOSConfigureCommand(PlatformConfigurationCommand):
 
 class AndroidConfigureCommand(PlatformConfigurationCommand):
     def __init__(self, parser):
-        """Constructs iOS configuration command"""
+        """Constructs Android configuration command"""
 
         # Load home directory from environment
         if 'DREEMCHEST_HOME' not in os.environ.keys():
@@ -206,6 +206,28 @@ class AndroidConfigureCommand(PlatformConfigurationCommand):
         cmake.generate('Unix Makefiles', options.source, options.output, cmake_parameters)
 
 
+class EmscriptenConfigureCommand(PlatformConfigurationCommand):
+    def __init__(self, parser):
+        """Constructs Emscripten configuration command"""
+
+        # Load home directory from environment
+        if 'EMSCRIPTEN' not in os.environ.keys():
+            raise Exception('EMSCRIPTEN environment variable was not set')
+
+        toolchain = os.path.join(os.environ['EMSCRIPTEN'], 'cmake', 'Modules', 'Platform', 'Emscripten.cmake')
+
+        PlatformConfigurationCommand.__init__(self, 'Emscripten', parser, ['Unix Makefiles'], ['opengl'], toolchain=toolchain)
+
+    def configure(self, options):
+        """Performs iOS build system configuration"""
+
+        # Perform basic build configuration
+        cmake_parameters = self._prepare(options)
+
+        # Invoke a CMake command to generate a build system
+        cmake.generate('Unix Makefiles', options.source, options.output, cmake_parameters)
+
+
 class Command(command_line.Tool):
     """A command line tool to configure a build system for a specified target system"""
 
@@ -215,6 +237,7 @@ class Command(command_line.Tool):
         command_line.Tool.__init__(self, parser, 'available platforms')
 
         self._add_command('android', AndroidConfigureCommand)
+        self._add_command('emscripten', EmscriptenConfigureCommand)
         if os.name == 'nt':
             self._add_command('windows', WindowsConfigureCommand)
         if sys.platform == 'darwin':

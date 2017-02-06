@@ -909,7 +909,9 @@ void OpenGL2::setAlphaTest(Compare function, u8 ref)
     else
     {
         glEnable(GL_ALPHA_TEST);
+    #ifndef DC_PLATFORM_EMSCRIPTEN
         glAlphaFunc(convertCompareFunction(function), ref);
+    #endif  //  #ifndef DC_PLATFORM_EMSCRIPTEN
     }
 }
 

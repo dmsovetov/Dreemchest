@@ -5,7 +5,6 @@ add_definitions(-DDC_BUILD_LIBRARY)
 set(DC_PCH_NAME Dreemchest)
 
 # Locate all dependencies
-find_package(OpenAL)
 find_package(Zlib)
 find_package(cURL)
 find_package(Lua)
@@ -60,6 +59,8 @@ if (DC_OPENGL_ENABLED)
     elseif (DC_PLATFORM MATCHES "Android")
         find_package(OpenGLES2 REQUIRED)
         set(OPENGL_gl_LIBRARY ${OPENGLES2_LIBRARIES})
+    elseif (DC_PLATFORM MATCHES "Emscripten")
+        # do nothing here
     else ()
         find_package(OpenGL REQUIRED)
     endif ()
@@ -75,6 +76,12 @@ if (DC_SOUND_ENABLED)
     
     if (OPENAL_FOUND)
         add_files(Sound/Drivers/OpenAL SOUND_OPENAL_SRCS)
+    endif ()
+
+    if (DC_PLATFORM MATCHES "Emscripten")
+        # do nothing here
+    else ()
+        find_package(OpenAL)
     endif ()
 
     set(SOUND_DECODERS_SRCS

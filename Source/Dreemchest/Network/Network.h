@@ -45,7 +45,12 @@
     #include    <arpa/inet.h>
     #include    <sys/socket.h>
     #include    <sys/select.h>
-    #include    <sys/poll.h>
+
+    #if defined(DC_PLATFORM_EMSCRIPTEN)
+        #include    <poll.h>
+    #else
+        #include    <sys/poll.h>
+    #endif  // #if defined( DC_PLATFORM_EMSCRIPTEN)
     #include    <fcntl.h>
     #include    <netdb.h>
     #include    <errno.h>
