@@ -83,7 +83,7 @@ if (DC_SOUND_ENABLED)
         Sound/Decoders/WavSoundDecoder.cpp
         Sound/Decoders/WavSoundDecoder.h)
 
-    if (OGGVORBIS_FOUND)
+    if (VORBIS_FOUND AND OGG_FOUND)
         set(SOUND_DECODERS_SRCS ${SOUND_DECODERS_SRCS} Sound/Decoders/OggSoundDecoder.cpp Sound/Decoders/OggSoundDecoder.h)
     endif ()
 
@@ -176,14 +176,14 @@ if (ZLIB_FOUND)
     target_include_directories(Dreemchest PRIVATE ${ZLIB_INCLUDE_DIR})
 endif ()
 
+if (VORBIS_FOUND)
+    target_link_libraries(Dreemchest ${VORBIS_LIBRARIES})
+    target_include_directories(Dreemchest PRIVATE ${VORBIS_INCLUDE_DIR})
+endif ()
+
 if (OGG_FOUND)
     target_link_libraries(Dreemchest ${OGG_LIBRARY})
     target_include_directories(Dreemchest PRIVATE ${OGG_INCLUDE_DIR})
-endif ()
-
-if (VORBIS_FOUND)
-    target_link_libraries(Dreemchest ${VORBIS_LIBRARY})
-    target_include_directories(Dreemchest PRIVATE ${VORBIS_INCLUDE_DIR})
 endif ()
 
 if (OPENAL_FOUND)

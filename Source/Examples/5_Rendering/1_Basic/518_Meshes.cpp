@@ -27,8 +27,6 @@
 #include <Dreemchest.h>
 #include <Framework.h>
 
-#include <OpenGL/gl.h>
-
 DC_USE_DREEMCHEST
 
 using namespace Platform;
