@@ -55,4 +55,5 @@ def checkout_submodule(directory):
 def checkout_submodules():
     """Initializes and pulls all submodules"""
 
+    print 'Updating submodules...'
     return invoke('git submodule update --init --recursive')

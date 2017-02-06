@@ -45,7 +45,7 @@ class Main(command_line.Tool):
 
         if sys.platform == 'darwin':
             self._add_command('bootstrap', bootstrap.MacOSBootstrapCommand)
-        elif sys.platform == 'nt':
+        elif sys.platform == 'nt' or sys.platform == 'win32':
             self._add_command('bootstrap', bootstrap.WindowsBootstrapCommand)
 
 

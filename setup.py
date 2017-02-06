@@ -192,9 +192,57 @@ class MacOSEnvironment(UnixEnvironment):
             self.add_path('$' + DREEMCHEST_CMAKE)
 
 
+class WindowsEnvironment(Environment):
+    """Configures Windows environment"""
+
+    def __init__(self, args):
+        """Constructs the WindowsEnvironment instance."""
+
+        Environment.__init__(self)
+        self._path = os.environ['PATH']
+
+    def set_variable(self, name, value):
+        """Sets an environment variable"""
+        import _winreg
+        try:
+            env = None
+            env = _winreg.OpenKeyEx(_winreg.HKEY_CURRENT_USER,
+                                    'Environment',
+                                    0,
+                                    _winreg.KEY_SET_VALUE | _winreg.KEY_READ)
+            _winreg.SetValueEx(env, name, 0, _winreg.REG_SZ, value)
+            _winreg.FlushKey(env)
+            _winreg.CloseKey(env)
+        except Exception:
+            if env:
+                _winreg.CloseKey(env)
+            raise Exception("failed to set '%s' environment variable" % name)
+
+    def configure(self, paths):
+        """Performs Windows environment configuration"""
+
+        Environment.configure(self, paths)
+
+        self.add_path('%' + DREEMCHEST_HOME + '%')
+
+        if paths.cmake:
+            self.set_variable(DREEMCHEST_CMAKE, os.path.join('%' + DREEMCHEST_HOME + '%', paths.cmake, 'CMake.app/Contents/bin'))
+            self.add_path('%' + DREEMCHEST_CMAKE + '%')
+
+    def add_path(self, path):
+        """Adds a specified path to an environment"""
+
+        if not self._path.endswith(';'):
+            self._path += ';'
+        self._path += path
+
+        self.set_variable('PATH', self._path)
+        print 'Path {path} added to environment'.format(path=path)
+
+
 def configure_environment(args, paths):
     """Configures system environment"""
-    environments = dict(mac=MacOSEnvironment)
+    environments = dict(mac=MacOSEnvironment, windows=WindowsEnvironment)
 
     name = platform_name()
 
@@ -325,8 +373,9 @@ def main():
     cmake_path = None
 
     if not args.no_cmake:
-        cmake_path = download_cmake(args.cmake)
-        print 'Installed CMake to ' + cmake_path
+        cmake_path = 'D:\\Projects\\github\\BFG9000\\src\\thirdParty\\Dreemchest\\tools\\cmake-3.4.3-win32-x86'
+    #    cmake_path = download_cmake(args.cmake)
+    #    print 'Installed CMake to ' + cmake_path
 
     # First setup environment variables
     paths = EnvironmentPaths(os.getcwd(), cmake_path)
@@ -340,4 +389,7 @@ def main():
         raise Exception('CMake installation could not be found')
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print 'Error: %s' % e

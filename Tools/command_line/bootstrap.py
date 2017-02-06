@@ -73,9 +73,18 @@ class BootstrapCommand(cmake.Command):
         # Make sure to pull all submodules before building them
         git.checkout_submodules()
 
-        if not getattr(options, 'no_emscripten'):
-            if 'EMSCRIPTEN' not in os.environ.keys():
-                raise Exception('No EMSCRIPTEN environment variable set')
+        if 'EMSCRIPTEN' not in os.environ.keys():
+            print "Warning: 'EMSCRIPTEN' environment variable is not set, Emscripten is disabled."
+            options.no_emscripten = True
+
+        if 'ANDROID_NDK' not in os.environ.keys():
+            print "Warning: 'ANDROID_NDK' environment variable is not set, Android is disabled."
+            options.no_android = True
+
+        emscripten_toolchain = None
+
+        if not options.no_emscripten:
+            emscripten_toolchain = os.path.join(os.environ['EMSCRIPTEN'], 'cmake', 'Modules', 'Platform', 'Emscripten.cmake')
 
         # Toolchain files for each platform
         toolchains = dict(
@@ -83,7 +92,7 @@ class BootstrapCommand(cmake.Command):
             Android=os.path.join(self._home, 'CMake', 'Toolchains', 'Android.cmake'),
             macOS=None,
             Windows=None,
-            Emscripten=os.path.join(os.environ['EMSCRIPTEN'], 'cmake', 'Modules', 'Platform', 'Emscripten.cmake')
+            Emscripten=emscripten_toolchain
         )
 
         # Now build each platform
@@ -91,8 +100,8 @@ class BootstrapCommand(cmake.Command):
             if getattr(options, 'no_' + platform.lower()):
                 continue
 
-            install_path = os.path.join(self._home, 'Build/Dependencies', platform)
-            binary_dir = os.path.join(self._home, 'Externals/Projects')
+            install_path = os.path.join(self._home, 'Build', 'Dependencies', platform)
+            binary_dir = os.path.join(self._home, 'Externals', 'Projects')
             source_dir = os.path.join(self._home, 'Externals')
 
             # Build all external libraries
@@ -115,7 +124,7 @@ class BootstrapCommand(cmake.Command):
                 if platform == 'Android':
                     cmake_options['ANDROID_NATIVE_API_LEVEL'] = 'android-%s' % options.api_level
 
-                cmake.configure_and_build(options.generator if platform in ['iOS', 'macOS'] else 'Unix Makefiles',
+                cmake.configure_and_build(options.generator if platform in ['iOS', 'macOS', 'Windows'] else 'Unix Makefiles',
                                           os.path.join(source_dir, source),
                                           os.path.join(binary_dir, name),
                                           prefix=install_path,
