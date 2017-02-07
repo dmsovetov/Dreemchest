@@ -32,6 +32,9 @@ DC_USE_DREEMCHEST
 // ** UIKitOpenGLView
 @implementation UIKitOpenGLView
 
+@synthesize width = _width;
+@synthesize height = _height;
+
 // ** layerClass
 + (Class) layerClass
 {
@@ -44,7 +47,7 @@ DC_USE_DREEMCHEST
     if ((self = [super initWithFrame: bounds]))
     {
         self.contentScaleFactor = scaleFactor;
-
+        
         [self setupLayer];
         if (![self setupContext: kEAGLRenderingAPIOpenGLES2])
         {
@@ -87,18 +90,21 @@ DC_USE_DREEMCHEST
     return YES;
 }
 
-// setupFrameBuffer
+// ** setupFrameBuffer
 - (BOOL) setupFrameBuffer
 {
-    // Create depth renderbuffer
-    glGenRenderbuffers(1, &_depthRenderBuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, _depthRenderBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8_OES, self.frame.size.width, self.frame.size.height);
-    
     // Create color renderbuffer
     glGenRenderbuffers(1, &_colorRenderBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, _colorRenderBuffer);
     [_context renderbufferStorage:GL_RENDERBUFFER fromDrawable:_layer];
+    
+    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &_width);
+    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &_height);
+    
+    // Create depth renderbuffer
+    glGenRenderbuffers(1, &_depthRenderBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, _depthRenderBuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8_OES, _width, _height);
     
     // Configure the framebuffer
     glGenFramebuffers(1, &_defaultFramebuffer);
@@ -169,7 +175,7 @@ DC_USE_DREEMCHEST
     [self makeCurrent];
 
     glBindFramebufferOES( GL_FRAMEBUFFER_OES, _defaultFramebuffer );
-    glViewport(0, 0, self.frame.size.width, self.frame.size.height);
+    glViewport(0, 0, _width, _height);
 }
 
 // ** endFrame

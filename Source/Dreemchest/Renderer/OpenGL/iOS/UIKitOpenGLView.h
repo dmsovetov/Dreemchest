@@ -48,12 +48,16 @@ DC_USE_DREEMCHEST
         id                          _displayLink;
         GLuint                      _defaultFramebuffer, _colorRenderBuffer, _depthRenderBuffer;
         Renderer::iOSOpenGLView*    _view;
+        int                         _width;
+        int                         _height;
     }
 
     - ( id )    initWithView: ( Renderer::iOSOpenGLView* )view bounds:( CGRect )bounds options:( unsigned int )options scaleFactor:(float)scaleFactor;
     - ( void )  beginFrame;
     - ( void )  endFrame: (BOOL) wait;
     - ( BOOL )  makeCurrent;
+    @property (readonly) int width;
+    @property (readonly) int height;
 @end
 
 #endif /*   !defined( __DC_Renderer_UIKitOpenGLView_H__ ) */
