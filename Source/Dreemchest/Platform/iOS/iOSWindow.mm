@@ -36,7 +36,7 @@ IWindow* createWindow( u32 width, u32 height )
 {
     iOSWindow* window = DC_NEW iOSWindow;
 
-    if( window->create() )
+    if( window->initialize() )
     {
         return window;
     }
@@ -54,7 +54,7 @@ iOSWindow::iOSWindow( void ) : m_owner( NULL ), m_window( NULL )
 // ** iOSWindow::~iOSWindow
 iOSWindow::~iOSWindow( void )
 {
-
+    LogWarning( "window", "%s", "iOS window destroyed\n" );
 }
 
 // ** iOSWindow::close
@@ -111,23 +111,12 @@ void* iOSWindow::handle( void ) const
     return reinterpret_cast<void*>( m_window );
 }
 
-// ** iOSWindow::create
-bool iOSWindow::create( void )
+// ** iOSWindow::initialize
+bool iOSWindow::initialize( void )
 {
-    CGRect  screenBounds = [[UIScreen mainScreen] bounds];
-    CGRect  scaledBounds = screenBounds;
-    CGFloat scale        = [[UIScreen mainScreen] scale];
-
-    if( scale > 0 ) {
-        scaledBounds.origin.x    *= scale;
-        scaledBounds.origin.y    *= scale;
-        scaledBounds.size.width  *= scale;
-        scaledBounds.size.height *= scale;
-    }
-
     m_window = [[UIKitWindow alloc] initWithWindow: this];
     [m_window makeKeyAndVisible];
-    
+ 
     return true;
 }
 

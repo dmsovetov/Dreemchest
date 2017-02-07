@@ -44,7 +44,7 @@ namespace Renderer
         // ** IView
         virtual bool        makeCurrent( void );
         virtual bool        beginFrame( void );
-        virtual void        endFrame( void );
+        virtual void        endFrame(bool wait);
 
         // ** iOSOpenGLView
         bool                initialize( UIWindow* window, u32 options, id delegate );

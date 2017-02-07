@@ -33,7 +33,7 @@
 DC_BEGIN_DREEMCHEST
 namespace Renderer
 {
-    class RenderView;
+    class iOSOpenGLView;
 }
 DC_END_DREEMCHEST
 
@@ -43,24 +43,16 @@ DC_USE_DREEMCHEST
 @interface UIKitOpenGLView : UIView
 {
     @private
-
-        UIWindow*               m_window;
-        Renderer::RenderView*   m_owner;
-
-        BOOL                    m_animating;
-        NSInteger               m_animationFrameInterval;
-        id                      m_displayLink;
-
-        EAGLContext*            m_context;
-        GLint                   m_backingWidth;
-        GLint                   m_backingHeight;
-        GLuint                  m_defaultFramebuffer, m_colorRenderbuffer, m_depthBuffer;
+        EAGLContext*                _context;
+        CAEAGLLayer*                _layer;
+        id                          _displayLink;
+        GLuint                      _defaultFramebuffer, _colorRenderBuffer, _depthRenderBuffer;
+        Renderer::iOSOpenGLView*    _view;
     }
 
-    - ( id )    initWithWindow: ( UIWindow* )window options:( unsigned int )options;
-    - ( void )  setOwner: ( Renderer::RenderView* )view;
+    - ( id )    initWithView: ( Renderer::iOSOpenGLView* )view bounds:( CGRect )bounds options:( unsigned int )options scaleFactor:(float)scaleFactor;
     - ( void )  beginFrame;
-    - ( void )  endFrame;
+    - ( void )  endFrame: (BOOL) wait;
     - ( BOOL )  makeCurrent;
 @end
 

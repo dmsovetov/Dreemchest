@@ -41,17 +41,11 @@ DC_END_DREEMCHEST
 
 DC_USE_DREEMCHEST
 
-@interface UIKitViewController : UIViewController
-{
-}
-@end
-
 @interface UIKitWindow : UIWindow
 {
     enum { MaxTouches = 16 };
     CGPoint                 m_prevMousePos;
     Platform::iOSWindow*    m_window;
-    UIKitViewController*    m_viewController;
     UITouch*                m_touches[MaxTouches];
 }
 

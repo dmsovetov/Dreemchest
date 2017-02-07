@@ -33,14 +33,17 @@
 - ( id )initWithWindow: ( Platform::iOSWindow* )window
 {
     m_window = window;
-
+    
     UIScreen* mainScreen = [UIScreen mainScreen];
-    //UIApplication*  app         = [UIApplication sharedApplication];
+    
+    if ((self = [super initWithFrame: [mainScreen bounds]]))
+    {
+        self.contentScaleFactor = mainScreen.scale;
+        self.rootViewController = [[UIViewController alloc] init];
+        return self;
+    }
 
-    self.contentScaleFactor = mainScreen.scale;
-    self.rootViewController = [[UIViewController alloc] initWithNibName:nil bundle:nil];
-
-    return [super initWithFrame: [mainScreen bounds]];
+    return nil;
 }
 
 // ** width

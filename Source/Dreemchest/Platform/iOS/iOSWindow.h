@@ -55,7 +55,7 @@ namespace Platform
         Window*             owner( void ) const;
 
         // ** iOSWindow
-        bool                create( void );
+        bool                initialize( void );
 
     private:
 

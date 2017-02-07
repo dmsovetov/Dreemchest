@@ -49,13 +49,11 @@ iOSOpenGLView::~iOSOpenGLView( void )
 // ** iOSOpenGLView::initialize
 bool iOSOpenGLView::initialize( UIWindow* window, u32 options, id delegate )
 {
-    m_view = [[UIKitOpenGLView alloc] initWithWindow: window options:options];
-    [m_view setOwner: this];
-    window.rootViewController.view = m_view;
-//    [window addSubview: m_view];
-//    [window setContentView: m_view];
+    m_view = [[UIKitOpenGLView alloc] initWithView:this bounds:window.bounds options:options scaleFactor: window.contentScaleFactor];
+    [window addSubview: m_view];
     return true;
 }
+
 
 // ** iOSOpenGLView::beginFrame
 bool iOSOpenGLView::beginFrame( void )
@@ -65,9 +63,9 @@ bool iOSOpenGLView::beginFrame( void )
 }
 
 // ** iOSOpenGLView::endFrame
-void iOSOpenGLView::endFrame( void )
+void iOSOpenGLView::endFrame(bool wait)
 {
-    [m_view endFrame];
+    [m_view endFrame: wait];
 }
 
 // ** iOSOpenGLView::makeCurrent
