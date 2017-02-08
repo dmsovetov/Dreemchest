@@ -52,6 +52,13 @@ RenderingContextPtr createOpenGL2RenderingContext(RenderViewPtr view)
     
 // ------------------------------------------------------ OpenGL2RenderingContext::ShaderPreprocessor -------------------------------------------------- //
 
+// ** OpenGL2RenderingContext::ShaderPreprocessor::ShaderPreprocessor
+OpenGL2RenderingContext::ShaderPreprocessor::ShaderPreprocessor(bool withPrecision)
+    : m_withPrecision(withPrecision)
+{
+    
+}
+    
 // ** OpenGL2RenderingContext::ShaderPreprocessor::generateBufferDefinition
 String OpenGL2RenderingContext::ShaderPreprocessor::generateBufferDefinition(const RenderingContext& renderingContext, const String& type, const String& name, s32 slot) const
 {
@@ -64,6 +71,17 @@ String OpenGL2RenderingContext::ShaderPreprocessor::generateBufferDefinition(con
         , "vec3"
         , "vec4"
         , "mat4"
+    };
+    
+    // A static array to map from an element type to GLSL precision.
+    static const String s_precision[] =
+    {
+          ""
+        , "highp"
+        , "highp"
+        , "highp"
+        , "highp"
+        , "highp"
     };
 
     // First find a uniform layout by name
@@ -89,7 +107,9 @@ String OpenGL2RenderingContext::ShaderPreprocessor::generateBufferDefinition(con
             def = element->name.value();
         }
         
-        definition += "\t" + s_types[element->type] + " " + def + ";\n";
+        String precision = m_withPrecision ? (s_precision[element->type] + " ") : "";
+        
+        definition += "\t" + precision + s_types[element->type] + " " + def + ";\n";
     }
     definition += "}; uniform " + type + " cb_" + toString(slot) + ";\n#define " + name + " cb_" + toString(slot) + "\n";
 
@@ -113,8 +133,13 @@ OpenGL2RenderingContext::OpenGL2RenderingContext(RenderViewPtr view)
 {
 #if !defined(DC_OPENGLES2_ENABLED)
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+    m_shaderLibrary.addPreprocessor(DC_NEW AddDefinitionPreprocessor("lowp"));
+    m_shaderLibrary.addPreprocessor(DC_NEW AddDefinitionPreprocessor("midp"));
+    m_shaderLibrary.addPreprocessor(DC_NEW AddDefinitionPreprocessor("highp"));
+    m_shaderLibrary.addPreprocessor(DC_NEW ShaderPreprocessor(false));
+#else
+    m_shaderLibrary.addPreprocessor(DC_NEW ShaderPreprocessor(true));
 #endif  //  #if !defined(DC_OPENGLES2_ENABLED)
-    m_shaderLibrary.addPreprocessor(DC_NEW ShaderPreprocessor);
     
 #if !defined(DC_OPENGLES2_ENABLED)
     m_shaderLibrary.addPreprocessor(DC_NEW ShaderVersionPreprocessor(110));

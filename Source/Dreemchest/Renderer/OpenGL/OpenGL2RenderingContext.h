@@ -81,8 +81,19 @@ namespace Renderer
         //! Generates a uniform structure from a cbuffer definition.
         class ShaderPreprocessor : public UniformBufferPreprocessor
         {
+        public:
+            
+                                    //! Constructs a ShaderPreprocessor instance.
+                                    ShaderPreprocessor(bool withPrecision);
+            
+        protected:
+            
             //! Generates a uniform definition.
             virtual String          generateBufferDefinition(const RenderingContext& renderingContext, const String& type, const String& name, s32 slot) const NIMBLE_OVERRIDE;
+            
+        private:
+            
+            bool                    m_withPrecision;        //!< Used by OpenGLES context to emit precision modifiers.
         };
         
         FixedArray<ConstantBuffer>  m_constantBuffers;      //!< An array of allocated constant buffer instances.

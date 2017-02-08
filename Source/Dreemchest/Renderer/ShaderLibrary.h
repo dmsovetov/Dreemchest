@@ -149,6 +149,25 @@ namespace Renderer
         virtual String                  generateBufferDefinition(const RenderingContext& renderingContext, const String& type, const String& name, s32 slot) const NIMBLE_ABSTRACT;
     };
     
+    //! Adds a single preprocessor definition to a shader source code.
+    class AddDefinitionPreprocessor : public ShaderPreprocessor
+    {
+    public:
+        
+                                        //! Constructs an instance of AddDefinitionPreprocessor.
+                                        AddDefinitionPreprocessor(const String& name, const String& value = "");
+        
+    protected:
+        
+        //! Appends a preprocessor definition to a shader source code.
+        virtual bool                    preprocess(const RenderingContext& renderingContext, String& source) const NIMBLE_OVERRIDE;
+        
+    private:
+        
+        String                          m_name;     //!< A definition name to be added.
+        String                          m_value;    //!< A definition value (can be an empty string).
+    };
+    
 } // namespace Renderer
 
 DC_END_DREEMCHEST

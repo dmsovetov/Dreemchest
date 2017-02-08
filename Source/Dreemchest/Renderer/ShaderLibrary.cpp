@@ -425,6 +425,31 @@ bool UniformBufferPreprocessor::preprocess(const RenderingContext& renderingCont
 
     return true;
 }
+    
+// --------------------------------------------------- AddDefinitionPreprocessor --------------------------------------------------- //
+    
+// ** AddDefinitionPreprocessor::AddDefinitionPreprocessor
+AddDefinitionPreprocessor::AddDefinitionPreprocessor(const String& name, const String& value)
+    : m_name(name)
+    , m_value(value)
+{
+    
+}
+
+// ** AddDefinitionPreprocessor::preprocess
+bool AddDefinitionPreprocessor::preprocess(const RenderingContext& renderingContext, String& source) const
+{
+    String definition = "#define " + m_name;
+    
+    if (!m_value.empty())
+    {
+        definition += (" " + m_value);
+    }
+    definition += "\n";
+    
+    source = definition + source;
+    return true;
+}
 
 } // namespace Renderer
 
