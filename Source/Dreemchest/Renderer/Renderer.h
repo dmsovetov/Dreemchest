@@ -321,6 +321,15 @@ namespace Renderer {
         
         virtual                     ~RenderView( void ) {}
         
+        //! Returns a view width.
+        virtual s32                 width() const NIMBLE_ABSTRACT;
+        
+        //! Returns a view height.
+        virtual s32                 height() const NIMBLE_ABSTRACT;
+        
+        //! Returns a view aspect ratio.
+        virtual f32                 aspectRatio() const { return static_cast<f32>(width()) / height(); }
+        
         //! Activates the view for rendering.
         virtual bool                makeCurrent( void ) { return false; }
         

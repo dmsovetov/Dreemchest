@@ -75,6 +75,18 @@ bool MacOSOpenGLView::makeCurrent( void )
 {
     return [m_view makeCurrent];
 }
+ 
+// ** MacOSOpenGLView::width
+s32 MacOSOpenGLView::width() const
+{
+    return m_view.frame.size.width;
+}
+   
+// ** MacOSOpenGLView::height
+s32 MacOSOpenGLView::height() const
+{
+    return m_view.frame.size.height;
+}
 
 } // namespace Renderer
 

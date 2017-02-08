@@ -58,6 +58,7 @@ DC_USE_DREEMCHEST
         
         [self setupFrameBuffer];
         [self setupDisplayLink];
+        [self resizeFromLayer: _layer];
         
         _view = view;
         return self;

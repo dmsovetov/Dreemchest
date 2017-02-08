@@ -73,6 +73,18 @@ bool iOSOpenGLView::makeCurrent( void )
 {
     return [m_view makeCurrent];
 }
+    
+// ** iOSOpenGLView::width
+s32 iOSOpenGLView::width() const
+{
+    return m_view.height;
+}
+  
+// ** iOSOpenGLView::height
+s32 iOSOpenGLView::height() const
+{
+    return m_view.height;
+}
 
 } // namespace Renderer
 

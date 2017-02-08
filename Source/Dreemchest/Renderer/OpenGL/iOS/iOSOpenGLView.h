@@ -42,9 +42,11 @@ namespace Renderer
         virtual             ~iOSOpenGLView( void );
 
         // ** IView
-        virtual bool        makeCurrent( void );
-        virtual bool        beginFrame( void );
-        virtual void        endFrame(bool wait);
+        virtual bool        makeCurrent( void ) NIMBLE_OVERRIDE;
+        virtual bool        beginFrame( void ) NIMBLE_OVERRIDE;
+        virtual void        endFrame(bool wait) NIMBLE_OVERRIDE;
+        virtual s32         width() const NIMBLE_OVERRIDE;
+        virtual s32         height() const NIMBLE_OVERRIDE;
 
         // ** iOSOpenGLView
         bool                initialize( UIWindow* window, u32 options, id delegate );
