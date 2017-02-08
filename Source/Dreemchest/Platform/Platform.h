@@ -65,6 +65,15 @@ namespace Platform {
     class Application;
     class Window;
     class Arguments;
+    
+    // Supported device orientations
+    enum DeviceOrientation
+    {
+          OrientationPortrait
+        , OrientationPortraitUpsideDown
+        , OrientationLandscapeLeft
+        , OrientationLandscapeRight
+    };
 
     dcDeclarePtrs( Window )
 

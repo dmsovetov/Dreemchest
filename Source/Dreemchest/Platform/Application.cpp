@@ -174,6 +174,27 @@ void Application::notifyUpdate( void )
         m_delegate->handleUpdate( this );
     }
 }
+
+// ** Application::notifyOrientationChanged
+void Application::notifyOrientationChanged(DeviceOrientation orientation)
+{
+    if (!m_delegate)
+    {
+        LogDebug( "application", "%s", "no application delegate set, orientation changed event ignored\n" );
+        return;
+    }
+    
+    static CString s_orientation[] =
+    {
+          "portrait"
+        , "portraitUpsideDown"
+        , "landscapeLeft"
+        , "landscapeRight"
+    };
+    
+    m_delegate->handleOrientationChanged(this, orientation);
+    LogDebug("application", "device orientation was changed to '%s'\n", s_orientation[orientation]);
+}
     
 // -------------------------------------------------------------- ApplicationDelegate ---------------------------------------------------------------- //
 

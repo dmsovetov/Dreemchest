@@ -67,6 +67,9 @@ namespace Platform {
         //! Notifies about an application update.
         virtual void            handleUpdate( Application* application ) {}
         
+        //! This method is called when a device orientation was changed.
+        virtual void            handleOrientationChanged( Application* application, DeviceOrientation orientation ) {}
+        
     protected:
         
         //! Outputs a debug message to a console.
@@ -151,6 +154,9 @@ namespace Platform {
 
         //! Notifies an application about an update.
         void                    notifyUpdate( void );
+        
+        //! Notifies an application about a device orientation change.
+        void                    notifyOrientationChanged(DeviceOrientation orientation);
 
         //! Returns application arguments passed on launch.
         const Arguments&        args( void ) const;
