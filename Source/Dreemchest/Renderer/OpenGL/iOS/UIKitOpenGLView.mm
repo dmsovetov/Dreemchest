@@ -47,6 +47,7 @@ DC_USE_DREEMCHEST
     if ((self = [super initWithFrame: bounds]))
     {
         self.contentScaleFactor = scaleFactor;
+        self.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
         
         [self setupLayer];
         if (![self setupContext: kEAGLRenderingAPIOpenGLES2])
@@ -59,9 +60,10 @@ DC_USE_DREEMCHEST
         [self setupDisplayLink];
         
         _view = view;
+        return self;
     }
 
-    return self;
+    return nil;
 }
 
 // ** setupLayer
@@ -79,11 +81,13 @@ DC_USE_DREEMCHEST
     
     if (!_context)
     {
+        Renderer::Log::error(NIMBLE_LOGGER_CONTEXT, "opengles", "failed to create context with a requested API level\n");
         return NO;
     }
     
     if (![EAGLContext setCurrentContext:_context])
     {
+        Renderer::Log::error(NIMBLE_LOGGER_CONTEXT, "opengles", "failed set context\n");
         return NO;
     }
     
@@ -96,16 +100,10 @@ DC_USE_DREEMCHEST
     // Create color renderbuffer
     glGenRenderbuffers(1, &_colorRenderBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, _colorRenderBuffer);
-    [_context renderbufferStorage:GL_RENDERBUFFER fromDrawable:_layer];
-    
-    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &_width);
-    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &_height);
-    
+
     // Create depth renderbuffer
     glGenRenderbuffers(1, &_depthRenderBuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, _depthRenderBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8_OES, _width, _height);
-    
+
     // Configure the framebuffer
     glGenFramebuffers(1, &_defaultFramebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, _defaultFramebuffer);
@@ -122,6 +120,30 @@ DC_USE_DREEMCHEST
     [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
 }
 
+// ** resizeFromLayer
+- (BOOL)resizeFromLayer:(CAEAGLLayer *)layer
+{
+    // Allocate color buffer backing based on the current layer size
+    glBindRenderbuffer(GL_RENDERBUFFER, _colorRenderBuffer);
+    
+    if( ![_context renderbufferStorage:GL_RENDERBUFFER fromDrawable:layer] )
+    {
+        Renderer::Log::error(NIMBLE_LOGGER_CONTEXT, "opengles", "failed to create renderbuffer from layer\n");
+        return NO;
+    }
+    
+    // Get the viewport dimensions
+    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &_width);
+    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &_height);
+    
+    // Update the depth buffer dimensions
+    glBindRenderbuffer(GL_RENDERBUFFER, _depthRenderBuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8_OES, _width, _height);
+    
+    Renderer::Log::verbose(NIMBLE_LOGGER_CONTEXT, "opengles", "renderbuffer resized to %dx%d\n", _width, _height);
+    return YES;
+}
+
 // ** render
 - (void)render: (CADisplayLink*)displayLink
 {
@@ -129,6 +151,12 @@ DC_USE_DREEMCHEST
     {
         _view->notifyUpdate();
     }
+}
+
+// ** layoutSubviews
+- (void) layoutSubviews
+{
+    [self resizeFromLayer: _layer];
 }
 
 // ** dealoc
@@ -175,7 +203,7 @@ DC_USE_DREEMCHEST
     [self makeCurrent];
 
     glBindFramebufferOES( GL_FRAMEBUFFER_OES, _defaultFramebuffer );
-    glViewport(0, 0, _width, _height);
+    glViewport(0, 0, self.width, self.height);
 }
 
 // ** endFrame
@@ -186,7 +214,7 @@ DC_USE_DREEMCHEST
         glFinish();
     }
     
-    glBindRenderbufferOES( GL_RENDERBUFFER_OES, _colorRenderBuffer );
+    glBindRenderbufferOES(GL_RENDERBUFFER_OES, _colorRenderBuffer);
     [_context presentRenderbuffer:GL_RENDERBUFFER_OES];
 }
 
