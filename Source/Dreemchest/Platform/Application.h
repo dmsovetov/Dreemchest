@@ -231,7 +231,7 @@ DC_END_DREEMCHEST
 #elif defined(DC_PLATFORM_ANDROID)
     //! Declares an application entry point
     #define dcDeclareApplication( delegate )            \
-        void android_main(struct android_app* state) { _DREEMCHEST_ENTRY_POINT(Application, delegate, 0, NULL, state) }
+        extern "C" { void android_main(struct android_app* state) { _DREEMCHEST_ENTRY_POINT(Application, delegate, 0, NULL, state) } }
 #else
     //! Declares an application entry point
     #define dcDeclareApplication( delegate )            \
