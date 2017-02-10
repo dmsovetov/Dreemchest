@@ -15,6 +15,8 @@ function(create_examples dir)
 			    endif ()
                 set_target_properties(${target_name} PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${IOS_CODESIGN_IDENTITY}")
 			endif ()
+
+			install(TARGETS ${target_name} DESTINATION bin)
 		endif()
 	endforeach()
 endfunction()

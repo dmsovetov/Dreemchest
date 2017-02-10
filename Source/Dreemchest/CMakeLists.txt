@@ -198,3 +198,19 @@ if (OPENAL_FOUND)
     target_link_libraries(Dreemchest ${OPENAL_LIBRARY})
     target_include_directories(Dreemchest PRIVATE ${OPENAL_INCLUDE_DIR})
 endif ()
+
+# Install targets
+install(TARGETS Dreemchest DESTINATION lib)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/BuildConfig.h" DESTINATION include/Dreemchest)
+
+get_target_property(SOURCES Dreemchest SOURCES)
+
+foreach(ABSOLUTE_FILE_PATH ${SOURCES})
+    get_filename_component(FILE_EXT "${ABSOLUTE_FILE_PATH}" EXT)
+
+    if (FILE_EXT STREQUAL ".h")
+        string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" SOURCE_FILE ${ABSOLUTE_FILE_PATH})
+        get_filename_component(HEADER_INSTALL_DIR "${SOURCE_FILE}" DIRECTORY)
+        install(FILES "${ABSOLUTE_FILE_PATH}" DESTINATION include/Dreemchest/${HEADER_INSTALL_DIR})
+    endif ()
+endforeach ()
