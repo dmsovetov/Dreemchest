@@ -28,7 +28,7 @@ import os
 import subprocess
 import shutil
 
-GENERATE_COMMAND = 'cmake -E chdir {output} cmake {source} -G "{generator}" {args} {rest} -Wno-dev'
+GENERATE_COMMAND = '{bin}/cmake -E chdir {output} {bin}/cmake {source} -G "{generator}" {args} {rest} -Wno-dev'
 
 
 def enable_option(value):
@@ -52,72 +52,85 @@ def library_option(parameters, name, options):
         parameters['CMAKE_DISABLE_FIND_PACKAGE_%s' % name] = 'ON'
 
 
-def generate(generator, source, output, parameters, rest=''):
-    """Invokes a CMake command to generate a build system"""
-
-    # Create an output directory
-    if not os.path.exists(output):
-        os.makedirs(output)
-
-    # Generate CMake parameter string
-    cmd_args = ['-D%s=%s' % (key, parameters[key]) for key in parameters]
-
-    # Generate a command line string
-    command_line = GENERATE_COMMAND.format(
-        output=output,
-        source=os.path.abspath(source),
-        generator=generator,
-        args=' '.join(cmd_args),
-        rest=rest
+class CMake:
+    """A wrapper class used to invoke cmake command"""
+    def __init__(self, home, toolchain=None, prefix_path=None, install_prefix=None, cxx_std=11):
+        self._home = home
+        self._options = dict(
+            CMAKE_INSTALL_PREFIX=install_prefix,
+            CMAKE_PREFIX_PATH=prefix_path,
+            CMAKE_CXX_STANDARD=cxx_std
         )
 
-    subprocess.check_call(command_line, shell=True)
+        if toolchain:
+            self._options['CMAKE_TOOLCHAIN_FILE'] = toolchain
 
+    @property
+    def home(self):
+        """Returns a CMake home directory"""
+        return self._home
 
-def build(source, target, configuration):
-    """Build a CMake-generated project binary tree."""
+    def build(self, generator, source_dir, binary_dir, target='install', configuration='Release', options=None):
+        """Generates a binary tree and then builds a specified target for requested configuration"""
 
-    # Generate a command line string
-    command_line = 'cmake --build %s --target %s --config %s' % (source, target, configuration)
+        # Prepare CMake options
+        if not options:
+            options = self._options
+        else:
+            options.update(self._options)
 
-    subprocess.check_call(command_line, shell=True)
+        try:
+            # Generate a binary tree
+            self.configure(generator, source_dir, binary_dir, options, '-Wno-dev -DCMAKE_BUILD_TYPE=' + configuration)
 
+            # Build a generated tree
+            rest = ''
+            if generator == 'Unix Makefiles' or generator == 'MinGW Makefiles':
+                rest = '-j8'
 
-def configure_and_build(generator, source_dir, binary_dir,
-                        target='ALL_BUILD',
-                        configuration='Release',
-                        install_prefix=None,
-                        prefix=None,
-                        options=None,
-                        toolchain=None):
-    """Generates a binary tree and then builds a specified target for requested configuration"""
+            self.build_tree(binary_dir, target=target, configuration=configuration, rest=rest)
 
-    if not options:
-        options = dict()
+        except subprocess.CalledProcessError:
+            print 'Failed to build %s' % source_dir
 
-    # Set the CMAKE_INSTALL_PREFIX variable
-    if install_prefix:
-        options['CMAKE_INSTALL_PREFIX'] = install_prefix
+        shutil.rmtree(binary_dir)
 
-    # Set the CMAKE_PREFIX_PATH
-    if prefix:
-        options['CMAKE_PREFIX_PATH'] = prefix
+    def configure(self, generator, source, output, parameters, rest=''):
+        """Invokes a CMake command to generate a build system"""
 
-    # Set the CMAKE_TOOLCHAIN_FILE variable
-    if toolchain:
-        options['CMAKE_TOOLCHAIN_FILE'] = toolchain
+        # Create an output directory
+        if not os.path.exists(output):
+            os.makedirs(output)
 
-    try:
-        # Generate a binary tree
-        generate(generator, source_dir, binary_dir, options, '-Wno-dev')
+        # Generate CMake parameter string
+        parameters.update(self._options)
+        cmd_args = ['-D%s=%s' % (key, parameters[key]) for key in parameters]
 
-        # Build a generated tree
-        build(binary_dir, target, configuration)
+        # Generate a command line string
+        command_line = GENERATE_COMMAND.format(
+            bin=self._home,
+            output=output,
+            source=os.path.abspath(source),
+            generator=generator,
+            args=' '.join(cmd_args),
+            rest=rest
+        )
 
-    except subprocess.CalledProcessError:
-        print 'Failed to build %s' % source_dir
+        subprocess.check_call(command_line, shell=True)
 
-    shutil.rmtree(binary_dir)
+    def build_tree(self, source, target='install', configuration='Release', rest=''):
+        """Build a CMake-generated project binary tree."""
+
+        # Generate a command line string
+        command_line = '{bin}/cmake --build {source} --target {target} --config {configuration} {rest}'.format(
+            bin=self._home,
+            source=source,
+            target=target,
+            configuration=configuration,
+            rest=rest,
+        )
+
+        subprocess.check_call(command_line, shell=True)
 
 
 class Command:

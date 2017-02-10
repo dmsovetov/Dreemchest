@@ -62,5 +62,4 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        pass
-    #    print 'Error: %s' % e
+        print 'Error: %s' % e

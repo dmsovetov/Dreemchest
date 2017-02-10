@@ -211,10 +211,11 @@ class EmscriptenConfigureCommand(PlatformConfigurationCommand):
         """Constructs Emscripten configuration command"""
 
         # Load home directory from environment
-        if 'EMSCRIPTEN' not in os.environ.keys():
-            raise Exception('EMSCRIPTEN environment variable was not set')
+        #if 'EMSCRIPTEN' not in os.environ.keys():
+        #    raise Exception('EMSCRIPTEN environment variable was not set')
 
-        toolchain = os.path.join(os.environ['EMSCRIPTEN'], 'cmake', 'Modules', 'Platform', 'Emscripten.cmake')
+        #toolchain = os.path.join(os.environ['EMSCRIPTEN'], 'cmake', 'Modules', 'Platform', 'Emscripten.cmake')
+        toolchain = '~'
 
         PlatformConfigurationCommand.__init__(self, 'Emscripten', parser, ['Unix Makefiles'], ['opengl'], toolchain=toolchain)
 
