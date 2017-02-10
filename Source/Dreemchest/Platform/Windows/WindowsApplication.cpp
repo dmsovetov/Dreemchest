@@ -40,7 +40,7 @@ extern Renderer::RenderViewWPtr renderView;
 namespace Platform {
 
 // ** createApplication
-IApplication* createApplication( void )
+IApplication* createApplication( void* userData )
 {
     return DC_NEW WindowsApplication;
 }

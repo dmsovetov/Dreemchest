@@ -62,11 +62,11 @@ namespace Network {
         }
         
         // ** Serialize event to a byte buffer.
-        Io::ByteBufferPtr buffer = Io::BinarySerializer::write( e );
+        //Io::ByteBufferPtr buffer = Io::BinarySerializer::write( e );
         
-        for( ConnectionList::const_iterator i = listeners.begin(), end = listeners.end(); i != end; ++i ) {
-            const_cast<ConnectionPtr&>( *i )->send<Packets::Event>( TypeInfo<T>::id(), buffer->array() );
-        }
+        //for( ConnectionList::const_iterator i = listeners.begin(), end = listeners.end(); i != end; ++i ) {
+        //    const_cast<ConnectionPtr&>( *i )->send<Packets::Event>( TypeInfo<T>::id(), buffer->array() );
+        //}
     }
     
     // ** Application::addPacketHandler

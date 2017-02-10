@@ -28,6 +28,7 @@
 #define __DC_Platform_AndroidApplication_H__
 
 #include "../Application.h"
+#include <android_native_app_glue.h>
 
 DC_BEGIN_DREEMCHEST
 
@@ -37,15 +38,35 @@ namespace Platform {
     class AndroidApplication : public IApplication
     {
     public:
+        
+                                    AndroidApplication(android_app* state);
 
         // ** IApplication
         virtual void                quit( u32 exitCode ) NIMBLE_OVERRIDE;
         virtual s32                 launch( Application* application ) NIMBLE_OVERRIDE;
         virtual const String&       resourcePath( void ) const NIMBLE_OVERRIDE;
+        
+    private:
+        
+        //! Processes a command
+        static void                 handleCommand(android_app* app, int32_t cmd);
+        
+        //! Handles input event
+        static int32_t              handleInput(android_app* app, AInputEvent* event);
+        
+        //! Creates display
+        bool                        createDisplay();
+        
+        //! Destroys display
+        void                        destroyDisplay();
+        
+        //! Polls OS events and then processes them.
+        void                        loop();
 
     private:
 
         Application*                m_application;      //!< Parent application instance.
+        android_app*                m_state;
         mutable String              m_workingDirectory; //!< A current working directory.
     };
 

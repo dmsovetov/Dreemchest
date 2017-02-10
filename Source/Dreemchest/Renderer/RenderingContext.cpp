@@ -506,6 +506,12 @@ ConstantBuffer_ RenderingContext::requestConstantBuffer(const void* data, s32 si
     UniformLayout layout = requestUniformLayout(name, elements);
     return requestConstantBuffer(data, size, layout);
 }
+    
+// ** RenderingContext::deprecatedRequestConstantBuffer
+ConstantBuffer_ RenderingContext::deprecatedRequestConstantBuffer(const void* data, s32 size, const UniformElement* elements)
+{
+    return 0;
+}
 
 // ** RenderingContext::requestTexture2D
 Texture_ RenderingContext::requestTexture2D(const void* data, u16 width, u16 height, u32 options)

@@ -38,7 +38,7 @@ DC_BEGIN_DREEMCHEST
 namespace Platform {
 
 //! Platform-specific application constructor.
-extern IApplication* createApplication( void );
+extern IApplication* createApplication( void* userData );
 
 //! Platform-specific service application constructor.
 extern IApplication* createServiceApplication( void );
@@ -112,9 +112,9 @@ String Application::pathForResource(const String& fileName) const
 }
 
 // ** Application::create
-Application* Application::create( const Arguments& args )
+Application* Application::create( const Arguments& args, void* userData )
 {
-    if( IApplication* impl = createApplication() ) {
+    if( IApplication* impl = createApplication(userData) ) {
         return DC_NEW Application( args, impl );
     }
 

@@ -172,4 +172,6 @@ namespace Network {
     
 DC_END_DREEMCHEST
 
+#include "NetworkApplication.hpp"
+
 #endif    /*    !__DC_Network_Application_H__    */

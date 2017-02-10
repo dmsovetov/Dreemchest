@@ -5,7 +5,12 @@ function(create_examples dir)
 	foreach(file ${src})
 		if (NOT ${file} STREQUAL ${dir})
 			get_filename_component(target_name ${file} NAME_WE)
-			add_executable(${target_name} WIN32 MACOSX_BUNDLE ${file})
+
+			if (ANDROID)
+			    add_library(${target_name} SHARED ${file})
+			else ()
+			    add_executable(${target_name} WIN32 MACOSX_BUNDLE ${file})
+			endif ()
 			target_link_libraries(${target_name} Dreemchest Framework)
 			set_property(TARGET ${target_name} PROPERTY FOLDER "Examples")
 

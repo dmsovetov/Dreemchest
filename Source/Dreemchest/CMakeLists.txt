@@ -168,6 +168,15 @@ target_include_directories(Dreemchest PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 file(MD5 ${CMAKE_CURRENT_BINARY_DIR}/BuildConfig.h DREEMCHEST_VERSION)
 configure_file(BuildConfig.in.h BuildConfig.h)
 
+# Link against the Android native app glue
+if (ANDROID)
+    find_library(LIB_LOG log)
+    find_library(LIB_ANDROID android)
+    add_library(android_app_glue STATIC ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c)
+    target_include_directories(Dreemchest PRIVATE ${ANDROID_NDK}/sources/android/native_app_glue)
+    target_link_libraries(Dreemchest android_app_glue ${LIB_LOG} ${LIB_ANDROID})
+endif ()
+
 # Link all requested libraries
 if (BOX2D_FOUND)
     target_link_libraries(Dreemchest ${BOX2D_LIBRARY})

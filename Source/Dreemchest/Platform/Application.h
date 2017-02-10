@@ -171,7 +171,7 @@ namespace Platform {
         String                  pathForResource(const String& fileName) const;
 
         //! Creates a new Application instance.
-        static Application*     create( const Arguments& args );
+        static Application*     create( const Arguments& args, void* userData = NULL );
 
         //! Returns a shared application instance.
         static Application*     sharedInstance( void );
@@ -208,28 +208,38 @@ namespace Platform {
 DC_END_DREEMCHEST
 
 //! A private macro definition to construct application instance and parse arguments
-#define _DREEMCHEST_ENTRY_POINT(AppClass, delegate, argc, argv)                                     \
-        DC_DREEMCHEST_NS Platform::Arguments args( argv, argc );                                    \
-        return DC_DREEMCHEST_NS Platform::AppClass::create( args )->launch( delegate );      
+#if defined(DC_PLATFORM_ANDROID)
+    #define _DREEMCHEST_ENTRY_POINT(AppClass, delegate, argc, argv, userData)                           \
+            DC_DREEMCHEST_NS Platform::Arguments args( argv, argc );                                    \
+            DC_DREEMCHEST_NS Platform::AppClass::create( args, userData )->launch( delegate );
+#else
+    #define _DREEMCHEST_ENTRY_POINT(AppClass, delegate, argc, argv, userData)                           \
+            DC_DREEMCHEST_NS Platform::Arguments args( argv, argc );                                    \
+            return DC_DREEMCHEST_NS Platform::AppClass::create( args, userData )->launch( delegate );
+#endif  //  #if defined(DC_PLATFORM_ANDROID)
 
-#ifdef DC_PLATFORM_WINDOWS
+#if defined(DC_PLATFORM_WINDOWS)
     //! Declares an application entry point
     #define dcDeclareApplication( delegate )                                                                    \
-        s32 main( s32 argc, s8** argv ) { _DREEMCHEST_ENTRY_POINT(Application, delegate, argc, argv) }          \
-        s32 WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) { _DREEMCHEST_ENTRY_POINT(Application, delegate, 1, ( s8** )&pCmdLine) }
+        s32 main( s32 argc, s8** argv ) { _DREEMCHEST_ENTRY_POINT(Application, delegate, argc, argv, NULL) }    \
+        s32 WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) { _DREEMCHEST_ENTRY_POINT(Application, delegate, 1, ( s8** )&pCmdLine, NULL) }
 
     //! Declares a service entry point
     #define dcDeclareServiceApplication( delegate )                                                             \
-        s32 main( s32 argc, s8** argv ) { _DREEMCHEST_ENTRY_POINT(ServiceApplication, delegate, argc, argv) }   \
-        s32 WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) { _DREEMCHEST_ENTRY_POINT(ServiceApplication, delegate, 1, ( s8** )&pCmdLine) }
+        s32 main( s32 argc, s8** argv ) { _DREEMCHEST_ENTRY_POINT(ServiceApplication, delegate, argc, argv, NULL) }   \
+        s32 WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) { _DREEMCHEST_ENTRY_POINT(ServiceApplication, delegate, 1, ( s8** )&pCmdLine, NULL) }
+#elif defined(DC_PLATFORM_ANDROID)
+    //! Declares an application entry point
+    #define dcDeclareApplication( delegate )            \
+        void android_main(struct android_app* state) { _DREEMCHEST_ENTRY_POINT(Application, delegate, 0, NULL, state) }
 #else
     //! Declares an application entry point
     #define dcDeclareApplication( delegate )            \
-        s32 main( s32 argc, s8** argv ) { _DREEMCHEST_ENTRY_POINT(Application, delegate, argc, argv) }
+        s32 main( s32 argc, s8** argv ) { _DREEMCHEST_ENTRY_POINT(Application, delegate, argc, argv, NULL) }
 
     //! Declares a service entry point
     #define dcDeclareServiceApplication( delegate )     \
-        s32 main( s32 argc, s8** argv ) { _DREEMCHEST_ENTRY_POINT(ServiceApplication, delegate, argc, argv) }
+        s32 main( s32 argc, s8** argv ) { _DREEMCHEST_ENTRY_POINT(ServiceApplication, delegate, argc, argv, NULL) }
 #endif  /*  #ifdef DC_PLATFORM_WINDOWS  */
 
 #endif /*   !defined( __DC_Platform_Application_H__ )   */

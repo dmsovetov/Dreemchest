@@ -34,7 +34,7 @@ DC_BEGIN_DREEMCHEST
 namespace Platform {
 
 // ** createApplication
-IApplication* createApplication( void )
+IApplication* createApplication( void* userData )
 {
     return DC_NEW MacOSApplication;
 }
