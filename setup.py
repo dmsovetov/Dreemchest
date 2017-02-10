@@ -344,18 +344,18 @@ def install_cmake(version):
     # Skip CMake installation if we already have a valid installation
     if DREEMCHEST_CMAKE_BIN in os.environ.keys():
         try:
-            cmake_path = os.environ[DREEMCHEST_CMAKE_BIN]
-            cmake_command = os.path.join(cmake_path, 'cmake --version')
+            cmake_bin = os.environ[DREEMCHEST_CMAKE_BIN]
+            cmake_command = os.path.join(cmake_bin, 'cmake --version')
 
-            if not os.path.exists(os.path.join(cmake_path, 'cmake')):
+            if not os.path.exists(os.path.join(cmake_bin, 'cmake')):
                 raise Exception('cmake executable does not exist')
 
             result = subprocess.check_output(cmake_command, shell=True)
             cmake_version = result.split("\n\n")[0].split(' ')[2]
 
             if cmake_version == version:
-                print 'Found existing CMake %s executable at %s' % (cmake_version, cmake_path)
-                return cmake_path
+                print 'Found existing CMake %s executable at %s' % (cmake_version, cmake_bin)
+                return os.environ[DREEMCHEST_CMAKE]
 
             print 'Found CMake %s, but %s was requested, downloading the required version...' % (cmake_version, version)
         except subprocess.CalledProcessError:
@@ -464,7 +464,7 @@ def install_emscripten(version):
 
     shutil.copyfile(source_toolchain, dest_toolchain)
 
-    return emscripten_home
+    return emscripten_path
 
 
 def main():
