@@ -38,6 +38,7 @@
 Build/~TestProject
 Build/Dependencies
 Build/Composer
+Build/Prebuilt
 Projects
 tools/cmake
 Build/LogFile.txt
