@@ -39,7 +39,7 @@ static String s_vertexShader =
     "attribute vec4 a_position;                         \n"
     "attribute vec3 a_normal;                           \n"
 
-    "varying vec3 v_color;                              \n"
+    "varying lowp vec3 v_color;                         \n"
 
     "void main()                                        \n"
     "{                                                  \n"
@@ -53,7 +53,7 @@ static String s_vertexShader =
 ;
 
 static String s_fragmentShader =
-    "varying vec3 v_color;                              \n"
+    "varying lowp vec3 v_color;                         \n"
 
     "void main()                                        \n"
     "{                                                  \n"

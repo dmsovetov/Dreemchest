@@ -73,7 +73,7 @@ static String s_vertexShader =
     "attribute vec4 a_position;                     \n"
     "attribute vec4 a_color;                        \n"
 
-    "varying vec4 v_color;                          \n"
+    "varying lowp vec4 v_color;                     \n"
 
     "void main()                                    \n"
     "{                                              \n"
@@ -86,7 +86,7 @@ static String s_vertexShader =
     ;
 
 static String s_fragmentShader =
-    "varying vec4 v_color;                          \n"
+    "varying lowp vec4 v_color;                     \n"
 
     "void main()                                    \n"
     "{                                              \n"
@@ -110,6 +110,7 @@ class RenderStateStack : public RenderingApplicationDelegate
 {
     StateBlock8 m_renderStates;
     ConstantBuffer_ m_instanceConstantBuffer;
+    ConstantBuffer_ m_viewConstantBuffer;
     
     virtual void handleLaunched(Application* application) NIMBLE_OVERRIDE
     {
@@ -135,16 +136,16 @@ class RenderStateStack : public RenderingApplicationDelegate
         // Create a view transform constant buffer
         {
             Transform transform;
-            transform.matrix = Matrix4::perspective(60.0f, m_window->aspectRatio(), 0.1f, 100.0f)
+            transform.matrix = Matrix4::perspective(60.0f, m_view->aspectRatio(), 0.1f, 100.0f)
                              * Matrix4::lookAt(Vec3(0.0f, 0.0f, -35.0f), Vec3(0.0f, 0.6f, 0.0f), Vec3::axisY())
                              ;
             
             // Create a uniform layout
-            UniformLayout   layout        = m_renderingContext->requestUniformLayout("View", Transform::Layout);
-            ConstantBuffer_ constantBuffer = m_renderingContext->requestConstantBuffer(&transform, sizeof(transform), layout);
+            UniformLayout layout = m_renderingContext->requestUniformLayout("View", Transform::Layout);
+            m_viewConstantBuffer = m_renderingContext->requestConstantBuffer(&transform, sizeof(transform), layout);
             
             // And bind it to a state block
-            m_renderStates.bindConstantBuffer(constantBuffer, 0);
+            m_renderStates.bindConstantBuffer(m_viewConstantBuffer, 0);
         }
         
         // Create a instance constant buffer
@@ -156,6 +157,16 @@ class RenderStateStack : public RenderingApplicationDelegate
         // Create and bind the default shader program
         Program program = m_renderingContext->requestProgram(s_vertexShader, s_fragmentShader);
         m_renderStates.bindProgram(program);
+    }
+    
+    virtual void handleOrientationChanged(Application* application, DeviceOrientation orientation) NIMBLE_OVERRIDE
+    {
+        Transform transform;
+        transform.matrix = Matrix4::perspective(60.0f, static_cast<f32>(m_view->height()) / static_cast<f32>(m_view->width()), 0.1f, 100.0f)
+                         * Matrix4::lookAt(Vec3(0.0f, 0.0f, -35.0f), Vec3(0.0f, 0.6f, 0.0f), Vec3::axisY())
+                         ;
+
+        m_renderingContext->updateConstantBuffer(m_viewConstantBuffer, &transform, sizeof(transform));
     }
  
     virtual void handleRenderFrame(f32 dt) NIMBLE_OVERRIDE
