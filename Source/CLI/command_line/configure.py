@@ -28,6 +28,7 @@ import os
 import sys
 import cmake
 import command_line
+import env
 
 
 class PlatformConfigurationCommand(cmake.Command):
@@ -36,13 +37,10 @@ class PlatformConfigurationCommand(cmake.Command):
     def __init__(self, platform, parser, generators, rendering_backend, toolchain=None):
         """Constructs a platform configuration command"""
 
-        # Load home directory from environment
-        if 'DREEMCHEST_HOME' not in os.environ.keys():
-            raise Exception('DREEMCHEST_HOME environment variable was not set')
+        # Load active environment
+        self._env = env.load()
 
-        prefix_path = os.path.join(os.environ['DREEMCHEST_HOME'], 'Build', 'Dependencies', platform)
-
-        cmake.Command.__init__(self, parser, generators, prefix_path=prefix_path)
+        cmake.Command.__init__(self, parser, generators, prefix_path=os.path.join(self.env.dependencies, platform))
 
         command_line.add_component(parser, 'pch', description='generate a build system that uses precompiled headers.', default=False)
         command_line.add_component(parser, 'composer', description='do not build the Composer tool.', default=False)
@@ -61,6 +59,11 @@ class PlatformConfigurationCommand(cmake.Command):
         self._toolchain = toolchain
 
         parser.set_defaults(function=self.configure)
+
+    @property
+    def env(self):
+        """Returns a loaded environment configuration"""
+        return self._env
 
     def configure(self, options):
         """Performs basic build system configuration"""
@@ -134,7 +137,10 @@ class WindowsConfigureCommand(DesktopConfigureCommand):
         cmake_parameters = self._prepare(options)
 
         # Invoke a CMake command to generate a build system
-        cmake.generate('Visual Studio 12', options.source, options.output, cmake_parameters)
+        install_path = os.path.join(self.env.prebuilt, 'Windows')
+        prefix_path = os.path.join(self.env.dependencies, 'Windows')
+        cm = cmake.CMake(self.env.cmake, prefix_path=prefix_path, install_prefix=install_path)
+        cm.configure('Visual Studio 12', options.source, options.output, cmake_parameters)
 
 
 class MacOSConfigureCommand(DesktopConfigureCommand):
@@ -152,7 +158,10 @@ class MacOSConfigureCommand(DesktopConfigureCommand):
         cmake_parameters = self._prepare(options)
 
         # Invoke a CMake command to generate a build system
-        cmake.generate('Xcode', options.source, options.output, cmake_parameters)
+        install_path = os.path.join(self.env.prebuilt, 'macOS')
+        prefix_path = os.path.join(self.env.dependencies, 'macOS')
+        cm = cmake.CMake(self.env.cmake, prefix_path=prefix_path, install_prefix=install_path)
+        cm.configure('Xcode', options.source, options.output, cmake_parameters)
 
 
 class IOSConfigureCommand(PlatformConfigurationCommand):
@@ -161,13 +170,11 @@ class IOSConfigureCommand(PlatformConfigurationCommand):
     def __init__(self, parser):
         """Constructs iOS configuration command"""
 
-        # Load home directory from environment
-        if 'DREEMCHEST_HOME' not in os.environ.keys():
-            raise Exception('DREEMCHEST_HOME environment variable was not set')
-
-        toolchain = os.path.join(os.environ['DREEMCHEST_HOME'], 'CMake', 'Toolchains', 'iOS.cmake')
-
-        PlatformConfigurationCommand.__init__(self, 'iOS', parser, ['Xcode'], ['opengl'], toolchain=toolchain)
+        PlatformConfigurationCommand.__init__(self,
+                                              'iOS',
+                                              parser,
+                                              ['Xcode'], ['opengl'],
+                                              toolchain=env.load().ios_toolchain)
 
         parser.add_argument('--identifier', help='a bundle identifier to be used.')
         parser.add_argument('--codesign', nargs='+', help='code sign identity name')
@@ -179,54 +186,61 @@ class IOSConfigureCommand(PlatformConfigurationCommand):
         cmake_parameters = self._prepare(options)
 
         # Invoke a CMake command to generate a build system
-        cmake.generate('Xcode', options.source, options.output, cmake_parameters)
+        install_path = os.path.join(self.env.prebuilt, 'iOS')
+        prefix_path = os.path.join(self.env.dependencies, 'iOS')
+        cm = cmake.CMake(self.env.cmake, prefix_path=prefix_path, install_prefix=install_path)
+        cm.configure('Xcode', options.source, options.output, cmake_parameters)
 
 
 class AndroidConfigureCommand(PlatformConfigurationCommand):
     def __init__(self, parser):
         """Constructs Android configuration command"""
 
-        # Load home directory from environment
-        if 'DREEMCHEST_HOME' not in os.environ.keys():
-            raise Exception('DREEMCHEST_HOME environment variable was not set')
-
-        toolchain = os.path.join(os.environ['DREEMCHEST_HOME'], 'CMake', 'Toolchains', 'Android.cmake')
-
-        PlatformConfigurationCommand.__init__(self, 'Android', parser, ['Unix Makefiles'], ['opengl'], toolchain=toolchain)
-
-        parser.add_argument('--api', help='Android API level')
+        PlatformConfigurationCommand.__init__(self,
+                                              'Android',
+                                              parser,
+                                              ['Unix Makefiles'],
+                                              ['opengl'],
+                                              toolchain=env.load().android_toolchain)
 
     def configure(self, options):
         """Performs iOS build system configuration"""
 
         # Perform basic build configuration
         cmake_parameters = self._prepare(options)
+        cmake_parameters['ANDROID_NATIVE_API_LEVEL'] = 'android-24'
+        cmake_parameters['ANDROID_NDK'] = self.env.android_ndk
 
         # Invoke a CMake command to generate a build system
-        cmake.generate('Unix Makefiles', options.source, options.output, cmake_parameters)
+        install_path = os.path.join(self.env.prebuilt, 'Android')
+        prefix_path = os.path.join(self.env.dependencies, 'Android')
+        cm = cmake.CMake(self.env.cmake, prefix_path=prefix_path, install_prefix=install_path)
+        cm.configure('Unix Makefiles', options.source, options.output, cmake_parameters)
 
 
 class EmscriptenConfigureCommand(PlatformConfigurationCommand):
     def __init__(self, parser):
         """Constructs Emscripten configuration command"""
 
-        # Load home directory from environment
-        #if 'EMSCRIPTEN' not in os.environ.keys():
-        #    raise Exception('EMSCRIPTEN environment variable was not set')
-
-        #toolchain = os.path.join(os.environ['EMSCRIPTEN'], 'cmake', 'Modules', 'Platform', 'Emscripten.cmake')
-        toolchain = '~'
-
-        PlatformConfigurationCommand.__init__(self, 'Emscripten', parser, ['Unix Makefiles'], ['opengl'], toolchain=toolchain)
+        PlatformConfigurationCommand.__init__(self,
+                                              'Emscripten',
+                                              parser,
+                                              ['Unix Makefiles'],
+                                              ['opengl'],
+                                              toolchain=env.load().emscripten_toolchain)
 
     def configure(self, options):
         """Performs iOS build system configuration"""
 
         # Perform basic build configuration
         cmake_parameters = self._prepare(options)
+        cmake_parameters['EMSCRIPTEN_ROOT_PATH'] = self.env.emscripten
 
         # Invoke a CMake command to generate a build system
-        cmake.generate('Unix Makefiles', options.source, options.output, cmake_parameters)
+        install_path = os.path.join(self.env.prebuilt, 'Emscripten')
+        prefix_path = os.path.join(self.env.dependencies, 'Emscripten')
+        cm = cmake.CMake(self.env.cmake, prefix_path=prefix_path, install_prefix=install_path)
+        cm.configure('Unix Makefiles', options.source, options.output, cmake_parameters)
 
 
 class Command(command_line.Tool):
