@@ -30,7 +30,6 @@ import cmake
 import git
 import yaml
 import env
-import tempfile
 
 
 class BootstrapCommand(cmake.Command):
@@ -179,7 +178,7 @@ class BootstrapCommand(cmake.Command):
         self._options = options
 
         # First build all required external libraries
-        #self.build_externals(options)
+        self.build_externals(options)
 
         # Now generate and build engine projects
         for platform in self.target_platforms:
