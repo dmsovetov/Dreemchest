@@ -494,6 +494,12 @@ ConstantBuffer_ RenderingContext::requestConstantBuffer(const void* data, s32 si
     return m_resourceCommandBuffer->createConstantBuffer(id, data, size, layout);
 }
     
+// ** RenderingContext::updateConstantBuffer
+void RenderingContext::updateConstantBuffer(ConstantBuffer_ id, const void* data, s32 size)
+{
+    m_resourceCommandBuffer->uploadConstantBuffer(id, data, size);
+}
+    
 // ** RenderingContext::requestConstantBuffer
 ConstantBuffer_ RenderingContext::requestConstantBuffer(const void* data, s32 size, const String& name, const UniformElement* elements)
 {

@@ -130,6 +130,9 @@ namespace Renderer
         //! Queues a program instance creation and returns it's index.
         Program                                 requestProgram(const String& vertex);
         
+        //! Queues a constant buffer data update.
+        void                                    updateConstantBuffer(ConstantBuffer_ id, const void* data, s32 size);
+        
         //! Returns a texture info by it's identifier.
         const TextureInfo&                      textureInfo(Texture_ id) const;
         
