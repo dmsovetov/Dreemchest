@@ -40,6 +40,6 @@ Build/Dependencies
 Build/Composer
 Build/Prebuilt
 Projects
-tools/cmake
+Tools
 Build/LogFile.txt
 Build/Examples/LogFile.txt
