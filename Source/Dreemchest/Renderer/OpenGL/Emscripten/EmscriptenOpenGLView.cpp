@@ -74,6 +74,18 @@ bool EmscriptenOpenGLView::makeCurrent( void )
 {
     return false;
 }
+    
+// ** EmscriptenOpenGLView::width
+s32 EmscriptenOpenGLView::width() const
+{
+    return 0;
+}
+
+// ** EmscriptenOpenGLView::height
+s32 EmscriptenOpenGLView::height() const
+{
+    return 0;
+}
 
 } // namespace Renderer
 

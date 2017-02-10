@@ -75,6 +75,18 @@ bool AndroidOpenGLView::makeCurrent( void )
     return false;
 }
 
+// ** AndroidOpenGLView::width
+s32 AndroidOpenGLView::width() const
+{
+    return 0;
+}
+
+// ** AndroidOpenGLView::height
+s32 AndroidOpenGLView::height() const
+{
+    return 0;
+}
+
 } // namespace Renderer
 
 DC_END_DREEMCHEST

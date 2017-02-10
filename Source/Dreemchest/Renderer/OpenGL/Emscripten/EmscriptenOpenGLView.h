@@ -42,6 +42,8 @@ namespace Renderer
         virtual             ~EmscriptenOpenGLView( void );
 
         // ** IView
+        virtual s32         width() const NIMBLE_OVERRIDE;
+        virtual s32         height() const NIMBLE_OVERRIDE;
         virtual bool        makeCurrent() NIMBLE_OVERRIDE;
         virtual bool        beginFrame() NIMBLE_OVERRIDE;
         virtual void        endFrame(bool wait) NIMBLE_OVERRIDE;
