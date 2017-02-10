@@ -13,8 +13,6 @@ find_package(PNG)
 find_package(JsonCpp)
 find_package(GTest)
 find_package(Box2D)
-find_package(Ogg)
-find_package(Vorbis)
 
 # Glob all source files
 add_directories(Base BASE_SRCS)
@@ -73,15 +71,18 @@ endif ()
 if (DC_SOUND_ENABLED)
     add_files(Sound SOUND_SRCS)
     add_files(Sound/Drivers SOUND_DRIVERS_SRCS)
-    
-    if (OPENAL_FOUND)
-        add_files(Sound/Drivers/OpenAL SOUND_OPENAL_SRCS)
-    endif ()
 
     if (DC_PLATFORM MATCHES "Emscripten")
         # do nothing here
     else ()
         find_package(OpenAL)
+    endif ()
+
+    find_package(Ogg)
+    find_package(Vorbis)
+
+    if (OPENAL_FOUND)
+        add_files(Sound/Drivers/OpenAL SOUND_OPENAL_SRCS)
     endif ()
 
     set(SOUND_DECODERS_SRCS
