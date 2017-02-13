@@ -39,7 +39,9 @@ DREEMCHEST_CMAKE = 'DREEMCHEST_CMAKE'
 DREEMCHEST_CMAKE_BIN = 'DREEMCHEST_CMAKE_BIN'
 DREEMCHEST_ANDROID = 'DREEMCHEST_ANDROID'
 DREEMCHEST_EMSCRIPTEN = 'DREEMCHEST_EMSCRIPTEN'
-ANDROID = 'ANDROID_HOME'
+ANDROID_HOME = 'ANDROID_HOME'
+ANDROID_SDK_HOME = 'ANDROID_SDK_HOME'
+ANDROID_SDK_ROOT = 'ANDROID_SDK_ROOT'
 EMSCRIPTEN = 'EMSCRIPTEN'
 
 EnvironmentPaths = namedtuple('EnvironmentPaths', ['home', 'cmake', 'android', 'emscripten'])
@@ -373,9 +375,17 @@ def install_android(version, api_levels, architectures):
         print 'Android SDK installation found at %s' % os.environ[DREEMCHEST_ANDROID]
         return os.environ[DREEMCHEST_ANDROID]
 
-    if ANDROID in os.environ.keys():
-        print 'Android SDK installation found at %s' % os.environ[ANDROID]
-        return os.environ[ANDROID]
+    if ANDROID_HOME in os.environ.keys():
+        print 'Android SDK installation found at %s' % os.environ[ANDROID_HOME]
+        return os.environ[ANDROID_HOME]
+
+    if ANDROID_SDK_HOME in os.environ.keys():
+        print 'Android SDK installation found at %s' % os.environ[ANDROID_SDK_HOME]
+        return os.environ[ANDROID_SDK_HOME]
+
+    if ANDROID_SDK_ROOT in os.environ.keys():
+        print 'Android SDK installation found at %s' % os.environ[ANDROID_SDK_ROOT]
+        return os.environ[ANDROID_SDK_ROOT]
 
     # Download an Android SDK
     platform = {'windows': 'windows', 'linux': 'linux', 'mac': 'macosx'}[platform_name()]
