@@ -165,7 +165,7 @@ namespace Reflection {
         template<typename TCollection> 
         Variant GenericListIterator<TCollection>::value( void ) const
         {
-            DC_ABORT_IF( !isValid(), "invalid iterator" );
+            NIMBLE_ABORT_IF( !isValid(), "invalid iterator" );
             Variant v;
             *m_iterator >> v;
             return v;
@@ -195,7 +195,7 @@ namespace Reflection {
         template<typename TCollection> 
         void GenericListIterator<TCollection>::remove( void )
         {
-            DC_ABORT_IF( !isValid(), "invalid iterator" );
+            NIMBLE_ABORT_IF( !isValid(), "invalid iterator" );
             m_iterator = m_collection.erase( m_iterator );
         }
 
@@ -215,7 +215,7 @@ namespace Reflection {
         template<typename TCollection> 
         void GenericListIterator<TCollection>::insertBefore( const Variant& value )
         {
-            DC_ABORT_IF( !isValid(), "invalid iterator" );
+            NIMBLE_ABORT_IF( !isValid(), "invalid iterator" );
             typename TCollection::value_type v;
             v << value;
 
@@ -289,7 +289,7 @@ namespace Reflection {
         template<typename TCollection> 
         Variant GenericMapIterator<TCollection>::value( void ) const
         {
-            DC_ABORT_IF( !isValid(), "invalid iterator" );
+            NIMBLE_ABORT_IF( !isValid(), "invalid iterator" );
             Variant v;
             m_iterator->second >> v;
             return v;
@@ -319,7 +319,7 @@ namespace Reflection {
         template<typename TCollection> 
         void GenericMapIterator<TCollection>::remove( void )
         {
-            DC_ABORT_IF( !isValid(), "invalid iterator" );
+            NIMBLE_ABORT_IF( !isValid(), "invalid iterator" );
             m_iterator = m_collection.erase( m_iterator );
         }
 
@@ -327,7 +327,7 @@ namespace Reflection {
         template<typename TCollection> 
         Variant GenericMapIterator<TCollection>::key( void ) const
         {
-            DC_ABORT_IF( !isValid(), "invalid iterator" );
+            NIMBLE_ABORT_IF( !isValid(), "invalid iterator" );
             Variant v;
             m_iterator->first >> v;
             return v;
@@ -397,7 +397,8 @@ namespace Reflection {
                 , IsMap      = IsKeyValueType<TCollection>::value && !IsSet<TCollection>::value
             };
 
-            return NIMBLE_TERNARY( !IsIterable, NullIteratorFactory<TCollection>, NIMBLE_TERNARY( IsMap, MapIteratorFactory<TCollection>, ListIteratorFactory<TCollection> ) )::create( collection );
+            return TypeSelector< !IsIterable, NullIteratorFactory<TCollection>, NullIteratorFactory<TCollection> >::type::create(collection);
+        //    return NIMBLE_TERNARY( !IsIterable, NullIteratorFactory<TCollection>, NIMBLE_TERNARY( IsMap, MapIteratorFactory<TCollection>, ListIteratorFactory<TCollection> ) )::create( collection );
         }
     
     } // namespace Private

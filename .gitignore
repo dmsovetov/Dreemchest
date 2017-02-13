@@ -2,7 +2,7 @@
 *.slo
 *.lo
 *.o
-*.obj
+#*.obj
 
 # Precompiled Headers
 *.gch
@@ -29,15 +29,17 @@
 
 #
 *.ogg
-dependency
-projects
-src/modules
-src/dreemchest/externals/src
-src/examples/assets
-externals/src
 *.suo
 *.pyc
 .idea
 
-~TestProject
-Build/*.dll
+*.DS_Store
+
+Build/~TestProject
+Build/Dependencies
+Build/Composer
+Build/Prebuilt
+Projects
+Tools
+Build/LogFile.txt
+Build/Examples/LogFile.txt

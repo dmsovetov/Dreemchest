@@ -24,12 +24,30 @@
 
  **************************************************************************/
 
+#include "Asset.h"
 #include "AssetSource.h"
 #include "AssetHandle.h"
+
+#include <Io/DiskFileSystem.h>
+#include <Io/Streams/Stream.h>
 
 DC_BEGIN_DREEMCHEST
 
 namespace Assets {
+
+// ---------------------------------------------- NullSource ---------------------------------------------- //
+
+// ** NullSource::construct
+bool NullSource::construct( Assets& assets, Handle asset )
+{
+    return true;
+}
+
+// ** NullSource::lastModified
+u32 NullSource::lastModified( void ) const
+{
+    return 0;
+}
 
 // ------------------------------------------ AbstractFileSource ------------------------------------------ //
 

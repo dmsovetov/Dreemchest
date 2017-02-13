@@ -33,97 +33,97 @@ DC_BEGIN_COMPOSER
 
 namespace Ui {
 
-	//! Asset selector widget.
-	class AssetSelector : public QWidget {
+    //! Asset selector widget.
+    class AssetSelector : public QWidget {
 
-		Q_OBJECT
-		Q_PROPERTY( Assets::Handle value READ value WRITE setValue NOTIFY valueChanged USER true )
+        Q_OBJECT
+        Q_PROPERTY( Assets::Handle value READ value WRITE setValue NOTIFY valueChanged USER true )
 
-	Q_SIGNALS:
+    Q_SIGNALS:
 
-		//! Emitted when the selected asset was changed.
-		void				valueChanged( void );
+        //! Emitted when the selected asset was changed.
+        void                valueChanged( void );
 
-	public:
+    public:
 
-							//! Constructs AssetSelector widget.
-							AssetSelector( u32 mask = ~0, QWidget* parent = NULL );
+                            //! Constructs AssetSelector widget.
+                            AssetSelector( u32 mask = ~0, QWidget* parent = NULL );
 
-		//! Returns the selected asset.
-		Assets::Handle      value( void ) const;
+        //! Returns the selected asset.
+        Assets::Handle      value( void ) const;
 
-		//! Sets the selected asset.
-		void				setValue( const Assets::Handle& value );
+        //! Sets the selected asset.
+        void                setValue( const Assets::Handle& value );
 
-	private:
+    private:
 
-		//! Event filter to handle drop events.
-		virtual bool		eventFilter( QObject* target, QEvent* e ) Q_DECL_OVERRIDE;
+        //! Event filter to handle drop events.
+        virtual bool        eventFilter( QObject* target, QEvent* e ) Q_DECL_OVERRIDE;
 
-	private:
+    private:
 
-		QLineEdit*			m_line;		//!< Asset selector line edit.
-		QToolButton*		m_button;	//!< Asset selector button.
-		u32					m_mask;		//!< Accepted asset types.
-		Assets::Handle      m_asset;	//!< The selected asset.
-	};
+        QLineEdit*            m_line;        //!< Asset selector line edit.
+        QToolButton*        m_button;    //!< Asset selector button.
+        u32                    m_mask;        //!< Accepted asset types.
+        Assets::Handle      m_asset;    //!< The selected asset.
+    };
 
-	//! Subclass of a QTreeView to extend the context menu & key press behaviour.
-	class AssetTree : public QTreeView {
+    //! Subclass of a QTreeView to extend the context menu & key press behaviour.
+    class AssetTree : public QTreeView {
 
-		Q_OBJECT
+        Q_OBJECT
 
-	public:
+    public:
 
-									//! Constructs asset tree bound to a specified path.
-									AssetTree( ProjectQPtr project, QWidget* parent );
+                                    //! Constructs asset tree bound to a specified path.
+                                    AssetTree( ProjectQPtr project, QWidget* parent );
 
-		//! Returns the selected items.
-		FileInfoArray				selection( void ) const;
+        //! Returns the selected items.
+        FileInfoArray                selection( void ) const;
 
-		//! Expands the selected items.
-		void						expandSelectedItems( void );
+        //! Expands the selected items.
+        void                        expandSelectedItems( void );
 
-		//! Sets asset tree model.
-		void						setModel( AssetFileSystemModelQPtr value );
+        //! Sets asset tree model.
+        void                        setModel( AssetFileSystemModelQPtr value );
 
         //! Returns asset model.
         AssetFileSystemModelQPtr    model( void ) const;
 
-	protected:
+    protected:
 
-		//! Handles the deletion and renaming items.
-		virtual void				keyPressEvent( QKeyEvent* e ) Q_DECL_OVERRIDE;
+        //! Handles the deletion and renaming items.
+        virtual void                keyPressEvent( QKeyEvent* e ) Q_DECL_OVERRIDE;
 
-		//! Handles the context menu requests.
-		virtual void				contextMenuEvent( QContextMenuEvent* e ) Q_DECL_OVERRIDE;
+        //! Handles the context menu requests.
+        virtual void                contextMenuEvent( QContextMenuEvent* e ) Q_DECL_OVERRIDE;
 
-		//! Resets the selection changed flag.
-		virtual void				mousePressEvent( QMouseEvent* e ) Q_DECL_OVERRIDE;
+        //! Resets the selection changed flag.
+        virtual void                mousePressEvent( QMouseEvent* e ) Q_DECL_OVERRIDE;
 
-		//! Handles the asset selection.
-		virtual void				mouseReleaseEvent( QMouseEvent* e ) Q_DECL_OVERRIDE;
+        //! Handles the asset selection.
+        virtual void                mouseReleaseEvent( QMouseEvent* e ) Q_DECL_OVERRIDE;
 
-		//! Binds the selected asset to an object inspector.
-		void						bindToInspector( const QModelIndexList& selection );
+        //! Binds the selected asset to an object inspector.
+        void                        bindToInspector( const QModelIndexList& selection );
 
-	private slots:
+    private slots:
 
-		//! Handles the doubleClicked signal.
-		void						itemDoubleClicked( const QModelIndex& index );
+        //! Handles the doubleClicked signal.
+        void                        itemDoubleClicked( const QModelIndex& index );
 
-		//! Handles the selectionChanged signal of QItemSelectionModel.
-		void						selectionChanged( const QItemSelection& selected, const QItemSelection& deselected );
+        //! Handles the selectionChanged signal of QItemSelectionModel.
+        void                        selectionChanged( const QItemSelection& selected, const QItemSelection& deselected );
 
-	private:
+    private:
 
-		ProjectQPtr		            m_project;			//!< Parent project instance.
-		FilteredAssetsModelQPtr	    m_proxy;			//!< Filtered assets model to be used.
-		bool						m_selectionChanged;	//!< This flag indicates that selection was changed.
-	};
+        ProjectQPtr                    m_project;            //!< Parent project instance.
+        FilteredAssetsModelQPtr        m_proxy;            //!< Filtered assets model to be used.
+        bool                        m_selectionChanged;    //!< This flag indicates that selection was changed.
+    };
 
 } // namespace Ui
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_AssetTree_H__	*/
+#endif    /*    !__DC_Composer_AssetTree_H__    */

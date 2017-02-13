@@ -39,27 +39,27 @@ namespace Scene {
 // ** ImageFormatRaw::constructFromStream
 bool ImageFormatRaw::constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, Image& asset )
 {
-	u16 width, height;
-	u8  channels;
+    u16 width, height;
+    u8  channels;
 
-	// Read image info
-	stream->read( &width, 2 );
-	stream->read( &height, 2 );
-	stream->read( &channels, 1 );
+    // Read image info
+    stream->read( &width, 2 );
+    stream->read( &height, 2 );
+    stream->read( &channels, 1 );
 
-	// Read image pixels
-	ByteArray pixels;
-	pixels.resize( width * height * channels );
-	stream->read( &pixels[0], pixels.size() );
+    // Read image pixels
+    ByteArray pixels;
+    pixels.resize( width * height * channels );
+    stream->read( &pixels[0], pixels.size() );
 
-	// Setup image asset
-	asset.setWidth( width );
-	asset.setHeight( height );
-	asset.setBytesPerPixel( channels );
-	asset.setMipLevelCount( 1 );
-	asset.setMipLevel( 0, pixels );
+    // Setup image asset
+    asset.setWidth( width );
+    asset.setHeight( height );
+    asset.setBytesPerPixel( channels );
+    asset.setMipLevelCount( 1 );
+    asset.setMipLevel( 0, pixels );
 
-	return true;
+    return true;
 }
 
 // ------------------------------------------ MeshFormatRaw ------------------------------------------ //
@@ -67,55 +67,62 @@ bool ImageFormatRaw::constructFromStream( Io::StreamPtr stream, Assets::Assets& 
 // ** MeshFormatRaw::constructFromStream
 bool MeshFormatRaw::constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, Mesh& asset )
 {
-	// Read the total number of mesh chunks
-	u32 chunkCount;
-	stream->read( &chunkCount, 4 );
+    // Read the total number of mesh chunks
+    u32 chunkCount;
+    stream->read( &chunkCount, 4 );
 
-	// Set the total number of mesh chunks
-	asset.setChunkCount( chunkCount );
+    // Set the total number of mesh chunks
+    asset.setChunkCount( chunkCount );
+    NIMBLE_BREAK_IF( chunkCount != 1 );
 
-	for( u32 i = 0; i < chunkCount; i++ ) {
-		// Read chunk texture name
-		String texture;
-		stream->readString( texture );
+    Mesh::VertexBuffer vertices;
+    Mesh::IndexBuffer indices;
 
-		// Read the total number of vertices & indices
-		u32 vertexCount, indexCount;
-		stream->read( &vertexCount, 4 );
-		stream->read( &indexCount, 4 );
+    for( u32 i = 0; i < chunkCount; i++ ) {
+        // Read chunk texture name
+        String texture;
+        stream->readString( texture );
 
-		// Read vertex buffer
-		Mesh::VertexBuffer vertices;
-		vertices.resize( vertexCount );
+        // Read the total number of vertices & indices
+        u32 vertexCount, indexCount;
+        stream->read( &vertexCount, 4 );
+        stream->read( &indexCount, 4 );
 
-		for( u32 j = 0; j < vertexCount; j++ ) {
-			Mesh::Vertex* v = &vertices[j];
+        // Read vertex buffer
+        vertices.resize( vertices.size() + vertexCount );
 
-			stream->read( &v->position.x, sizeof( v->position ) );
-			stream->read( &v->normal.x, sizeof( v->normal ) );
-			stream->read( &v->uv[0].x, sizeof( v->uv[0] ) );
-			stream->read( &v->uv[1].x, sizeof( v->uv[1] ) );
-		}
+        for( u32 j = vertices.size() - vertexCount; j < vertexCount; j++ ) {
+            Mesh::Vertex* v = &vertices[j];
 
-		// Set chunk vertex buffer.
-		asset.setVertexBuffer( i, vertices );
+            stream->read( &v->position.x, sizeof( v->position ) );
+            stream->read( &v->normal.x, sizeof( v->normal ) );
+            stream->read( &v->uv[0].x, sizeof( v->uv[0] ) );
+            stream->read( &v->uv[1].x, sizeof( v->uv[1] ) );
+        }
 
-		// Read index buffer
-		Mesh::IndexBuffer indices;
-		indices.resize( indexCount );
-		stream->read( &indices[0], indices.size() * sizeof( u16 ) );
+        // Read index buffer
+        indices.resize( indices.size() + indexCount );
 
-		// Set chunk index buffer
-		asset.setIndexBuffer( i, indices );
+        for( u32 j = indices.size() - indexCount; j < indexCount; j++ ) {
+            u16 idx;
+            stream->read( &idx, sizeof(u16) );
+            indices[j] = idx;
+        }
 
-		// Set chunk texture
-		asset.setTexture( i, texture );
-	}
+        // Set chunk texture
+        asset.setTexture( i, texture );
+    }
 
-	// Update node bounds
-	asset.updateBounds();
+    // Set mesh vertex buffer.
+    asset.setVertexBuffer( vertices );
 
-	return true;
+    // Set mesh index buffer
+    asset.setIndexBuffer( indices );
+
+    // Update node bounds
+    asset.updateBounds();
+
+    return true;
 }
 
 // --------------------------------------- MaterialSourceKeyValue --------------------------------------- //
@@ -123,49 +130,49 @@ bool MeshFormatRaw::constructFromStream( Io::StreamPtr stream, Assets::Assets& a
 // ** MaterialSourceKeyValue::constructFromStream
 bool MaterialSourceKeyValue::constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, Material& asset )
 {
-#ifdef HAVE_JSON
-	String json;
-	json.resize( stream->length() );
+#ifdef JSONCPP_FOUND
+    String json;
+    json.resize( stream->length() );
 
-	if( json.empty() ) {
-		return true;
-	}
+    if( json.empty() ) {
+        return true;
+    }
 
-	stream->read( &json[0], stream->length() );
+    stream->read( &json[0], stream->length() );
 
-	Json::Reader reader;
-	Json::Value root;
+    Json::Reader reader;
+    Json::Value root;
 
-	if( !reader.parse( json, root ) ) {
-		return false;
-	}
+    if( !reader.parse( json, root ) ) {
+        return false;
+    }
 
-	String      shader		   = root["shader"].asString();
-	Json::Value diffuseColor   = root["colors"]["tint"] != Json::nullValue ? root["colors"]["tint"] : root["colors"]["diffuse"];
-	Json::Value diffuseTexture = root["textures"]["diffuse"];
-	Json::Value parameters = root["parameters"];
+    String      shader           = root["shader"].asString();
+    Json::Value diffuseColor   = root["colors"]["tint"] != Json::nullValue ? root["colors"]["tint"] : root["colors"]["diffuse"];
+    Json::Value diffuseTexture = root["textures"]["diffuse"];
+    Json::Value parameters = root["parameters"];
 
-	if( shader.find( "cutout" ) != String::npos ) {
-		asset.setRenderingMode( RenderCutout );
-	}
-	else if( shader.find( "transparent" ) != String::npos ) {
-		asset.setRenderingMode( RenderTranslucent );
-	}
-	else if( shader.find( "additive" ) != String::npos ) {
-		asset.setRenderingMode( RenderAdditive );
-	}
-	else {
-		asset.setRenderingMode( RenderOpaque );
-	}
-	
-	asset.setModel( Material::Phong );
-	asset.setColor( Material::Diffuse, Rgba( diffuseColor[0].asFloat(), diffuseColor[1].asFloat(), diffuseColor[2].asFloat(), diffuseColor[3].asFloat() ) );
-	asset.setTexture( Material::Diffuse, assets.find<Image>( diffuseTexture["asset"].asString() ) );
+    if( shader.find( "cutout" ) != String::npos ) {
+        asset.setRenderingMode( RenderingMode::Cutout );
+    }
+    else if( shader.find( "transparent" ) != String::npos ) {
+        asset.setRenderingMode( RenderingMode::Translucent );
+    }
+    else if( shader.find( "additive" ) != String::npos ) {
+        asset.setRenderingMode( RenderingMode::Additive );
+    }
+    else {
+        asset.setRenderingMode( RenderingMode::Opaque );
+    }
+    
+    asset.setLightingModel( LightingModel::Phong );
+    asset.setColor( Material::Diffuse, Rgba( diffuseColor[0].asFloat(), diffuseColor[1].asFloat(), diffuseColor[2].asFloat(), diffuseColor[3].asFloat() ) );
+    asset.setTexture( Material::Diffuse, assets.find<Image>( diffuseTexture["asset"].asString() ) );
 
-	return true;
+    return true;
 #else
-	return false;
-#endif	/*	HAVE_JSON	*/
+    return false;
+#endif    /*    #ifdef JSONCPP_FOUND    */
 }
 
 } // namespace Scene

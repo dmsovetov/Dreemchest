@@ -27,7 +27,16 @@
 #ifndef DEPRECATED_H
 #define DEPRECATED_H
 
-#define DEV_DEPRECATED_SCENE_SERIALIZATION  (1)
+#define DEV_DEPRECATED_SCENE_RENDERER           (0)
+#define DEV_DEPRECATED_SCENE_SERIALIZATION      (1)
+#define DEV_RENDERER_SOFTWARE_CBUFFERS          (1)
+#define DEV_RENDERER_SKIP_DRAW_CALLS            (0)
+#define DEV_CSM_BOUNDING_SPHERES                (1)
+#define DEV_RENDERER_UNIFORM_CACHING            (1)
+#define DEV_RENDERER_PROGRAM_CACHING            (1)
+#define DEV_RENDERER_INPUT_LAYOUT_CACHING       (1)
+#define DEV_RENDERER_STATE_CACHING              (1)
+#define DEV_RENDERER_DEPRECATED_INPUT_LAYOUTS   (0)
 
 DC_BEGIN_DREEMCHEST
 
@@ -35,11 +44,11 @@ DC_BEGIN_DREEMCHEST
     using StrongPtr = Ptr<T>;
 
     template<typename T>
-	class Hash : public std::map<String64, T> {};
+    class Hash : public std::map<String64, T> {};
 
     typedef Kv<String>      KeyValue;
     typedef Array<KeyValue> KeyValueArray;
-	typedef Variant			Archive;
+    typedef Variant            Archive;
 
 typedef Array<Archive> Archives;
 
@@ -48,42 +57,6 @@ DC_END_DREEMCHEST
 #include "Base/Preprocessor.h"
 #include "Base/Classes.h"
 
-#define DC_NOT_IMPLEMENTED                  \
-            LogInternal( "assert", "feature is not implemented" ); \
-            NIMBLE_BREAK;
-
-#define DC_BREAK_IF( expression, ... )      \
-            if( expression ) {              \
-    	        LogInternal( "unexpected", (__VA_ARGS__ " (" NIMBLE_STRINGIFY( expression ) ")") ); \
-			    NIMBLE_BREAK  ;             \
-            }
-
-#ifdef NIMBLE_DEBUG
-	#define DC_ABORT_IF( expression, ... )	\
-                if( expression ) {           \
-				    LogFatal( "assert", (__VA_ARGS__ " (" NIMBLE_STRINGIFY( expression ) ")") ); \
-				    NIMBLE_BREAK;           \
-                }
-#else
-	#define DC_ABORT_IF( expression, ... )	\
-                if( expression ) {           \
-				    LogFatal( "assert", (__VA_ARGS__ " (" NIMBLE_STRINGIFY( expression ) ")") ); \
-				    NIMBLE_ABORT( -1 );     \
-                }
-#endif  /*  NIMBLE_DEBUG    */
-
-#if NIMBLE_NO_DEBUG
-    #undef DC_BREAK_IF
-    #define DC_BREAK_IF( ... )
-    #undef DC_ABORT_IF
-    #define DC_ABORT_IF( ... )
-    #undef DC_NOT_IMPLEMENTED
-    #define DC_NOT_IMPLEMENTED
-#endif  /*  #if NIMBLE_NO_DEBUG  */
-
-#define DC_DEPRECATED       NIMBLE_DEPRECATED
-#define DC_DECL_OVERRIDE    NIMBLE_OVERRIDE
-#define DC_NEW              new
-#define DC_BREAK            NIMBLE_BREAK;
+#define DC_NEW new
 
 #endif  /*  !DEPRECATED_H   */

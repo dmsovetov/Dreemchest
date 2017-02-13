@@ -24,6 +24,7 @@
 
  **************************************************************************/
 
+#include "Asset.h"
 #include "AssetHandle.h"
 #include "Assets.h"
 
@@ -38,13 +39,15 @@ Handle::Handle( void ) : m_assets( NULL )
 }
 
 // ** Handle::Handle
-Handle::Handle( Assets* assets, Index index ) : m_assets( NULL ), m_index( 0 )
+Handle::Handle( AssetsWPtr assets, Index index )
+    : m_index( 0 )
 {
     setHandle( assets, index );
 }
 
 // ** Handle::Handle
-Handle::Handle( const Handle& other ) : m_assets( NULL ), m_index( 0 )
+Handle::Handle( const Handle& other )
+    : m_index( 0 )
 {
     setHandle( other.assets(), other.index() );
 }
@@ -83,7 +86,7 @@ Asset* Handle::operator -> ( void )
 }
 
 // ** Handle::setHandle
-void Handle::setHandle( Assets* assets, Index index )
+void Handle::setHandle( AssetsWPtr assets, Index index )
 {
     m_assets = assets;
     m_index  = index;
@@ -91,50 +94,6 @@ void Handle::setHandle( Assets* assets, Index index )
 #ifdef DC_DEBUG
     m_asset = isValid() ? &asset() : NULL;
 #endif  /*  DC_DEBUG    */
-}
-
-// ** Handle::asset
-const Asset& Handle::asset( void ) const
-{
-    DC_BREAK_IF( !isValid() );
-    return m_assets->assetAtIndex( index() );
-}
-
-// ** Handle::asset
-Asset& Handle::asset( void )
-{
-    DC_BREAK_IF( !isValid() );
-    return const_cast<Asset&>( m_assets->assetAtIndex( index() ) );
-}
-
-// ** Handle::isValid
-bool Handle::isValid( void ) const
-{
-    return m_assets && m_assets->isIndexValid( index() );
-}
-
-// ** Handle::isLoaded
-bool Handle::isLoaded( void ) const
-{
-    return isValid() && (operator->())->state() == Asset::Loaded;
-}
-
-// ** Handle::index
-Index Handle::index( void ) const
-{
-    return m_index;
-}
-
-// ** Handle::assets
-Assets* Handle::assets( void ) const
-{
-    return m_assets;
-}
-
-// ** Handle::forceLoad
-bool Handle::forceLoad( void )
-{
-    return assets()->loadAssetToCache( *this );
 }
 
 } // namespace Assets

@@ -33,14 +33,14 @@ DC_BEGIN_COMPOSER
 
 namespace Ui {
 
-	//! Enumeration combo box.
-	template<typename TModel>
-	class EnumerationComboBox : public QComboBox {
-	public:
+    //! Enumeration combo box.
+    template<typename TModel>
+    class EnumerationComboBox : public QComboBox {
+    public:
 
-						//! Constructs EnumerationComboBox instance
-						EnumerationComboBox( QWidget* parent = NULL );
-	};
+                        //! Constructs EnumerationComboBox instance
+                        EnumerationComboBox( QWidget* parent = NULL );
+    };
 
     // ** EnumerationComboBox::EnumerationComboBox
     template<typename TModel>
@@ -53,4 +53,4 @@ namespace Ui {
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_ComboBox_H__	*/
+#endif    /*    !__DC_Composer_ComboBox_H__    */

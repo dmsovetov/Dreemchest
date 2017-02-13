@@ -62,7 +62,7 @@ WindowsWindow::~WindowsWindow( void )
 // ** WindowsWindow::close
 void WindowsWindow::close( void )
 {
-	DC_BREAK_IF( m_window == NULL, "invalid handle" );
+	NIMBLE_BREAK_IF( m_window == NULL, "invalid handle" );
 
 	// ** Destroy window
 	if( !DestroyWindow( m_window ) ) {
@@ -76,7 +76,7 @@ void WindowsWindow::close( void )
 
 	// ** Remove window from registry
 	s32 removed = s_windows.erase( m_window );
-	DC_BREAK_IF( removed != 1, "failed to remove window from a shared list" );
+	NIMBLE_BREAK_IF( removed != 1, "failed to remove window from a shared list" );
 
 	m_window				= NULL;
 	m_applicationInstance	= NULL;
@@ -218,18 +218,20 @@ LRESULT WindowsWindow::windowProc( HWND hWnd, UINT message, WPARAM wParam, LPARA
 	case WM_KEYUP:			window->owner()->notifyKeyUp( translateKey( ( u32 )wParam ) );
 							break;
 
-	case WM_LBUTTONDOWN:	window->owner()->notifyMouseDown( LOWORD( lParam ), HIWORD( lParam ) );
+    case WM_LBUTTONDOWN:	window->owner()->notifyMouseDown( Window::LeftMouseButton, LOWORD( lParam ), HIWORD( lParam ) );
 							break;
 
-	case WM_LBUTTONUP:		window->owner()->notifyMouseUp( LOWORD( lParam ), HIWORD( lParam ) );
+	case WM_LBUTTONUP:		window->owner()->notifyMouseUp(Window::LeftMouseButton,  LOWORD( lParam ), HIWORD( lParam ) );
 							break;
 
-	case WM_MOUSEMOVE:		window->owner()->notifyMouseMove( LOWORD( lParam ), HIWORD( lParam ), LOWORD( lParam ), HIWORD( lParam ) );
+	case WM_MOUSEMOVE:		window->owner()->notifyMouseMove( Window::LeftMouseButton, LOWORD( lParam ), HIWORD( lParam ), LOWORD( lParam ), HIWORD( lParam ) );
 							break;
 
-	case WM_RBUTTONDOWN:	break;
+	case WM_RBUTTONDOWN:	window->owner()->notifyMouseDown( Window::RightMouseButton, LOWORD( lParam ), HIWORD( lParam ) );
+							break;
 
-	case WM_RBUTTONUP:		break;
+	case WM_RBUTTONUP:		window->owner()->notifyMouseDown( Window::RightMouseButton, LOWORD( lParam ), HIWORD( lParam ) );
+							break;
 
 	case WM_CHAR:			break;
 

@@ -27,12 +27,12 @@
 #ifndef __DC_Renderer_MacOSOpenGLView_H__
 #define __DC_Renderer_MacOSOpenGLView_H__
 
-#include "../OpenGLHal.h"
+#include "../OpenGL2.h"
 #include "CocoaOpenGLView.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace renderer {
+namespace Renderer {
 
     // ** class MacOSOpenGLView
     class MacOSOpenGLView : public OpenGLView {
@@ -41,19 +41,21 @@ namespace renderer {
         virtual             ~MacOSOpenGLView( void );
 
         // ** IView
-        virtual bool        makeCurrent( void );
-        virtual bool        beginFrame( void );
-        virtual void        endFrame( void );
+        virtual s32         width() const NIMBLE_OVERRIDE;
+        virtual s32         height() const NIMBLE_OVERRIDE;
+        virtual bool        makeCurrent( void ) NIMBLE_OVERRIDE;
+        virtual bool        beginFrame( void ) NIMBLE_OVERRIDE;
+        virtual void        endFrame(bool wait) NIMBLE_OVERRIDE;
 
         // ** MacOSOpenGLView
-        bool                initialize( NSWindow* window, PixelFormat depthStencil, id delegate );
+        bool                initialize( NSWindow* window, u32 options, id delegate );
 
     private:
 
         CocoaOpenGLView*    m_view;
     };
 
-} // namespace renderer
+} // namespace Renderer
 
 DC_END_DREEMCHEST
 

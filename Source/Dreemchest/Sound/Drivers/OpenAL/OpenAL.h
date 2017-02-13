@@ -29,8 +29,13 @@
 
 #include "../SoundEngine.h"
 
-#include <AL/al.h>
-#include <AL/alc.h>
+#if defined(DC_PLATFORM_MACOS) || defined(DC_PLATFORM_IOS)
+    #include <al.h>
+    #include <alc.h>
+#else
+    #include <AL/al.h>
+    #include <AL/alc.h>
+#endif  //  #ifdef DC_PLATFORM_MACOS
 
 DC_BEGIN_DREEMCHEST
 
@@ -48,8 +53,8 @@ namespace Sound {
         virtual SoundSourcePtr  createSource( void );
         virtual SoundBufferPtr  createBuffer( SoundDecoderPtr decoder, u32 chunks );
         virtual void            setPosition( const Vec3& value );
-		virtual void			setVolume( f32 value );
-		virtual void			setPitch( f32 value );
+        virtual void            setVolume( f32 value );
+        virtual void            setPitch( f32 value );
         virtual void            setDistanceModel( DistanceModel value );
 
         // ** OpenAL

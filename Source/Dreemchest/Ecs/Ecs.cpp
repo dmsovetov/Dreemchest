@@ -30,6 +30,7 @@
 
 #include "Entity/Entity.h"
 #include "Entity/Index.h"
+#include "Entity/DataCache.h"
 #include "System/SystemGroup.h"
 
 #include <time.h>
@@ -48,48 +49,48 @@ Ecs::Ecs( const EntityIdGeneratorPtr& entityIdGenerator ) : m_entityId( entityId
 // ** Ecs::create
 EcsPtr Ecs::create( const EntityIdGeneratorPtr& entityIdGenerator )
 {
-	DC_BREAK_IF( !entityIdGenerator.valid(), "invalid entity id generator" );
-	return DC_NEW Ecs( entityIdGenerator );
+    NIMBLE_BREAK_IF( !entityIdGenerator.valid(), "invalid entity id generator" );
+    return DC_NEW Ecs( entityIdGenerator );
 }
 
 // ** Ecs::setEntityIdGenerator
 void Ecs::setEntityIdGenerator( const EntityIdGeneratorPtr& value )
 {
-	m_entityId = value;
+    m_entityId = value;
 }
 
 // ** Ecs::generateId
 EntityId Ecs::generateId( void ) const
 {
-	EntityId id;
+    EntityId id;
 
-	do {
-		id = m_entityId->generate();
-	} while( isUsedId( id ) );
+    do {
+        id = m_entityId->generate();
+    } while( isUsedId( id ) );
 
-	return id;
+    return id;
 }
 
 // ** Ecs::addEntity
 void Ecs::addEntity( EntityPtr entity )
 {
-	DC_BREAK_IF( !entity.valid(), "invalid entity" );
+    NIMBLE_BREAK_IF( !entity.valid(), "invalid entity" );
 
-	const EntityId& id = entity->id();
+    const EntityId& id = entity->id();
     if( id.isNull() ) {
-        LogWarning( "entity", "adding entity with an invalid id\n" );
+        LogWarning( "entity", "%s", "adding entity with an invalid id\n" );
     }
 
-	DC_BREAK_IF( isUsedId( id ), "entity id is already used" );
+    NIMBLE_BREAK_IF( isUsedId( id ), "entity id is already used" );
 
-	// Setup entity
-	entity->setEcs( this );
+    // Setup entity
+    entity->setEcs( this );
 
-	// Register the entity
-	m_entities[id] = entity;
+    // Register the entity
+    m_entities[id] = entity;
 
-	// Queue entity for notification.
-	m_changed.insert( entity );
+    // Queue entity for notification.
+    m_changed.insert( entity );
 }
 
 // ** Ecs::addEntities
@@ -98,7 +99,7 @@ s32 Ecs::addEntities( const EntityArray& entities )
     s32 addedCount = 0;
 
     for( s32 i = 0, n = static_cast<s32>( entities.size() ); i < n; i++ ) {
-        DC_BREAK_IF( !entities[i].valid(), "invalid entity" );
+        NIMBLE_BREAK_IF( !entities[i].valid(), "invalid entity" );
 
         // Don't add the same entity twice
         if( isUsedId( entities[i]->id() ) ) {
@@ -115,18 +116,18 @@ s32 Ecs::addEntities( const EntityArray& entities )
 // ** Ecs::createEntity
 EntityPtr Ecs::createEntity( const EntityId& id )
 {
-	EntityPtr entity( DC_NEW Entity );
-	entity->setId( id );
-	//addEntity( entity );
+    EntityPtr entity( DC_NEW Entity );
+    entity->setId( id );
+    //addEntity( entity );
 
-	return entity;
+    return entity;
 }
 
 // ** Ecs::createEntity
 EntityPtr Ecs::createEntity( void )
 {
-	EntityId id = generateId();
-	return createEntity( id );
+    EntityId id = generateId();
+    return createEntity( id );
 }
 
 // ** Ecs::copyEntity
@@ -167,173 +168,183 @@ EntityPtr Ecs::cloneEntity( EntityWPtr entity )
 // ** Ecs::findEntity
 EntityPtr Ecs::findEntity( const EntityId& id ) const
 {
-	Entities::const_iterator i = m_entities.find( id );
-	return i != m_entities.end() ? i->second : EntityPtr();
+    Entities::const_iterator i = m_entities.find( id );
+    return i != m_entities.end() ? i->second : EntityPtr();
 }
 
 // ** Ecs::findByAspect
 EntitySet Ecs::findByAspect( const Aspect& aspect ) const
 {
-	EntitySet result;
+    EntitySet result;
 
-	for( Entities::const_iterator i = m_entities.begin(), end = m_entities.end(); i != end; ++i ) {
-		if( aspect.hasIntersection( i->second ) ) {
-			result.insert( i->second );
-		}
-	}
+    for( Entities::const_iterator i = m_entities.begin(), end = m_entities.end(); i != end; ++i ) {
+        if( aspect.hasIntersection( i->second ) ) {
+            result.insert( i->second );
+        }
+    }
 
-	return result;
+    return result;
 }
 
 // ** Ecs::removeEntity
 void Ecs::removeEntity( const EntityId& id )
 {
-	DC_BREAK_IF( !isUsedId( id ), "entity does not exist" );
+    NIMBLE_BREAK_IF( !isUsedId( id ), "entity does not exist" );
 
-	Entities::iterator i = m_entities.find( id );
+    Entities::iterator i = m_entities.find( id );
 
-	if( i == m_entities.end() ) {
-		return;
-	}
+    if( i == m_entities.end() ) {
+        return;
+    }
 
-	i->second->markAsRemoved();
+    i->second->markAsRemoved();
 
-	m_changed.insert( i->second );
-	m_removed.insert( i->second );
+    m_changed.insert( i->second );
+    m_removed.insert( i->second );
 }
 
 // ** Ecs::isUsedId
 bool Ecs::isUsedId( const EntityId& id ) const
 {
-	return m_entities.find( id ) != m_entities.end();
+    return m_entities.find( id ) != m_entities.end();
 }
 
 // ** Ecs::requestIndex
 IndexPtr Ecs::requestIndex( const String& name, const Aspect& aspect )
 {
     // Find index by an aspect
-	Indices::iterator i = m_indices.find( aspect );
+    Indices::iterator i = m_indices.find( aspect );
 
     // Found - just return it
-	if( i != m_indices.end() ) {
-		return i->second;
-	}
+    if( i != m_indices.end() ) {
+        return i->second;
+    }
 
     // Create a new index instance
-	IndexPtr index( DC_NEW Index( this, name, aspect ) );
-	m_indices[aspect] = index;
+    IndexPtr index( DC_NEW Index( this, name, aspect ) );
+    m_indices[aspect] = index;
 
     // Add this index to a changed set
     m_changedIndices.insert( index );
 
-	return index;
+    return index;
 }
 
 // ** Ecs::createGroup
 SystemGroupPtr Ecs::createGroup( const String& name, u32 mask )
 {
-	SystemGroupPtr group( DC_NEW SystemGroup( this, name, mask ) );
-	m_systems.push_back( group );
-	return group;
+    SystemGroupPtr group( DC_NEW SystemGroup( this, name, mask ) );
+    m_systems.push_back( group );
+    return group;
 }
 
 // ** Ecs::notifyEntityChanged
 void Ecs::notifyEntityChanged( const EntityId& id )
 {
-	if( !isUsedId( id ) ) {
-		LogDebug( "entity", "changed with invalid id %s\n", id.toString().c_str() );
-		return;
-	}
+    if( !isUsedId( id ) ) {
+        LogDebug( "entity", "changed with invalid id %s\n", id.toString().c_str() );
+        return;
+    }
 
-	Entities::iterator i = m_entities.find( id );
+    Entities::iterator i = m_entities.find( id );
 
-	if( i != m_entities.end() ) {
-		m_changed.insert( i->second );
-	}
+    if( i != m_entities.end() ) {
+        m_changed.insert( i->second );
+    }
 }
 
 // **  Ecs::rebuildIndex
 void Ecs::rebuildIndex( IndexWPtr index )
 {
     // Process all entities
-	for( Entities::iterator i = m_entities.begin(), end = m_entities.end(); i != end; ++i ) {
-	    index->notifyEntityChanged( i->second );
-	}
+    for( Entities::iterator i = m_entities.begin(), end = m_entities.end(); i != end; ++i ) {
+        index->notifyEntityChanged( i->second );
+    }
 }
 
 // ** Ecs::rebuildIndices
 void Ecs::rebuildIndices( void )
 {
-	// Rebuild each index
-	for( Indices::iterator i = m_indices.begin(), end = m_indices.end(); i != end; i++ ) {
-		rebuildIndex( i->second );
-	}
+    // Rebuild each index
+    for( Indices::iterator i = m_indices.begin(), end = m_indices.end(); i != end; i++ ) {
+        rebuildIndex( i->second );
+    }
 }
 
 // ** Ecs::rebuildChangedEntities
 void Ecs::rebuildChangedEntities( void )
 {
-	while( m_changed.size() ) {
-		EntitySet changed = m_changed;
-		m_changed.clear();
+    while( m_changed.size() ) {
+        EntitySet changed = m_changed;
+        m_changed.clear();
 
-		for( EntitySet::iterator i = changed.begin(), end = changed.end(); i != end; ++i ) {
-			for( Indices::iterator j = m_indices.begin(), jend = m_indices.end(); j != jend; j++ ) {
-				j->second->notifyEntityChanged( *i );
-			}
-		}
-	}
+        for( EntitySet::iterator i = changed.begin(), end = changed.end(); i != end; ++i ) {
+            for( Indices::iterator j = m_indices.begin(), jend = m_indices.end(); j != jend; j++ ) {
+                j->second->notifyEntityChanged( *i );
+            }
+        }
+    }
 }
 
 // ** Ecs::cleanupRemovedEntities
 void Ecs::cleanupRemovedEntities( void )
 {
-	while( m_removed.size() ) {
-		EntitySet removed = m_removed;
-		m_removed.clear();
+    while( m_removed.size() ) {
+        EntitySet removed = m_removed;
+        m_removed.clear();
 
-		for( EntitySet::iterator i = removed.begin(), end = removed.end(); i != end; ++i ) {
-			m_entities.erase( (*i)->id() );
-		}
-	}
+        for( EntitySet::iterator i = removed.begin(), end = removed.end(); i != end; ++i ) {
+            m_entities.erase( (*i)->id() );
+        }
+    }
 }
 
 // ** Ecs::update
 void Ecs::update( u32 currentTime, f32 dt, u32 systems )
 {
-	// Process all changed entities.
+    // Process all changed entities.
     rebuildChangedEntities();
 
-	// Remove all queued entities.
+    // Remove all queued entities.
     cleanupRemovedEntities();
+
+    // Populate all data caches
+    while( m_dataCaches.size() ) {
+        DataCacheList dataCaches = m_dataCaches;
+        m_dataCaches.clear();
+
+        for( DataCacheList::iterator i = dataCaches.begin(), end = dataCaches.end(); i != end; ++i ) {
+            (*i)->populate();
+        }
+    }
 
     // Rebuild all changed indices.
     while( m_changedIndices.size() ) {
         IndexSet changed = m_changedIndices;
         m_changedIndices.clear();
 
-		for( IndexSet::iterator i = changed.begin(), end = changed.end(); i != end; ++i ) {
-			rebuildIndex( *i );
-		}
+        for( IndexSet::iterator i = changed.begin(), end = changed.end(); i != end; ++i ) {
+            rebuildIndex( *i );
+        }
     }
 
-	// Update all system groups.
-	for( u32 i = 0, n = ( u32 )m_systems.size(); i < n; i++ ) {
-		SystemGroupPtr& group = m_systems[i];
+    // Update all system groups.
+    for( u32 i = 0, n = ( u32 )m_systems.size(); i < n; i++ ) {
+        SystemGroupPtr& group = m_systems[i];
 
-		if( group->mask() & systems ) {
-			group->update( currentTime, dt );
-		}
-	}
+        if( group->mask() & systems ) {
+            group->update( currentTime, dt );
+        }
+    }
 }
 
 // ** EntityIdGenerator::EntityIdGenerator
 EntityIdGenerator::EntityIdGenerator( void )
 {
 #if DC_ECS_INTEGER_IDS
-	m_nextId = 1;
+    m_nextId = 1;
 #else
-	srand( static_cast<u32>( time( NULL ) ) );
+    srand( static_cast<u32>( time( NULL ) ) );
 #endif
 }
 
@@ -341,9 +352,9 @@ EntityIdGenerator::EntityIdGenerator( void )
 EntityId EntityIdGenerator::generate( void )
 {
 #if DC_ECS_INTEGER_IDS
-	return m_nextId++;
+    return m_nextId++;
 #else
-	return Guid::generate();
+    return Guid::generate();
 #endif
 }
 

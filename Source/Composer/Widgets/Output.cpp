@@ -46,6 +46,8 @@ Output::Output( QWidget* parent )
 // ** Output::Writer::write
 void Output::Writer::write( Logger::Level level, const String& text ) const
 {
+    Logger::DebugWriter::write( level, text );
+
     QString line = QString::fromStdString( text );
 
     if( line.endsWith( "\n" ) ) {

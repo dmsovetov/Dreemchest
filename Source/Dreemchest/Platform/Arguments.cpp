@@ -33,55 +33,55 @@ namespace Platform {
 // ** Arguments::Arguments
 Arguments::Arguments( s8** argv, u32 argc )
 {
-	for( u32 i = 1; i < argc; i++ ) {
-		CString arg   = argv[i];
-		CString value = i + 1 < argc ? argv[i + 1] : "";
-		u32		len   = strlen( arg );
+    for( u32 i = 1; i < argc; i++ ) {
+        CString arg   = argv[i];
+        CString value = i + 1 < argc ? argv[i + 1] : "";
+        u32        len   = strlen( arg );
 
-		if( len <= 2 ) {
-			continue;
-		}
+        if( len <= 2 ) {
+            continue;
+        }
 
-		if( arg[0] == '-' && arg[1] == '-' ) {
-			m_values[arg + 2] = value;
-		}
-	}
+        if( arg[0] == '-' && arg[1] == '-' ) {
+            m_values[arg + 2] = value;
+        }
+    }
 }
 
 // ** Arguments::integer
 s32 Arguments::integer( const String& name, s32 defaultValue ) const
 {
-	if( !has( name ) ) {
-		return defaultValue;
-	}
+    if( !has( name ) ) {
+        return defaultValue;
+    }
 
-	return atoi( m_values.find( name )->second.c_str() );
+    return atoi( m_values.find( name )->second.c_str() );
 }
 
 // ** Arguments::number
 f32 Arguments::number( const String& name, f32 defaultValue ) const
 {
-	if( !has( name ) ) {
-		return defaultValue;
-	}
+    if( !has( name ) ) {
+        return defaultValue;
+    }
 
-	return static_cast<f32>( atof( m_values.find( name )->second.c_str() ) );
+    return static_cast<f32>( atof( m_values.find( name )->second.c_str() ) );
 }
 
 // ** Arguments::string
 const String& Arguments::string( const String& name, const String& defaultValue ) const
 {
-	if( !has( name ) ) {
-		return defaultValue;
-	}
+    if( !has( name ) ) {
+        return defaultValue;
+    }
 
-	return m_values.find( name )->second;
+    return m_values.find( name )->second;
 }
 
 // ** Arguments::has
 bool Arguments::has( const String& name ) const
 {
-	return m_values.find( name ) != m_values.end();
+    return m_values.find( name ) != m_values.end();
 }
 
 } // namespace Platform

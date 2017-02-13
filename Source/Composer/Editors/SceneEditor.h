@@ -33,109 +33,109 @@ DC_BEGIN_COMPOSER
 
 namespace Editors {
 
-	//! Scene editor.
-	class SceneEditor : public VisualEditor {
+    //! Scene editor.
+    class SceneEditor : public VisualEditor {
 
         Q_OBJECT
 
-	public:
+    public:
 
                                         //! Constructs SceneEditor instance.
                                         SceneEditor( void );
 
-	protected:
+    protected:
 
-		//! Scene editing tool types.
-		enum ActiveTool {
-			  NoTool		        //!< All tools are disabled.
-			, ToolTranslate	        //!< Translation tool is now active.
-			, ToolRotate		    //!< Rotation tool is now active.
-			, ToolScale		        //!< Scaling tool is now active.
+        //! Scene editing tool types.
+        enum ActiveTool {
+              NoTool                //!< All tools are disabled.
+            , ToolTranslate            //!< Translation tool is now active.
+            , ToolRotate            //!< Rotation tool is now active.
+            , ToolScale                //!< Scaling tool is now active.
             , ToolRaiseTerrain      //!< Terrain raising tool is now active.
             , ToolLowerTerrain      //!< Terrain lowering tool is now active.
             , ToolFlattenTerrain    //!< Terrain flattening tool is now active.
             , ToolLevelTerrain      //!< Terrain leveling tool is now active.
             , ToolSmoothTerrain     //!< Terrain smoothing tool is now active.
-		};
+        };
 
 
-		//! Performs the scene editor initialization.
-		virtual bool					initialize( ProjectQPtr project, const FileInfo& asset, Ui::DocumentQPtr document ) DC_DECL_OVERRIDE;
+        //! Performs the scene editor initialization.
+        virtual bool                    initialize( ProjectQPtr project, const FileInfo& asset, Ui::DocumentQPtr document ) Q_DECL_OVERRIDE;
 
-		//! Renders the scene.
-		virtual void					render( f32 dt ) DC_DECL_OVERRIDE;
+        //! Renders the scene.
+        virtual void                    render( f32 dt ) Q_DECL_OVERRIDE;
 
         //! Saves the scene to file.
-        virtual void                    save( void ) DC_DECL_OVERRIDE;
+        virtual void                    save( void ) Q_DECL_OVERRIDE;
 
-		//! Handles the mouse press event.
-		virtual void					handleMousePress( s32 x, s32 y, const Ui::MouseButtons& button ) DC_DECL_OVERRIDE;
+        //! Handles the mouse press event.
+        virtual void                    handleMousePress( s32 x, s32 y, const Ui::MouseButtons& button ) Q_DECL_OVERRIDE;
 
-		//! Handles the mouse release event.
-		virtual void					handleMouseRelease( s32 x, s32 y, const Ui::MouseButtons& button ) DC_DECL_OVERRIDE;
+        //! Handles the mouse release event.
+        virtual void                    handleMouseRelease( s32 x, s32 y, const Ui::MouseButtons& button ) Q_DECL_OVERRIDE;
 
-		//! Handles the mouse move event.
-		virtual void					handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, const Ui::MouseButtons& buttons ) DC_DECL_OVERRIDE;
+        //! Handles the mouse move event.
+        virtual void                    handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, const Ui::MouseButtons& buttons ) Q_DECL_OVERRIDE;
 
-		//! Handles the mouse wheel event.
-		virtual void					handleMouseWheel( s32 delta ) DC_DECL_OVERRIDE;
+        //! Handles the mouse wheel event.
+        virtual void                    handleMouseWheel( s32 delta ) Q_DECL_OVERRIDE;
 
-		//! Handles the drag enter event.
-		virtual bool					handleDragEnter( MimeDataQPtr mime ) DC_DECL_OVERRIDE;
+        //! Handles the drag enter event.
+        virtual bool                    handleDragEnter( MimeDataQPtr mime ) Q_DECL_OVERRIDE;
 
-		//! Handles the drag move event.
-		virtual void					handleDragMove( MimeDataQPtr mime, s32 x, s32 y ) DC_DECL_OVERRIDE;
+        //! Handles the drag move event.
+        virtual void                    handleDragMove( MimeDataQPtr mime, s32 x, s32 y ) Q_DECL_OVERRIDE;
 
-		//! Handles the drop event.
-		virtual void					handleDrop( MimeDataQPtr mime, s32 x, s32 y ) DC_DECL_OVERRIDE;
+        //! Handles the drop event.
+        virtual void                    handleDrop( MimeDataQPtr mime, s32 x, s32 y ) Q_DECL_OVERRIDE;
 
-		//! Scene editor has entered the foreground.
-		virtual void					notifyEnterForeground( Ui::MainWindowQPtr window ) DC_DECL_OVERRIDE;
+        //! Scene editor has entered the foreground.
+        virtual void                    notifyEnterForeground( Ui::MainWindowQPtr window ) Q_DECL_OVERRIDE;
 
-		//! Scene editor has entered the background.
-		virtual void					notifyEnterBackground( Ui::MainWindowQPtr window ) DC_DECL_OVERRIDE;
+        //! Scene editor has entered the background.
+        virtual void                    notifyEnterBackground( Ui::MainWindowQPtr window ) Q_DECL_OVERRIDE;
 
-		//! Disables all transform tools.
-		void							menuTransformSelect( Ui::ActionQPtr action );
+        //! Disables all transform tools.
+        void                            menuTransformSelect( Ui::ActionQPtr action );
 
-		//! Activates translation transform tool.
-		void							menuTransformTranslate( Ui::ActionQPtr action );
+        //! Activates translation transform tool.
+        void                            menuTransformTranslate( Ui::ActionQPtr action );
 
-		//! Activates rotation transform tool.
-		void							menuTransformRotate( Ui::ActionQPtr action );
+        //! Activates rotation transform tool.
+        void                            menuTransformRotate( Ui::ActionQPtr action );
 
-		//! Activates scaling transform tool.
-		void							menuTransformScale( Ui::ActionQPtr action );
+        //! Activates scaling transform tool.
+        void                            menuTransformScale( Ui::ActionQPtr action );
 
-		//! Activates terrain raising tool.
-		void							menuTerrainRaise( Ui::ActionQPtr action );
+        //! Activates terrain raising tool.
+        void                            menuTerrainRaise( Ui::ActionQPtr action );
 
-		//! Activates terrain lowering tool.
-		void							menuTerrainLower( Ui::ActionQPtr action );
+        //! Activates terrain lowering tool.
+        void                            menuTerrainLower( Ui::ActionQPtr action );
 
-		//! Activates terrain flattening tool.
-		void							menuTerrainFlatten( Ui::ActionQPtr action );
+        //! Activates terrain flattening tool.
+        void                            menuTerrainFlatten( Ui::ActionQPtr action );
 
-		//! Activates terrain leveling tool.
-		void							menuTerrainLevel( Ui::ActionQPtr action );
+        //! Activates terrain leveling tool.
+        void                            menuTerrainLevel( Ui::ActionQPtr action );
 
-		//! Activates terrain smoothing tool.
-		void							menuTerrainSmooth( Ui::ActionQPtr action );
+        //! Activates terrain smoothing tool.
+        void                            menuTerrainSmooth( Ui::ActionQPtr action );
 
-		//! Returns the nearest scene object underneath the mouse cursor.
-		Scene::SceneObjectWPtr			findSceneObjectAtPoint( s32 x, s32 y ) const;
+        //! Returns the nearest scene object underneath the mouse cursor.
+        Scene::SceneObjectWPtr            findSceneObjectAtPoint( s32 x, s32 y ) const;
 
-		//! Highlights the scene object.
-		void							highlightSceneObject( Scene::SceneObjectWPtr sceneObject );
+        //! Highlights the scene object.
+        void                            highlightSceneObject( Scene::SceneObjectWPtr sceneObject );
 
-		//! Selects the scene object.
-		void							selectSceneObject( Scene::SceneObjectWPtr sceneObject );
+        //! Selects the scene object.
+        void                            selectSceneObject( Scene::SceneObjectWPtr sceneObject );
 
-		//! Sets active transform tool.
-		void							setTool( ActiveTool tool );
+        //! Sets active transform tool.
+        void                            setTool( ActiveTool tool );
 
-		//! Binds transformation tool gizmo to a scene object.
-		void							bindTransformGizmo( Scene::SceneObjectWPtr sceneObject, ActiveTool tool ) const;
+        //! Binds transformation tool gizmo to a scene object.
+        void                            bindTransformGizmo( Scene::SceneObjectWPtr sceneObject, ActiveTool tool ) const;
 
         //! Loads scene from a file.
         Scene::ScenePtr                 loadFromFile( const QString& fileName ) const;
@@ -143,51 +143,30 @@ namespace Editors {
     private Q_SLOTS:
 
         //! Handles the scene object double click in scene hierarchy widget.
-		void							navigateToObject( Scene::SceneObjectWPtr sceneObject );
+        void                            navigateToObject( Scene::SceneObjectWPtr sceneObject );
 
 
-	private:
+    private:
 
-		Scene::ScenePtr					m_scene;					//!< Actual scene.
-		AutoPtr<SceneModel>				m_sceneModel;				//!< Scene model used by user interface.
-		Scene::RenderingContextPtr		m_renderingContext;			//!< Scene rendering context.
-		Scene::SpectatorCameraPtr		m_camera;					//!< Main editor camera.
-		Scene::Vec3BindingPtr			m_cursorMovement;			//!< Cursor to Vec3 binding.
+        Scene::ScenePtr                    m_scene;                    //!< Actual scene.
+        UPtr<SceneModel>                m_sceneModel;                //!< Scene model used by user interface.
+        Scene::RenderingContextPtr        m_renderingContext;            //!< Scene rendering context.
+        Scene::RenderCachePtr           m_renderCache;              //!< Render asset cache.
+        Scene::RenderScenePtr           m_renderScene;              //!< Rendering scene instance.
+        Scene::RvmPtr                   m_rvm;                      //!< Rendering virtual machine that executes generated instructions.
+        Scene::SceneObjectPtr            m_camera;                    //!< Main editor camera.
+        Scene::Vec3BindingPtr            m_cursorMovement;            //!< Cursor to Vec3 binding.
 
-		Ui::ToolBarQPtr					m_tools;					//!< Scene editor toolbar.
-		ActiveTool				        m_activeTool;		        //!< Active editing tool.
+        Ui::ToolBarQPtr                    m_tools;                    //!< Scene editor toolbar.
+        ActiveTool                        m_activeTool;                //!< Active editing tool.
         Scene::SceneObjectPtr           m_terrainTool;              //!< Terrain tool scene object.
 
-		Scene::SceneObjectWPtr			m_activeSceneObject;		//!< The scene object underneath the mouse cursor is stored here.
-		Scene::SceneObjectWPtr			m_selectedSceneObject;		//!< The selected scene object.
-	};
-
-	//! FrameTarget is used for rendering the scene to rendering frame.
-	class FrameTarget : public Scene::RenderTarget {
-	public:
-
-		//! Returns the frame width.
-		virtual u32						width( void ) const { return m_frame->width(); }
-
-		//! Returns the frame height.
-		virtual u32						height( void ) const { return m_frame->height(); }
-
-		//! Creates the WindowView instance.
-		static Scene::RenderTargetPtr	create( const Ui::RenderingFrameQPtr& frame ) { return new FrameTarget( frame ); }
-
-	private:
-
-										//! Constructs the WindowTarget instance.
-										FrameTarget( const Ui::RenderingFrameQPtr& frame )
-											: m_frame( frame ) {}
-
-	private:
-
-		Ui::RenderingFrameQPtr			m_frame;	//!< The output frame.
-	};
+        Scene::SceneObjectWPtr            m_activeSceneObject;        //!< The scene object underneath the mouse cursor is stored here.
+        Scene::SceneObjectWPtr            m_selectedSceneObject;        //!< The selected scene object.
+    };
 
 } // namespace Editors
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_SceneEditor_H__	*/
+#endif    /*    !__DC_Composer_SceneEditor_H__    */

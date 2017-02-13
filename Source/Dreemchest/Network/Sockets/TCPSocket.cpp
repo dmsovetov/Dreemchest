@@ -32,7 +32,7 @@ namespace Network {
 
 // ** TCPSocket::TCPSocket
 TCPSocket::TCPSocket( SocketDescriptor& descriptor, const Address& address )
-	: Socket( descriptor ), m_address( address )
+    : Socket( descriptor ), m_address( address )
 {
     if( m_descriptor.isValid() ) {
         return;
@@ -47,72 +47,73 @@ TCPSocket::TCPSocket( SocketDescriptor& descriptor, const Address& address )
     }
 
     m_descriptor = result;
-	m_descriptor.enableAddressReuse();
+    m_descriptor.enableAddressReuse();
 }
 
 TCPSocket::~TCPSocket( void )
 {
-	close();
+    close();
 }
 
 // ** TCPSocket::connectTo
 TCPSocketPtr TCPSocket::connectTo( const Address& address, u16 port )
 {
-	TCPSocketPtr socket( DC_NEW TCPSocket );
+    TCPSocketPtr socket( DC_NEW TCPSocket );
 
-	if( !socket->connect( address, port ) ) {
-		return TCPSocketPtr();
-	}
+    if( !socket->connect( address, port ) ) {
+        return TCPSocketPtr();
+    }
 
-	return socket;
+    return socket;
 }
 
 // ** TCPSocket::address
 const Address& TCPSocket::address( void ) const
 {
-	return m_address;
+    return m_address;
 }
 
 // ** TCPSocket::connect
 bool TCPSocket::connect( const Address& address, u16 port )
 {
-    DC_ABORT_IF( !m_descriptor.isValid(), "the socket should be valid" );
+    NIMBLE_ABORT_IF( !m_descriptor.isValid(), "the socket should be valid" );
 
     m_address = address;
 
-	sockaddr_in addr = Network::toSockaddr( address, port );
+    sockaddr_in addr = Network::toSockaddr( address, port );
 
-	// Connect to a remote host
-	SocketResult result = ::connect( m_descriptor, ( const sockaddr* )&addr, sizeof( addr ) );
+    // Connect to a remote host
+    SocketResult result = ::connect( m_descriptor, ( const sockaddr* )&addr, sizeof( addr ) );
 
-	if( result.isError() ) {
+    if( result.isError() ) {
         LogError( "socket", "connect failed %d, %s\n", result.errorCode(), result.errorMessage().c_str() );
-		return false;
-	}
+        return false;
+    }
 
-	// Set non blocking mode
-	m_descriptor.setNonBlocking();
+    // Set non blocking mode
+    m_descriptor.setNonBlocking();
 
-	// Set no delay
-	m_descriptor.setNoDelay();
+    // Set no delay
+    m_descriptor.setNoDelay();
 
-	return true;
+    return true;
 }
 
 // ** TCPSocket::close
 void TCPSocket::close( void )
 {
-	if( m_descriptor.isValid() ) {
+    if( m_descriptor.isValid() ) {
         notify<Closed>( this );
-	}
-	
-	Socket::close();
+    }
+    
+    Socket::close();
 }
 
 // ** TCPSocket::send
-u32 TCPSocket::send( const void* buffer, u32 size )
+u32 TCPSocket::send( const void* buffer, s32 size )
 {
-    DC_ABORT_IF( !m_descriptor.isValid(), "invalid socket descriptor" );
+    NIMBLE_ABORT_IF( !m_descriptor.isValid(), "invalid socket descriptor" );
+    NIMBLE_BREAK_IF( size <= 0, "size should be a positive number" );
 
     // This socket was queued for removal - close now
     if( m_shouldClose ) {
@@ -140,7 +141,7 @@ u32 TCPSocket::send( const void* buffer, u32 size )
         }
 
         // Something went wrong - write a log message and close socket
-		LogError( "socket", "send failed %d, %s\n", result.errorCode(), result.errorMessage().c_str() );
+        LogError( "socket", "send failed %d, %s\n", result.errorCode(), result.errorMessage().c_str() );
         close();
 
         return 0;
@@ -152,7 +153,7 @@ u32 TCPSocket::send( const void* buffer, u32 size )
 // ** TCPSocket::recv
 void TCPSocket::recv( void )
 {
-    DC_ABORT_IF( !m_descriptor.isValid(), "invalid socket descriptor" );
+    NIMBLE_ABORT_IF( !m_descriptor.isValid(), "invalid socket descriptor" );
 
     // This socket was queued for removal - close now
     if( m_shouldClose ) {
@@ -161,19 +162,19 @@ void TCPSocket::recv( void )
     }
 
     // Rewind to the end of a buffer
-	m_data->setPosition( 0, Io::SeekEnd );
+    m_data->setPosition( 0, Io::SeekEnd );
 
     // Start receiving bytes from TCP stream
-	while( true ) {
+    while( true ) {
         // Read the data from a socket
         s8           chunk[1];
         SocketResult result = ::recv( m_descriptor, chunk, sizeof( chunk ), 0 );
 
         // Peer has performed an orderly shutdown
-		if( result == 0 ) {
-			close();
+        if( result == 0 ) {
+            close();
             return;
-		}
+        }
 
         // Would block returned - just wait
         if( result.wouldBlock() ) {
@@ -188,11 +189,11 @@ void TCPSocket::recv( void )
         }
 
         // Write received data to a buffer
-		m_data->write( chunk, result );
-	}
+        m_data->write( chunk, result );
+    }
 
     // Rewind back to a first byte
-	m_data->setPosition( 0, Io::SeekSet );
+    m_data->setPosition( 0, Io::SeekSet );
 
     // If there is data inside buffer - notify subscribers
     if( m_data->bytesAvailable() ) {

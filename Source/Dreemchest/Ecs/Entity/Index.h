@@ -33,66 +33,60 @@ DC_BEGIN_DREEMCHEST
 
 namespace Ecs {
 
-	//! Entity index represents a set of entities grouped by a certain criteria.
-	class Index : public RefCounted {
-	friend class Ecs;
-	public:
+    //! Entity index represents a set of entities grouped by a certain criteria.
+    class Index : public InjectEventEmitter<RefCounted> {
+    friend class Ecs;
+    public:
 
-		virtual					~Index( void );
+        virtual                    ~Index( void );
 
-		//! Returns a family size.
-		s32						size( void ) const;
+        //! Returns a family size.
+        s32                        size( void ) const;
 
-		//! Returns a set of entities 
-		const EntitySet&		entities( void ) const;
+        //! Returns a set of entities 
+        const EntitySet&        entities( void ) const;
+        EntitySet&                entities( void );
 
-		//! Returns a set of entities 
-		EntitySet&				entities( void );
+        //! New entity has been added to index.
+        struct Added {
+                                //! Constructs Added instance.
+                                Added( const EntityPtr& entity );
+            EntityPtr            entity;    //! Added entity.
+        };
 
-		//! Returns event emitter
-		EventEmitter&			events( void );
+        //! Entity has been removed from index.
+        struct Removed {
+                                //! Constructs Removed instance.
+                                Removed( const EntityPtr& entity );
+            EntityPtr            entity;    //! Removed entity.
+        };
 
-		//! New entity has been added to index.
-		struct Added {
-								//! Constructs Added instance.
-								Added( const EntityPtr& entity );
-			EntityPtr			entity;	//! Added entity.
-		};
+    protected:
 
-		//! Entity has been removed from index.
-		struct Removed {
-								//! Constructs Removed instance.
-								Removed( const EntityPtr& entity );
-			EntityPtr			entity;	//! Removed entity.
-		};
+                                //! Constructs Index instance.
+                                Index( EcsWPtr ecs, const String& name, const Aspect& aspect );
 
-	protected:
+        //! Processes entity addition.
+        virtual void            processEntityAdded( const EntityPtr& entity );
 
-								//! Constructs Index instance.
-								Index( EcsWPtr ecs, const String& name, const Aspect& aspect );
+        //! Processes entity removal.
+        virtual void            processEntityRemoved( const EntityPtr& entity );
 
-		//! Processes entity addition.
-		virtual void			processEntityAdded( const EntityPtr& entity );
+    private:
 
-		//! Processes entity removal.
-		virtual void			processEntityRemoved( const EntityPtr& entity );
+        //! Processes the entity change
+        void                    notifyEntityChanged( const EntityPtr& entity );
 
-	private:
+    protected:
 
-		//! Processes the entity change
-		void					notifyEntityChanged( const EntityPtr& entity );
-
-	protected:
-
-		EcsWPtr					m_ecs;				//!< Parent ECS instance.
-		String					m_name;				//!< Index name.
-		Aspect					m_aspect;			//!< Entity aspect.
-		EntitySet				m_entities;			//!< Entity set.
-		EventEmitter			m_eventEmitter;		//!< Index event emitter.
-	};
+        EcsWPtr                    m_ecs;                //!< Parent ECS instance.
+        String                    m_name;                //!< Index name.
+        Aspect                    m_aspect;            //!< Entity aspect.
+        EntitySet                m_entities;            //!< Entity set.
+    };
 
 } // namespace Ecs
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Ecs_Index_H__	*/
+#endif    /*    !__DC_Ecs_Index_H__    */

@@ -35,7 +35,7 @@ namespace Network {
 
     //! Remote connection interface wraps a network sockets and used for sending/receiving packets.
     class Connection_ : public InjectEventEmitter<RefCounted> {
-	friend class Application;
+    friend class Application;
     public:
 
         virtual                 ~Connection_( void ) {}
@@ -46,42 +46,42 @@ namespace Network {
         //! Returns the connection id.
         u32                     id( void ) const;
 
-		//! Queues this connection for closing.
-		void					closeLater( void );
+        //! Queues this connection for closing.
+        void                    closeLater( void );
 
-		//! Returns true if the connection will be closed.
-		bool					willBeClosed( void ) const;
+        //! Returns true if the connection will be closed.
+        bool                    willBeClosed( void ) const;
 
-		//! Returns the total amount of bytes received.
-		s32						totalBytesReceived( void ) const;
+        //! Returns the total amount of bytes received.
+        s32                        totalBytesReceived( void ) const;
 
-		//! Returns the total amount of bytes sent.
-		s32						totalBytesSent( void ) const;
+        //! Returns the total amount of bytes sent.
+        s32                        totalBytesSent( void ) const;
 
-		//! Returns current time.
-		s32						time( void ) const;
+        //! Returns current time.
+        s32                        time( void ) const;
 
-		//! Returns the round trip time.
-		s32						roundTripTime( void ) const;
+        //! Returns the round trip time.
+        s32                        roundTripTime( void ) const;
 
-		//! Returns current timeout value.
-		s32						timeout( void ) const;
+        //! Returns current timeout value.
+        s32                        timeout( void ) const;
 
         //! Sends a packet over this connection.
         void                    send( const AbstractPacket& packet );
 
-		//! Adds new connection middleware.
-		void					addMiddleware( ConnectionMiddlewareUPtr instance );
+        //! Adds new connection middleware.
+        void                    addMiddleware( ConnectionMiddlewareUPtr instance );
 
-	#ifndef DC_CPP11_DISABLED
-		//! Generic method to construct and sent the network packet over this connection.
-		template<typename TPacket, typename ... TArgs>
-		void					send( const TArgs& ... args );
+    #if DREEMCHEST_CPP11
+        //! Generic method to construct and sent the network packet over this connection.
+        template<typename TPacket, typename ... TArgs>
+        void                    send( const TArgs& ... args );
 
-		//! Generic method to construct and add the middleware to this connection.
-		template<typename TMiddleware, typename ... TArgs>
-		void					addMiddleware( const TArgs& ... args );
-	#endif	/*	!DC_CPP11_DISABLED	*/
+        //! Generic method to construct and add the middleware to this connection.
+        template<typename TMiddleware, typename ... TArgs>
+        void                    addMiddleware( const TArgs& ... args );
+    #endif    /*    #if DREEMCHEST_CPP11    */
 
         //! Base class for all connection events.
         struct Event {
@@ -110,16 +110,16 @@ namespace Network {
 
     protected:
 
-		//! Network packet data header.
-		struct Header {
-            				    //! Constructs Header instance.
-						        Header( PacketTypeId type = 0, u16 size = 0 )
-							        : type( type ), size( size ) {}
-			PacketTypeId	    type;	//!< Packet type.
-			u16			        size;	//!< Total serialized data size.
+        //! Network packet data header.
+        struct Header {
+                                //! Constructs Header instance.
+                                Header( PacketTypeId type = 0, u16 size = 0 )
+                                    : type( type ), size( size ) {}
+            PacketTypeId        type;    //!< Packet type.
+            u16                    size;    //!< Total serialized data size.
 
             enum { Size = sizeof( PacketTypeId ) + sizeof( u16 ) };
-		};
+        };
 
                                 //! Constructs Connection instance.
                                 Connection_( void );
@@ -130,14 +130,14 @@ namespace Network {
         //! Tracks the specified amount of sent data.
         void                    trackSentAmount( s32 value );
 
-		//! Notifies about a received packet.
-		void					notifyPacketReceived( PacketTypeId type, u16 size, Io::ByteBufferWPtr packet );	
+        //! Notifies about a received packet.
+        void                    notifyPacketReceived( PacketTypeId type, u16 size, Io::ByteBufferWPtr packet );    
 
-		//! Sets the round trip time for this connection.
-		void					setRoundTripTime( s32 value );
+        //! Sets the round trip time for this connection.
+        void                    setRoundTripTime( s32 value );
 
-		//! Sets current time.
-		void					setTime( s32 value );
+        //! Sets current time.
+        void                    setTime( s32 value );
 
         //! Writes the packet to a binary stream.
         s32                     writePacket( const AbstractPacket& packet, Io::ByteBufferWPtr stream ) const;
@@ -145,8 +145,8 @@ namespace Network {
         //! Reads the packet from a binary stream to a temporary buffer and returns it's header.
         Header                  readPacket( Io::ByteBufferWPtr stream, Io::ByteBufferWPtr packet ) const;
 
-		//! Updates this connection
-		void					update( u32 dt );
+        //! Updates this connection
+        void                    update( u32 dt );
 
         //! Sends a byte buffer over this connection.
         virtual s32             sendData( Io::ByteBufferWPtr data ) = 0;
@@ -156,35 +156,35 @@ namespace Network {
 
     private:
 
-		//! Container type to store the list of connection middlewares.
-		typedef List<ConnectionMiddlewareUPtr> ConnectionMiddlewares;
-	
+        //! Container type to store the list of connection middlewares.
+        typedef List<ConnectionMiddlewareUPtr> ConnectionMiddlewares;
+    
         u32                     m_id;                   //!< Connection id.
-		s32						m_totalBytesReceived;   //!< The total amount of bytes received.
-		s32						m_totalBytesSent;       //!< The total amount of bytes sent.
-		s32						m_time;					//!< Current connection time.
-		s32						m_timeout;				//!< The timeout counter reset each time a packet received.
-		s32						m_roundTripTime;		//!< Current round trip time.
-		bool					m_shouldClose;			//!< Indicates that a connection should be closed.
-		ConnectionMiddlewares	m_middlewares;			//!< Connection middlewares added to connection.
+        s32                        m_totalBytesReceived;   //!< The total amount of bytes received.
+        s32                        m_totalBytesSent;       //!< The total amount of bytes sent.
+        s32                        m_time;                    //!< Current connection time.
+        s32                        m_timeout;                //!< The timeout counter reset each time a packet received.
+        s32                        m_roundTripTime;        //!< Current round trip time.
+        bool                    m_shouldClose;            //!< Indicates that a connection should be closed.
+        ConnectionMiddlewares    m_middlewares;            //!< Connection middlewares added to connection.
     };
 
-#ifndef DC_CPP11_DISABLED
-	// ** Connection::send
-	template<typename TPacket, typename ... TArgs>
-	void Connection_::send( const TArgs& ... args )
-	{
-		TPacket packet( args... );
-		send( packet );
-	}
+#if DREEMCHEST_CPP11
+    // ** Connection::send
+    template<typename TPacket, typename ... TArgs>
+    void Connection_::send( const TArgs& ... args )
+    {
+        TPacket packet( args... );
+        send( packet );
+    }
 
-	// ** Connection::addMiddleware
-	template<typename TMiddleware, typename ... TArgs>
-	void Connection_::addMiddleware( const TArgs& ... args )
-	{
-		addMiddleware( DC_NEW TMiddleware( args... ) );
-	}
-#endif	/*	!DC_CPP11_DISABLED	*/
+    // ** Connection::addMiddleware
+    template<typename TMiddleware, typename ... TArgs>
+    void Connection_::addMiddleware( const TArgs& ... args )
+    {
+        addMiddleware( DC_NEW TMiddleware( args... ) );
+    }
+#endif    /*    #if DREEMCHEST_CPP11    */
 
 } // namespace Network
 

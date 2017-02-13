@@ -26,116 +26,17 @@
 
 #include "Assets.h"
 
+#include "Asset.h"
 #include "AssetHandle.h"
 #include "AssetSource.h"
-
 DC_BEGIN_DREEMCHEST
 
 namespace Assets {
 
-// ---------------------------------------------- Asset ---------------------------------------------- //
-
-// ** Asset::Asset
-Asset::Asset( void ) : m_state( Unloaded )
-{
-}
-
-// ** Asset::Asset
-Asset::Asset( Type type, const AssetId& uniqueId, SourceUPtr source )
-    : m_source( source )
-    , m_type( type )
-    , m_uniqueId( uniqueId )
-    , m_state( Unloaded )
-    , m_lastConstructed( 0 )
-    , m_lastModified( 0 )
-    , m_lastUsed( 0 )
-{
-}
-
-// ** Asset::type
-const Type& Asset::type( void ) const
-{
-    return m_type;
-}
-
-// ** Asset::state
-Asset::State Asset::state( void ) const
-{
-    return m_state;
-}
-
-// ** Asset::uniqueId
-const AssetId& Asset::uniqueId( void ) const
-{
-    return m_uniqueId;
-}
-
-// ** Asset::name
-const String& Asset::name( void ) const
-{
-    return m_name;
-}
-
-// ** Asset::setName
-void Asset::setName( const String& value )
-{
-    m_name = value;
-}
-
-// ** Asset::source
-AbstractSource* Asset::source( void ) const
-{
-    return m_source.get();
-}
-
-// ** Asset::switchToState
-void Asset::switchToState( State value )
-{
-    DC_BREAK_IF( m_state == value );
-    m_state = value;
-}
-
-// ** Asset::setData
-void Asset::setData( Index value )
-{
-    m_data = value;
-}
-
-// ** Asset::data
-Index Asset::data( void ) const
-{
-    return m_data;
-}
-
-// ** Asset::hasData
-bool Asset::hasData( void ) const
-{
-    return data().isValid();
-}
-
-// ** Asset::lastModified
-u32 Asset::lastModified( void ) const
-{
-    return m_lastModified;
-}
-
-// ** Asset::lastUsed
-u32 Asset::lastUsed( void ) const
-{
-    return m_lastUsed;
-}
-
-// ** Asset::lastConstructed
-u32 Asset::lastConstructed( void ) const
-{
-    return m_lastConstructed;
-}
-
-// --------------------------------------------- Assets --------------------------------------------- //
-
 // ** Assets::Assets
 Assets::Assets( void )
 {
+    m_loadingQueue = DC_NEW LoadingQueue( *this, INT_MAX );
 }
 
 // ** Assets::Assets
@@ -147,15 +48,23 @@ Assets::~Assets( void )
 }
 
 // ** Assets::addAsset
-Handle Assets::addAsset( const Type& type, const AssetId& uniqueId, SourceUPtr source )
+Handle Assets::addAsset( const TypeId& type, const AssetId& uniqueId, SourceUPtr source )
 {
-    DC_BREAK_IF( m_indexById.find( uniqueId ) != m_indexById.end() );
+    NIMBLE_BREAK_IF( m_indexById.find( uniqueId ) != m_indexById.end() );
+
+    // Find an asset cache for this type of asset
+    AbstractAssetCache& cache = findAssetCache( type );
+
+    // Setup a new asset
+    Asset asset( type, &cache, cache.reserve(), uniqueId, source );
 
     // First reserve the slot for an asset data.
-    Index index = m_assets.add( Asset( type, uniqueId, source ) );
+    Index index = m_assets.add( asset );
 
     // Now register unique id associated with this asset slot.
     m_indexById[uniqueId] = index;
+
+    LogDebug( "asset", "%s %s added (%d assets of a same type, %d assets total)\n", assetTypeName( type ).c_str(), uniqueId.c_str(), cache.size(), m_assets.size() );
 
     // Construct an asset handle.
     return Handle( this, index );
@@ -166,14 +75,31 @@ bool Assets::removeAsset( const AssetId& id )
 {
     // Find index by id.
     AssetIndexById::iterator i = m_indexById.find( id );
-    DC_BREAK_IF( i == m_indexById.end() );
+    NIMBLE_BREAK_IF( i == m_indexById.end() );
 
     // Store the slot before and remove the handle mapping.
     Index index = i->second;
     m_indexById.erase( i );
 
+    // Output log message
+    const Asset& asset = m_assets.get( index );
+    AbstractAssetCache& cache = findAssetCache( asset.type() );
+    LogDebug( "asset", "%s %s removed (%d assets of a same type, %d assets total)\n", assetTypeName( asset.type() ).c_str(), id.c_str(), cache.size(), m_assets.size() );
+
     // Now release an asset data
     return m_assets.remove( index );
+}
+
+// ** Assets::totalBytesUsed
+s32 Assets::totalBytesUsed( void ) const
+{
+    s32 result = 0;
+
+    for( AssetCaches::const_iterator i = m_cache.begin(), end = m_cache.end(); i != end; ++i ) {
+        result += i->second->allocatedBytes();
+    }
+
+    return result;
 }
 
 // ** Assets::findAsset
@@ -188,131 +114,130 @@ Handle Assets::findAsset( const AssetId& id ) const
     return Handle( const_cast<Assets*>( this ), i->second );
 }
 
-// ** Assets::assetAtIndex
-const Asset& Assets::assetAtIndex( Index index ) const
+// ** Assets::typeFromName
+TypeId Assets::typeFromName( const String& value ) const
 {
-    return m_assets.get( index );
+    Map<String, TypeId>::const_iterator i = m_nameToType.find( value );
+    
+    if( i == m_nameToType.end() ) {
+        NIMBLE_BREAK;
+        return 0;
+    }
+
+    return i->second;
 }
 
-// ** Assets::isIndexValid
-bool Assets::isIndexValid( Index index ) const
+// ** Assets::assetTypeName
+String Assets::assetTypeName( const TypeId& type ) const
 {
-    return m_assets.has( index );
+    Map<TypeId, String>::const_iterator i = m_typeToName.find( type );
+    
+    if( i == m_typeToName.end() ) {
+        NIMBLE_BREAK;
+        return "";
+    }
+
+    return i->second;
 }
 
 // ** Assets::releaseWriteLock
 void Assets::releaseWriteLock( const Handle& asset )
 {
-    asset->m_lastModified = Platform::currentTime();
+    asset->m_timestamp.modified = Platform::currentTime();
 }
 
-// ** Assets::loadAssetToCache
-bool Assets::loadAssetToCache( Handle asset )
+// ** Assets::queueLoaded
+void Assets::queueLoaded( const Handle& asset )
 {
-    if( asset->state() != Asset::Unloaded ) {
-        return true;
+    m_loadedAssets.push_back( asset );
+}
+
+// ** Assets::queueUnloaded
+void Assets::queueUnloaded( const Handle& asset )
+{
+    m_unloadedAssets.push_back( asset );
+}
+
+// ** Assets::findAssetCache
+AbstractAssetCache& Assets::findAssetCache( const TypeId& type ) const
+{
+    AssetCaches::iterator i = m_cache.find( type );
+
+    if( i != m_cache.end() ) {
+        return *i->second;
     }
 
-    // Perform loading
-    LogVerbose( "cache", "loading '%s'...\n", asset->name().c_str() );
-
-    // Switch to Loading state
-    asset->switchToState( Asset::Loading );
-
-    // Reserve asset data before loading
-    if( !asset->hasData() ) {
-        asset->setData( reserveAssetData( asset->type() ) );
-    }
-
-    // Get the asset format
-    AbstractSource* source = asset->source();
-    DC_ABORT_IF( source == NULL, "invalid asset source" );
-
-    // Parse asset
-    bool result = source->construct( *this, asset );
-
-    // Switch to a Loaded or Error state
-    asset->switchToState( result ? Asset::Loaded : Asset::Error );
-
-    // Update the last constructed time stamp
-    asset->m_lastConstructed = Time::current();
-
-    return result;
+    NIMBLE_ABORT_IF( true, "unknown asset type" );
+    return *reinterpret_cast<AbstractAssetCache*>( NULL );
 }
 
 // ** Assets::update
 void Assets::update( f32 dt )
 {
+    // Save current time
+    m_currentTime = Platform::currentTime();
+
     // Check outdated assets
     for( s32 i = 0, n = m_assets.size(); i < n; i++ ) {
         // Get an asset by index
         Asset& asset = m_assets.dataAt( i );
 
-        // Skip unloaded assets
-        if( asset.state() != Asset::Loaded ) {
-            continue;
-        }
-
-        // Compare the asset source last modified timestamp with last constructed one
-        const AbstractSource* source = asset.source();
-        DC_ABORT_IF( source == NULL, "asset has no valid asset source" );
-
         // Skip up-to-date assets
-        if( source->lastModified() <= asset.lastModified() ) {
+        if( asset.isUpToDate() ) {
             continue;
         }
 
-        // Mark this asset as unloaded
-        asset.switchToState( Asset::Unloaded );
+        LogVerbose( "cache", "asset '%s' was changed\n", asset.name().c_str() );
+
+        // Create an asset handle
+        Handle assetHandle = createHandle( asset );
+
+        // Unload an asset
+        forceUnload( assetHandle );
 
         // Queue asset for reloading
-        Handle handle( this, m_assets.handleAt( i ) );
-        LogVerbose( "cache", "reloading '%s'\n", asset.name().c_str() );
-
-        queueForLoading( handle );
+        m_loadingQueue->queue( assetHandle );
     }
 
-    // Process the loading queue
-    while( !m_loadingQueue.empty() ) {
-        // Get the first asset in loading queue
-        Handle asset = *m_loadingQueue.begin();
-        m_loadingQueue.pop_front();
+    // Update the loading queue
+    m_loadingQueue->update();
 
-        // Load an asset to cache
-        loadAssetToCache( asset );
+    // Notify listeners about asset state changes
+    for( AssetList::iterator i = m_unloadedAssets.begin(), end = m_unloadedAssets.end(); i != end; ++i ) {
+        notify<Unloaded>( *this, i->asset() );
     }
+    m_unloadedAssets.clear();
+
+    for( AssetList::iterator i = m_loadedAssets.begin(), end = m_loadedAssets.end(); i != end; ++i ) {
+        notify<Loaded>( *this, i->asset() );
+    }
+    m_loadedAssets.clear();
 }
 
-// ** Assets::queue
-void Assets::queueForLoading( const Handle& asset ) const
+// ** Assets::createHandle
+Handle Assets::createHandle( const Asset& asset ) const
 {
-    // Make sure this asset should be loaded
-    if( asset->state() != Asset::Unloaded ) {
-        return;
-    }
-
-    // First check if this asset is already in queue
-    AssetList::const_iterator i = std::find( m_loadingQueue.begin(), m_loadingQueue.end(), asset );
-
-    // Just skip if it was found
-    if( i != m_loadingQueue.end() ) {
-        return;
-    }
-
-    m_loadingQueue.push_back( asset );
-    LogVerbose( "cache", "asset '%s' is queued for loading\n", asset->name().c_str() );
+    return findAsset( asset.uniqueId() );
 }
 
-// ** Assets::reserveAssetData
-Index Assets::reserveAssetData( const Type& type )
+// ** Assets::forceLoad
+bool Assets::forceLoad( const Handle& asset )
 {
-    AssetCaches::iterator i = m_cache.find( type );
+    return m_loadingQueue->loadToCache( asset );
+}
 
-    if( i != m_cache.end() ) {
-        return i->second->reserve();
-    }
+// ** Assets::forceUnload
+void Assets::forceUnload( Handle asset )
+{
+    NIMBLE_BREAK_IF( !asset->isLoaded(), "an asset was not loaded" );
 
-    return Index();
+    // Mark this asset as unloaded
+    asset->switchToState( Asset::Unloaded );
+
+    // Queue an asset for notification
+    m_unloadedAssets.push_front( asset );
+
+    LogVerbose( "cache", "asset '%s' unloaded\n", asset->name().c_str() );
 }
 
 } // namespace Assets

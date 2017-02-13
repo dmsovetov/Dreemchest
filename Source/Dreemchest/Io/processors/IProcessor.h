@@ -31,7 +31,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
     //! A stream processor class is used for processing in/out streamed bytes.
     class IProcessor {
@@ -46,7 +46,7 @@ namespace io {
         virtual u64     read( void* src, u64 size )         = 0;
     };
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST
 

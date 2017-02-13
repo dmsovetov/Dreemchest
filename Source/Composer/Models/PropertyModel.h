@@ -64,23 +64,23 @@ DC_BEGIN_COMPOSER
 
     protected:
 
-	    //! Returns the constant row count equal to 1.
-	    virtual int			                rowCount( const QModelIndex& parent ) const Q_DECL_OVERRIDE;
+        //! Returns the constant row count equal to 1.
+        virtual int                            rowCount( const QModelIndex& parent ) const Q_DECL_OVERRIDE;
 
-	    //! Always returns an invalid index.
-	    virtual QModelIndex	                parent( const QModelIndex& child ) const Q_DECL_OVERRIDE;
+        //! Always returns an invalid index.
+        virtual QModelIndex                    parent( const QModelIndex& child ) const Q_DECL_OVERRIDE;
 
-	    //! Returns the total number of properties exposed by an object.
-	    virtual int			                columnCount( const QModelIndex& parent = QModelIndex() ) const Q_DECL_OVERRIDE;
+        //! Returns the total number of properties exposed by an object.
+        virtual int                            columnCount( const QModelIndex& parent = QModelIndex() ) const Q_DECL_OVERRIDE;
 
-	    //! Reads the data from object's property at index.column.
-	    virtual QVariant	                data( const QModelIndex& index, int role = Qt::DisplayRole ) const Q_DECL_OVERRIDE;
+        //! Reads the data from object's property at index.column.
+        virtual QVariant                    data( const QModelIndex& index, int role = Qt::DisplayRole ) const Q_DECL_OVERRIDE;
 
-	    //! Writes the data to object's property at index.column.
-	    virtual bool		                setData( const QModelIndex& index, const QVariant& value, int role = Qt::EditRole ) Q_DECL_OVERRIDE;
+        //! Writes the data to object's property at index.column.
+        virtual bool                        setData( const QModelIndex& index, const QVariant& value, int role = Qt::EditRole ) Q_DECL_OVERRIDE;
 
-	    //! Returns the model index.
-	    virtual QModelIndex                 index( int row, int column, const QModelIndex& parent = QModelIndex() ) const Q_DECL_OVERRIDE;
+        //! Returns the model index.
+        virtual QModelIndex                 index( int row, int column, const QModelIndex& parent = QModelIndex() ) const Q_DECL_OVERRIDE;
 
     private:
 
@@ -90,4 +90,4 @@ DC_BEGIN_COMPOSER
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_PropertyModel_H__	*/
+#endif    /*    !__DC_Composer_PropertyModel_H__    */

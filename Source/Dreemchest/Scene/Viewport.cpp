@@ -25,143 +25,83 @@
  **************************************************************************/
 
 #include "Viewport.h"
-#include "Components/Transform.h"
-#include "Components/Rendering.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-// ** Viewport::Viewport
-Viewport::Viewport( SceneObjectWPtr camera ) : m_camera( camera )
-{
+// ---------------------------------------- AbstractViewport ---------------------------------------- //
 
+// ** AbstractViewport::rect
+Rect AbstractViewport::rect( void ) const
+{
+    return Rect( 0.0f, 0.0f, width(), height() );
 }
 
-// ** Viewport::x
-s32 Viewport::x( void ) const
+// ------------------------------------------ WindowViewport ------------------------------------------ //
+
+// ** WindowViewport::WindowViewport
+WindowViewport::WindowViewport( const Platform::WindowWPtr& window )
+    : m_window( window )
+    , m_lastX( -1 )
+    , m_lastY( -1 )
 {
-	return m_x;
+    NIMBLE_ABORT_IF( !window.valid(), "invalid window" );
+    m_window->subscribe<Platform::Window::TouchBegan>( dcThisMethod( WindowViewport::handleTouchBegan ) );
+    m_window->subscribe<Platform::Window::TouchMoved>( dcThisMethod( WindowViewport::handleTouchMoved ) );
+    m_window->subscribe<Platform::Window::TouchEnded>( dcThisMethod( WindowViewport::handleTouchEnded ) );
 }
 
-// ** Viewport::y
-s32 Viewport::y( void ) const
+// ** WindowViewport::~WindowViewport
+WindowViewport::~WindowViewport( void )
 {
-	return m_y;
+    if( !m_window.valid() ) {
+        return;
+    }
+
+    m_window->unsubscribe<Platform::Window::TouchBegan>( dcThisMethod( WindowViewport::handleTouchBegan ) );
+    m_window->unsubscribe<Platform::Window::TouchMoved>( dcThisMethod( WindowViewport::handleTouchMoved ) );
+    m_window->unsubscribe<Platform::Window::TouchEnded>( dcThisMethod( WindowViewport::handleTouchEnded ) );
 }
 
-// ** Viewport::pos
-Vec2 Viewport::pos( void ) const
+// ** WindowViewport::create
+WindowViewportPtr WindowViewport::create( const Platform::WindowWPtr& window )
 {
-	return Vec2( x(), y() );
+    return WindowViewportPtr( DC_NEW WindowViewport( window ) );
 }
 
-// ** Viewport::ray
-const Ray& Viewport::ray( void ) const
+// ** WindowViewport::width
+s32 WindowViewport::width( void ) const
 {
-	return m_ray;
+    return m_window->width();
 }
 
-// ** Viewport::eye
-const Vec3& Viewport::eye( void ) const
+// ** WindowViewport::height
+s32 WindowViewport::height( void ) const
 {
-	DC_ABORT_IF( !m_camera.valid(), "viewport has no camera set" );
-	return m_camera->get<Transform>()->position();
+    return m_window->height();
 }
 
-// ** Viewport::flags
-const FlagSet8& Viewport::flags( void ) const
+// ** WindowViewport::handleTouchBegan
+void WindowViewport::handleTouchBegan( const Platform::Window::TouchBegan& e )
 {
-	return m_flags;
+    m_lastX = e.x;
+    m_lastY = e.y;
+    notify<TouchBegan>( this, e.id, e.x, e.y );
 }
 
-// ** Viewport::camera
-SceneObjectWPtr Viewport::camera( void ) const
+// ** WindowViewport::handleTouchMoved
+void WindowViewport::handleTouchMoved( const Platform::Window::TouchMoved& e )
 {
-	return m_camera;
+    notify<TouchMoved>( this, e.id, e.x, e.y, e.x - m_lastX, e.y - m_lastY );
+    m_lastX = e.x;
+    m_lastY = e.y;
 }
 
-// ** Viewport::setCamera
-void Viewport::setCamera( SceneObjectWPtr value )
+// ** WindowViewport::handleTouchEnded
+void WindowViewport::handleTouchEnded( const Platform::Window::TouchEnded& e )
 {
-	m_camera = value;
-}
-
-// ** Viewport::touchBegan
-void Viewport::touchBegan( s32 x, s32 y )
-{
-	touchBegan( x, y, m_flags );
-}
-
-// ** Viewport::touchBegan
-void Viewport::touchBegan( s32 x, s32 y, const FlagSet8& flags )
-{
-	// Update viewport flags.
-	m_flags = flags;
-
-	// Set viewport cursor position.
-	setCursor( x, y );
-
-	// Emit the event.
-	notify<TouchBegan>( TouchBegan( this, m_flags ) );
-}
-
-// ** Viewport::touchEnded
-void Viewport::touchEnded( s32 x, s32 y )
-{
-	touchEnded( x, y, m_flags );
-}
-
-// ** Viewport::touchEnded
-void Viewport::touchEnded( s32 x, s32 y, const FlagSet8& flags )
-{
-	// Update viewport flags.
-	m_flags = flags & ~flags;
-
-	// Set viewport cursor position.
-	setCursor( x, y );
-
-	// Emit the event.
-	notify<TouchEnded>( TouchEnded( this, flags ) );
-}
-
-// ** Viewport::touchMoved
-void Viewport::touchMoved( s32 x, s32 y, const FlagSet8& flags )
-{
-	// Update viewport flags.
-	m_flags = flags;
-
-	// Set viewport cursor position.
-	setCursor( x, y );
-
-	// Emit the event
-	notify<TouchMoved>( TouchMoved( this, x, y ) );
-}
-
-// ** Viewport::setCursor
-void Viewport::setCursor( s32 x, s32 y )
-{
-	m_x		= x;
-	m_y		= y;
-	m_ray	= constructViewRay( m_x, m_y );
-}
-
-// ** Viewport::constructViewRay
-Ray Viewport::constructViewRay( s32 x, s32 y ) const
-{
-	// Get components.
-	CameraWPtr    camera	= m_camera->get<Camera>();
-	TransformWPtr transform = m_camera->get<Transform>();
-
-	// Calculate near & far points in world space.
-	Vec3 near, far;
-	camera->toWorldSpace( Vec3( x, y, 0 ), near, transform->matrix() );
-	camera->toWorldSpace( Vec3( x,y, 1 ), far, transform->matrix() );
-
-	// Calculate direction
-	Vec3 dir = Vec3::normalize( far - near );
-
-	return Ray( transform->worldSpacePosition(), dir );
+    notify<TouchEnded>( this, e.id, e.x, e.y );
 }
 
 } // namespace Scene

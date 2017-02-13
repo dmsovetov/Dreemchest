@@ -29,115 +29,19 @@
 
 #include "../Dreemchest.h"
 
-#include <Platform/Time.h>
-#include <Io/streams/Stream.h>
-#include <Io/DiskFileSystem.h>
-
-#include "AssetType.h"
+#include "Asset.h"
+#include "AssetCache.h"
+#include "AssetLoadingQueue.h"
+#include "AssetHandle.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Assets {
 
-    NIMBLE_LOGGER_TAG( Assets )
-
-    //! Opaque 32 bit handle.
-    typedef OpaqueHandle<12, 20> Index;
-
-    //! Forward declaration of an AssetDataHandle type.
-    template<typename TAsset> class GenericHandle;
-
-    //! Forward declaration of an asset WriteLock type.
-    template<typename TAsset> class WriteLock;
-
-    //! Asset identifier type.
-    typedef String AssetId;
-
-    //! Set of assets.
-    typedef Set<class Handle> AssetSet;
-
-    //! List of assets.
-    typedef List<class Handle> AssetList;
-
-    // Unique ptr for asset source.
-    typedef AutoPtr<class AbstractSource> SourceUPtr;
-
-    //! Asset class instance stores info about a single asset.
-    class Asset {
-    friend class Assets;
-    public:
-
-        //! Available asset states.
-        enum State {
-              Unloaded  //!< Asset is now unloaded.
-            , Loading   //!< Asset is now loading.
-            , Loaded    //!< Asset is loaded and ready to use.
-            , Error     //!< Asset was failed to load.
-        };
-
-                                    //! Constructs empty Asset instance.
-                                    Asset( void );
-
-                                    //! Constructs Asset instance.
-                                    Asset( Type type, const AssetId& uniqueId, SourceUPtr source );
-
-        //! Returns asset unique id.
-        const AssetId&              uniqueId( void ) const;
-
-        //! Returns asset type.
-        const Type&                 type( void ) const;
-
-        //! Returns asset name.
-        const String&               name( void ) const;
-
-        //! Sets asset name.
-        void                        setName( const String& value );
-
-        //! Returns an asset source.
-        AbstractSource*             source( void ) const;
-
-        //! Returns asset state.
-        State                       state( void ) const;
-
-        //! Returns the last asset modification timestamp.
-        u32                         lastModified( void ) const;
-
-        //! Returns the last asset use timestamp.
-        u32                         lastUsed( void ) const;
-
-        //! Returns the last asset construction timestamp.
-        u32                         lastConstructed( void ) const;
-
-    private:
-
-        //! Switches an asset to a specified state.
-        void                        switchToState( State value );
-
-        //! Sets the data handle.
-        void                        setData( Index value );
-
-        //! Returns the data handle.
-        Index                       data( void ) const;
-
-        //! Returns true if an asset has valid data.
-        bool                        hasData( void ) const;
-
-    private:
-
-        SourceUPtr                  m_source;           //!< Asset source used for asset construction.
-        Type                        m_type;             //!< Asset type.
-        AssetId                     m_uniqueId;         //!< Unique asset id.
-        String                      m_name;             //!< Asset name.
-        State                       m_state;            //!< Current asset state.
-        Index                       m_data;             //!< Asset data slot.
-        mutable u32                 m_lastConstructed;  //!< Last time this asset was constructed from source.
-        mutable u32                 m_lastModified;     //!< Last time this asset was modified.
-        mutable u32                 m_lastUsed;         //!< Last time this asset was used.
-    };
-
     //! Root interface to access all available assets.
-    class Assets : public RefCounted {
+    class Assets : public InjectEventEmitter<RefCounted> {
     friend class Handle;
+    friend class LoadingQueue;
     template<typename TAsset> friend class WriteLock;
     public:
 
@@ -145,16 +49,24 @@ namespace Assets {
                                     Assets( void );
                                     ~Assets( void );
 
+        //! Adds a new asset of specified type.
+        template<typename TAsset>
+        DataHandle<TAsset>          add( const AssetId& uniqueId, SourceUPtr source );
+
         //! Returns an asset of specified type.
         template<typename TAsset>
-        GenericHandle<TAsset>       find( const AssetId& uniqueId ) const;
+        DataHandle<TAsset>          find( const AssetId& uniqueId ) const;
 
-        //! Sets the default placeholder for unloaded assets of specified type.
+        //! Returns asset cache of specified type.
         template<typename TAsset>
-        void                        setPlaceholder( const TAsset& value );
+        const AssetCache<TAsset>&   assetCache( void ) const;
+
+        //! Returns asset cache of specified type.
+        template<typename TAsset>
+        AssetCache<TAsset>&         assetCache( void );
 
         //! Adds new asset with unique id.
-        Handle                      addAsset( const Type& type, const AssetId& uniqueId, SourceUPtr source );
+        Handle                      addAsset( const TypeId& type, const AssetId& uniqueId, SourceUPtr source );
 
         //! Removes asset by a unique id.
         bool                        removeAsset( const AssetId& uniqueId );
@@ -165,34 +77,71 @@ namespace Assets {
         //! Updates an asset manager (performs loading, unloading, etc).
         void                        update( f32 dt );
 
-    private:
+        //! Returns an asset type by it's name.
+        TypeId                      typeFromName( const String& name ) const;
 
-        //! Forward declaration of generic asset cache type.
-        template<typename TAsset>   class AssetCache;
+        //! Returns asset type name.
+        String                      assetTypeName( const TypeId& type ) const;
+
+        //! Returns the total number of bytes allocated for asset data.
+        s32                         totalBytesUsed( void ) const;
+
+        //! Forces an asset to be loaded and returns true if loading succeed.
+        bool                        forceLoad( const Handle& asset );
+
+        //! Forces an asset to be unloaded.
+        void                        forceUnload( Handle asset );
+
+        //! Registers an asset type.
+        template<typename TAsset>
+        AssetCache<TAsset>&         registerType( void );
+
+        //! This event is emitted when an asset was loaded.
+        struct Loaded {
+                                    //! Constructs a Loaded event instance.
+                                    Loaded( const Assets& sender, const Asset& asset )
+                                        : sender( sender )
+                                        , asset( asset ) {}
+            const Assets&           sender; //!< An asset manager that sent this event.
+            const Asset&            asset;  //!< An asset instance that was loaded.
+        };
+
+        //! This event is emitted when an asset was unloaded.
+        struct Unloaded {
+                                    //! Constructs a Unloaded event instance.
+                                    Unloaded( const Assets& sender, const Asset& asset )
+                                        : sender( sender )
+                                        , asset( asset ) {}
+            const Assets&           sender; //!< An asset manager that sent this event.
+            const Asset&            asset;  //!< An asset instance that was unloaded.
+        };
+
+    private:
 
         //! Returns an asset by index.
         const Asset&                assetAtIndex( Index index ) const;
+        Asset&                      assetAtIndex( Index index );
 
         //! Returns true if the specified asset index is valid.
         bool                        isIndexValid( Index index ) const;
 
-        //! Puts an asset to a loading queue.
-        void                        queueForLoading( const Handle& asset ) const;
+        //! Constructs an asset handle for a specified asset.
+        Handle                      createHandle( const Asset& asset ) const;
 
         //! Requests an asset cache for a specified asset type.
-        template<typename TAsset>
-        AssetCache<TAsset>&         requestAssetCache( void ) const;
+        AbstractAssetCache&         findAssetCache( const TypeId& type ) const;
 
-        //! Returns cached asset data.
+        //! Returns cached read-only asset data.
         template<typename TAsset>
-        const TAsset&               assetData( const Handle& asset ) const;
+        const TAsset&               readOnlyAssetData( const Asset& asset ) const;
 
-        //! Reserves asset data handle inside the cache.
-        Index                       reserveAssetData( const Type& type );
+        //! Returns writable asset data (used internally by write locks).
+        template<typename TAsset>
+        TAsset&                     writableAssetData( const Asset& asset ) const;
 
         //! Locks an asset for reading and updates last used timestamp.
         template<typename TAsset>
-        const TAsset&               acquireReadLock( const Handle& asset ) const;
+        const TAsset&               acquireReadLock( const Asset& asset ) const;
 
         //! Locks an asset for writing.
         template<typename TAsset>
@@ -201,115 +150,153 @@ namespace Assets {
         //! Unlocks an asset after writing and updates last modified timestamp.
         void                        releaseWriteLock( const Handle& asset );
 
-        //! Loads an asset data to a cache.
-        bool                        loadAssetToCache( Handle asset );
+        //! Queues a loaded asset for notification.
+        void                        queueLoaded( const Handle& asset );
+
+        //! Queues an unloaded asset for notification.
+        void                        queueUnloaded( const Handle& asset );
 
     private:
 
-        //! Abstract asset cache.
-        struct AbstractAssetCache {
-            virtual                 ~AbstractAssetCache( void ) {}
-
-            //! Reserves the slot handle inside cache.
-            virtual Index           reserve( void ) = 0;
-        };
-
-        //! Generic asset cache that stores asset data of specified type.
-        template<typename TAsset>
-        struct AssetCache : public AbstractAssetCache {
-            //! Reserves the slot handle inside cache.
-            virtual Index           reserve( void ) { return slots.reserve(); }
-
-            TAsset                  placeholder;    //!< Default placeholder that is returned for unloaded assets.
-            Pool<TAsset, Index>     slots;          //!< Cached asset data is stored here.
-        };
-
         //! Container type to store unique id to an asset slot mapping.
-        typedef Map<AssetId, Index>   AssetIndexById;
+        typedef Map<AssetId, Index> AssetIndexById;
 
         //! Container type to store asset cache for an asset type.
-        typedef Map<Type, AbstractAssetCache*> AssetCaches;
+        typedef Map<TypeId, AbstractAssetCache*> AssetCaches;
 
-        Pool<Asset, Index>          m_assets;       //!< All available assets.
-        AssetIndexById              m_indexById;    //!< AssetId to asset index mapping.
-        mutable AssetCaches         m_cache;        //!< Asset cache by an asset type.
-        mutable AssetList           m_loadingQueue; //!< All assets waiting for loading are put in this queue.
+        Pool<Asset, Index>          m_assets;           //!< All available assets.
+        AssetIndexById              m_indexById;        //!< AssetId to asset index mapping.
+        u32                         m_currentTime;      //!< Cached current time.
+        Map<String, TypeId>         m_nameToType;       //!< Maps asset name to type.
+        Map<TypeId, String>         m_typeToName;       //!< Maps asset type to name.
+        AssetList                   m_loadedAssets;     //!< A list of assets that were loaded and are waiting for notification.
+        AssetList                   m_unloadedAssets;   //!< A list of assets that were loaded and are waiting for notification.
+        mutable LoadingQueueUPtr    m_loadingQueue;     //!< Asset loading queue.
+        mutable AssetCaches         m_cache;            //!< Asset cache by an asset type.
     };
 
-    // ** Assets::find
+    // ** Assets::assetCache
     template<typename TAsset>
-    GenericHandle<TAsset> Assets::find( const AssetId& uniqueId ) const
+    AssetCache<TAsset>& Assets::assetCache( void )
     {
-        Handle handle = findAsset( uniqueId );
-        return handle;
+        return static_cast<AssetCache<TAsset>&>( findAssetCache( Asset::typeId<TAsset>() ) );
     }
 
-    // ** Assets::setPlaceholder
+    // ** Assets::assetCache
     template<typename TAsset>
-    void Assets::setPlaceholder( const TAsset& value )
+    const AssetCache<TAsset>& Assets::assetCache( void ) const
     {
-        AssetCache<TAsset>& cache = requestAssetCache<TAsset>();
-        cache.placeholder = value;
+        return const_cast<Assets*>( this )->assetCache<TAsset>();
     }
 
-    // ** Assets::requestAssetCache
+    // ** Assets::registerType
     template<typename TAsset>
-    Assets::AssetCache<TAsset>& Assets::requestAssetCache( void ) const
+    AssetCache<TAsset>& Assets::registerType( void )
     {
-        Type type = Type::fromClass<TAsset>();
-        AssetCaches::iterator i = m_cache.find( type );
+        // Get the type & name
+        TypeId type = Asset::typeId<TAsset>();
+        String name = TypeInfo<TAsset>::name();
 
-        if( i != m_cache.end() ) {
-            return *static_cast<AssetCache<TAsset>*>( i->second );
-        }
+        // Register type & name
+        m_nameToType[name] = type;
+        m_typeToName[type] = name;
 
+        // Create an asset cache for this type of asset
+        NIMBLE_BREAK_IF( m_cache.count( type ) );
         AssetCache<TAsset>* cache = DC_NEW AssetCache<TAsset>();
         m_cache[type] = cache;
 
         return *cache;
     }
 
-    // ** Assets::assetData
+    //! Adds a new asset of specified type.
     template<typename TAsset>
-    const TAsset& Assets::assetData( const Handle& asset ) const
+    DataHandle<TAsset> Assets::add( const AssetId& uniqueId, SourceUPtr source )
+    {
+        Handle handle = addAsset( Asset::typeId<TAsset>(), uniqueId, source );
+        return handle;
+    }
+
+    // ** Assets::find
+    template<typename TAsset>
+    DataHandle<TAsset> Assets::find( const AssetId& uniqueId ) const
+    {
+        Handle handle = findAsset( uniqueId );
+        return handle;
+    }
+
+    // ** Assets::readOnlyAssetData
+    template<typename TAsset>
+    const TAsset& Assets::readOnlyAssetData( const Asset& asset ) const
     {
         // Request an asset cache for this type of asset
-        AssetCache<TAsset>& cache = requestAssetCache<TAsset>();
+        AssetCache<TAsset>& cache = static_cast<AssetCache<TAsset>&>( asset.cache() );
 
         // Use the placeholder for unloaded assets
-        if( !asset->hasData() ) {
-            return cache.placeholder;
+        if( !asset.isLoaded() ) {
+            return cache.placeholder();
         }
 
+        // This asset is already loaded, so we can just return a const reference to a writable data
+        return writableAssetData<TAsset>( asset );
+    }
+
+    // ** Assets::writableAssetData
+    template<typename TAsset>
+    TAsset& Assets::writableAssetData( const Asset& asset ) const
+    {
+        NIMBLE_BREAK_IF( !asset.dataIndex().isValid(), "asset data is invalid" );
+
+        // Get asset cache
+        AssetCache<TAsset>& cache = static_cast<AssetCache<TAsset>&>( asset.cache() );
+
         // Now lookup an asset data
-        TAsset& data = cache.slots.get( asset->data() );
+        TAsset& data = cache.get( asset.dataIndex() );
         return data;
     }
 
     // ** Assets::acquireReadLock
     template<typename TAsset>
-    const TAsset& Assets::acquireReadLock( const Handle& asset ) const
+    const TAsset& Assets::acquireReadLock( const Asset& asset ) const
     {
-        DC_BREAK_IF( !asset.isValid() );
-
-        if( !asset.isLoaded() ) {
-            queueForLoading( asset );
+        if( asset.state() == Asset::Unloaded ) {
+            m_loadingQueue->queue( createHandle( asset ) );
         }
 
-        const TAsset& data = assetData<TAsset>( asset );
-        asset->m_lastUsed = Platform::currentTime();
+        const TAsset& data = readOnlyAssetData<TAsset>( asset );
+        asset.m_timestamp.used = m_currentTime;
         return data;
     }
 
     // ** Assets::acquireWriteLock
     template<typename TAsset>
-    WriteLock<TAsset> Assets::acquireWriteLock( const Handle& asset )
+    NIMBLE_INLINE WriteLock<TAsset> Assets::acquireWriteLock( const Handle& asset )
     {
         return WriteLock<TAsset>( asset );
+    }
+
+    // ** Assets::assetAtIndex
+    NIMBLE_INLINE const Asset& Assets::assetAtIndex( Index index ) const
+    {
+        return m_assets.get( index );
+    }
+
+    // ** Assets::assetAtIndex
+    NIMBLE_INLINE Asset& Assets::assetAtIndex( Index index )
+    {
+        return m_assets.get( index );
+    }
+
+    // ** Assets::isIndexValid
+    NIMBLE_INLINE bool Assets::isIndexValid( Index index ) const
+    {
+        return m_assets.has( index );
     }
 
 } // namespace Assets
 
 DC_END_DREEMCHEST
+
+#include "AssetHandle.hpp"
 
 #endif    /*    !__DC_Assets_H__    */

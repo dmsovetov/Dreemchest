@@ -64,4 +64,4 @@ namespace Network {
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Network_SocketResult_H__	*/
+#endif    /*    !__DC_Network_SocketResult_H__    */

@@ -39,11 +39,11 @@ Input* Input::s_input = NULL;
 // ** Input::Input
 Input::Input( IInput* impl ) : m_impl( impl )
 {
-    DC_ABORT_IF( s_input != NULL, "only a single Input instance is allowed" );
-    if( !m_impl ) LogWarning( "input", "not implemented on current platform\n" );
+    NIMBLE_ABORT_IF( s_input != NULL, "only a single Input instance is allowed" );
+    if( !m_impl ) LogWarning( "input", "%s", "not implemented on current platform\n" );
     s_input = this;
 
-	memset( m_isKeyDown, 0, sizeof( m_isKeyDown ) );
+    memset( m_isKeyDown, 0, sizeof( m_isKeyDown ) );
 }
 
 Input::~Input( void )
@@ -54,9 +54,9 @@ Input::~Input( void )
 // ** Input::sharedInstance
 Input* Input::sharedInstance( void )
 {
-	if( s_input == NULL ) {
-		s_input = Input::create();
-	}
+    if( s_input == NULL ) {
+        s_input = Input::create();
+    }
 
     return s_input;
 }
@@ -64,7 +64,7 @@ Input* Input::sharedInstance( void )
 // ** Input::create
 Input* Input::create( void )
 {
-#if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_OSX )
+#if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_MACOS )
     if( IInput* impl = createInput() ) {
         return DC_NEW Input( impl );
     }
@@ -85,18 +85,18 @@ bool Input::keyPressed( const Key& key )
 {
     DC_CHECK_IMPL( false );
     
-	if( keyDown( key ) ) {
-		if( !m_isKeyDown[key] ) {
-			m_isKeyDown[key] = true;
-			return true;
-		}
+    if( keyDown( key ) ) {
+        if( !m_isKeyDown[key] ) {
+            m_isKeyDown[key] = true;
+            return true;
+        }
 
-		return false;
-	} else {
-		m_isKeyDown[key] = false;
-	}
+        return false;
+    } else {
+        m_isKeyDown[key] = false;
+    }
 
-	return false;
+    return false;
 }
 
 // ** Input::mouseX

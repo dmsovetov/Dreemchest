@@ -43,12 +43,16 @@ namespace Network {
 Application::Application( void )
     : m_nextConnectionId( 1 )
 {
-    DC_ABORT_IF( TypeInfo<Application>::name() != String( "Application" ), "the type info return an invalid name" );
+    NIMBLE_ABORT_IF( TypeInfo<Application>::name() != String( "Application" ), "the type info return an invalid name" );
     
+#if DREEMCHEST_CPP11
     addPacketHandler< PacketHandlerCallback<Packets::Event> >( dcThisMethod( Application::handleEventPacket ) );
     addPacketHandler< PacketHandlerCallback<Packets::Ping> >( dcThisMethod( Application::handlePingPacket ) );
     addPacketHandler< PacketHandlerCallback<Packets::RemoteCall> >( dcThisMethod( Application::handleRemoteCallPacket ) );
     addPacketHandler< PacketHandlerCallback<Packets::RemoteCallResponse> >( dcThisMethod( Application::handleRemoteCallResponsePacket ) );
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif  /*  #if DREEMCHEST_CPP11    */
 }
 
 // ** Application::~Application
@@ -58,29 +62,29 @@ Application::~Application( void )
     ConnectionSet connections = m_connections;
 
     // Close all connections upon application destruction
-	for( ConnectionSet::iterator i = connections.begin(); i != connections.end(); ++i ) {
-		ConnectionPtr connection = *i;
+    for( ConnectionSet::iterator i = connections.begin(); i != connections.end(); ++i ) {
+        ConnectionPtr connection = *i;
         connection->close();
-	}
+    }
 }
 
 // ** Application::createConnection
 ConnectionPtr Application::createConnection( TCPSocketWPtr socket )
 {
-	// Create the connection instance and add it to an active connections set
-	ConnectionPtr connection( DC_NEW Connection( this, socket ) );
-	m_connections.insert( connection );
+    // Create the connection instance and add it to an active connections set
+    ConnectionPtr connection( DC_NEW Connection( this, socket ) );
+    m_connections.insert( connection );
 
     // Subscribe for connection events.
     connection->subscribe<Connection::Received>( dcThisMethod( Application::handlePacketReceived ) );
-	connection->subscribe<Connection::Closed>( dcThisMethod( Application::handleConnectionClosed ) );
+    connection->subscribe<Connection::Closed>( dcThisMethod( Application::handleConnectionClosed ) );
 
     // Assigned the connection id
     connection->setId( m_nextConnectionId++ );
 
     LogVerbose( "connection", "connection #%d accepted from %s (%d active connections)\n", connection->id(), connection->address().toString(), m_connections.size() );
 
-	return connection;
+    return connection;
 }
 
 // ** Application::closeConnection
@@ -90,53 +94,57 @@ void Application::closeConnection( ConnectionWPtr connection )
 
     // Unsubscribe from a connection events
     connection->unsubscribe<Connection::Received>( dcThisMethod( Application::handlePacketReceived ) );
-	connection->unsubscribe<Connection::Closed>( dcThisMethod( Application::handleConnectionClosed ) );
+    connection->unsubscribe<Connection::Closed>( dcThisMethod( Application::handleConnectionClosed ) );
 
     // Notify listeners about a disconnection
     notify<Disconnected>( this, connection );
 
     // Remove from a connections container
-	m_connections.erase( connection );
+    m_connections.erase( connection );
 }
 
 // ** Application::eventListeners
 ConnectionList Application::eventListeners( void ) const
 {
-	return ConnectionList();
+    return ConnectionList();
 }
 
 // ** Application::handlePingPacket
 void Application::handlePingPacket( ConnectionWPtr connection, const Packets::Ping& ping )
 {
-	if( ping.iterations ) {
-		connection->send<Packets::Ping>( ping.iterations - 1, ping.timestamp, connection->time() );
-	} else {
-		u32 rtt  = connection->time() - ping.timestamp;
-		u32 time = ping.time + rtt / 2;
+    if( ping.iterations ) {
+    #if DREEMCHEST_CPP11
+        connection->send<Packets::Ping>( ping.iterations - 1, ping.timestamp, connection->time() );
+    #else
+        NIMBLE_NOT_IMPLEMENTED
+    #endif  /*  #if DREEMCHEST_CPP11    */
+    } else {
+        u32 rtt  = connection->time() - ping.timestamp;
+        u32 time = ping.time + rtt / 2;
 
-		if( abs( ( s64 )time - connection->time() ) > 50 ) {
-			LogWarning( "connection", "%dms time error detected\n", time - connection->time() );
-			connection->setTime( time );
-		}
+        if( std::abs( ( s64 )time - connection->time() ) > 50 ) {
+            LogWarning( "connection", "%dms time error detected\n", time - connection->time() );
+            connection->setTime( time );
+        }
 
-		
-		connection->setRoundTripTime( rtt );
-	}
+        
+        connection->setRoundTripTime( rtt );
+    }
 }
 
 // ** Application::handleRemoteCallPacket
 void Application::handleRemoteCallPacket( ConnectionWPtr connection, const Packets::RemoteCall& packet )
 {
-	// Find a remote call handler
-	RemoteCallHandlers::iterator i = m_remoteCallHandlers.find( String32( packet.method ) );
+    // Find a remote call handler
+    RemoteCallHandlers::iterator i = m_remoteCallHandlers.find( String32( packet.method ) );
 
-	if( i == m_remoteCallHandlers.end() ) {
-		LogWarning( "rpc", "trying to invoke unknown remote procedure %d\n", packet.method );
-		return;
-	}
+    if( i == m_remoteCallHandlers.end() ) {
+        LogWarning( "rpc", "trying to invoke unknown remote procedure %d\n", packet.method );
+        return;
+    }
 
-	// Invoke a method
-	i->second->handle( connection, packet );
+    // Invoke a method
+    i->second->handle( connection, packet );
 }
 
 // ** Application::handleRemoteCallResponsePacket
@@ -148,16 +156,16 @@ void Application::handleRemoteCallResponsePacket( ConnectionWPtr connection, con
 // ** Application::handleEventPacket
 void Application::handleEventPacket( ConnectionWPtr connection, const Packets::Event& packet )
 {
-	// Find an event handler from this event id.
-	EventHandlers::iterator i = m_eventHandlers.find( packet.eventId );
+    // Find an event handler from this event id.
+    EventHandlers::iterator i = m_eventHandlers.find( packet.eventId );
 
-	if( i == m_eventHandlers.end() ) {
-		LogWarning( "rpc", "unknown event %d received\n", packet.eventId );
-		return;
-	}
+    if( i == m_eventHandlers.end() ) {
+        LogWarning( "rpc", "unknown event %d received\n", packet.eventId );
+        return;
+    }
 
-	// Handle this event
-	i->second->handle( connection, packet );
+    // Handle this event
+    i->second->handle( connection, packet );
 }
 
 // ** Application::handlePacketReceived
@@ -167,13 +175,13 @@ void Application::handlePacketReceived( const Connection::Received& e )
     ConnectionWPtr connection = static_cast<Connection*>( e.sender.get() );
 
     // Create instance of a network packet
-	PacketUPtr packet = m_packetFactory.construct( e.type );
+    PacketUPtr packet = m_packetFactory.construct( e.type );
 
     // The packet type is unknown - skip it
-	if( packet == NULL ) {
+    if( packet == NULL ) {
         LogDebug( "packet", "packet of unknown type %d received, %d bytes skipped\n", e.type, e.packet->bytesAvailable() );
-		return;
-	}
+        return;
+    }
 
     // Track received packet size
     m_bytesReceivedPerPacket[packet->name()] += e.size;
@@ -181,13 +189,13 @@ void Application::handlePacketReceived( const Connection::Received& e )
     // Get the packet stream
     Io::ByteBufferWPtr stream = e.packet;
 
-	// Read the packet data from a stream
+    // Read the packet data from a stream
     s32 position = stream->position();
-	packet->deserialize( stream );
-	s32 bytesRead = stream->position() - position;
-    DC_BREAK_IF( bytesRead != e.size, "packet size mismatch" );
+    packet->deserialize( stream );
+    s32 bytesRead = stream->position() - position;
+    NIMBLE_BREAK_IF( bytesRead != e.size, "packet size mismatch" );
 
-	// Find all handlers that are eligible to process this type of packet
+    // Find all handlers that are eligible to process this type of packet
     PacketHandlers::iterator i = m_packetHandlers.find( e.type );
     if( i == m_packetHandlers.end() ) {
         return;
@@ -204,8 +212,8 @@ void Application::handleConnectionClosed( const Connection::Closed& e )
     // Output the log message
     LogVerbose( "connection", "#%d was closed (%d active connections)\n", e.sender->id(), m_connections.size() );
 
-	// Remove this connection from list
-	closeConnection( static_cast<Connection*>( e.sender.get() ) );
+    // Remove this connection from list
+    closeConnection( static_cast<Connection*>( e.sender.get() ) );
 }
 
 // ** Application::bytesSentPerPacket
@@ -223,21 +231,21 @@ const Application::TrafficPerPacket& Application::bytesReceivedPerPacket( void )
 // ** Application::update
 void Application::update( u32 dt )
 {
-	// Update all connections
-	ConnectionSet connections = m_connections;
+    // Update all connections
+    ConnectionSet connections = m_connections;
 
-	for( ConnectionSet::iterator i = connections.begin(); i != connections.end(); ++i ) {
-		// Get the connection instance from an iterator
-		ConnectionPtr connection = *i;
+    for( ConnectionSet::iterator i = connections.begin(); i != connections.end(); ++i ) {
+        // Get the connection instance from an iterator
+        ConnectionPtr connection = *i;
 
-		// Update the connection instance
-		connection->update( dt );
+        // Update the connection instance
+        connection->update( dt );
 
-		// Close this connection if it was queued for closing
-		if( connection->willBeClosed() ) {
-			connection->close();
-		}
-	}
+        // Close this connection if it was queued for closing
+        if( connection->willBeClosed() ) {
+            connection->close();
+        }
+    }
 }
 
 } // namespace Network

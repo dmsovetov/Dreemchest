@@ -40,58 +40,58 @@ Document::Document( MainWindowQPtr parent, Editors::AssetEditorQPtr assetEditor,
     : QDockWidget( title, NULL ), m_mainWindow( parent ), m_assetEditor( assetEditor ), m_renderingFrame( NULL )
 {
     assetEditor->setParent( this );
-	connect( this, SIGNAL(visibilityChanged(bool)), this, SLOT(visibilityChanged(bool)) );
+    connect( this, SIGNAL(visibilityChanged(bool)), this, SLOT(visibilityChanged(bool)) );
 }
 
 // ** Document::visibilityChanged
 void Document::visibilityChanged( bool visible )
 {
-	if( visible ) {
-		m_mainWindow->setActiveDocument( this );
-	}
+    if( visible ) {
+        m_mainWindow->setActiveDocument( this );
+    }
 }
 
 // ** Document::closeEvent
 void Document::closeEvent( QCloseEvent *e )
 {
-	// Close the document
-	if( !m_mainWindow->closeDocument( this ) ) {
-		e->ignore();
-	} else {
-		// Process the event
-//		QDockWidget::closeEvent( e );	
-	}
+    // Close the document
+    if( !m_mainWindow->closeDocument( this ) ) {
+        e->ignore();
+    } else {
+        // Process the event
+//        QDockWidget::closeEvent( e );    
+    }
 }
 
 // ** Document::renderingFrame
 RenderingFrameQPtr Document::renderingFrame( void ) const
 {
-	return m_renderingFrame;
+    return m_renderingFrame;
 }
 
 // ** Document::attachRenderingFrame
 RenderingFrameQPtr Document::attachRenderingFrame( void )
 {
-	DC_BREAK_IF( m_renderingFrame );
+    NIMBLE_BREAK_IF( m_renderingFrame );
 
-	// Get the shared rendering context
-	RenderingFrameQPtr sharedContext = m_mainWindow->sharedRenderingContext();
+    // Get the shared rendering context
+    RenderingFrameQPtr sharedContext = m_mainWindow->sharedRenderingContext();
 
-	// Create the rendering frame instance
-	m_renderingFrame = new RenderingFrame( sharedContext, this );
-	m_renderingFrame->setInterval( 10 );
-	m_renderingFrame->makeCurrent();
+    // Create the rendering frame instance
+    m_renderingFrame = new RenderingFrame( sharedContext, this );
+    m_renderingFrame->setInterval( 10 );
+    m_renderingFrame->makeCurrent();
 
-	// Set the rendering frame as a main widget of a dock widget
-	setWidget( m_renderingFrame );
+    // Set the rendering frame as a main widget of a dock widget
+    setWidget( m_renderingFrame );
 
-	return m_renderingFrame;
+    return m_renderingFrame;
 }
 
 // ** Document::assetEditor
 Editors::AssetEditorQPtr Document::assetEditor( void ) const
 {
-	return m_assetEditor;
+    return m_assetEditor;
 }
 
 } // namespace Ui

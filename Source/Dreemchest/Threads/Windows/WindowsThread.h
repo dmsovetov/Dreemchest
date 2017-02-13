@@ -41,11 +41,11 @@ namespace Threads {
 	public:
 
 							WindowsThread( void );
-		virtual				~WindowsThread( void ) DC_DECL_OVERRIDE;
+		virtual				~WindowsThread( void ) NIMBLE_OVERRIDE;
 
 		// ** Thread
-		virtual void		start( const ThreadCallback& callback, void *userData ) DC_DECL_OVERRIDE;
-		virtual void		wait( void ) const DC_DECL_OVERRIDE;
+		virtual void		start( const ThreadCallback& callback, void *userData ) NIMBLE_OVERRIDE;
+		virtual void		wait( void ) const NIMBLE_OVERRIDE;
 
 	private:
 
@@ -61,12 +61,12 @@ namespace Threads {
 	public:
 
 							WindowsMutex( void );
-		virtual				~WindowsMutex( void ) DC_DECL_OVERRIDE;
+		virtual				~WindowsMutex( void ) NIMBLE_OVERRIDE;
 
 		// ** Mutex
-		virtual bool		tryLock( void ) DC_DECL_OVERRIDE;
-		virtual void		lock( void ) DC_DECL_OVERRIDE;
-		virtual void		unlock( void ) DC_DECL_OVERRIDE;
+		virtual bool		tryLock( void ) NIMBLE_OVERRIDE;
+		virtual void		lock( void ) NIMBLE_OVERRIDE;
+		virtual void		unlock( void ) NIMBLE_OVERRIDE;
 
 	private:
 
@@ -81,8 +81,8 @@ namespace Threads {
 		virtual             ~WindowsCondition( void );
 
 		// ** Condition
-        virtual void        wait( void ) DC_DECL_OVERRIDE;
-        virtual void        trigger( void ) DC_DECL_OVERRIDE;
+        virtual void        wait( void ) NIMBLE_OVERRIDE;
+        virtual void        trigger( void ) NIMBLE_OVERRIDE;
 
 	private:
 

@@ -31,9 +31,9 @@
 
 #include "../Decoders/WavSoundDecoder.h"
 
-#ifdef DC_HAVE_VORBIS
+#ifdef OGGVORBIS_FOUND
     #include "../Decoders/OggSoundDecoder.h"
-#endif
+#endif  /*  #ifdef OGGVORBIS_FOUND  */
 
 DC_BEGIN_DREEMCHEST
 
@@ -92,24 +92,24 @@ void SoundEngine::setDistanceModel( DistanceModel value )
 SoundDecoderPtr SoundEngine::createSoundDecoder( SoundContainerFormat format ) const
 {
     switch( format ) {
-    case SoundFormatUnknown:    LogWarning( "soundEngine", "unknown sound format\n" );
+    case SoundFormatUnknown:    LogWarning( "soundEngine", "%s", "unknown sound format\n" );
                                 return SoundDecoderPtr();
 
     case SoundFormatWav:        return DC_NEW WavSoundDecoder;
     case SoundFormatMp3:
-								#ifdef DC_HAVE_MP3
-									return DC_NEW Mp3SoundDecoder;
-								#else
-									LogWarning( "soundEngine", "MP3 sound decoder is not supported\n" );
-								#endif
-								break;
+                                #ifdef MP3_FOUND
+                                    return DC_NEW Mp3SoundDecoder;
+                                #else
+                                    LogWarning( "soundEngine", "%s", "MP3 sound decoder is not supported\n" );
+                                #endif  /*  #ifdef MP3_FOUND  */
+                                break;
     case SoundFormatOgg:
-								#ifdef DC_HAVE_VORBIS
-									return DC_NEW OggSoundDecoder;
-								#else
-									LogWarning( "soundEngine", "Vorbis sound decoder is not supported\n" );
-								#endif
-								break;
+                                #ifdef OGGVORBIS_FOUND
+                                    return DC_NEW OggSoundDecoder;
+                                #else
+                                    LogWarning( "soundEngine", "%s", "Vorbis sound decoder is not supported\n" );
+                                #endif  /*  #ifdef OGGVORBIS_FOUND  */
+                                break;
     }
 
     return NULL;
@@ -118,12 +118,12 @@ SoundDecoderPtr SoundEngine::createSoundDecoder( SoundContainerFormat format ) c
 // ** SoundEngine::createSoundDecoderWithFormat
 SoundDecoderPtr SoundEngine::createSoundDecoderWithFormat( ISoundStreamPtr stream, SoundContainerFormat format )
 {
-    DC_ABORT_IF( !stream.valid(), "invalid stream" );
+    NIMBLE_ABORT_IF( !stream.valid(), "invalid stream" );
 
     SoundDecoderPtr soundDecoder = createSoundDecoder( format );
 
     if( !soundDecoder.valid() ) {
-        LogError( "soundEngine", "failed to open file\n" );
+        LogError( "soundEngine", "%s", "failed to open file\n" );
         return SoundDecoderPtr();
     }
 
@@ -131,7 +131,7 @@ SoundDecoderPtr SoundEngine::createSoundDecoderWithFormat( ISoundStreamPtr strea
         return soundDecoder;
     }
 
-    LogError( "soundEngine", "unknown file format\n" );
+    LogError( "soundEngine", "%s", "unknown file format\n" );
     return SoundDecoderPtr();
 }
 

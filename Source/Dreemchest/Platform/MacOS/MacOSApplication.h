@@ -31,18 +31,23 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace Platform {
 
     // ** class MacOSApplication
     class MacOSApplication : public IApplication {
     public:
 
         // ** IApplication
-        virtual void        quit( u32 exitCode );
-        virtual int         launch( Application* application );
+        virtual void            quit( u32 exitCode );
+        virtual int             launch( Application* application );
+        virtual const String&   resourcePath( void ) const;
+        
+    private:
+        
+        mutable String          m_resourcePath;
     };
 
-} // namespace platform
+} // namespace Platform
 
 DC_END_DREEMCHEST
 

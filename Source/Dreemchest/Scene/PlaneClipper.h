@@ -31,42 +31,44 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Checks if an object is inside the set of planes.
-	class PlaneClipper {
-	public:
+#if DEV_DEPRECATED_SCENE_RENDERER
+    //! Checks if an object is inside the set of planes.
+    class PlaneClipper {
+    public:
 
-							//! Constructs the PlaneClipper instance.
-							PlaneClipper( u8 id = 0 );
+                            //! Constructs the PlaneClipper instance.
+                            PlaneClipper( u8 id = 0 );
 
-		//! Adds a new clipping plane.
-		void				add( const Plane& plane );
+        //! Adds a new clipping plane.
+        void                add( const Plane& plane );
 
-		//! Adds planes from a camera frustum.
-		void				setAsFrustum( const Matrix4& viewProjection );
+        //! Adds planes from a camera frustum.
+        void                setAsFrustum( const Matrix4& viewProjection );
 
-		//! Adds planes from a box.
-		void				setAsBox( const Vec3& center, f32 radius );
+        //! Adds planes from a box.
+        void                setAsBox( const Vec3& center, f32 radius );
 
-		//! Returns plane clipper id.
-		u8					id( void ) const;
+        //! Returns plane clipper id.
+        u8                    id( void ) const;
 
-		//! Returns true if bounding box is inside the clipping planes.
-		bool				inside( const Bounds& bounds ) const;
+        //! Returns true if bounding box is inside the clipping planes.
+        bool                inside( const Bounds& bounds ) const;
 
-		//! Returns true if bounding sphere is inside the clipping planes.
-		bool				inside( const Vec3& center, f32 radius ) const;
+        //! Returns true if bounding sphere is inside the clipping planes.
+        bool                inside( const Vec3& center, f32 radius ) const;
 
-		//! Creates the plane clipper from a camera frustum.
-		static PlaneClipper	createFromFrustum( const Matrix4& viewProjection, u8 id = 0 );
+        //! Creates the plane clipper from a camera frustum.
+        static PlaneClipper    createFromFrustum( const Matrix4& viewProjection, u8 id = 0 );
 
-		//! Creates the plane clipper from a box.
-		static PlaneClipper	createFromBox( const Vec3& center, f32 radius, u8 id = 0 );
+        //! Creates the plane clipper from a box.
+        static PlaneClipper    createFromBox( const Vec3& center, f32 radius, u8 id = 0 );
 
-	private:
+    private:
 
-		u8					m_id;		//!< Clipper identifier.
-		Array<Plane>		m_planes;	//!< Clipping planes.
-	};
+        u8                    m_id;        //!< Clipper identifier.
+        Array<Plane>        m_planes;    //!< Clipping planes.
+    };
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

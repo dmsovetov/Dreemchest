@@ -75,7 +75,7 @@ Instance Assembly::createInstance( const String& name ) const
     // -------------------------------
     static bool warningShown = false;
     if( !warningShown ) {
-        LogWarning( "assembly", "Assembly.cpp:81: this is just a prototyping code and it should not be used in production env\n" );
+        LogWarning( "assembly", "%s", "Assembly.cpp:81: this is just a prototyping code and it should not be used in production env\n" );
         warningShown = true;
     }
 

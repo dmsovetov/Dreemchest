@@ -38,12 +38,12 @@ SoundData::SoundData( SoundFxWPtr sfx, CString identifier, CString uri, SoundGro
     : m_soundFx( sfx )
     , m_uri( uri )
     , m_group( group )
-    , m_pcm( NULL )
     , m_format( SoundFormatUnknown )
     , m_isRelative( false )
+    , m_referenceDistance( 1.0f )
     , m_maximumDistance( FLT_MAX )
     , m_rolloffFactor( 1.0f )
-    , m_referenceDistance( 1.0f )
+    , m_pcm( NULL )
 {
     m_identifier        = identifier;
     m_type              = 0;
@@ -70,8 +70,8 @@ CString SoundData::identifier( void ) const
 // ** SoundData::setIdentifier
 void SoundData::setIdentifier( CString value )
 {
-    DC_ABORT_IF( value != NULL, "invalid identifier" );
-    DC_ABORT_IF( strlen( value ) == 0, "empty identifier" );
+    NIMBLE_ABORT_IF( value != NULL, "invalid identifier" );
+    NIMBLE_ABORT_IF( strlen( value ) == 0, "empty identifier" );
     
     m_identifier = value;
 }

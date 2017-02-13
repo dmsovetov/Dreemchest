@@ -35,11 +35,11 @@ namespace Fx {
 // ** InitialLife::update
 void InitialLife::update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const
 {
-	Particle::Life* life = particles->life;
+    Particle::Life* life = particles->life;
 
-	for( s32 i = first; i < last; i++ ) {
-		life[i].current = life[i].initial = m_value.sample( 0, state.m_time, 1.0f );
-	}
+    for( s32 i = first; i < last; i++ ) {
+        life[i].current = life[i].initial = m_value.sample( 0, state.m_time, 1.0f );
+    }
 }
 
 // --------------------------------------------------------- Life --------------------------------------------------------- //
@@ -47,48 +47,48 @@ void InitialLife::update( Particle* particles, s32 first, s32 last, const Simula
 // ** Life::update
 void Life::update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const
 {
-	for( s32 i = first; i < last; i++ ) {
-		Particle::Life* life = &particles->life[i];
-		life->current -= state.m_dt;
-		life->scalar = min2( 1.0f, 1.0f - life->current / life->initial );
-	}
+    for( s32 i = first; i < last; i++ ) {
+        Particle::Life* life = &particles->life[i];
+        life->current -= state.m_dt;
+        life->scalar = min2( 1.0f, 1.0f - life->current / life->initial );
+    }
 }
 
 // ------------------------------------------------------ LinearVelocity ------------------------------------------------------ //
 
 // ** LinearVelocity::x
-FloatParameter&	LinearVelocity::x( void )
+FloatParameter&    LinearVelocity::x( void )
 {
-	return m_velocity[0];
+    return m_velocity[0];
 }
 
 // ** LinearVelocity::y
-FloatParameter&	LinearVelocity::y( void )
+FloatParameter&    LinearVelocity::y( void )
 {
-	return m_velocity[1];
+    return m_velocity[1];
 }
 
 // ** LinearVelocity::z
-FloatParameter&	LinearVelocity::z( void )
+FloatParameter&    LinearVelocity::z( void )
 {
-	return m_velocity[2];
+    return m_velocity[2];
 }
 
 // ** LinearVelocity::update
 void LinearVelocity::update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const
 {
-	const Particle::Life* life	   = particles->life;
-	const u32*			  indices  = particles->indices;
+    const Particle::Life* life       = particles->life;
+    const u32*              indices  = particles->indices;
     Vec3*                 velocity = particles->velocity;
 
-	for( s32 i = first; i < last; i++ ) {
-		f32 scalar = life[i].scalar;
-		u32 idx	   = indices[i];
+    for( s32 i = first; i < last; i++ ) {
+        f32 scalar = life[i].scalar;
+        u32 idx       = indices[i];
 
         velocity[i].x += m_velocity[0].sample( idx, scalar, 0.0f );
         velocity[i].y += m_velocity[1].sample( idx, scalar, 0.0f );
         velocity[i].z += m_velocity[2].sample( idx, scalar, 0.0f );
-	}
+    }
 }
 
 // ----------------------------------------------------- LimitVelocity ----------------------------------------------------- //
@@ -96,20 +96,20 @@ void LinearVelocity::update( Particle* particles, s32 first, s32 last, const Sim
 // ** LimitVelocity::update
 void LimitVelocity::update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const
 {
-	const Particle::Life* life	   = particles->life;
-	const u32*			  indices  = particles->indices;
+    const Particle::Life* life       = particles->life;
+    const u32*              indices  = particles->indices;
     Vec3*                 velocity = particles->velocity;
 
-	for( s32 i = first; i < last; i++ ) {
+    for( s32 i = first; i < last; i++ ) {
         f32 maximum = m_value.sample( indices[i], life[i].scalar, 0.0f );
-		f32 current = velocity[i].length();
+        f32 current = velocity[i].length();
 
         if( current <= maximum ) {
             continue;
         }
 
         velocity[i] = velocity[i] / current * maximum;
-	}
+    }
 }
 
 // ------------------------------------------------------ InitialSize ------------------------------------------------------ //
@@ -117,9 +117,9 @@ void LimitVelocity::update( Particle* particles, s32 first, s32 last, const Simu
 // ** InitialSize::update
 void InitialSize::update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const
 {
-	for( s32 i = first; i < last; i++ ) {
-		particles->size[i].initial = particles->size[i].current = m_value.sample( 0, state.m_time, 5 );
-	}
+    for( s32 i = first; i < last; i++ ) {
+        particles->size[i].initial = particles->size[i].current = m_value.sample( 0, state.m_time, 5 );
+    }
 }
 
 // --------------------------------------------------------- Size ---------------------------------------------------------- //
@@ -127,13 +127,13 @@ void InitialSize::update( Particle* particles, s32 first, s32 last, const Simula
 // ** Size::update
 void Size::update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const
 {
-	Particle::Scalar*	  size	= particles->size;
-	const Particle::Life* life	= particles->life;
-	const u32*			  indices = particles->indices;
+    Particle::Scalar*      size    = particles->size;
+    const Particle::Life* life    = particles->life;
+    const u32*              indices = particles->indices;
 
-	for( s32 i = first; i < last; i++ ) {
-		size[i].current = size[i].initial * m_value.sample( indices[i], life[i].scalar, 1.0f );
-	}
+    for( s32 i = first; i < last; i++ ) {
+        size[i].current = size[i].initial * m_value.sample( indices[i], life[i].scalar, 1.0f );
+    }
 }
 
 // -------------------------------------------------- InitialTransparency -------------------------------------------------- //
@@ -141,11 +141,11 @@ void Size::update( Particle* particles, s32 first, s32 last, const SimulationSta
 // ** InitialTransparency::update
 void InitialTransparency::update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const
 {
-	Particle::Scalar* transparency	= particles->transparency;
+    Particle::Scalar* transparency    = particles->transparency;
 
-	for( s32 i = first; i < last; i++ ) {
-		transparency[i].initial = transparency[i].current = m_value.sample( 0, state.m_time, 1.0f );
-	}
+    for( s32 i = first; i < last; i++ ) {
+        transparency[i].initial = transparency[i].current = m_value.sample( 0, state.m_time, 1.0f );
+    }
 }
 
 // ----------------------------------------------------- Transparency ------------------------------------------------------ //
@@ -153,13 +153,13 @@ void InitialTransparency::update( Particle* particles, s32 first, s32 last, cons
 // ** Transparency::update
 void Transparency::update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const
 {
-	Particle::Scalar*	  transparency	= particles->transparency;
-	const Particle::Life* life			= particles->life;
-	const u32*			  indices		= particles->indices;
+    Particle::Scalar*      transparency    = particles->transparency;
+    const Particle::Life* life            = particles->life;
+    const u32*              indices        = particles->indices;
 
-	for( s32 i = first; i < last; i++ ) {
-		transparency[i].current = transparency[i].initial * m_value.sample( indices[i], life[i].scalar, 1.0f );
-	}
+    for( s32 i = first; i < last; i++ ) {
+        transparency[i].current = transparency[i].initial * m_value.sample( indices[i], life[i].scalar, 1.0f );
+    }
 }
 
 // ----------------------------------------------------- InitialAngularVelocity ------------------------------------------------------ //
@@ -167,11 +167,11 @@ void Transparency::update( Particle* particles, s32 first, s32 last, const Simul
 // ** InitialAngularVelocity::update
 void InitialAngularVelocity::update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const
 {
-	Particle::Scalar* angular = particles->angularVelocity;
+    Particle::Scalar* angular = particles->angularVelocity;
 
-	for( s32 i = first; i < last; i++ ) {
-		angular[i].current = angular[i].initial = m_value.sample( 0, state.m_time, 0.0f );
-	}
+    for( s32 i = first; i < last; i++ ) {
+        angular[i].current = angular[i].initial = m_value.sample( 0, state.m_time, 0.0f );
+    }
 }
 
 // -------------------------------------------------------- InitialRotation ---------------------------------------------------------- //
@@ -179,11 +179,11 @@ void InitialAngularVelocity::update( Particle* particles, s32 first, s32 last, c
 // ** InitialRotation::update
 void InitialRotation::update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const
 {
-	f32* rotation = particles->rotation;
+    f32* rotation = particles->rotation;
 
-	for( s32 i = first; i < last; i++ ) {
-		rotation[i] = m_value.sample( 0, state.m_time, 0.0f );
-	}
+    for( s32 i = first; i < last; i++ ) {
+        rotation[i] = m_value.sample( 0, state.m_time, 0.0f );
+    }
 }
 
 // ----------------------------------------------------------- Rotation -------------------------------------------------------------- //
@@ -191,12 +191,12 @@ void InitialRotation::update( Particle* particles, s32 first, s32 last, const Si
 // ** Rotation::update
 void Rotation::update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const
 {
-	const Particle::Scalar* angular  = particles->angularVelocity;
-	f32*				    rotation = particles->rotation;
+    const Particle::Scalar* angular  = particles->angularVelocity;
+    f32*                    rotation = particles->rotation;
 
-	for( s32 i = first; i < last; i++ ) {
-		rotation[i] += angular[i].current * state.m_dt;
-	}
+    for( s32 i = first; i < last; i++ ) {
+        rotation[i] += angular[i].current * state.m_dt;
+    }
 }
 
 // --------------------------------------------------------- InitialSpeed ------------------------------------------------------------ //
@@ -204,11 +204,11 @@ void Rotation::update( Particle* particles, s32 first, s32 last, const Simulatio
 // ** InitialSpeed::update
 void InitialSpeed::update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const
 {
-	Particle::Force* force = particles->force;
+    Particle::Force* force = particles->force;
 
-	for( s32 i = first; i < last; i++ ) {
-		force[i].velocity *= m_value.sample( 0, state.m_time, 0 );
-	}
+    for( s32 i = first; i < last; i++ ) {
+        force[i].velocity *= m_value.sample( 0, state.m_time, 0 );
+    }
 }
 
 // --------------------------------------------------------- InitialGravity ---------------------------------------------------------- //
@@ -216,11 +216,11 @@ void InitialSpeed::update( Particle* particles, s32 first, s32 last, const Simul
 // ** InitialGravity::update
 void InitialGravity::update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const
 {
-	Particle::Force* force = particles->force;
+    Particle::Force* force = particles->force;
 
-	for( s32 i = first; i < last; i++ ) {
-		force[i].acceleration.y -= m_value.sample( 0, state.m_time, 0 );
-	}
+    for( s32 i = first; i < last; i++ ) {
+        force[i].acceleration.y -= m_value.sample( 0, state.m_time, 0 );
+    }
 }
 
 // ---------------------------------------------------------- Acceleration ----------------------------------------------------------- //
@@ -229,12 +229,12 @@ void InitialGravity::update( Particle* particles, s32 first, s32 last, const Sim
 void Acceleration::update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const
 {
     Vec3*            velocity = particles->velocity;
-	Particle::Force* force	  = particles->force;
+    Particle::Force* force      = particles->force;
 
-	for( s32 i = first; i < last; i++ ) {
-	    force[i].velocity += force[i].acceleration * state.m_dt;
+    for( s32 i = first; i < last; i++ ) {
+        force[i].velocity += force[i].acceleration * state.m_dt;
         velocity[i]        = force[i].velocity;
-	}
+    }
 }
 
 // ------------------------------------------------------------ Position ------------------------------------------------------------- //
@@ -243,12 +243,12 @@ void Acceleration::update( Particle* particles, s32 first, s32 last, const Simul
 void Position::update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const
 {
     const Vec3* velocity = particles->velocity;
-    const Particle::Force* force	  = particles->force;
-	Vec3*	    position = particles->position;
+    //const Particle::Force* force      = particles->force;
+    Vec3*        position = particles->position;
 
-	for( s32 i = first; i < last; i++ ) {
-		position[i] += (velocity[i] /*+ force[i].velocity*/) * state.m_dt;
-	}
+    for( s32 i = first; i < last; i++ ) {
+        position[i] += (velocity[i] /*+ force[i].velocity*/) * state.m_dt;
+    }
 }
 
 // ----------------------------------------------------------- InitialColor ----------------------------------------------------------- //
@@ -256,12 +256,12 @@ void Position::update( Particle* particles, s32 first, s32 last, const Simulatio
 // ** InitialColor::update
 void InitialColor::update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const
 {
-	Particle::Color* color = particles->color;
-	Rgb				 white = Rgb( 1.0f, 1.0f, 1.0f );
+    Particle::Color* color = particles->color;
+    Rgb                 white = Rgb( 1.0f, 1.0f, 1.0f );
 
-	for( s32 i = first; i < last; i++ ) {
-		color[i].current = color[i].initial = m_value.sample( 0, state.m_time, white );
-	}
+    for( s32 i = first; i < last; i++ ) {
+        color[i].current = color[i].initial = m_value.sample( 0, state.m_time, white );
+    }
 }
 
 // -------------------------------------------------------------- Color -------------------------------------------------------------- //
@@ -269,14 +269,14 @@ void InitialColor::update( Particle* particles, s32 first, s32 last, const Simul
 // ** Color::update
 void Color::update( Particle* particles, s32 first, s32 last, const SimulationState& state ) const
 {
-	Particle::Color*	  color   = particles->color;
-	const Particle::Life* life	  = particles->life;
-	const u32*			  indices = particles->indices;
-	Rgb					  white	  = Rgb( 1.0f, 1.0f, 1.0f );
+    Particle::Color*      color   = particles->color;
+    const Particle::Life* life      = particles->life;
+    const u32*              indices = particles->indices;
+    Rgb                      white      = Rgb( 1.0f, 1.0f, 1.0f );
 
-	for( s32 i = first; i < last; i++ ) {
-		color[i].current = color[i].initial * m_value.sample( indices[i], life[i].scalar, white );
-	}
+    for( s32 i = first; i < last; i++ ) {
+        color[i].current = color[i].initial * m_value.sample( indices[i], life[i].scalar, white );
+    }
 }
 
 } // namespace Fx

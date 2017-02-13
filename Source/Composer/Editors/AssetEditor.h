@@ -42,40 +42,40 @@ DC_BEGIN_COMPOSER
 
 namespace Editors {
 
-	//! Base class for all asset editors.
-	class AssetEditor : public QObject {
-	public:
+    //! Base class for all asset editors.
+    class AssetEditor : public QObject {
+    public:
 
-		//! Asset editor has entered the foreground.
-		virtual void			notifyEnterForeground( Ui::MainWindowQPtr window ) {}
+        //! Asset editor has entered the foreground.
+        virtual void            notifyEnterForeground( Ui::MainWindowQPtr window ) {}
 
-		//! Asset editor has entered the background.
-		virtual void			notifyEnterBackground( Ui::MainWindowQPtr window ) {}
+        //! Asset editor has entered the background.
+        virtual void            notifyEnterBackground( Ui::MainWindowQPtr window ) {}
 
-		//! Performs asset editor initialization.
-		virtual bool			initialize( ProjectQPtr project, const FileInfo& asset, Ui::DocumentQPtr document );
+        //! Performs asset editor initialization.
+        virtual bool            initialize( ProjectQPtr project, const FileInfo& asset, Ui::DocumentQPtr document );
 
-		//! Saves the asset to disk.
-		virtual void			save( void ) {}
+        //! Saves the asset to disk.
+        virtual void            save( void ) {}
 
-		//! Returns true if the document has changes.
-		bool					hasChanges( void ) const;
+        //! Returns true if the document has changes.
+        bool                    hasChanges( void ) const;
 
-		//! Returns the edited asset.
-		const FileInfo&		    asset( void ) const;
+        //! Returns the edited asset.
+        const FileInfo&            asset( void ) const;
 
-		//! Returns the parent document.
-		Ui::DocumentQPtr		document( void ) const;
+        //! Returns the parent document.
+        Ui::DocumentQPtr        document( void ) const;
 
-	protected:
+    protected:
 
-		ProjectQPtr	            m_project;	//!< Parent project instance.
-		Ui::DocumentQPtr		m_document;	//!< Parent document.
-		FileInfo			    m_asset;	//!< An asset being edited.
-	};
+        ProjectQPtr                m_project;    //!< Parent project instance.
+        Ui::DocumentQPtr        m_document;    //!< Parent document.
+        FileInfo                m_asset;    //!< An asset being edited.
+    };
 
 } // namespace Editors
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_AssetEditor_H__	*/
+#endif    /*    !__DC_Composer_AssetEditor_H__    */

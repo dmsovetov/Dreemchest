@@ -29,136 +29,135 @@
 
 #include "Emitter.h"
 
-#include "../Renderer/Hal.h"
-#include "../Renderer/Renderer2D.h"
-
 DC_BEGIN_DREEMCHEST
 
 namespace Fx {
 
     //! Particle vertex struct used for rendering.
     struct ParticleVertex {
-        Vec3        pos;		//!< Vertex position.
-        Rgba        color;		//!< Vertex color.
+        Vec3        pos;        //!< Vertex position.
+        Rgba        color;        //!< Vertex color.
     };
 
-	//! Rendering material interface.
-	class IMaterial : public RefCounted {
-	public:
+    //! Rendering material interface.
+    class IMaterial : public RefCounted {
+    public:
 
-									//! Constructs IMaterial instance.
-									IMaterial( Ptr<RefCounted> data = Ptr<RefCounted>() )
-										: m_data( data ) {}
-		virtual						~IMaterial( void ) {}
+                                    //! Constructs IMaterial instance.
+                                    IMaterial( Ptr<RefCounted> data = Ptr<RefCounted>() )
+                                        : m_data( data ) {}
+        virtual                        ~IMaterial( void ) {}
 
-		//! Returns the raw material pointer.
-		virtual Ptr<RefCounted>		get( void ) const { return m_data; }
+        //! Returns the raw material pointer.
+        virtual Ptr<RefCounted>        get( void ) const { return m_data; }
 
-	private:
+    private:
 
-		Ptr<RefCounted>				m_data;	//!< Implementation reference.
-	};
+        Ptr<RefCounted>                m_data;    //!< Implementation reference.
+    };
 
-	//! Material factory interface.
-	class IMaterialFactory : public RefCounted {
-	public:
+    //! Material factory interface.
+    class IMaterialFactory : public RefCounted {
+    public:
 
-		virtual						~IMaterialFactory( void ) {}
+        virtual                        ~IMaterialFactory( void ) {}
 
-		//! Creates a new material instance.
-		virtual IMaterialPtr		createMaterial( const String& identifier ) = 0;
-	};
+        //! Creates a new material instance.
+        virtual IMaterialPtr        createMaterial( const String& identifier ) = 0;
+    };
 
-	//! Hardware rendering interface.
-	class IRenderingInterface : public RefCounted {
-	public:
+    //! Hardware rendering interface.
+    class IRenderingInterface : public RefCounted {
+    public:
 
-		virtual						~IRenderingInterface( void ) {}
+        virtual                        ~IRenderingInterface( void ) {}
 
-		//! Renders an array of 3d points.
-		virtual void				renderPoints( const Vec3* position, const Rgba* color, const f32* size, s32 count, s32 stride ) = 0;
+        //! Renders an array of 3d points.
+        virtual void                renderPoints( const Vec3* position, const Rgba* color, const f32* size, s32 count, s32 stride ) = 0;
 
-		//! Renders an array of 2d points.
-		virtual void				renderPoints( const Vec2* position, const Rgba* color, const f32* size, s32 count, s32 stride ) = 0;
+        //! Renders an array of 2d points.
+        virtual void                renderPoints( const Vec2* position, const Rgba* color, const f32* size, s32 count, s32 stride ) = 0;
 
-		//! Renders the oriented 2d quad.
-		virtual void				renderOrientedQuadUV( const IMaterialWPtr& material, f32 x, f32 y, f32 width, f32 height, const Vec2& up, const Vec2& side, const Rgba& color ) = 0;
+        //! Renders the oriented 2d quad.
+        virtual void                renderOrientedQuadUV( const IMaterialWPtr& material, f32 x, f32 y, f32 width, f32 height, const Vec2& up, const Vec2& side, const Rgba& color ) = 0;
 
-		//! Renders the 2d line segment.
-		virtual void				renderLine( f32 x1, f32 y1, f32 x2, f32 y2, const Rgba& color1, const Rgba& color2 ) = 0;
+        //! Renders the 2d line segment.
+        virtual void                renderLine( f32 x1, f32 y1, f32 x2, f32 y2, const Rgba& color1, const Rgba& color2 ) = 0;
 
-		//! Renders the 2d thick line.
-		virtual void				renderThickLine( const IMaterialWPtr& material, f32 x1, f32 y1, f32 x2, f32 y2, f32 size1, f32 size2, const Rgba& color1, const Rgba& color2 ) = 0;
+        //! Renders the 2d thick line.
+        virtual void                renderThickLine( const IMaterialWPtr& material, f32 x1, f32 y1, f32 x2, f32 y2, f32 size1, f32 size2, const Rgba& color1, const Rgba& color2 ) = 0;
 
-		//! Renders the 2d line strip.
-		virtual void				renderLineStrip( const Vec2* position, const Rgb* color, s32 count, s32 stride, f32 alpha = 1.0f ) = 0;
+        //! Renders the 2d line strip.
+        virtual void                renderLineStrip( const Vec2* position, const Rgb* color, s32 count, s32 stride, f32 alpha = 1.0f ) = 0;
 
-		//! Renders the 2d thick line strip.
-		virtual void				renderThickLineStrip( const IMaterialWPtr& material, const Vec2* positions, const Rgb* colors, const f32* sizes, s32 count, s32 stride, f32 alpha = 1.0f ) = 0;
+        //! Renders the 2d thick line strip.
+        virtual void                renderThickLineStrip( const IMaterialWPtr& material, const Vec2* positions, const Rgb* colors, const f32* sizes, s32 count, s32 stride, f32 alpha = 1.0f ) = 0;
 
-		//! Flushes the accumulated particles.
-		virtual void				flush( void ) = 0;
-	};
+        //! Flushes the accumulated particles.
+        virtual void                flush( void ) = 0;
+    };
 
-	//! The built-in rendering interface.
-	class BuiltInRenderingInterface : public IRenderingInterface {
-	public:
+#if DEV_DEPRECATED_SCENE_RENDERER
+    //! The built-in rendering interface.
+    class BuiltInRenderingInterface : public IRenderingInterface {
+    public:
 
-									//! Constructs the BuiltInRenderingInterface instance.
-									BuiltInRenderingInterface( Renderer::Renderer2DPtr renderer );
+                                    //! Constructs the BuiltInRenderingInterface instance.
+                                    BuiltInRenderingInterface( Renderer::Renderer2DPtr renderer );
 
-		//! Renders an array of 3d points.
-		virtual void				renderPoints( const Vec3* position, const Rgba* color, const f32* size, s32 count, s32 stride );
+        //! Renders an array of 3d points.
+        virtual void                renderPoints( const Vec3* position, const Rgba* color, const f32* size, s32 count, s32 stride );
 
-		//! Renders an array of 2d points.
-		virtual void				renderPoints( const Vec2* position, const Rgba* color, const f32* size, s32 count, s32 stride );
+        //! Renders an array of 2d points.
+        virtual void                renderPoints( const Vec2* position, const Rgba* color, const f32* size, s32 count, s32 stride );
 
-		//! Renders the oriented 2d quad.
-		virtual void				renderOrientedQuadUV( const IMaterialWPtr& material, f32 x, f32 y, f32 width, f32 height, const Vec2& up, const Vec2& side, const Rgba& color );
+        //! Renders the oriented 2d quad.
+        virtual void                renderOrientedQuadUV( const IMaterialWPtr& material, f32 x, f32 y, f32 width, f32 height, const Vec2& up, const Vec2& side, const Rgba& color );
 
-		//! Renders the 2d line segment.
-		virtual void				renderLine( f32 x1, f32 y1, f32 x2, f32 y2, const Rgba& color1, const Rgba& color2 );
+        //! Renders the 2d line segment.
+        virtual void                renderLine( f32 x1, f32 y1, f32 x2, f32 y2, const Rgba& color1, const Rgba& color2 );
 
-		//! Renders the 2d thick line.
-		virtual void				renderThickLine( const IMaterialWPtr& material, f32 x1, f32 y1, f32 x2, f32 y2, f32 size1, f32 size2, const Rgba& color1, const Rgba& color2 );
+        //! Renders the 2d thick line.
+        virtual void                renderThickLine( const IMaterialWPtr& material, f32 x1, f32 y1, f32 x2, f32 y2, f32 size1, f32 size2, const Rgba& color1, const Rgba& color2 );
 
-		//! Renders the 2d line strip.
-		virtual void				renderLineStrip( const Vec2* position, const Rgb* color, s32 count, s32 stride, f32 alpha = 1.0f );
+        //! Renders the 2d line strip.
+        virtual void                renderLineStrip( const Vec2* position, const Rgb* color, s32 count, s32 stride, f32 alpha = 1.0f );
 
-		//! Renders the 2d thick line strip.
-		virtual void				renderThickLineStrip( const IMaterialWPtr& material, const Vec2* positions, const Rgb* colors, const f32* sizes, s32 count, s32 stride, f32 alpha = 1.0f );
+        //! Renders the 2d thick line strip.
+        virtual void                renderThickLineStrip( const IMaterialWPtr& material, const Vec2* positions, const Rgb* colors, const f32* sizes, s32 count, s32 stride, f32 alpha = 1.0f );
 
-		//! Flushes the accumulated particles.
-		virtual void				flush( void );
+        //! Flushes the accumulated particles.
+        virtual void                flush( void );
 
-	private:
+    private:
 
-		Renderer::Renderer2DPtr		m_renderer;	//!< 2d rendering interface.
-	};
+        Renderer::Renderer2DPtr        m_renderer;    //!< 2d rendering interface.
+    };
+#endif
 
     //! Base class for all particle renderers.
     class ParticleRenderer : public RefCounted {
     public:
 
-		virtual                     ~ParticleRenderer( void ) {}
+        virtual                     ~ParticleRenderer( void ) {}
 
-		//! Returns the particle renderer type.
-        virtual RenderingMode		type( void ) const = 0;
+        //! Returns the particle renderer type.
+        virtual RenderingMode        type( void ) const = 0;
 
-		//! Renders the particles with a specified blending mode & texture.
+        //! Renders the particles with a specified blending mode & texture.
         virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) = 0;
 
-		//! Creates the particle renderer instance by type.
-        static ParticleRendererPtr	create( RenderingMode type, const IRenderingInterfacePtr& renderingInterface );
+        //! Creates the particle renderer instance by type.
+        static ParticleRendererPtr    create( RenderingMode type, const IRenderingInterfacePtr& renderingInterface );
 
-	protected:
+    protected:
 
-									//! Constructs ParticleRenderer instance.
-									ParticleRenderer( const IRenderingInterfacePtr& renderingInterface );
+                                    //! Constructs ParticleRenderer instance.
+                                    ParticleRenderer( const IRenderingInterfacePtr& renderingInterface );
 
-	protected:
+    protected:
 
-		IRenderingInterfacePtr		m_renderingInterface;
+        IRenderingInterfacePtr        m_renderingInterface;
     };
 
     // ** class PointRenderer
@@ -168,8 +167,8 @@ namespace Fx {
                                     PointRenderer( const IRenderingInterfacePtr& renderingInterface );
 
         // ** Renderer
-        virtual RenderingMode		type( void ) const { return RenderPoints; }
-        virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) DC_DECL_OVERRIDE;
+        virtual RenderingMode       type( void ) const NIMBLE_OVERRIDE { return RenderPoints; }
+        virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) NIMBLE_OVERRIDE;
     };
 
     // ** class QuadRenderer
@@ -179,8 +178,8 @@ namespace Fx {
                                     QuadRenderer( const IRenderingInterfacePtr& renderingInterface );
 
         // ** Renderer
-        virtual RenderingMode		type( void ) const { return RenderQuads; }
-        virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) DC_DECL_OVERRIDE;
+        virtual RenderingMode       type( void ) const NIMBLE_OVERRIDE { return RenderQuads; }
+        virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) NIMBLE_OVERRIDE;
     };
 
     // ** class LineRenderer
@@ -190,8 +189,8 @@ namespace Fx {
                                     LineRenderer( const IRenderingInterfacePtr& renderingInterface );
 
         // ** Renderer
-        virtual RenderingMode		type( void ) const { return RenderLines; }
-        virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) DC_DECL_OVERRIDE;
+        virtual RenderingMode       type( void ) const NIMBLE_OVERRIDE { return RenderLines; }
+        virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) NIMBLE_OVERRIDE;
     };
 
     // ** class ThickLineRenderer
@@ -201,8 +200,8 @@ namespace Fx {
                                     ThickLineRenderer( const IRenderingInterfacePtr& renderingInterface );
 
         // ** Renderer
-        virtual RenderingMode		type( void ) const { return RenderThickLines; }
-        virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) DC_DECL_OVERRIDE;
+        virtual RenderingMode       type( void ) const NIMBLE_OVERRIDE { return RenderThickLines; }
+        virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) NIMBLE_OVERRIDE;
     };
 
     // ** class PathRenderer
@@ -212,8 +211,8 @@ namespace Fx {
                                     PathRenderer( const IRenderingInterfacePtr& renderingInterface );
 
         // ** Renderer
-        virtual RenderingMode	    type( void ) const { return RenderPaths; }
-        virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) DC_DECL_OVERRIDE;
+        virtual RenderingMode       type( void ) const NIMBLE_OVERRIDE { return RenderPaths; }
+        virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) NIMBLE_OVERRIDE;
     };
 
     // ** class ThickPathRenderer
@@ -223,12 +222,12 @@ namespace Fx {
                                     ThickPathRenderer( const IRenderingInterfacePtr& renderingInterface );
 
         // ** Renderer
-        virtual RenderingMode		type( void ) const { return RenderThickPaths; }
-        virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) DC_DECL_OVERRIDE;
+        virtual RenderingMode       type( void ) const NIMBLE_OVERRIDE { return RenderThickPaths; }
+        virtual void                render( const IMaterialWPtr& material, const Particle *particles, s32 count ) NIMBLE_OVERRIDE;
     };
 
 } // namespace Fx
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_Fx_Renderers_H__	*/
+#endif        /*    !__DC_Fx_Renderers_H__    */

@@ -30,46 +30,48 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if DEV_DEPRECATED_SCENE_RENDERER
 // ** FrustumCullingSystem::begin
 bool FrustumCullingSystem::begin( u32 currentTime, f32 dt )
 {
-	// Clear frustums
-	m_frustums.clear();
+    // Clear frustums
+    m_frustums.clear();
 
-	// Extract frustums from active cameras.
-	const Ecs::EntitySet& cameras = m_cameras->entities();
+    // Extract frustums from active cameras.
+    const Ecs::EntitySet& cameras = m_cameras->entities();
 
-	u8 cameraId = 0;
+    u8 cameraId = 0;
 
-	for( Ecs::EntitySet::const_iterator i = cameras.begin(), end = cameras.end(); i != end; ++i ) {
-		Camera*	   camera		   = (*i)->get<Camera>();
-		Transform* cameraTransform = (*i)->get<Transform>();
+    for( Ecs::EntitySet::const_iterator i = cameras.begin(), end = cameras.end(); i != end; ++i ) {
+        Camera*       camera           = (*i)->get<Camera>();
+        Transform* cameraTransform = (*i)->get<Transform>();
 
-		if( !camera->target().valid() ) {
-			continue;
-		}
+        if( !camera->target().valid() ) {
+            continue;
+        }
 
-		camera->setId( cameraId++ );
+        camera->setId( cameraId++ );
 
-		Matrix4		 viewProjection = camera->calculateViewProjection( cameraTransform->matrix() );
-		PlaneClipper frustum		= PlaneClipper::createFromFrustum( viewProjection, camera->id() );
+        Matrix4         viewProjection = camera->calculateViewProjection( cameraTransform->matrix() );
+        PlaneClipper frustum        = PlaneClipper::createFromFrustum( viewProjection, camera->id() );
 
-		m_frustums.push_back( frustum );
-	}
+        m_frustums.push_back( frustum );
+    }
 
-	return GenericEntitySystem::begin( currentTime, dt );
+    return GenericEntitySystem::begin( currentTime, dt );
 }
 
 // ** FrustumCullingSystem::process
 void FrustumCullingSystem::process( u32 currentTime, f32 dt, Ecs::Entity& entity, StaticMesh& staticMesh, Transform& transform )
 {
-	const Bounds& bounds = staticMesh.worldSpaceBounds();
+    const Bounds& bounds = staticMesh.worldSpaceBounds();
 
-	for( u32 i = 0, n = m_frustums.size(); i < n; i++ ) {
-		const PlaneClipper& frustum = m_frustums[i];
-		staticMesh.setVisibilityMask( BIT( frustum.id() ), frustum.inside( bounds ) );
-	}
+    for( u32 i = 0, n = m_frustums.size(); i < n; i++ ) {
+        const PlaneClipper& frustum = m_frustums[i];
+        staticMesh.setVisibilityMask( BIT( frustum.id() ), frustum.inside( bounds ) );
+    }
 }
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

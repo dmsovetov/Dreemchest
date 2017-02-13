@@ -40,21 +40,21 @@ namespace Sound {
     public:
 
                                 OpenALSource( void );
-        virtual                 ~OpenALSource( void ) DC_DECL_OVERRIDE;
+        virtual                 ~OpenALSource( void ) NIMBLE_OVERRIDE;
 
         // ** SoundSource
-        virtual void            update( void ) DC_DECL_OVERRIDE;
-        virtual void            setBuffer( SoundBufferPtr value ) DC_DECL_OVERRIDE;
-        virtual SourceState     state( void ) const DC_DECL_OVERRIDE;
-        virtual void            setState( SourceState value ) DC_DECL_OVERRIDE;
-        virtual void            setVolume( f32 value ) DC_DECL_OVERRIDE;
-        virtual void            setPitch( f32 value ) DC_DECL_OVERRIDE;
-        virtual void            setPosition( const Vec3& value ) DC_DECL_OVERRIDE;
-        virtual void            setLooped( bool value ) DC_DECL_OVERRIDE;
-        virtual void            setRelative( bool value ) DC_DECL_OVERRIDE;
-        virtual void            setReferenceDistance( f32 value ) DC_DECL_OVERRIDE;
-        virtual void            setMaximumDistance( f32 value ) DC_DECL_OVERRIDE;
-        virtual void            setRolloffFactor( f32 value ) DC_DECL_OVERRIDE;
+        virtual void            update( void ) NIMBLE_OVERRIDE;
+        virtual void            setBuffer( SoundBufferPtr value ) NIMBLE_OVERRIDE;
+        virtual SourceState     state( void ) const NIMBLE_OVERRIDE;
+        virtual void            setState( SourceState value ) NIMBLE_OVERRIDE;
+        virtual void            setVolume( f32 value ) NIMBLE_OVERRIDE;
+        virtual void            setPitch( f32 value ) NIMBLE_OVERRIDE;
+        virtual void            setPosition( const Vec3& value ) NIMBLE_OVERRIDE;
+        virtual void            setLooped( bool value ) NIMBLE_OVERRIDE;
+        virtual void            setRelative( bool value ) NIMBLE_OVERRIDE;
+        virtual void            setReferenceDistance( f32 value ) NIMBLE_OVERRIDE;
+        virtual void            setMaximumDistance( f32 value ) NIMBLE_OVERRIDE;
+        virtual void            setRolloffFactor( f32 value ) NIMBLE_OVERRIDE;
         bool                    isStreamed( void ) const;
 
     private:

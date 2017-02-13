@@ -35,7 +35,7 @@
 #endif
 
 #ifdef DC_PLATFORM_ANDROID
-	#include <unistd.h>
+    #include <unistd.h>
 #endif
 
 DC_BEGIN_DREEMCHEST
@@ -63,7 +63,7 @@ ThreadPtr Thread::create( void )
     #error Unknown threading option defined.
 #endif
 
-	return ThreadPtr();
+    return ThreadPtr();
 }
 
 // ** Thread::isAlive
@@ -75,7 +75,7 @@ inline bool Thread::isAlive( void ) const
 // ** Thread::id
 u32 Thread::id( void ) const
 {
-    DC_BREAK_IF( m_id == 0, "thread id is expected to be a non-zero value" )
+    NIMBLE_BREAK_IF( m_id == 0, "thread id is expected to be a non-zero value" )
     return m_id;
 }
 

@@ -35,44 +35,44 @@ namespace Scene {
 // ** SimpleShape2D::createCircle
 SimpleShape2D SimpleShape2D::createCircle( f32 radius, f32 x, f32 y, const MaterialShape2D& material )
 {
-	SimpleShape2D part;
-	part.type = Shape2DType::Circle;
-	part.material = material;
-	part.circle.radius = radius;
-	part.circle.x = x;
-	part.circle.y = y;
+    SimpleShape2D part;
+    part.type = Shape2DType::Circle;
+    part.material = material;
+    part.circle.radius = radius;
+    part.circle.x = x;
+    part.circle.y = y;
     return part;
 }
 
 // ** SimpleShape2D::createRect
 SimpleShape2D SimpleShape2D::createRect( f32 width, f32 height, f32 x, f32 y, const MaterialShape2D& material )
 {
-	SimpleShape2D part;
-	part.type = Shape2DType::Rect;
-	part.material = material;
-	part.rect.width = width;
-	part.rect.height = height;
-	part.rect.x = x;
-	part.rect.y = y;
-	return part;
+    SimpleShape2D part;
+    part.type = Shape2DType::Rect;
+    part.material = material;
+    part.rect.width = width;
+    part.rect.height = height;
+    part.rect.x = x;
+    part.rect.y = y;
+    return part;
 }
 
 // ** SimpleShape2D::addPolygon
 SimpleShape2D SimpleShape2D::createPolygon( const Vec2* vertices, u32 count, const MaterialShape2D& material )
 {
-	DC_BREAK_IF( count > PolygonShape2D::MaxVertices, "too much vertices" );
+    NIMBLE_BREAK_IF( count > PolygonShape2D::MaxVertices, "too much vertices" );
 
-	SimpleShape2D part;
-	part.type = Shape2DType::Polygon;
-	part.material = material;
-	part.polygon.count = count;
+    SimpleShape2D part;
+    part.type = Shape2DType::Polygon;
+    part.material = material;
+    part.polygon.count = count;
 
-	for( u32 i = 0; i < count; i++ ) {
-		part.polygon.vertices[i * 2 + 0] = vertices[i].x;
-		part.polygon.vertices[i * 2 + 1] = vertices[i].y;
-	}
+    for( u32 i = 0; i < count; i++ ) {
+        part.polygon.vertices[i * 2 + 0] = vertices[i].x;
+        part.polygon.vertices[i * 2 + 1] = vertices[i].y;
+    }
 
-	return part;
+    return part;
 }
 
 // ** SimpleShape2D::operator <<
@@ -87,7 +87,7 @@ void SimpleShape2D::operator << ( const Variant& value )
     case Shape2DType::Circle:   circle << value;    break;
     case Shape2DType::Polygon:  polygon << value;   break;
     case Shape2DType::Rect:     rect << value;      break;
-    default:                    DC_NOT_IMPLEMENTED;
+    default:                    NIMBLE_NOT_IMPLEMENTED;
     };
 }
 
@@ -103,7 +103,7 @@ void SimpleShape2D::operator >> ( Variant& value )
     case Shape2DType::Circle:   circle >> vshape;   break;
     case Shape2DType::Polygon:  polygon >> vshape;  break;
     case Shape2DType::Rect:     rect >> vshape;     break;
-    default:                    DC_NOT_IMPLEMENTED;
+    default:                    NIMBLE_NOT_IMPLEMENTED;
     };
 
     KeyValue& kv = vshape.expect<KeyValue>();
@@ -216,20 +216,20 @@ void MaterialShape2D::operator >> ( Variant& value )
 // ** Shape2D::clear
 void Shape2D::clear( void )
 {
-	m_parts.clear();
+    m_parts.clear();
 }
 
 // ** Shape2D::partCount
 u32 Shape2D::partCount( void ) const
 {
-	return ( u32 )m_parts.size();
+    return ( u32 )m_parts.size();
 }
 
 // ** Shape2D::part
 const SimpleShape2D& Shape2D::part( u32 index ) const
 {
-	DC_ABORT_IF( index >= partCount(), "index is out of range" );
-	return m_parts[index];
+    NIMBLE_ABORT_IF( index >= partCount(), "index is out of range" );
+    return m_parts[index];
 }
 
 // ** Shape2D::addPart
@@ -254,7 +254,15 @@ void Shape2D::setParts( const Shape2D::Parts& value )
 
 // ** RigidBody2D::RigidBody2D
 RigidBody2D::RigidBody2D( f32 mass, Type type, u16 category, u16 collisionMask, bool isBullet, bool isSensor )
-	: m_mass( mass ), m_type( type ), m_linearDamping( 0.0f ), m_angularDamping( 0.0f ), m_torque( 0.0f ), m_category( category ), m_collisionMask( collisionMask ), m_gravityScale( 1.0f ), m_rotatedTo( 0.0f )
+    : m_mass( mass )
+    , m_type( type )
+    , m_linearDamping( 0.0f )
+    , m_angularDamping( 0.0f )
+    , m_torque( 0.0f )
+    , m_gravityScale( 1.0f )
+    , m_category( category )
+    , m_collisionMask( collisionMask )
+    , m_rotatedTo( 0.0f )
 {
     m_flags.set( IsBullet, isBullet );
     m_flags.set( IsSensor, isSensor );
@@ -263,37 +271,37 @@ RigidBody2D::RigidBody2D( f32 mass, Type type, u16 category, u16 collisionMask, 
 // ** RigidBody2D::mass
 f32 RigidBody2D::mass( void ) const
 {
-	return m_mass;
+    return m_mass;
 }
 
 // ** RigidBody2D::type
 RigidBody2D::Type RigidBody2D::type( void ) const
 {
-	return m_type;
+    return m_type;
 }
 
 // ** RigidBody2D::linearDamping
 f32 RigidBody2D::linearDamping( void ) const
 {
-	return m_linearDamping;
+    return m_linearDamping;
 }
 
 // ** RigidBody2D::setLinearDamping
 void RigidBody2D::setLinearDamping( f32 value )
 {
-	m_linearDamping = value;
+    m_linearDamping = value;
 }
 
 // ** RigidBody2D::angularDamping
 f32 RigidBody2D::angularDamping( void ) const
 {
-	return m_angularDamping;
+    return m_angularDamping;
 }
 
 // ** RigidBody2D::setAngularDamping
 void RigidBody2D::setAngularDamping( f32 value )
 {
-	m_angularDamping = value;
+    m_angularDamping = value;
 }
 
 // ** RigidBody2D::gravityScale
@@ -373,25 +381,25 @@ bool RigidBody2D::isSensor( void ) const
 // ** RigidBody2D::torque
 f32 RigidBody2D::torque( void ) const
 {
-	return m_torque;
+    return m_torque;
 }
 
 // ** RigidBody2D::applyTorque
 void RigidBody2D::applyTorque( f32 value )
 {
-	m_torque += value;
+    m_torque += value;
 }
 
 // ** RigidBody2D::force
 const Vec2& RigidBody2D::force( void ) const
 {
-	return m_force;
+    return m_force;
 }
 
 // ** RigidBody2D::applyForc
 void RigidBody2D::applyForce( const Vec2& value )
 {
-	m_force += value;
+    m_force += value;
 }
 
 // ** RigidBody2D::category
@@ -409,7 +417,7 @@ u16 RigidBody2D::collisionMask( void ) const
 // ** RigidBody2D::applyForceToPoint
 void RigidBody2D::applyForceToPoint( const Vec2& value, const Vec2& point )
 {
-	m_forces.push_back( AppliedForce( value, point ) );
+    m_forces.push_back( AppliedForce( value, point ) );
 }
 
 // ** RigidBody2D::applyImpulse
@@ -427,27 +435,27 @@ void RigidBody2D::applyImpulseToPoint( const Vec2& value, const Vec2& point )
 // ** RigidBody2D::appliedForceCount
 u32 RigidBody2D::appliedForceCount( void ) const
 {
-	return ( u32 )m_forces.size();
+    return ( u32 )m_forces.size();
 }
 
 // ** RigidBody2D::appliedImpulse
 const RigidBody2D::AppliedForce& RigidBody2D::appliedImpulse( u32 index ) const
 {
-	DC_ABORT_IF( index >= appliedImpulseCount(), "index is out of range" );
-	return m_impulses[index];
+    NIMBLE_ABORT_IF( index >= appliedImpulseCount(), "index is out of range" );
+    return m_impulses[index];
 }
 
 // ** RigidBody2D::appliedImpulseCount
 u32 RigidBody2D::appliedImpulseCount( void ) const
 {
-	return ( u32 )m_impulses.size();
+    return ( u32 )m_impulses.size();
 }
 
 // ** RigidBody2D::appliedForce
 const RigidBody2D::AppliedForce& RigidBody2D::appliedForce( u32 index ) const
 {
-	DC_ABORT_IF( index >= appliedForceCount(), "index is out of range" );
-	return m_forces[index];
+    NIMBLE_ABORT_IF( index >= appliedForceCount(), "index is out of range" );
+    return m_forces[index];
 }
 
 // ** RigidBody2D::collisionEventCount
@@ -459,7 +467,7 @@ u32 RigidBody2D::collisionEventCount( void ) const
 // ** RigidBody2D::collisionEvent
 const RigidBody2D::CollisionEvent& RigidBody2D::collisionEvent( u32 index ) const
 {
-    DC_ABORT_IF( index < 0 || index >= collisionEventCount(), "index is out of range" );
+    NIMBLE_ABORT_IF( index < 0 || index >= collisionEventCount(), "index is out of range" );
     return m_collisionEvents[index];
 }
 
@@ -472,10 +480,10 @@ void RigidBody2D::queueCollisionEvent( const CollisionEvent& e )
 // ** RigidBody2D::clear
 void RigidBody2D::clear( void )
 {
-	m_torque = 0.0f;
-	m_force  = Vec2( 0.0f, 0.0f );
+    m_torque = 0.0f;
+    m_force  = Vec2( 0.0f, 0.0f );
     m_flags.off( WasPutToRest | WasMoved | WasRotated );
-	m_forces.clear();
+    m_forces.clear();
     m_impulses.clear();
 }
 

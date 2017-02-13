@@ -33,93 +33,98 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Scene viewport class is used by entity systems to handle user's input.
-	class Viewport : public InjectEventEmitter<RefCounted> {
-	public:
+    //! Scene viewport interface.
+    class AbstractViewport : public InjectEventEmitter<RefCounted> {
+    public:
 
-		//! This event is emitted when touch began.
-		struct TouchBegan {
-							TouchBegan( ViewportWPtr viewport, u8 buttons )
-								: viewport( viewport ), buttons( buttons ) {}
-			ViewportWPtr	viewport;
-			FlagSet8		buttons;
-		};
+        virtual                        ~AbstractViewport( void ) {}
 
-		//! This event is emitted when touch ended.
-		struct TouchEnded {
-							TouchEnded( ViewportWPtr viewport, u8 buttons )
-								: viewport( viewport ), buttons( buttons ) {}
-			ViewportWPtr	viewport;
-			FlagSet8		buttons;
-		};
+        //! Returns the render target rect.
+        Rect                        rect( void ) const;
 
-		//! This event is emitted when touch was moved.
-		struct TouchMoved {
-							TouchMoved( ViewportWPtr viewport, s32 dx, s32 dy )
-								: viewport( viewport ), dx( dx ), dy( dy ) {}
-			ViewportWPtr	viewport;
-			s32				dx;
-			s32				dy;
-		};
+        //! Returns the render target width.
+        virtual s32                    width( void ) const NIMBLE_ABSTRACT;
 
-							//! Constructs Viewport instance.
-							Viewport( SceneObjectWPtr camera );
+        //! Returns the render target height.
+        virtual s32                    height( void ) const NIMBLE_ABSTRACT;
 
-		//! Returns cursor X position.
-		s32					x( void ) const;
+        //! A base class for all viewport event types.
+        struct Event {
+                                    //! Constructs an Event instance.
+                                    Event( ViewportWPtr sender )
+                                        : sender( sender ) {}
+            ViewportWPtr            sender; //!< An event sender instance.
+        };
 
-		//! Returns cursor Y position.
-		s32					y( void ) const;
+        //! A base class for all touch events.
+        struct TouchEvent : public Event {
+                                    //! Constructs a TouchEvent instance.
+                                    TouchEvent( ViewportPtr sender, s32 id, s32 x, s32 y )
+                                        : Event( sender ), id( id ), x( x ), y( y ) {}
+            s32                     id;     //!< A touch integer identifier.
+            s32                     x;      //!< A touch X coordinate.
+            s32                     y;      //!< A touch Y coordinate.
+        };
 
-		//! Returns cursor position.
-		Vec2				pos( void ) const;
+        //! This event is emitted when a user touch begins.
+        struct TouchBegan : public TouchEvent {
+                                    //! Constructs a TouchBegan instance.
+                                    TouchBegan( ViewportPtr sender, s32 id, s32 x, s32 y )
+                                        : TouchEvent( sender, id, x, y ) {}
+        };
 
-		//! Returns camera position.
-		const Vec3&			eye( void ) const;
+        //! This event is emitted when a user touch ends.
+        struct TouchEnded : public TouchEvent {
+                                    //! Constructs a TouchEnded instance.
+                                    TouchEnded( ViewportPtr sender, s32 id, s32 x, s32 y )
+                                        : TouchEvent( sender, id, x, y ) {}
+        };
 
-		//! Returns cursor view ray.
-		const Ray&			ray( void ) const;
+        //! This event is emitted when a user touch was moved.
+        struct TouchMoved : public TouchEvent {
+                                    //! Constructs a TouchMoved instance.
+                                    TouchMoved( ViewportPtr sender, s32 id, s32 x, s32 y, s32 dx, s32 dy )
+                                        : TouchEvent( sender, id, x, y ), dx( dx ), dy( dy ) {}
+            s32                     dx;     //!< A change of a touch X coordinate.
+            s32                     dy;     //!< A change of a touch Y coordinate.
+        };
+    };
 
-		//! Returns viewport flags.
-		const FlagSet8&		flags( void ) const;
+    //! WindowViewport is used for attaching a scene viewport to a window instance.
+    class WindowViewport : public AbstractViewport {
+    public:
 
-		//! Begins the touch at specified coordinates.
-		void				touchBegan( s32 x, s32 y );
+        virtual                     ~WindowViewport( void );
 
-		//! Begins the touch at specified coordinates and flags.
-		void				touchBegan( s32 x, s32 y, const FlagSet8& flags );
+        //! Returns the window width.
+        virtual s32                    width( void ) const NIMBLE_OVERRIDE;
 
-		//! Ends the touch at specified coordinates.
-		void				touchEnded( s32 x, s32 y );
+        //! Returns the window height.
+        virtual s32                    height( void ) const NIMBLE_OVERRIDE;
 
-		//! Ends the touch at specified coordinates and flags.
-		void				touchEnded( s32 x, s32 y, const FlagSet8& flags );
+        //! Creates the WindowView instance.
+        static WindowViewportPtr    create( const Platform::WindowWPtr& window );
 
-		//! Moves touch to a specified coordinates and flags.
-		void				touchMoved( s32 x, s32 y, const FlagSet8& flags );
+    private:
 
-		//! Sets the camera that owns this cursor.
-		void				setCamera( SceneObjectWPtr value );
+                                    //! Constructs the WindowViewport instance.
+                                    WindowViewport( const Platform::WindowWPtr& window );
 
-		//! Returns the camera that owns this cursor.
-		SceneObjectWPtr		camera( void ) const;
+        //! Handles a TouchBegan event from a window instance.
+        void                        handleTouchBegan( const Platform::Window::TouchBegan& e );
 
-		//! Constructs the world space ray at specified viewport coordinates.
-		Ray					constructViewRay( s32 x, s32 y ) const;
+        //! Handles a TouchMoved event from a window instance.
+        void                        handleTouchMoved( const Platform::Window::TouchMoved& e );
 
-	private:
+        //! Handles a TouchEnded event from a window instance.
+        void                        handleTouchEnded( const Platform::Window::TouchEnded& e );
 
-		//! Updates viewport cursor position.
-		void				setCursor( s32 x, s32 y );
+    private:
 
-	private:
-
-		SceneObjectWPtr		m_camera;	//!< Parent camera instance.
-		s32					m_x;		//!< Cursor X position.
-		s32					m_y;		//!< Cursor Y position.
-		Ray					m_ray;		//!< Cursor view ray.
-		FlagSet8			m_flags;	//!< Viewport flags.
-	};
+        Platform::WindowWPtr        m_window;    //!< The output window.
+        s32                         m_lastX;    //!< A last known cursor X coordinate.
+        s32                         m_lastY;    //!< A last known cursor Y coordinate.
+    };
 
 } // namespace Scene
 

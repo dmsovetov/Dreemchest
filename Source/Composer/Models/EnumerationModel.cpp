@@ -32,7 +32,7 @@ DC_BEGIN_COMPOSER
 EnumeraionModel::EnumeraionModel( const Reflection::Enum* enumeration, QObject* parent )
     : QStringListModel( parent )
 {
-    DC_ABORT_IF( enumeration == NULL, "invalid enumeration" );
+    NIMBLE_ABORT_IF( enumeration == NULL, "invalid enumeration" );
 
     QStringList strings;
 

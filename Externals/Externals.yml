@@ -1,0 +1,101 @@
+#################################################################################
+#
+# The MIT License (MIT)
+#
+# Copyright (c) 2015 Dmitry Sovetov
+#
+# https://github.com/dmsovetov
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+#################################################################################
+
+- name: curl
+  options:
+    BUILD_CURL_EXE: False
+    CURL_STATICLIB: True
+  ios:
+    disabled: True
+  emscripten:
+    disabled: True
+
+- name: lua
+  options:
+    BUILD_SHARED_LIBS: False
+    LUA_USE_C89: True
+  ios:
+    options:
+      BUILD_EXECUTABLES: False
+  emscripten:
+    disabled: True
+
+- name: zlib
+  options:
+    BUILD_SHARED_LIBS: False
+  ios:
+    disabled: True
+  macos:
+    disabled: True
+
+- name: ogg
+- name: vorbis
+
+- name: libpng
+  options:
+    PNG_TESTS: False
+    PNG_STATIC: True
+    PNG_SHARED: False
+
+- name: Box2D
+  source: Box2D/Box2D
+  options:
+    BOX2D_BUILD_EXAMPLES: False
+    BOX2D_INSTALL: True
+
+- name: jsoncpp
+  options:
+    JSONCPP_WITH_TESTS: False
+    JSONCPP_WITH_POST_BUILD_UNITTEST: False
+
+- name: gtest
+  source: GoogleTest
+  windows:
+    options:
+      gtest_force_shared_crt: True
+  emscripten:
+    disabled: True
+
+- name: OpenAL
+  options:
+    ALSOFT_EXAMPLES: False
+    ALSOFT_TESTS: False
+    LIBTYPE: Static
+  ios:
+    disabled: True
+  macos:
+    disabled: True
+  emscripten:
+    disabled: True
+
+- name: libtiff
+  windows:
+    options:
+      CMAKE_CXX_FLAGS: -D_XKEYCHECK_H
+  ios:
+    disabled: True
+  emscripten:
+    disabled: True

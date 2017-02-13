@@ -34,96 +34,96 @@ DC_BEGIN_DREEMCHEST
 
 namespace Fx {
 
-	//! Root particle system type. Contains an array of particle emitters.
-	class ParticleSystem : public RefCounted {
-	public:
+    //! Root particle system type. Contains an array of particle emitters.
+    class ParticleSystem : public RefCounted {
+    public:
 
 
-		//! Returns the total number of emitters inside this particle system.
-		s32							emitterCount( void ) const;
+        //! Returns the total number of emitters inside this particle system.
+        s32                            emitterCount( void ) const;
 
-		//! Returns an emitter by index.
-		EmitterWPtr					emitter( s32 index ) const;
+        //! Returns an emitter by index.
+        EmitterWPtr                    emitter( s32 index ) const;
 
-		//! Removes an emitter.
-		void						removeEmitter( const EmitterWPtr& emitter );
+        //! Removes an emitter.
+        void                        removeEmitter( const EmitterWPtr& emitter );
 
-		//! Adds a new emitter.
-		EmitterWPtr					addEmitter( void );
+        //! Adds a new emitter.
+        EmitterWPtr                    addEmitter( void );
 
-		void						addEmitter( EmitterPtr e ) { m_emitters.push_back( e ); }
+        void                        addEmitter( EmitterPtr e ) { m_emitters.push_back( e ); }
 
-		//! Creates a new instance if a particle system.
-		ParticleSystemInstancePtr	createInstance( IMaterialFactoryWPtr materialFactory ) const;
+        //! Creates a new instance if a particle system.
+        ParticleSystemInstancePtr    createInstance( IMaterialFactoryWPtr materialFactory ) const;
 
-	private:
+    private:
 
-		EmittersArray				m_emitters;	//!< All particle emitters.
-	};
+        EmittersArray                m_emitters;    //!< All particle emitters.
+    };
 
-	//! A single particle system instance.
-	class ParticleSystemInstance : public RefCounted {
-	friend class ParticleSystem;
-	public:
+    //! A single particle system instance.
+    class ParticleSystemInstance : public RefCounted {
+    friend class ParticleSystem;
+    public:
 
-		//! Returns the particle system instance position.
-		const Vec3&					position( void ) const;
+        //! Returns the particle system instance position.
+        const Vec3&                    position( void ) const;
 
-		//! Sets the particle system instance position.
-		void						setPosition( const Vec3& value );
+        //! Sets the particle system instance position.
+        void                        setPosition( const Vec3& value );
 
-		//! Returns the time scaling factor.
-		f32							timeScale( void ) const;
+        //! Returns the time scaling factor.
+        f32                            timeScale( void ) const;
 
-		//! Sets the time scaling factor.
-		void						setTimeScale( f32 value );
+        //! Sets the time scaling factor.
+        void                        setTimeScale( f32 value );
 
-		//! Returns the total number of alive particles.
-		s32							aliveCount( void ) const;
+        //! Returns the total number of alive particles.
+        s32                            aliveCount( void ) const;
 
-		//! Returns the total number of emitters.
-		s32							emitterCount( void ) const;
+        //! Returns the total number of emitters.
+        s32                            emitterCount( void ) const;
 
-		//! Returns the emitter instance.
-		EmitterInstanceWPtr			emitter( s32 index ) const;
+        //! Returns the emitter instance.
+        EmitterInstanceWPtr            emitter( s32 index ) const;
 
         //! Restarts a playback of a particle system.
         void                        restart( void );
 
-		//! Stops the playback of a particle system.
-		void						stop( void );
+        //! Stops the playback of a particle system.
+        void                        stop( void );
 
-		//! Starts the playback of a particle system.
-		void						play( void );
+        //! Starts the playback of a particle system.
+        void                        play( void );
 
-		//! Returns the particle system bounding box.
-		Bounds						bounds( void ) const;
+        //! Returns the particle system bounding box.
+        Bounds                        bounds( void ) const;
 
-		//! Returns true if the particle system has ended the playback.
-		bool						hasEnded( void ) const;
+        //! Returns true if the particle system has ended the playback.
+        bool                        hasEnded( void ) const;
 
-		//! Performs the particle system update.
-		s32							update( f32 dt );
+        //! Performs the particle system update.
+        s32                            update( f32 dt );
 
-		//! Performs the particle system warmup with a specified time delta.
+        //! Performs the particle system warmup with a specified time delta.
         void                        warmUp( f32 dt = 0.1f );
 
-	private:
+    private:
 
-									//! Constructs ParticleSystemInstance instance.
-									ParticleSystemInstance( IMaterialFactoryWPtr materialFactory, ParticleSystemWPtr particleSystem );
+                                    //! Constructs ParticleSystemInstance instance.
+                                    ParticleSystemInstance( IMaterialFactoryWPtr materialFactory, ParticleSystemWPtr particleSystem );
 
-	private:
+    private:
 
-		ParticleSystemWPtr			m_particleSystem;	//!< Parent particle system.
-		EmitterInstancesArray		m_emitters;			//!< Array of emitter instances.
-		Vec3						m_position;			//!< Current instance position.
-		f32							m_timeScale;		//!< The time scaling factor.
-		s32							m_aliveCount;		//!< The total number of alive particles.
-	};
+        ParticleSystemWPtr            m_particleSystem;    //!< Parent particle system.
+        EmitterInstancesArray        m_emitters;            //!< Array of emitter instances.
+        Vec3                        m_position;            //!< Current instance position.
+        f32                            m_timeScale;        //!< The time scaling factor.
+        s32                            m_aliveCount;        //!< The total number of alive particles.
+    };
 
 } // namespace Fx
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_Fx_ParticleSystem_H__	*/
+#endif        /*    !__DC_Fx_ParticleSystem_H__    */

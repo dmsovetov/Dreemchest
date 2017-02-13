@@ -33,106 +33,106 @@ DC_BEGIN_DREEMCHEST
 
 namespace Ecs {
 
-	//! System group is a collection of system instances that processed one by one.
-	class SystemGroup : public RefCounted {
-	friend class Ecs;
-	public:
+    //! System group is a collection of system instances that processed one by one.
+    class SystemGroup : public RefCounted {
+    friend class Ecs;
+    public:
 
-		virtual				~SystemGroup( void ) {}
+        virtual                ~SystemGroup( void ) {}
 
-		//! Returns a system group mask.
-		u32					mask( void ) const;
+        //! Returns a system group mask.
+        u32                    mask( void ) const;
 
-		//! Update all systems in a group.
-		void				update( u32 currentTime, f32 dt );
+        //! Update all systems in a group.
+        void                update( u32 currentTime, f32 dt );
 
-		//! Constructs and adds a new system to a group.
-	#ifndef DC_CPP11_DISABLED
-		template<typename TSystem, typename ... Args>
-		WeakPtr<TSystem>	add( const Args& ... args );
-	#endif
+        //! Constructs and adds a new system to a group.
+    #if DREEMCHEST_CPP11
+        template<typename TSystem, typename ... Args>
+        WeakPtr<TSystem>    add( const Args& ... args );
+    #endif  /*  #if DREEMCHEST_CPP11    */
 
-		//! Adds a new system to a group.
-		template<typename TSystem>
-		WeakPtr<TSystem>	add( TSystem* system );
+        //! Adds a new system to a group.
+        template<typename TSystem>
+        WeakPtr<TSystem>    add( TSystem* system );
 
-		//! Removes a system from a group.
-		template<typename TSystem>
-		void				remove( void );
+        //! Removes a system from a group.
+        template<typename TSystem>
+        void                remove( void );
 
-		//! Returns a system by type.
-		template<typename TSystem>
-		WeakPtr<TSystem>	get( void ) const;
+        //! Returns a system by type.
+        template<typename TSystem>
+        WeakPtr<TSystem>    get( void ) const;
 
-	private:
+    private:
 
-							//! Constructs SystemGroup instance.
-							SystemGroup( EcsWPtr ecs, const String& name, u32 mask );
+                            //! Constructs SystemGroup instance.
+                            SystemGroup( EcsWPtr ecs, const String& name, u32 mask );
 
-	private:
+    private:
 
-		//! This struct holds one system & it's id.
-		struct Item {
-			TypeIdx			m_idx;		//!< System type index.
-			SystemPtr		m_system;	//!< Actual system instance.
+        //! This struct holds one system & it's id.
+        struct Item {
+            TypeIdx            m_idx;        //!< System type index.
+            SystemPtr        m_system;    //!< Actual system instance.
 
-							//! Constructs Item instance.
-							Item( TypeIdx idx = 0, SystemPtr system = SystemPtr() )
-								: m_idx( idx ), m_system( system ) {}
+                            //! Constructs Item instance.
+                            Item( TypeIdx idx = 0, SystemPtr system = SystemPtr() )
+                                : m_idx( idx ), m_system( system ) {}
 
-			//! Returns true if the item id matches the specified one.
-			bool			operator == ( TypeIdx idx ) const { return m_idx == idx; }
-		};
+            //! Returns true if the item id matches the specified one.
+            bool            operator == ( TypeIdx idx ) const { return m_idx == idx; }
+        };
 
-		EcsWPtr				m_ecs;		//!< Parent ECS instance.
-		String				m_name;		//!< System group name.
-		u32					m_mask;		//!< System group mask.
-		Array<Item>			m_systems;	//!< Active systems.
-		bool				m_isLocked;	//!< System group is locked inside the update loop.
-	};
+        EcsWPtr                m_ecs;        //!< Parent ECS instance.
+        String                m_name;        //!< System group name.
+        u32                    m_mask;        //!< System group mask.
+        Array<Item>            m_systems;    //!< Active systems.
+        bool                m_isLocked;    //!< System group is locked inside the update loop.
+    };
 
-	// ** SystemGroup::add
-#ifndef DC_CPP11_DISABLED
-	template<typename TSystem, typename ... Args>
-	WeakPtr<TSystem> SystemGroup::add( const Args& ... args )
-	{
-		return add( DC_NEW TSystem( args... ) );
-	}
-#endif	/*	!DC_CPP11_DISABLED	*/
+    // ** SystemGroup::add
+#if DREEMCHEST_CPP11
+    template<typename TSystem, typename ... Args>
+    WeakPtr<TSystem> SystemGroup::add( const Args& ... args )
+    {
+        return add( DC_NEW TSystem( args... ) );
+    }
+#endif    /*    #if DREEMCHEST_CPP11    */
 
-	template<typename TSystem>
-	WeakPtr<TSystem> SystemGroup::add( TSystem* system )
-	{
-		DC_ABORT_IF( m_isLocked, "locked system group could not be modified" );
-		DC_ABORT_IF( get<TSystem>().valid(), "the same system should not be added twice" );
+    template<typename TSystem>
+    WeakPtr<TSystem> SystemGroup::add( TSystem* system )
+    {
+        NIMBLE_ABORT_IF( m_isLocked, "locked system group could not be modified" );
+        NIMBLE_ABORT_IF( get<TSystem>().valid(), "the same system should not be added twice" );
 
-		if( !system->initialize( m_ecs ) ) {
-			return WeakPtr<TSystem>();
-		}
+        if( !system->initialize( m_ecs ) ) {
+            return WeakPtr<TSystem>();
+        }
 
-		m_systems.push_back( Item( TypeIndex<TSystem>::idx(), system ) );
-		return WeakPtr<TSystem>( system );
-	}
+        m_systems.push_back( Item( TypeIndex<TSystem>::idx(), system ) );
+        return WeakPtr<TSystem>( system );
+    }
 
-	// ** SystemGroup::remove
-	template<typename TSystem>
-	void SystemGroup::remove( void )
-	{
-		DC_ABORT_IF( m_isLocked, "locked system group could not be modified" );
-		DC_ABORT_IF( !get<TSystem>().valid(), "the specified system does not exist" );
-		m_systems.erase( TypeIndex<TSystem>::idx() );
-	}
+    // ** SystemGroup::remove
+    template<typename TSystem>
+    void SystemGroup::remove( void )
+    {
+        NIMBLE_ABORT_IF( m_isLocked, "locked system group could not be modified" );
+        NIMBLE_ABORT_IF( !get<TSystem>().valid(), "the specified system does not exist" );
+        m_systems.erase( TypeIndex<TSystem>::idx() );
+    }
 
-	//! Returns a system by type.
-	template<typename TSystem>
-	WeakPtr<TSystem> SystemGroup::get( void ) const
-	{
-		Array<Item>::const_iterator i = std::find( m_systems.begin(), m_systems.end(), TypeIndex<TSystem>::idx() );
-		return i != m_systems.end() ? static_cast<TSystem*>( i->m_system.get() ) : WeakPtr<TSystem>();
-	}
+    //! Returns a system by type.
+    template<typename TSystem>
+    WeakPtr<TSystem> SystemGroup::get( void ) const
+    {
+        Array<Item>::const_iterator i = std::find( m_systems.begin(), m_systems.end(), TypeIndex<TSystem>::idx() );
+        return i != m_systems.end() ? static_cast<TSystem*>( i->m_system.get() ) : WeakPtr<TSystem>();
+    }
 
 } // namespace Ecs
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Ecs_SystemGroup_H__	*/
+#endif    /*    !__DC_Ecs_SystemGroup_H__    */

@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef	__DC_Network_RemoteCallHandler_H__
-#define	__DC_Network_RemoteCallHandler_H__
+#ifndef    __DC_Network_RemoteCallHandler_H__
+#define    __DC_Network_RemoteCallHandler_H__
 
 #include "../Packets/RemoteCall.h"
 
@@ -33,126 +33,99 @@ DC_BEGIN_DREEMCHEST
 
 namespace Network {
 
-	//! Remote procedure call handler interface class.
-	class IRemoteCallHandler {
-	public:
+    //! Remote procedure call handler interface class.
+    class IRemoteCallHandler {
+    public:
 
-		virtual			~IRemoteCallHandler( void ) {}
+        virtual            ~IRemoteCallHandler( void ) {}
 
-		//! Packet handler callback.
-		virtual void	handle( ConnectionWPtr connection, const Packets::RemoteCall& packet ) = 0;
-	};
+        //! Packet handler callback.
+        virtual void    handle( ConnectionWPtr connection, const Packets::RemoteCall& packet ) = 0;
+    };
 
-	//! Remote call response object.
-	template<typename T>
-	class Response {
-	public:
+    //! Remote call response object.
+    template<typename T>
+    class Response {
+    public:
 
-		//! Constructs a Response instance.
-		Response( const ConnectionWPtr& connection, u16 id ) 
-			: m_connection( connection ), m_id( id ), m_wasSent( false ) {}
+        //! Constructs a Response instance.
+        Response( const ConnectionWPtr& connection, u16 id ) 
+            : m_connection( connection ), m_id( id ), m_wasSent( false ) {}
 
-		bool wasSent( void ) const { return m_wasSent; }
+        bool wasSent( void ) const { return m_wasSent; }
 
-		//! Send a response to caller.
+        //! Send a response to caller.
         bool operator()( const T& value, const Error& error = Error() );
 
-	private:
+    private:
 
-		//! Parent connection.
-		ConnectionWPtr	m_connection;
+        //! Parent connection.
+        ConnectionWPtr    m_connection;
 
-		//! Remote call identifier.
-		u16				m_id;
+        //! Remote call identifier.
+        u16                m_id;
 
-		//! Flag indicating that a response was sent.
-		bool			m_wasSent;
-	};
+        //! Flag indicating that a response was sent.
+        bool            m_wasSent;
+    };
 
-	// ** Response::operator()
-	template<>
-	inline bool Response<Void>::operator()( const Void& value, const Error& error )
-	{
-		LogWarning( "rpc", "void responses are ignored\n" ); 
-		return true;
-	}
+    //! Template class that handles a RemoteCall packet and invokes a local procedure.
+    template<typename T, typename R>
+    class RemoteCallHandler : public IRemoteCallHandler {
+    public:
 
-	template<>
-	inline Response<Void>::Response( const ConnectionWPtr& connection, u16 id ) : m_connection( connection ), m_id( id ), m_wasSent( true )
-	{
-	}
+        //! Response type.
+        typedef Response<R> ResponseType;
 
-	//! Template class that handles a RemoteCall packet and invokes a local procedure.
-	template<typename T, typename R>
-	class RemoteCallHandler : public IRemoteCallHandler {
-	public:
+        //! Function type to handle remote calls.
+        typedef cClosure<void(ConnectionWPtr,ResponseType&,const T&)> Callback;
 
-		//! Response type.
-		typedef Response<R> ResponseType;
+                        //! Constructs RemoteCallHandler instance.
+                        RemoteCallHandler( const Callback& callback )
+                            : m_callback( callback ) {}
 
-		//! Function type to handle remote calls.
-		typedef cClosure<void(ConnectionWPtr,ResponseType&,const T&)> Callback;
+        //! Reads a payload from an Event packet and emits it as local event.
+        virtual void    handle( ConnectionWPtr connection, const Packets::RemoteCall& packet ) NIMBLE_OVERRIDE;
 
-						//! Constructs RemoteCallHandler instance.
-						RemoteCallHandler( const Callback& callback )
-							: m_callback( callback ) {}
+    private:
 
-		//! Reads a payload from an Event packet and emits it as local event.
-		virtual void	handle( ConnectionWPtr connection, const Packets::RemoteCall& packet ) DC_DECL_OVERRIDE;
+        //! Local procedure
+        Callback        m_callback;
+    };
 
-	private:
 
-		//! Local procedure
-		Callback		m_callback;
-	};
+    //! Remote response handler interface.
+    class IRemoteResponseHandler {
+    public:
 
-	// ** RemoteCallHandler::handle
-	template<typename T, typename R>
-	inline void RemoteCallHandler<T, R>::handle( ConnectionWPtr connection, const Packets::RemoteCall& packet )
-	{
-		ResponseType response( connection, packet.id );
-        m_callback( connection, response, Private::readFromStream<T>( Io::ByteBuffer::createFromArray( packet.payload ) ) );
-	}
+        virtual            ~IRemoteResponseHandler( void ) {}
 
-	//! Remote response handler interface.
-	class IRemoteResponseHandler {
-	public:
+        virtual void    handle( ConnectionWPtr connection, const Packets::RemoteCallResponse& packet ) = 0;
+    };
 
-		virtual			~IRemoteResponseHandler( void ) {}
+    //! Template class that handles a RemoteCallResponse packet and invokes a local procedure.
+    template<typename T>
+    class RemoteResponseHandler : public IRemoteResponseHandler {
+    public:
 
-		virtual void	handle( ConnectionWPtr connection, const Packets::RemoteCallResponse& packet ) = 0;
-	};
+        //! Function type to handle remote calls.
+        typedef cClosure<bool(ConnectionWPtr,const Error&,const T&)> Callback;
 
-	//! Template class that handles a RemoteCallResponse packet and invokes a local procedure.
-	template<typename T>
-	class RemoteResponseHandler : public IRemoteResponseHandler {
-	public:
+                        //! Constructs RemoteResponseHandler instance.
+                        RemoteResponseHandler( const Callback& callback )
+                            : m_callback( callback ) {}
 
-		//! Function type to handle remote calls.
-		typedef cClosure<bool(ConnectionWPtr,const Error&,const T&)> Callback;
+        //! Reads a payload from an Event packet and emits it as local event.
+        virtual void    handle( ConnectionWPtr connection, const Packets::RemoteCallResponse& packet ) NIMBLE_OVERRIDE;
 
-						//! Constructs RemoteResponseHandler instance.
-						RemoteResponseHandler( const Callback& callback )
-							: m_callback( callback ) {}
+    private:
 
-		//! Reads a payload from an Event packet and emits it as local event.
-		virtual void	handle( ConnectionWPtr connection, const Packets::RemoteCallResponse& packet ) DC_DECL_OVERRIDE;
-
-	private:
-
-		//! Local procedure
-		Callback		m_callback;
-	};
-
-	// ** RemoteResponseHandler::handle
-	template<typename T>
-	inline void RemoteResponseHandler<T>::handle( ConnectionWPtr connection, const Packets::RemoteCallResponse& packet )
-	{
-        m_callback( connection, packet.error, Private::readFromStream<T>( Io::ByteBuffer::createFromArray( packet.payload ) ) );
-	}
+        //! Local procedure
+        Callback        m_callback;
+    };
 
 } // namespace Network
     
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Network_RemoteCallHandler_H__	*/
+#endif    /*    !__DC_Network_RemoteCallHandler_H__    */

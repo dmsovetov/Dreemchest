@@ -40,7 +40,7 @@ namespace Sound {
         u8         slotCount;
         u32        threshold;
         f32        fadeTime;
-		f32		   volume;
+        f32           volume;
     };
 
     //! SoundGroup instance is a home for SoundChannel instances that are playing sounds.
@@ -73,7 +73,7 @@ namespace Sound {
         bool                    hasFreeSlots( void ) const;
 
         //! Returns a group identifier.
-        CString					identifier( void ) const;
+        CString                    identifier( void ) const;
 
         //! Sets a group identifier.
         void                    setIdentifier( CString value );
@@ -105,11 +105,11 @@ namespace Sound {
         //! Sets a sound fade out time (in milliseconds) for the freed playback slots.
         void                    setFadeTime( f32 value );
 
-		//! Returns a volume factor that is applied for all sounds inside this group.
-		f32						volume( void ) const;
+        //! Returns a volume factor that is applied for all sounds inside this group.
+        f32                        volume( void ) const;
 
-		//! Sets a volume factor that is applied for all sounds inside this group.
-		void					setVolume( f32 value );
+        //! Sets a volume factor that is applied for all sounds inside this group.
+        void                    setVolume( f32 value );
 
         //! Returns a serialized sound group data.
         SoundGroupInfo          data( void ) const;
@@ -154,13 +154,13 @@ namespace Sound {
         u32                     m_threshold;
 
         //! Sound channel slots.
-        SoundChannelsWeak		m_slots;
+        SoundChannelsWeak        m_slots;
         
         //! Fade out time.
         f32                     m_fadeTime;
 
-		//! Volume factor for all sounds in this group.
-		f32						m_volume;
+        //! Volume factor for all sounds in this group.
+        f32                        m_volume;
     };
 
 } // namespace Sound

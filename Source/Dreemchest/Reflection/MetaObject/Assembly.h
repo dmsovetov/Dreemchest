@@ -74,7 +74,7 @@ namespace Reflection {
     {
         //! Get the static meta-object from a class
         const Class* metaObject = TClass::staticMetaObject();
-        DC_ABORT_IF( metaObject == NULL, "the specified class does not declare a meta-object" );
+        NIMBLE_ABORT_IF( metaObject == NULL, "the specified class does not declare a meta-object" );
 
         //! Get the class name
         CString name = metaObject->name();
@@ -86,7 +86,7 @@ namespace Reflection {
         Classes::iterator i = m_classes.find( hash );
 
         if( i != m_classes.end() ) {
-            DC_BREAK;
+            NIMBLE_BREAK;
             LogWarning( "assembly", "class '%s' was already added to the '%s' assembly\n", name, m_name == "" ? "toplevel" : m_name.c_str() );
             return false;
         }

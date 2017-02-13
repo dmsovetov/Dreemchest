@@ -37,20 +37,20 @@ namespace Network {
     class UDPSocket NIMBLE_FINAL : public Socket {
     public:
 
-		//! Sends a datagram to a specified address & port.
+        //! Sends a datagram to a specified address & port.
         u32                     send( const Address& address, u16 port, const void* buffer, u32 size );
 
-		//! Starts listening for datagrams at a given port.
+        //! Starts listening for datagrams at a given port.
         bool                    listen( u16 port );
 
-		//! Checks if any data has been received.
+        //! Checks if any data has been received.
         void                    recv( void );
 
-		//! Creates a new UDP socket instance.
-		static UDPSocketPtr	    create( void );
+        //! Creates a new UDP socket instance.
+        static UDPSocketPtr        create( void );
 
-		//! Creates a new broadcast UDP socket instance.
-		static UDPSocketPtr	    createBroadcast( void );
+        //! Creates a new broadcast UDP socket instance.
+        static UDPSocketPtr        createBroadcast( void );
 
         //! This event is emitted when packet was received.
         struct Data {
@@ -73,4 +73,4 @@ namespace Network {
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Network_UDPSocket_H__	*/
+#endif    /*    !__DC_Network_UDPSocket_H__    */

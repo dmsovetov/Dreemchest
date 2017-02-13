@@ -32,38 +32,36 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace Io {
-        
-	//! A FileStream class is used for work with physical files.
-	class FileStream : public Stream {
+namespace Io
+{
+    //! A FileStream class is used for work with physical files.
+    class FileStream : public Stream
+    {
     friend class DiskFileSystem;
+    public:
 
-        DC_DECLARE_IS( FileStream, FileStream, this );
-
-	public:
-
-		virtual					~FileStream( void );
+        virtual                 ~FileStream( void );
 
         //! Disposes this file stream.
-        virtual void            dispose( void ) DC_DECL_OVERRIDE;
+        virtual void            close( void ) NIMBLE_OVERRIDE;
 
         //! Returns a total lenght of this file.
-        virtual s32             length( void ) const DC_DECL_OVERRIDE;
+        virtual s32             length( void ) const NIMBLE_OVERRIDE;
 
         //! Returns current file position.
-        virtual s32             position( void ) const DC_DECL_OVERRIDE;
+        virtual s32             position( void ) const NIMBLE_OVERRIDE;
 
         //! Sets the position inside the file.
-        virtual void            setPosition( s32 offset, SeekOrigin origin = SeekSet ) DC_DECL_OVERRIDE;
+        virtual void            setPosition( s32 offset, SeekOrigin origin = SeekSet ) NIMBLE_OVERRIDE;
 
         //! Returns true if there are any data left.
-        virtual bool            hasDataLeft( void ) const DC_DECL_OVERRIDE;
+        virtual bool            hasDataLeft( void ) const NIMBLE_OVERRIDE;
 
         //! Reads data from file.
-        virtual s32             read( void* buffer, s32 size ) const DC_DECL_OVERRIDE;
+        virtual s32             read( void* buffer, s32 size ) const NIMBLE_OVERRIDE;
 
         //! Writes data to file.
-        virtual s32             write( const void* buffer, s32 size ) DC_DECL_OVERRIDE;
+        virtual s32             write( const void* buffer, s32 size ) NIMBLE_OVERRIDE;
 
         //! Returns a file name of this file.
         const Path&             fileName( void ) const;
@@ -79,20 +77,20 @@ namespace Io {
     private:
 
         //! File handle.
-		FILE*                   m_file;
+        FILE*                   m_file;
 
         //! Total file length in bytes.
-		s32                     m_length;
+        s32                     m_length;
 
         //! File name.
         Path                    m_fileName;
 
         //! Total opened files counter, used for debugging.
         static u32              s_openFileCount;
-	};
+    };
 
 } // namespace Io
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__File_H__	*/
+#endif        /*    !__File_H__    */

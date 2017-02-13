@@ -104,7 +104,7 @@ namespace Sound {
     protected:
 
         //! Strong pointer to a hardware sound buffer.
-        SoundBufferPtr			m_buffer;
+        SoundBufferPtr            m_buffer;
 
         //! Sound source state.
         SourceState             m_state;

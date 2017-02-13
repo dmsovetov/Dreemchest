@@ -46,7 +46,7 @@ namespace Threads {
                                 TaskThread( const String& name, TaskQueueWPtr queue );
 
         //! Returns a pointer to thread task queue.
-        TaskQueueWPtr			taskQueue( void ) const;
+        TaskQueueWPtr            taskQueue( void ) const;
         
         //! Returns a thread identifier.
         u32                     threadId( void ) const;
@@ -62,10 +62,10 @@ namespace Threads {
         String                  m_name;
 
         //! Task queue.
-        TaskQueueWPtr			m_tasks;
+        TaskQueueWPtr            m_tasks;
 
         //! Thread object.
-        ThreadPtr				m_thread;
+        ThreadPtr                m_thread;
     };
     
 } // namespace Threads

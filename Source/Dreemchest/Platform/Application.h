@@ -29,6 +29,7 @@
 
 #include "Platform.h"
 #include "Arguments.h"
+#include "Window.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -45,12 +46,16 @@ namespace Platform {
 
         //! Launches application with a callback.
         virtual int             launch( Application* application )  = 0;
+        
+        //! Returns a resource path.
+        virtual const String&   resourcePath( void ) const = 0;
     };
 
     //! ApplicationDelegate is used to handle events raised by application.
     class ApplicationDelegate {
     public:
 
+                                ApplicationDelegate(const String& tag = "APP");
         virtual                 ~ApplicationDelegate( void ) {}
 
         //! Notifies that application is about to start.
@@ -61,24 +66,67 @@ namespace Platform {
 
         //! Notifies about an application update.
         virtual void            handleUpdate( Application* application ) {}
+        
+        //! This method is called when a device orientation was changed.
+        virtual void            handleOrientationChanged( Application* application, DeviceOrientation orientation ) {}
+        
+    protected:
+        
+        //! Outputs a debug message to a console.
+        void                    debug(CString prefix, CString format, ...);
+        
+        //! Outputs a verbose message to a console.
+        void                    verbose(CString prefix, CString format, ...);
+        
+        //! Outputs a warning message to a console.
+        void                    warning(CString prefix, CString format, ...);
+        
+        //! Outputs an error message to a console.
+        void                    error(CString prefix, CString format, ...);
+        
+        //! Outputs a fatal message to a console.
+        void                    fatal(CString prefix, CString format, ...);
+        
+    private:
+        
+        String                  m_loggerTag;    //!< A tag string that is passed to a logger.
     };
 
-	//! Base class for windowed applications.
-	class WindowedApplicationDelegate : public ApplicationDelegate {
-	public:
+    //! Base class for windowed applications.
+    class WindowedApplicationDelegate : public ApplicationDelegate
+    {
+    protected:
 
-		//! Abstract method to be overridden in a subclass to setup application after window creation.
-		virtual bool			initialize( void ) = 0;
+        //! Creates and initializes a window instance.
+        virtual bool            initialize(s32 width, s32 height);
+        
+        //! Sets a window caption.
+        void                    setCaption(const String& value);
+        
+        // This method is called when mouse/touch is pressed.
+        virtual void            handleTouchBegan(const Window::TouchBegan& e) {}
+        
+        // This method is called when mouse/touch is released.
+        virtual void            handleTouchEnded(const Window::TouchEnded& e) {}
+        
+        // This method is called when mouse/touch is moved.
+        virtual void            handleTouchMoved(const Window::TouchMoved& e) {}
+        
+    #if defined( DC_PLATFORM_KEYBOARD )
+        // This method is called when key is pressed.
+        virtual void            handleKeyPressed(const Window::KeyPressed& e) {}
+        
+        // This method is called when key is released.
+        virtual void            handleKeyReleased(const Window::KeyReleased& e) {}
+    #endif  //  #if defined( DC_PLATFORM_KEYBOARD )
+        
+        // This method is called each frame
+        virtual void            handleWindowUpdate(const Window::Update& e) {}
 
-	private:
+    protected:
 
-        //! Handles the application start and creates the window.
-        virtual void            handleLaunched( Application* application ) DC_DECL_OVERRIDE;
-
-	protected:
-
-		WindowPtr				m_window;	//!< Main application window.
-	};
+        WindowPtr               m_window;    //!< Main application window.
+    };
 
     //! Application class is an entry point for applications.
     class Application {
@@ -106,12 +154,24 @@ namespace Platform {
 
         //! Notifies an application about an update.
         void                    notifyUpdate( void );
+        
+        //! Notifies an application about a device orientation change.
+        void                    notifyOrientationChanged(DeviceOrientation orientation);
 
-		//! Returns application arguments passed on launch.
-		const Arguments&		args( void ) const;
+        //! Returns application arguments passed on launch.
+        const Arguments&        args( void ) const;
+        
+        //! Returns a current working directory.
+        const String&           currentDirectory( void ) const;
+        
+        //! Returns a resource path.
+        const String&           resourcePath( void ) const;
+        
+        //! Returns a full path for a resource.
+        String                  pathForResource(const String& fileName) const;
 
         //! Creates a new Application instance.
-        static Application*     create( const Arguments& args );
+        static Application*     create( const Arguments& args, void* userData = NULL );
 
         //! Returns a shared application instance.
         static Application*     sharedInstance( void );
@@ -123,10 +183,11 @@ namespace Platform {
 
     private:
 
-        static Application*     s_application;	//!< Shared application instance.
-        IApplication*           m_impl;			//!< Platform specific application implementation.
-        ApplicationDelegate*    m_delegate;		//!< Application delegate instance.
-		Arguments				m_arguments;	//!< Passed arguments.
+        static Application*     s_application;      //!< Shared application instance.
+        IApplication*           m_impl;             //!< Platform specific application implementation.
+        ApplicationDelegate*    m_delegate;         //!< Application delegate instance.
+        mutable String          m_currentDirectory; //!< A current directory.
+        Arguments               m_arguments;        //!< Passed arguments.
     };
 
     //! Service application
@@ -146,18 +207,39 @@ namespace Platform {
 
 DC_END_DREEMCHEST
 
-//! Declares an application entry point
-#define dcDeclareApplication( delegate )													        \
-    s32 main( s32 argc, s8** argv ) {														        \
-		DC_DREEMCHEST_NS Platform::Arguments args( argv, argc );							        \
-        return DC_DREEMCHEST_NS Platform::Application::create( args )->launch( delegate );	        \
-    }
+//! A private macro definition to construct application instance and parse arguments
+#if defined(DC_PLATFORM_ANDROID)
+    #define _DREEMCHEST_ENTRY_POINT(AppClass, delegate, argc, argv, userData)                           \
+            DC_DREEMCHEST_NS Platform::Arguments args( argv, argc );                                    \
+            DC_DREEMCHEST_NS Platform::AppClass::create( args, userData )->launch( delegate );
+#else
+    #define _DREEMCHEST_ENTRY_POINT(AppClass, delegate, argc, argv, userData)                           \
+            DC_DREEMCHEST_NS Platform::Arguments args( argv, argc );                                    \
+            return DC_DREEMCHEST_NS Platform::AppClass::create( args, userData )->launch( delegate );
+#endif  //  #if defined(DC_PLATFORM_ANDROID)
 
-//! Declares a service entry point
-#define dcDeclareServiceApplication( delegate )                                                     \
-    s32 main( s32 argc, s8** argv ) {														        \
-		DC_DREEMCHEST_NS Platform::Arguments args( argv, argc );							        \
-        return DC_DREEMCHEST_NS Platform::ServiceApplication::create( args )->launch( delegate );	\
-    }
+#if defined(DC_PLATFORM_WINDOWS)
+    //! Declares an application entry point
+    #define dcDeclareApplication( delegate )                                                                    \
+        s32 main( s32 argc, s8** argv ) { _DREEMCHEST_ENTRY_POINT(Application, delegate, argc, argv, NULL) }    \
+        s32 WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) { _DREEMCHEST_ENTRY_POINT(Application, delegate, 1, ( s8** )&pCmdLine, NULL) }
+
+    //! Declares a service entry point
+    #define dcDeclareServiceApplication( delegate )                                                             \
+        s32 main( s32 argc, s8** argv ) { _DREEMCHEST_ENTRY_POINT(ServiceApplication, delegate, argc, argv, NULL) }   \
+        s32 WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) { _DREEMCHEST_ENTRY_POINT(ServiceApplication, delegate, 1, ( s8** )&pCmdLine, NULL) }
+#elif defined(DC_PLATFORM_ANDROID)
+    //! Declares an application entry point
+    #define dcDeclareApplication( delegate )            \
+        extern "C" { void android_main(struct android_app* state) { _DREEMCHEST_ENTRY_POINT(Application, delegate, 0, NULL, state) } }
+#else
+    //! Declares an application entry point
+    #define dcDeclareApplication( delegate )            \
+        s32 main( s32 argc, s8** argv ) { _DREEMCHEST_ENTRY_POINT(Application, delegate, argc, argv, NULL) }
+
+    //! Declares a service entry point
+    #define dcDeclareServiceApplication( delegate )     \
+        s32 main( s32 argc, s8** argv ) { _DREEMCHEST_ENTRY_POINT(ServiceApplication, delegate, argc, argv, NULL) }
+#endif  /*  #ifdef DC_PLATFORM_WINDOWS  */
 
 #endif /*   !defined( __DC_Platform_Application_H__ )   */

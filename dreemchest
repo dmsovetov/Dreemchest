@@ -1,0 +1,3 @@
+#!/bin/bash -l
+cd "$DREEMCHEST_HOME"
+python "./Source/CLI/command_line/main.py" "$@"

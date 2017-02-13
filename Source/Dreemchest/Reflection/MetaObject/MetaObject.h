@@ -109,7 +109,7 @@ namespace Reflection {
     template<typename T>
     NIMBLE_INLINE MetaObject* staticMetaObject( void )
     {
-        return TypeSelector<IsClassOrUnion<T>::value, Private::ClassMetaObject, Private::PrimitiveMetaObject>::type::detectMetaObject<T>();
+        return TypeSelector<IsClassOrUnion<T>::value, Private::ClassMetaObject, Private::PrimitiveMetaObject>::type::template detectMetaObject<T>();
     }
 
 } // namespace Reflection

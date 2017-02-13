@@ -24,16 +24,21 @@
 
  **************************************************************************/
 
-#include    "PosixThread.h"
+#include "PosixThread.h"
 
 #ifdef DC_PLATFORM_WINDOWS
     #pragma comment( lib, "../../../../lib/pthreadVC1.lib" )
 #endif
 
+#ifdef DC_PLATFORM_EMSCRIPTEN
+    #ifndef __EMSCRIPTEN_PTHREADS__
+        #error Emscripten makefile configured with no pthreads support.
+    #endif  //  #ifndef __EMSCRIPTEN_PTHREADS__
+#endif  //  #ifdef DC_PLATFORM_EMSCRIPTEN
 
 DC_BEGIN_DREEMCHEST
 
-namespace thread {
+namespace Threads {
 
 // ** PosixThread::PosixThread
 PosixThread::PosixThread( void )
@@ -55,7 +60,7 @@ void PosixThread::start( const ThreadCallback& callback, void *userData )
     Thread::start( callback, userData );
     
     u32 error = pthread_create( &m_thread, NULL, threadProc, this );
-    DC_BREAK_IF( error );
+    NIMBLE_BREAK_IF( error );
 }
 
 // ** PosixThread::threadProc
@@ -73,27 +78,27 @@ void* PosixThread::threadProc( void *data )
 // ** PosixThread::yield
 void PosixThread::yield( void )
 {
-	threadYield();
+    threadYield();
 }
 
 // ** PosixThread::wait
 void PosixThread::wait( void ) const
 {
-	pthread_join( m_thread, NULL );
+    pthread_join( m_thread, NULL );
 }
 
 // ** PosixThread::threadYield
 void PosixThread::threadYield( void )
 {
-#if defined( DC_PLATFORM_ANDROID )
+#if defined( DC_PLATFORM_ANDROID ) || defined( DC_PLATFORM_EMSCRIPTEN )
     sched_yield();
 #elif defined( DC_PLATFORM_LINUX )
-	pthread_yield();
+    pthread_yield();
 #else
     pthread_yield_np();
 #endif
 }
 
-} // namespace thread
+} // namespace Threads
 
 DC_END_DREEMCHEST

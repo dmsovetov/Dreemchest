@@ -38,16 +38,16 @@ namespace Io {
     class Path;
     class Serializable;
     class Storage;
-	class Serializable;
+    class Serializable;
 
-	class FileSystem;
-		class DiskFileSystem;
-		class Archive;
+    class FileSystem;
+        class DiskFileSystem;
+        class Archive;
 
-	class Stream;
-		class FileStream;
-		class ByteBuffer;
-		class PackedStream;
+    class Stream;
+        class FileStream;
+        class ByteBuffer;
+        class PackedStream;
 
     //! Available stream open modes.
     enum StreamMode {
@@ -55,12 +55,12 @@ namespace Io {
         BinaryWriteStream,    //!< Open binary stream for writing.
     };
 
-	//! Available seeking origins.
-	enum SeekOrigin {
-		SeekSet = 0,    //!< Seek from the begining of a stream.
-		SeekCur,        //!< Seek from a current position inside a stream.
-		SeekEnd         //!< Seek from the end of a stream.
-	};
+    //! Available seeking origins.
+    enum SeekOrigin {
+        SeekSet = 0,    //!< Seek from the begining of a stream.
+        SeekCur,        //!< Seek from a current position inside a stream.
+        SeekEnd         //!< Seek from the end of a stream.
+    };
 
 
     dcDeclarePtrs( Stream );
@@ -72,18 +72,18 @@ namespace Io {
     //! Archive ptr type.
     typedef StrongPtr<Archive>      ArchivePtr;
 
-	//! Serializable strong ptr.
-	typedef StrongPtr<Serializable>	SerializablePtr;
+    //! Serializable strong ptr.
+    typedef StrongPtr<Serializable>    SerializablePtr;
 
-    typedef Map<Path, ArchivePtr>	Archives;
-    typedef Set<Path>				PathSet;
-	typedef List<SerializablePtr>	Serializables;
+    typedef Map<Path, ArchivePtr>    Archives;
+    typedef Set<Path>                PathSet;
+    typedef List<SerializablePtr>    Serializables;
 
-	//! Field serializer strong ptr.
-	typedef StrongPtr<class Serializer> SerializerPtr;
+    //! Field serializer strong ptr.
+    typedef StrongPtr<class Serializer> SerializerPtr;
 
-	//! List of field serializer ptrs.
-	typedef List<SerializerPtr> SerializerList;
+    //! List of field serializer ptrs.
+    typedef List<SerializerPtr> SerializerList;
 
     //! Abstract class interface to be implemented by a streamable types.
     class Streamable : public RefCounted {
@@ -103,12 +103,12 @@ namespace Io {
 DC_END_DREEMCHEST
 
 #ifndef DC_BUILD_LIBRARY
-	#include "streams/FileStream.h"
+    #include "streams/FileStream.h"
     #include "streams/ByteBuffer.h"
-	#include "FileSystem.h"
-	#include "Archive.h"
+    #include "FileSystem.h"
+    #include "Archive.h"
     #include "DiskFileSystem.h"
-	#include "KeyValue.h"
+    #include "KeyValue.h"
 #endif
 
 #endif /*   !defined( __DC_Io_H__ )   */

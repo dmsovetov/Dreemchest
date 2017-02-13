@@ -1,15 +1,26 @@
+// shadertype=glsl
+[Features]
+F_View     = cbuffer1
+F_Instance = cbuffer2
+
 [VertexShader]
-#version 120
+void main()
+{
+	vec4 vertex = gl_Vertex;
 
-uniform mat4 u_vp, u_transform;
+#if defined( F_Instance )
+	vertex = Instance.transform * vertex;
+#endif	/*	F_Instance	*/
 
-void main() {
-	gl_Position = u_vp * u_transform * gl_Vertex;
+#if defined( F_View )
+	vertex = View.transform * vertex;
+#endif	/*	F_View	*/
+
+	gl_Position = vertex;
 }
 
 [FragmentShader]
-#version 120
-
-void main() {
-	gl_FragColor = vec4( 1.0, 0.0, 1.0, 1.0 );
+void main()
+{
+    gl_FragColor = vec4( 1.0, 0.0, 1.0, 1.0 );
 }

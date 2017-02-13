@@ -33,64 +33,64 @@ DC_BEGIN_COMPOSER
 
 namespace Importers {
 
-	//! Base class for all image importers.
-	class ImageImporter : public AssetImporter {
-	public:
+    //! Base class for all image importers.
+    class ImageImporter : public AssetImporter {
+    public:
 
-		//! Writes the imported image to file.
-		virtual bool		import( FileSystemQPtr fs,const Io::Path& sourceFileName, const Io::Path& destinationFileName ) DC_DECL_OVERRIDE;
+        //! Writes the imported image to file.
+        virtual bool        import( FileSystemQPtr fs,const Io::Path& sourceFileName, const Io::Path& destinationFileName ) NIMBLE_OVERRIDE;
 
-	private:
+    private:
 
-		//! Imports an image from file.
-		virtual bool		importImage( FileSystemQPtr fs, const Io::Path& sourceFileName ) = 0;
+        //! Imports an image from file.
+        virtual bool        importImage( FileSystemQPtr fs, const Io::Path& sourceFileName ) = 0;
 
-	protected:
+    protected:
 
-		//! Imported image.
-		struct Image {
-			u16				width;		//!< Image width.
-			u16				height;		//!< Image height.
-			u8				channels;	//!< Image channels.
-			Array<u8>		pixels;		//!< Image pixel buffer.
-		};
+        //! Imported image.
+        struct Image {
+            u16                width;        //!< Image width.
+            u16                height;        //!< Image height.
+            u8                channels;    //!< Image channels.
+            Array<u8>        pixels;        //!< Image pixel buffer.
+        };
 
-		Image				m_image;	//!< The imported image.
-	};
+        Image                m_image;    //!< The imported image.
+    };
 
-	//! Imports the TGA image.
-	class ImageImporterTGA : public ImageImporter {
-	public:
+    //! Imports the TGA image.
+    class ImageImporterTGA : public ImageImporter {
+    public:
 
-		//! Performs importing of a TGA image.
-		virtual bool		importImage( FileSystemQPtr fs, const Io::Path& sourceFileName ) DC_DECL_OVERRIDE;
+        //! Performs importing of a TGA image.
+        virtual bool        importImage( FileSystemQPtr fs, const Io::Path& sourceFileName ) NIMBLE_OVERRIDE;
 
-	private:
+    private:
 
-		//! Reads 16-bit image.
-		void				readPixels16( Io::StreamPtr stream, Image& image, u16 width, u16 height ) const;
+        //! Reads 16-bit image.
+        void                readPixels16( Io::StreamPtr stream, Image& image, u16 width, u16 height ) const;
 
-		//! Reads 24/32-bit image.
-		void				readPixels( Io::StreamPtr stream, Image& image, u16 width, u16 height, u8 bitsPerPixel ) const;
+        //! Reads 24/32-bit image.
+        void                readPixels( Io::StreamPtr stream, Image& image, u16 width, u16 height, u8 bitsPerPixel ) const;
 
-		//! Swaps red & blue channels.
-		void				swapChannels( Image& image ) const;
-	};
+        //! Swaps red & blue channels.
+        void                swapChannels( Image& image ) const;
+    };
 
-#ifdef HAVE_TIFF
+#ifdef TIFF_FOUND
 
-	//! Imports the TIF image.
-	class ImageImporterTIF : public ImageImporter {
-	public:
+    //! Imports the TIF image.
+    class ImageImporterTIF : public ImageImporter {
+    public:
 
-		//! Performs importing of a TIF image.
-		virtual bool		importImage( FileSystemQPtr fs, const Io::Path& sourceFileName ) DC_DECL_OVERRIDE;
-	};
+        //! Performs importing of a TIF image.
+        virtual bool        importImage( FileSystemQPtr fs, const Io::Path& sourceFileName ) NIMBLE_OVERRIDE;
+    };
 
-#endif	/*	HAVE_TIFF	*/
+#endif    /*    #ifdef TIFF_FOUND    */
 
 } // namespace Importers
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_ImageImporter_H__	*/
+#endif    /*    !__DC_Composer_ImageImporter_H__    */

@@ -33,7 +33,7 @@ namespace Network {
 // ** ConnectionTCP::ConnectionTCP
 ConnectionTCP::ConnectionTCP( TCPSocketPtr socket ) : m_socket( socket )
 {
-    DC_ABORT_IF( !m_socket.valid(), "invalid socket" );
+    NIMBLE_ABORT_IF( !m_socket.valid(), "invalid socket" );
 
     // Create the temporary read buffer for received packet
     m_packet = Io::ByteBuffer::create();
@@ -58,14 +58,14 @@ TCPSocketWPtr ConnectionTCP::socket( void ) const
 // ** ConnectionTCP::address
 const Address& ConnectionTCP::address( void ) const
 {
-	return socket()->address();
+    return socket()->address();
 }
 
 // ** ConnectionTCP::sendData
 s32 ConnectionTCP::sendData( Io::ByteBufferWPtr data )
 {
-	DC_BREAK_IF( !m_socket.valid(), "invalid socket" );
-	s32 result = m_socket->send( data->buffer(), data->length() );
+    NIMBLE_BREAK_IF( !m_socket.valid(), "invalid socket" );
+    s32 result = m_socket->send( data->buffer(), data->length() );
     return result;
 }
 
@@ -73,10 +73,10 @@ s32 ConnectionTCP::sendData( Io::ByteBufferWPtr data )
 void ConnectionTCP::close( void )
 {
     // Unsubscribe from socket events
-	if( m_socket.valid() ) {
-		m_socket->unsubscribe<TCPSocket::Data>( dcThisMethod( ConnectionTCP::handleSocketData ) );
-		m_socket->unsubscribe<TCPSocket::Closed>( dcThisMethod( ConnectionTCP::handleSocketClosed ) );
-	}
+    if( m_socket.valid() ) {
+        m_socket->unsubscribe<TCPSocket::Data>( dcThisMethod( ConnectionTCP::handleSocketData ) );
+        m_socket->unsubscribe<TCPSocket::Closed>( dcThisMethod( ConnectionTCP::handleSocketClosed ) );
+    }
 
     // Notify all subscribers that connection is now closed
     notify<Closed>( this );
@@ -115,12 +115,12 @@ void ConnectionTCP::handleSocketData( const TCPSocket::Data& e )
         }
 
         // Notify about this packet
-		notifyPacketReceived( header.type, header.size, m_packet );
+        notifyPacketReceived( header.type, header.size, m_packet );
     }
 
     // Trim processed data
-	LogDebug( "socket", "%d bytes from %s processed, %d bytes left in buffer\n", data->position(), socket->address().toString(), data->length() - data->position() );
-	data->trimFromLeft( data->position() );
+    LogDebug( "socket", "%d bytes from %s processed, %d bytes left in buffer\n", data->position(), socket->address().toString(), data->length() - data->position() );
+    data->trimFromLeft( data->position() );
 }
 
 // ** ConnectionTCP::handleSocketClosed

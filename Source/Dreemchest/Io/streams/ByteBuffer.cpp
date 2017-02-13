@@ -31,17 +31,20 @@ DC_BEGIN_DREEMCHEST
 namespace Io {
 
 // ** ByteBuffer::ByteBuffer
-ByteBuffer::ByteBuffer( const u8* pointer, s32 size ) : m_position( 0 )
+ByteBuffer::ByteBuffer( const u8* pointer, s32 size )
+    : m_position( 0 )
 {
-    if( size == 0 ) {
+    if( size == 0 )
+    {
         return;
     }
     
     m_buffer.resize( size );
 
-	if( pointer ) {
-		memcpy( &m_buffer[0], pointer, size );
-	}
+    if( pointer )
+    {
+        memcpy( &m_buffer[0], pointer, size );
+    }
 }
 
 ByteBuffer::~ByteBuffer( void )
@@ -82,7 +85,7 @@ s32 ByteBuffer::bytesAvailable( void ) const
 // ** ByteBuffer::array
 const Array<u8>& ByteBuffer::array( void ) const
 {
-	return m_buffer;
+    return m_buffer;
 }
 
 // ** ByteBuffer::buffer
@@ -106,13 +109,13 @@ s32 ByteBuffer::length( void ) const
 // ** ByteBuffer::copy
 ByteBufferPtr ByteBuffer::copy( void ) const
 {
-	return ByteBuffer::createFromArray( m_buffer );
+    return ByteBuffer::createFromArray( m_buffer );
 }
 
 // ** ByteBuffer::trimFromLeft
 void ByteBuffer::trimFromLeft( s32 size )
 {
-    DC_ABORT_IF( size > length(), "too long chunk to trim" );
+    NIMBLE_ABORT_IF( size > length(), "too long chunk to trim" );
     m_buffer.erase( m_buffer.begin(), m_buffer.begin() + size );
     m_position = min2( m_position, length() );
 }
@@ -120,7 +123,7 @@ void ByteBuffer::trimFromLeft( s32 size )
 // ** ByteBuffer::trimFromRight
 void ByteBuffer::trimFromRight( s32 size )
 {
-    DC_ABORT_IF( size > length(), "too long chunk to trim" );
+    NIMBLE_ABORT_IF( size > length(), "too long chunk to trim" );
     m_buffer.erase( m_buffer.begin() + (length() - size), m_buffer.end() );
     m_position = min2( m_position, length() );
 }
@@ -128,9 +131,9 @@ void ByteBuffer::trimFromRight( s32 size )
 // ** ByteBuffer::read
 s32 ByteBuffer::read( void* buffer, s32 size ) const
 {
-    DC_ABORT_IF( buffer == NULL, "invalid destination buffer" );
-    DC_ABORT_IF( size <= 0, "the size should be positive" );
-    DC_ABORT_IF( size > bytesAvailable(), "not enough data to read" );
+    NIMBLE_ABORT_IF( buffer == NULL, "invalid destination buffer" );
+    NIMBLE_ABORT_IF( size <= 0, "the size should be positive" );
+    NIMBLE_ABORT_IF( size > bytesAvailable(), "not enough data to read" );
 
     memcpy( buffer, current(), size );
     m_position += size;
@@ -141,12 +144,13 @@ s32 ByteBuffer::read( void* buffer, s32 size ) const
 // ** ByteBuffer::write
 s32 ByteBuffer::write( const void* buffer, s32 size )
 {
-    DC_ABORT_IF( buffer == NULL, "invalid destination buffer" );
-    DC_ABORT_IF( size <= 0, "the size should be positive" );
+    NIMBLE_ABORT_IF( buffer == NULL, "invalid destination buffer" );
+    NIMBLE_ABORT_IF( size <= 0, "the size should be positive" );
 
     s32 extra = max2( 0, size - bytesAvailable() );
 
-    if( extra ) {
+    if( extra )
+    {
         m_buffer.resize( length() + extra );
     }
 
@@ -165,16 +169,17 @@ s32 ByteBuffer::position( void ) const
 // ** ByteBuffer::setPosition
 void ByteBuffer::setPosition( s32 offset, SeekOrigin origin )
 {
-    switch( origin ) {
-    case SeekSet:   m_position = min2( length(), offset );
-                    break;
+    switch( origin )
+    {
+        case SeekSet:   m_position = min2( length(), offset );
+                        break;
             
-    case SeekCur:   m_position = min2( m_position + offset, length() );
-                    break;
+        case SeekCur:   m_position = min2( m_position + offset, length() );
+                        break;
             
-	case SeekEnd:   m_position = max2( 0, length() - offset );
-                    break;
-	}
+        case SeekEnd:   m_position = max2( 0, length() - offset );
+                        break;
+    }
 }
 
 } // namespace Io

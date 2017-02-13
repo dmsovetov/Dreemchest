@@ -40,7 +40,7 @@ SoundBuffer::SoundBuffer( SoundDecoderPtr decoder, u32 chunks )
     , m_size( 0 )
     , m_chunks( chunks )
 {
-    DC_ABORT_IF( !decoder.valid(), "invalid sound decoder" );
+    NIMBLE_ABORT_IF( !decoder.valid(), "invalid sound decoder" );
     m_size = decoder->size();
     m_format = decoder->format();
 }

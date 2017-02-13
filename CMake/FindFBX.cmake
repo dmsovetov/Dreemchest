@@ -22,7 +22,7 @@ find_library(FBX_LIBRARY_DEBUG ${FBX_LIBNAME}
     PATH_SUFFIXES "lib/${FBX_LIBDIR}/${FBX_ARCH}/debug")
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(FbxSdk DEFAULT_MSG FBX_LIBNAME JSONCPP_INCLUDE_DIR)
+find_package_handle_standard_args(FbxSdk DEFAULT_MSG FBX_LIBNAME FBX_INCLUDE_DIR)
 
 if (FBX_INCLUDE_DIR AND FBX_LIBRARY_DEBUG AND FBX_LIBRARY_RELEASE)
 	if(NOT FBX_FOUND)

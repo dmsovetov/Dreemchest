@@ -24,8 +24,8 @@
 
  **************************************************************************/
 
-#ifndef	__DC_Network_TCPSocket_H__
-#define	__DC_Network_TCPSocket_H__
+#ifndef    __DC_Network_TCPSocket_H__
+#define    __DC_Network_TCPSocket_H__
 
 #include "Socket.h"
 
@@ -34,33 +34,33 @@ DC_BEGIN_DREEMCHEST
 namespace Network {
 
     //! TCP socket.
-	class TCPSocket : public Socket {
+    class TCPSocket : public Socket {
     friend class TCPSocketListener;
     public:
 
-        virtual						~TCPSocket( void );
+        virtual                        ~TCPSocket( void );
 
         //! Returns a remote address.
-		const Address&	            address( void ) const;
+        const Address&                address( void ) const;
 
         //! Connects to a TCP socket at a given remote address and port.
-        bool					    connect( const Address& address, u16 port );
+        bool                        connect( const Address& address, u16 port );
 
         //! Closes a socket.
-        virtual void			    close( void ) DC_DECL_OVERRIDE;
+        virtual void                close( void ) NIMBLE_OVERRIDE;
 
         //! Reads all incoming data.
-        virtual void			    recv( void ) DC_DECL_OVERRIDE;
+        virtual void                recv( void ) NIMBLE_OVERRIDE;
 
-		//! Sends data to socket.
-		/*
-		\param buffer Data to be sent.
-		\param size Data size to be sent.
-		*/
-        u32						    send( const void* buffer, u32 size );
+        //! Sends data to socket.
+        /*
+        \param buffer Data to be sent.
+        \param size Data size to be sent.
+        */
+        u32                            send( const void* buffer, s32 size );
 
         //! Connects to a TCP socket at a given remote address and port.
-        static TCPSocketPtr		    connectTo( const Address& address, u16 port );
+        static TCPSocketPtr            connectTo( const Address& address, u16 port );
 
         //! Base class for all TCP socket events.
         struct Event {
@@ -99,11 +99,11 @@ namespace Network {
 
     private:
 
-        Address				        m_address;      //!< Remote socket address.
+        Address                        m_address;      //!< Remote socket address.
     };
 
 } // namespace Network
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Network_TCPSocket_H__	*/
+#endif    /*    !__DC_Network_TCPSocket_H__    */

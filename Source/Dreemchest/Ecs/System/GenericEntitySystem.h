@@ -33,91 +33,91 @@ DC_BEGIN_DREEMCHEST
 
 namespace Ecs {
 
-#ifndef DC_CPP11_DISABLED
+#if DREEMCHEST_CPP11
 
-	//! Generic entity system to process entities that contain all components from a specified set.
-	template<typename TSystem, typename ... TComponents>
-	class GenericEntitySystem : public EntitySystem {
-	public:
+    //! Generic entity system to process entities that contain all components from a specified set.
+    template<typename TSystem, typename ... TComponents>
+    class GenericEntitySystem : public EntitySystem {
+    public:
 
-						//! Constructs GenericEntitySystem instance.
-						GenericEntitySystem( const String& name = TypeInfo<TSystem>::name() )
-							: EntitySystem( name, Aspect::all<TComponents...>() ) {}
+                        //! Constructs GenericEntitySystem instance.
+                        GenericEntitySystem( const String& name = TypeInfo<TSystem>::name() )
+                            : EntitySystem( name, Aspect::all<TComponents...>() ) {}
 
-	protected:
+    protected:
 
-		//! Component types.
-		typedef std::tuple<TComponents...> Types;
+        //! Component types.
+        typedef std::tuple<TComponents...> Types;
 
-		//! Tuple indices
-		typedef IndexTupleBuilder<sizeof...(TComponents)> Indices;
+        //! Tuple indices
+        typedef IndexTupleBuilder<sizeof...(TComponents)> Indices;
 
-		//! Performs an update of a system
-		virtual void	update( u32 currentTime, f32 dt ) DC_DECL_OVERRIDE;
+        //! Performs an update of a system
+        virtual void    update( u32 currentTime, f32 dt ) NIMBLE_OVERRIDE;
 
-		//! Called when entity was added.
-		virtual void	entityAdded( const Entity& entity ) DC_DECL_OVERRIDE;
+        //! Called when entity was added.
+        virtual void    entityAdded( const Entity& entity ) NIMBLE_OVERRIDE;
 
-		//! Generic processing function that should be overriden in a subclass.
-		virtual void	process( u32 currentTime, f32 dt, Entity& entity, TComponents& ... components );
+        //! Generic processing function that should be overriden in a subclass.
+        virtual void    process( u32 currentTime, f32 dt, Entity& entity, TComponents& ... components );
 
-		//! Called when entity was added.
-        virtual void	entityAdded( const Entity& entity, TComponents& ... components ) {}
+        //! Called when entity was added.
+        virtual void    entityAdded( const Entity& entity, TComponents& ... components ) {}
 
-	private:
+    private:
 
-		//! Dispatches the entity components to processing
-		template<s32 ... Idxs> 
-		void dispatchProcess( u32 currentTime, f32 dt, Entity& entity, IndexesTuple<Idxs...> const& )  
-		{ 
-			process( currentTime, dt, entity, *entity.get<typename std::tuple_element<Idxs, Types>::type>()... );
-		}
+        //! Dispatches the entity components to processing
+        template<s32 ... Idxs> 
+        void dispatchProcess( u32 currentTime, f32 dt, Entity& entity, IndexesTuple<Idxs...> const& )  
+        { 
+            process( currentTime, dt, entity, *entity.get<typename std::tuple_element<Idxs, Types>::type>()... );
+        }
 
-		//! Calls entityAdded method with components
-		template<s32 ... Idxs> 
-		void dispatchEntityAdded( const Entity& entity, IndexesTuple<Idxs...> const& )  
-		{ 
-			entityAdded( entity, *entity.get<typename std::tuple_element<Idxs, Types>::type>()... );
-		}
-	};
+        //! Calls entityAdded method with components
+        template<s32 ... Idxs> 
+        void dispatchEntityAdded( const Entity& entity, IndexesTuple<Idxs...> const& )  
+        { 
+            entityAdded( entity, *entity.get<typename std::tuple_element<Idxs, Types>::type>()... );
+        }
+    };
 
-	// ** GenericEntitySystem::update
-	template<typename TSystem, typename ... TComponents>
-	void GenericEntitySystem<TSystem, TComponents...>::update( u32 currentTime, f32 dt )
-	{
-		if( !begin( currentTime, dt ) ) {
-			return;
-		}
+    // ** GenericEntitySystem::update
+    template<typename TSystem, typename ... TComponents>
+    void GenericEntitySystem<TSystem, TComponents...>::update( u32 currentTime, f32 dt )
+    {
+        if( !begin( currentTime, dt ) ) {
+            return;
+        }
 
         NIMBLE_BREADCRUMB_CALL_STACK;
 
-		EntitySet& entities = m_index->entities();
+        EntitySet& entities = m_index->entities();
 
-		for( EntitySet::iterator i = entities.begin(), n = entities.end(); i != n; ++i ) {
-			dispatchProcess( currentTime, dt, *i->get(), typename Indices::Indexes() );
-		}
+        for( EntitySet::iterator i = entities.begin(), n = entities.end(); i != n; ++i ) {
+            dispatchProcess( currentTime, dt, *i->get(), typename Indices::Indexes() );
+        }
 
-		end();	
-	}
+        end();    
+    }
 
-	// ** GenericEntitySystem::entityAdded
-	template<typename TSystem, typename ... TComponents>
-	void GenericEntitySystem<TSystem, TComponents...>::entityAdded( const Entity& entity )
-	{
+    // ** GenericEntitySystem::entityAdded
+    template<typename TSystem, typename ... TComponents>
+    void GenericEntitySystem<TSystem, TComponents...>::entityAdded( const Entity& entity )
+    {
         NIMBLE_BREADCRUMB_CALL_STACK;
-		dispatchEntityAdded( entity, typename Indices::Indexes() );
-	}
+        dispatchEntityAdded( entity, typename Indices::Indexes() );
+    }
 
-	// ** GenericEntitySystem::process
-	template<typename TSystem, typename ... TComponents>
-	void GenericEntitySystem<TSystem, TComponents...>::process( u32 currentTime, f32 dt, Entity& entity, TComponents& ... components )
-	{
-	}
+    // ** GenericEntitySystem::process
+    template<typename TSystem, typename ... TComponents>
+    void GenericEntitySystem<TSystem, TComponents...>::process( u32 currentTime, f32 dt, Entity& entity, TComponents& ... components )
+    {
+    }
 
-#endif	/*	!DC_CPP11_DISABLED	*/
+#endif    /*    #if DREEMCHEST_CPP11    */
 
 } // namespace Ecs
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Ecs_GenericEntitySystem_H__	*/
+#endif    /*    !__DC_Ecs_GenericEntitySystem_H__    */

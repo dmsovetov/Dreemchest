@@ -30,18 +30,19 @@
 #include <Dreemchest.h>
 #include <functional>
 
-#define DEV_BACKGROUND_ASSET_LOADING	(0)
-#define DEV_USE_DOCK_INDICATOR			(1)
+#define DEV_BACKGROUND_ASSET_LOADING        (0)
+#define DEV_USE_DOCK_INDICATOR                (1)
+#define DEV_DISABLE_SYSTEM_ICON_PROVIDER    (1)
 
-#ifdef DC_QT4_ENABLED
-	#include <QtGui>
-	#include <QtCore>
-	#include <QtOpenGL>
+#if DC_QT_VERSION == 4
+    #include <QtGui>
+    #include <QtCore>
+    #include <QtOpenGL>
 
-	#define Q_DECL_OVERRIDE override
-#elif DC_QT5_ENABLED
-	#include <QtWidgets>
-	#include <QtOpenGL>
+    #define Q_DECL_OVERRIDE override
+#elif DC_QT_VERSION == 5
+    #include <QtWidgets>
+    #include <QtOpenGL>
 #endif
 
 #define qCheckParent( object )          \
@@ -49,18 +50,18 @@
                 qWarning() << "Object has no parent" << __FUNCTION__ << __FILE__ << __LINE__;   \
             }
 
-#define qDeclarePtrs( T )							\
-		    typedef QSharedPointer<class T>	T##Ptr;	\
-	        typedef QWeakPointer<class T>	T##WPtr;
+#define qDeclarePtrs( T )                            \
+            typedef QSharedPointer<class T>    T##Ptr;    \
+            typedef QWeakPointer<class T>    T##WPtr;
 
-#define qDeclarePtr( T )		        \
-		    typedef class T* T##QPtr;
+#define qDeclarePtr( T )                \
+            typedef class T* T##QPtr;
 
 #define qComposer    qobject_cast<Composer*>( qApp )
 #define qMainWindow  qComposer->window()
 
-#define DC_BEGIN_COMPOSER	/*namespace Composer {*/
-#define DC_END_COMPOSER		/*}*/
+#define DC_BEGIN_COMPOSER    /*namespace Composer {*/
+#define DC_END_COMPOSER        /*}*/
 
 DC_BEGIN_COMPOSER
 
@@ -69,154 +70,154 @@ DC_BEGIN_COMPOSER
     // Declare the log tag in global namespace
     DREEMCHEST_LOGGER_TAG( Composer )
 
-	// Declare Qt metatypes
+    // Declare Qt metatypes
     Q_DECLARE_METATYPE( Variant )
-	Q_DECLARE_METATYPE( Assets::Handle )
-	Q_DECLARE_METATYPE( Scene::ImageHandle )
-	Q_DECLARE_METATYPE( Scene::RenderingMode )
-	Q_DECLARE_METATYPE( Scene::Material::Model )
+    Q_DECLARE_METATYPE( Assets::Handle )
+    Q_DECLARE_METATYPE( Scene::ImageHandle )
+    Q_DECLARE_METATYPE( Scene::RenderingMode )
+    Q_DECLARE_METATYPE( Scene::LightingModel )
 
-	namespace Ui {
+    namespace Ui {
 
         qDeclarePtr( AssetTree )
         qDeclarePtr( MainWindow )
         qDeclarePtr( Document )
         qDeclarePtr( SceneTree )
-		qDeclarePtr( Action )
-		qDeclarePtr( Menu )
-		qDeclarePtr( ToolBar )
-		qDeclarePtr( RenderingFrame )
+        qDeclarePtr( Action )
+        qDeclarePtr( Menu )
+        qDeclarePtr( ToolBar )
+        qDeclarePtr( RenderingFrame )
         qDeclarePtr( PropertyInspector )
         qDeclarePtr( EntityInspector )
 
-		//! Message status.
-		enum MessageStatus {
-			  MessageInfo		//!< The information message.
-			, MessageWarning	//!< The warning message.
-			, MessageError		//!< The error message.
-		};
+        //! Message status.
+        enum MessageStatus {
+              MessageInfo        //!< The information message.
+            , MessageWarning    //!< The warning message.
+            , MessageError        //!< The error message.
+        };
 
-		//! Message box result.
-		enum MessageBoxResult {
-			  MessageBoxYes		//!< Yes button was clicked.
-			, MessageBoxNo		//!< No button was clicked.
-			, MessageBoxCancel	//!< Cancel button was clicked.
-		};
+        //! Message box result.
+        enum MessageBoxResult {
+              MessageBoxYes        //!< Yes button was clicked.
+            , MessageBoxNo        //!< No button was clicked.
+            , MessageBoxCancel    //!< Cancel button was clicked.
+        };
 
         //! A helper struct to store the mouse button.
         struct MouseButtons : public FlagSet8 {
             //! Mouse button bit mask.
             enum {
-			      Left	    = Qt::LeftButton	//!< Left mouse button.
-			    , Right	    = Qt::RightButton	//!< Right mouse button.
-			    , Middle    = Qt::MiddleButton	//!< Middle mouse button.
+                  Left        = Qt::LeftButton    //!< Left mouse button.
+                , Right        = Qt::RightButton    //!< Right mouse button.
+                , Middle    = Qt::MiddleButton    //!< Middle mouse button.
             };
 
                         //! Constructs MouseButtons instance from Qt enum.
                         MouseButtons( Qt::MouseButton button = Qt::NoButton )
                         {
                             switch( button ) {
-	                        case Qt::LeftButton:	on( Left );	    break;
-	                        case Qt::RightButton:	on( Right );	break;
-	                        case Qt::MidButton:		on( Middle );	break;	
+                            case Qt::LeftButton:    on( Left );        break;
+                            case Qt::RightButton:    on( Right );    break;
+                            case Qt::MidButton:        on( Middle );    break;    
                             }
                         }
 
                         //! Constructs
         };
 
-		//! Menu action callback type.
-		typedef std::function<void(ActionQPtr)> ActionCallback;
+        //! Menu action callback type.
+        typedef std::function<void(ActionQPtr)> ActionCallback;
 
-	    //! Converts the Qt key index to engine key.
-	    extern Platform::Key convertKey( s32 key );
+        //! Converts the Qt key index to engine key.
+        extern Platform::Key convertKey( s32 key );
 
         //! Forward declaration of enumeration combo box.
         template<typename TModel> class EnumerationComboBox;
 
-	} // namespace Ui
+    } // namespace Ui
 
-	namespace Editors {
+    namespace Editors {
 
-		//! This marks terrain chunks.
-		class TerrainChunk : public Ecs::Component<TerrainChunk> {
-		public:
+        //! This marks terrain chunks.
+        class TerrainChunk : public Ecs::Component<TerrainChunk> {
+        public:
 
-									//! Constructs TerrainChunk instance.
-									TerrainChunk( Scene::TerrainHandle chunk = Scene::TerrainHandle(), u32 x = 0, u32 z = 0 )
-										: m_terrain( chunk ), m_x( x ), m_z( z ) {}
+                                    //! Constructs TerrainChunk instance.
+                                    TerrainChunk( Scene::TerrainHandle chunk = Scene::TerrainHandle(), u32 x = 0, u32 z = 0 )
+                                        : m_terrain( chunk ), m_x( x ), m_z( z ) {}
 
-			//! Returns terrain instance.
-			Scene::TerrainHandle    terrain( void ) const { return m_terrain; }
+            //! Returns terrain instance.
+            Scene::TerrainHandle    terrain( void ) const { return m_terrain; }
 
-			//! Returns chunk X.
-			u32						x( void ) const { return m_x; } // column
+            //! Returns chunk X.
+            u32                        x( void ) const { return m_x; } // column
 
-			//! Returns chunk Y.
-			u32						z( void ) const { return m_z; } // row
+            //! Returns chunk Y.
+            u32                        z( void ) const { return m_z; } // row
 
-		private:
+        private:
 
-			Scene::TerrainHandle    m_terrain;	//!< Terrain asset.
-			u32						m_x;		//!< Chunk X coordinate.
-			u32						m_z;		//!< Chunk Z coordinate.
-		};
+            Scene::TerrainHandle    m_terrain;    //!< Terrain asset.
+            u32                        m_x;        //!< Chunk X coordinate.
+            u32                        m_z;        //!< Chunk Z coordinate.
+        };
 
-		//! This component marks scene objects as internally used by scene editor.
-		class SceneEditorInternal : public Ecs::Component<SceneEditorInternal> {
-		public:
+        //! This component marks scene objects as internally used by scene editor.
+        class SceneEditorInternal : public Ecs::Component<SceneEditorInternal> {
+        public:
 
-			//! Scene object editor flags.
-			enum Flags {
-				  Selected		= BIT( 0 )	//!< The scene object is now selected.
-				, Highlighted	= BIT( 1 )	//!< The scene object is highlighted.
-				, Private		= BIT( 2 )	//!< Private scene objects should not be displayed in scene hierarchy window.
-				, Freezed		= BIT( 3 )	//!< Freezed scene objects can't be selected by mouse.
-			};
+            //! Scene object editor flags.
+            enum Flags {
+                  Selected        = BIT( 0 )    //!< The scene object is now selected.
+                , Highlighted    = BIT( 1 )    //!< The scene object is highlighted.
+                , Private        = BIT( 2 )    //!< Private scene objects should not be displayed in scene hierarchy window.
+                , Freezed        = BIT( 3 )    //!< Freezed scene objects can't be selected by mouse.
+            };
 
-									//! Constructs SceneEditorInternal instance.
-									SceneEditorInternal( Scene::SceneObjectWPtr parent = Scene::SceneObjectWPtr(), u8 flags = 0 );
+                                    //! Constructs SceneEditorInternal instance.
+                                    SceneEditorInternal( Scene::SceneObjectWPtr parent = Scene::SceneObjectWPtr(), u8 flags = 0 );
 
-			//! Returns parent scene object.
-			Scene::SceneObjectWPtr	parent( void ) const;
+            //! Returns parent scene object.
+            Scene::SceneObjectWPtr    parent( void ) const;
 
-			//! Returns true if this scene object is private.
-			bool					isPrivate( void ) const;
+            //! Returns true if this scene object is private.
+            bool                    isPrivate( void ) const;
 
-			//! Returns true if this scene object is highlighted.
-			bool					isHighlighted( void ) const;
+            //! Returns true if this scene object is highlighted.
+            bool                    isHighlighted( void ) const;
 
-			//! Marks this scene object as highlighted.
-			void					setHighlighted( bool value );
+            //! Marks this scene object as highlighted.
+            void                    setHighlighted( bool value );
 
-			//! Returns true if this scene object is selected.
-			bool					isSelected( void ) const;
+            //! Returns true if this scene object is selected.
+            bool                    isSelected( void ) const;
 
-			//! Marks this scene object as selected.
-			void					setSelected( bool value );
+            //! Marks this scene object as selected.
+            void                    setSelected( bool value );
 
-		private:
+        private:
 
-			FlagSet8				m_flags;	//!< Bitset mask.
-			Scene::SceneObjectWPtr	m_parent;	//!< Parent scene object.
-		};
+            FlagSet8                m_flags;    //!< Bitset mask.
+            Scene::SceneObjectWPtr    m_parent;    //!< Parent scene object.
+        };
 
-		qDeclarePtr( AssetEditor )
-		qDeclarePtr( VisualEditor )
-		qDeclarePtr( SceneEditor )
+        qDeclarePtr( AssetEditor )
+        qDeclarePtr( VisualEditor )
+        qDeclarePtr( SceneEditor )
 
-	} // namespace Editors
+    } // namespace Editors
 
-	namespace Importers {
+    namespace Importers {
 
-		dcDeclarePtrs( AssetImporter )
+        dcDeclarePtrs( AssetImporter )
 
-	} // namespace Importers
+    } // namespace Importers
 
-	qDeclarePtr( Project )
-	qDeclarePtr( AssetManager )
+    qDeclarePtr( Project )
+    qDeclarePtr( AssetManager )
 
-	qDeclarePtr( Composer )
+    qDeclarePtr( Composer )
     qDeclarePtr( FileSystem )
     qDeclarePtr( SceneModel )
     qDeclarePtr( AssetFileSystemModel )
@@ -225,112 +226,116 @@ DC_BEGIN_COMPOSER
 
     typedef const QMimeData* MimeDataQPtr;
 
-	//! Container type to store file info.
-	typedef QVector<class FileInfo> FileInfoArray;
+    //! Container type to store file info.
+    typedef QVector<class FileInfo> FileInfoArray;
 
     //! Completely deletes layout and it's items
     inline void qDeleteLayout( QLayout* layout )
     {
-	    if( !layout ) {
-		    return;
-	    }
+        if( !layout ) {
+            return;
+        }
 
-	    QLayoutItem* child = NULL;
+        QLayoutItem* child = NULL;
 
-	    while( (child = layout->takeAt(0)) != 0 ) {
-		    delete child->widget();
-		    delete child;
-	    }
+        while( (child = layout->takeAt(0)) != 0 ) {
+            delete child->widget();
+            delete child;
+        }
 
-	    delete layout;
+        delete layout;
     }
 
-	//! Root composer class.
-	class Composer : public QApplication {
+    //! Root composer class.
+    class Composer : public QApplication {
 
         Q_OBJECT
 
-	Q_SIGNALS:
+    Q_SIGNALS:
 
-		//! Event is emitted when the project is created.
-		void				projectCreated( Project* project );
+        //! Event is emitted when the project is created.
+        void                projectCreated( Project* project );
 
         //! Event is emitted when the project was opened.
-        void				projectOpened( Project* project );
+        void                projectOpened( Project* project );
 
         //! Event is emitted when the project was closed.
-        void				projectClosed( Project* project );
+        void                projectClosed( Project* project );
 
-	public:
+    public:
 
-		//! Asset MIME type string.
-		static const String kAssetMime;
+        //! Asset MIME type string.
+        static const String kAssetMime;
 
-		//! Available menues
-		enum Menu {
-			  FileMenu
-			, EditMenu 
-			, ViewMenu
-			, AssetsMenu
-		
-			, TotalMenues
-		};
+        //! Available menues
+        enum Menu {
+              FileMenu
+            , EditMenu 
+            , ViewMenu
+            , AssetsMenu
+        
+            , TotalMenues
+        };
 
-                                //! Constructs Composer instance.
-								Composer( int argc, char ** argv );
+                                    //! Constructs Composer instance.
+                                    Composer( int argc, char ** argv );
 
-		//! Opens the existing project at path.
-		void					openProject( const String& path );
+        //! Opens the existing project at path.
+        void                        openProject( const String& path );
 
-		//! Creates new project at path.
-		void					createProject( const String& path );
+        //! Creates new project at path.
+        void                        createProject( const String& path );
 
         //! Closes an opened project.
-        void                    closeProject( void );
+        void                        closeProject( void );
 
-		//! Returns opened project.
-		ProjectQPtr	            project( void ) const;
+        //! Returns opened project.
+        ProjectQPtr                    project( void ) const;
 
-		//! Returns main window.
-		Ui::MainWindowQPtr		window( void ) const;
+        //! Returns global assembly instance.
+        Reflection::AssemblyWPtr    assembly( void ) const;
 
-		//! Returns the file system instance.
-		FileSystemQPtr	        fileSystem( void ) const;
+        //! Returns main window.
+        Ui::MainWindowQPtr            window( void ) const;
 
-		//! Performs the composer initialization.
-		bool					initialize( void );
+        //! Returns the file system instance.
+        FileSystemQPtr                fileSystem( void ) const;
 
-		//! Extracts an asset set from MIME data.
-		Assets::AssetSet		assetsFromMime( MimeDataQPtr mime ) const;
+        //! Performs the composer initialization.
+        bool                        initialize( void );
 
-		//! Extracts a single asset from MIME data.
-		Assets::Handle	        assetFromMime( MimeDataQPtr mime ) const;
+        //! Extracts an asset set from MIME data.
+        Assets::AssetSet            assetsFromMime( MimeDataQPtr mime ) const;
 
-	private:
+        //! Extracts a single asset from MIME data.
+        Assets::Handle                assetFromMime( MimeDataQPtr mime ) const;
 
-		//! Creates a new project.
-		void					menuCreateProject( Ui::ActionQPtr action );
+    private:
 
-		//! Opens an existing project.
-		void					menuOpenProject( Ui::ActionQPtr action );
+        //! Creates a new project.
+        void                        menuCreateProject( Ui::ActionQPtr action );
 
-		//! Saves current project.
-		void					menuSaveProject( Ui::ActionQPtr action );
+        //! Opens an existing project.
+        void                        menuOpenProject( Ui::ActionQPtr action );
 
-		//! Undo the last action.
-		void					menuUndo( Ui::ActionQPtr action );
+        //! Saves current project.
+        void                        menuSaveProject( Ui::ActionQPtr action );
 
-		//! Redo the last action.
-		void					menuRedo( Ui::ActionQPtr action );
+        //! Undo the last action.
+        void                        menuUndo( Ui::ActionQPtr action );
 
-	private:
+        //! Redo the last action.
+        void                        menuRedo( Ui::ActionQPtr action );
 
-		Ui::MainWindowQPtr		m_mainWindow;			//!< Main composer window.
-		Ui::MenuQPtr			m_menues[TotalMenues];	//!< Default menues.
-		ProjectQPtr             m_project;				//!< Active project.
-        FileSystemQPtr		    m_fileSystem;		    //!< File system interface.
-	};
+    private:
+
+        Ui::MainWindowQPtr            m_mainWindow;            //!< Main composer window.
+        Ui::MenuQPtr                m_menues[TotalMenues];    //!< Default menues.
+        ProjectQPtr                 m_project;                //!< Active project.
+        FileSystemQPtr                m_fileSystem;            //!< File system interface.
+        Reflection::AssemblyPtr     m_assembly;             //!< Global assembly instance.
+    };
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_H__	*/
+#endif    /*    !__DC_Composer_H__    */

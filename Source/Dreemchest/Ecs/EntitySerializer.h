@@ -31,23 +31,24 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace Ecs {
-
+namespace Ecs
+{
     //! Performs writing/reading entities to a key-value storage.
-    class Serializer : public Reflection::Serializer {
+    class Serializer : public Reflection::Serializer
+    {
     public:
 
-		//! Function type used by a component converters.
-		typedef cClosure<KeyValue(const Variant&)> ComponentConverter;
+        //! Function type used by a component converters.
+        typedef cClosure<KeyValue(const Variant&)> ComponentConverter;
 
                                             //! Constructs Serializer instance.
                                             Serializer( EcsWPtr ecs, const Bitset& excluded = Bitset() );
 
         //! Writes entity instance to a key-value storage.
-        virtual bool                        serialize( EntityWPtr entity, KeyValue& ar ) const;
+        virtual bool                        serializeEntity( EntityWPtr entity, KeyValue& ar ) const;
 
         //! Creates entity and reads it from a key-value storage.
-        virtual bool                        deserialize( Reflection::AssemblyWPtr assembly, EntityWPtr entity, const KeyValue& ar );
+        virtual bool                        deserializeEntity( Reflection::AssemblyWPtr assembly, EntityWPtr entity, const KeyValue& ar );
 
         //! Writes component instance to a key-value storage.
         void                                serializeComponent( ComponentWPtr component, KeyValue& ar ) const;
@@ -55,22 +56,22 @@ namespace Ecs {
         //! Reads component instance from a key-value storage.
         void                                deserializeComponent( ComponentWPtr component, const KeyValue& ar ) const;
 
-		//! Registers a type converter.
-		template<typename TComponent>
-		void					            registerComponentConverter( const ComponentConverter& callback );
+        //! Registers a type converter.
+        template<typename TComponent>
+        void                                registerComponentConverter( const ComponentConverter& callback );
 
     protected:
 
         //! Searches for an entity by it's identifier.
         virtual EntityWPtr                  resolveEntity( const Guid& id ) const;
 
-	private:
+    private:
 
         //! Returns a component converter.
         ComponentConverter                  findComponentConverter( const String& name ) const;
 
-		//! Callback to access the default value of Entity flags property.
-		Variant								defaultEntityFlags( const KeyValue& ar ) const;
+        //! Callback to access the default value of Entity flags property.
+        Variant                             defaultEntityFlags( const KeyValue& ar ) const;
 
         //! Converts a Guid value to an entity reference.
         Variant                             convertGuidToEntity( const Reflection::Class& cls, const Reflection::Property& property, const Variant& value ) const;
@@ -88,8 +89,8 @@ namespace Ecs {
 
     private:
 
-		//! Container type to store component conversions.
-		typedef HashMap<String32, ComponentConverter> ComponentConverters;
+        //! Container type to store component conversions.
+        typedef HashMap<String32, ComponentConverter> ComponentConverters;
 
         EcsWPtr                             m_ecs;                  //!< Parent Ecs instance.
         Bitset                              m_excluded;             //!< List of excluded components.
@@ -97,8 +98,8 @@ namespace Ecs {
     };
 
     // ** Serializer::registerComponentConverter
-	template<typename TComponent>
-	void Serializer::registerComponentConverter( const ComponentConverter& callback )
+    template<typename TComponent>
+    void Serializer::registerComponentConverter( const ComponentConverter& callback )
     {
         String32 hash( TypeInfo<TComponent>::name() );
         m_componentConverters[hash] = callback;

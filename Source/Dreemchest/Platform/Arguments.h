@@ -33,32 +33,32 @@ DC_BEGIN_DREEMCHEST
 
 namespace Platform {
 
-	//! Application arguments parser.
-	class Arguments {
-	public:
+    //! Application arguments parser.
+    class Arguments {
+    public:
 
-						//! Constructs Arguments instance.
-						Arguments( s8** argv, u32 argc );
+                        //! Constructs Arguments instance.
+                        Arguments( s8** argv, u32 argc );
 
-		//! Returns integer value.
-		s32				integer( const String& name, s32 defaultValue = 0 ) const;
+        //! Returns integer value.
+        s32                integer( const String& name, s32 defaultValue = 0 ) const;
 
-		//! Returns the float value.
-		f32				number( const String& name, f32 defaultValue = 0.0f ) const;
+        //! Returns the float value.
+        f32                number( const String& name, f32 defaultValue = 0.0f ) const;
 
-		//! Returns string value.
-		const String&	string( const String& name, const String& defaultValue = "" ) const;
+        //! Returns string value.
+        const String&    string( const String& name, const String& defaultValue = "" ) const;
 
-		//! Returns true if argument with a specified name was passed to an application.
-		bool			has( const String& name ) const;
+        //! Returns true if argument with a specified name was passed to an application.
+        bool            has( const String& name ) const;
 
-	private:
+    private:
 
-		//! Container type to store parsed arguments.
-		typedef Map<String, String> ArgumentValues;
+        //! Container type to store parsed arguments.
+        typedef Map<String, String> ArgumentValues;
 
-		ArgumentValues	m_values;	//!< Parsed argument values.
-	};
+        ArgumentValues    m_values;    //!< Parsed argument values.
+    };
 
 } // namespace Platform
 

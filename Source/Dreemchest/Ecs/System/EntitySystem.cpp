@@ -40,33 +40,33 @@ EntitySystem::EntitySystem( const String& name, const Aspect& aspect ) : System(
 // ** EntitySystem::initialize
 bool EntitySystem::initialize( EcsWPtr ecs )
 {
-	if( !System::initialize( ecs ) ) {
-		return false;
-	}
+    if( !System::initialize( ecs ) ) {
+        return false;
+    }
 
     // Request index and subdcribe for entity events
-	m_index = ecs->requestIndex( m_name, m_aspect );
-	m_index->events().subscribe<Index::Added>( dcThisMethod( EntitySystem::handleEntityAdded ) );
-	m_index->events().subscribe<Index::Removed>( dcThisMethod( EntitySystem::handleEntityRemoved ) );
+    m_index = ecs->requestIndex( m_name, m_aspect );
+    m_index->subscribe<Index::Added>( dcThisMethod( EntitySystem::handleEntityAdded ) );
+    m_index->subscribe<Index::Removed>( dcThisMethod( EntitySystem::handleEntityRemoved ) );
 
     // Run event handler for all entities that reside in an index
     for( EntitySet::const_iterator i = m_index->entities().begin(), end = m_index->entities().end(); i != end; ++i ) {
         entityAdded( *i->get() );
     }
 
-	return true;
+    return true;
 }
 
 // ** EntitySystem::entityCount
 s32 EntitySystem::entityCount( void ) const
 {
-	return m_index->size();
+    return m_index->size();
 }
 
 // ** EntitySystem::begin
 bool EntitySystem::begin( u32 currentTime, f32 dt )
 {
-	return true;
+    return true;
 }
 
 // ** EntitySystem::end
@@ -74,42 +74,42 @@ void EntitySystem::end( void )
 {
 }
 
-// ** EntitySystem::process
-void EntitySystem::process( u32 currentTime, f32 dt, Entity& entity )
+// ** EntitySystem::processEntity
+void EntitySystem::processEntity( u32 currentTime, f32 dt, Entity& entity )
 {
 }
 
 // ** EntitySystem::update
 void EntitySystem::update( u32 currentTime, f32 dt )
 {
-	if( !begin( currentTime, dt ) ) {
-		return;
-	}
+    if( !begin( currentTime, dt ) ) {
+        return;
+    }
 
     NIMBLE_BREADCRUMB_CALL_STACK;
 
-	EntitySet& entities = m_index->entities();
+    EntitySet& entities = m_index->entities();
 
-	for( EntitySet::iterator i = entities.begin(); i != entities.end(); ) {
-		Entity& entity = *(i++)->get();
-		process( currentTime, dt, entity );
-	}
+    for( EntitySet::iterator i = entities.begin(); i != entities.end(); ) {
+        Entity& entity = *(i++)->get();
+        processEntity( currentTime, dt, entity );
+    }
 
-	end();
+    end();
 }
 
 // ** EntitySystem::handleEntityAdded
 void EntitySystem::handleEntityAdded( const Index::Added& e )
 {
     NIMBLE_BREADCRUMB_CALL_STACK;
-	entityAdded( *e.entity.get() );
+    entityAdded( *e.entity.get() );
 }
 
 // ** EntitySystem::handleEntityRemoved
 void EntitySystem::handleEntityRemoved( const Index::Removed& e )
 {
     NIMBLE_BREADCRUMB_CALL_STACK;
-	entityRemoved( *e.entity.get() );
+    entityRemoved( *e.entity.get() );
 }
 
 // ** EntitySystem::entityAdded

@@ -34,64 +34,64 @@ namespace Network {
 
 // ** Connection::Connection
 Connection::Connection( Application* application, const TCPSocketPtr& socket )
-	: ConnectionTCP( socket ), m_application( application ), m_nextRemoteCallId( 1 )
+    : ConnectionTCP( socket ), m_application( application ), m_nextRemoteCallId( 1 )
 {
-	memset( &m_traffic, 0, sizeof( m_traffic ) );
+    memset( &m_traffic, 0, sizeof( m_traffic ) );
 }
 
 // ** Connection::traffic
 const Connection::Traffic& Connection::traffic( void ) const
 {
-	return m_traffic;
+    return m_traffic;
 }
 
 // ** Connection::application
 Application* Connection::application( void ) const
 {
-	return m_application;
+    return m_application;
 }
 
 // ** Connection::handleResponse
 void Connection::handleResponse( const Packets::RemoteCallResponse& packet )
 {
-	// Find pending remote call
-	PendingRemoteCalls::iterator i = m_pendingRemoteCalls.find( packet.id );
+    // Find pending remote call
+    PendingRemoteCalls::iterator i = m_pendingRemoteCalls.find( packet.id );
 
-	if( i == m_pendingRemoteCalls.end() ) {
-		LogWarning( "rpc", "received response with an invalid request id %d\n", packet.id );
-		return;
-	}
+    if( i == m_pendingRemoteCalls.end() ) {
+        LogWarning( "rpc", "received response with an invalid request id %d\n", packet.id );
+        return;
+    }
 
-	// Run a callback
-	i->second.m_handler->handle( this, packet );
-	m_pendingRemoteCalls.erase( i );
+    // Run a callback
+    i->second.m_handler->handle( this, packet );
+    m_pendingRemoteCalls.erase( i );
 }
 
 // ** Connection::update
 void Connection::update( u32 dt )
 {
-	ConnectionTCP::update( dt );
+    ConnectionTCP::update( dt );
 
-	if( time() - m_traffic.m_lastUpdateTimestamp >= 1000 ) {
-		m_traffic.m_sentBps		= (totalBytesSent()	 - m_traffic.m_lastSentBytes)	  * 8;
-		m_traffic.m_receivedBps = (totalBytesReceived() - m_traffic.m_lastReceivedBytes) * 8;
-		m_traffic.m_lastUpdateTimestamp = time();
-		m_traffic.m_lastSentBytes = totalBytesSent();
-		m_traffic.m_lastReceivedBytes = totalBytesReceived();
-	}
+    if( time() - m_traffic.m_lastUpdateTimestamp >= 1000 ) {
+        m_traffic.m_sentBps        = (totalBytesSent()     - m_traffic.m_lastSentBytes)      * 8;
+        m_traffic.m_receivedBps = (totalBytesReceived() - m_traffic.m_lastReceivedBytes) * 8;
+        m_traffic.m_lastUpdateTimestamp = time();
+        m_traffic.m_lastSentBytes = totalBytesSent();
+        m_traffic.m_lastReceivedBytes = totalBytesReceived();
+    }
 
-	if( m_pendingRemoteCalls.empty() ) {
-		return;
-	}
+    if( m_pendingRemoteCalls.empty() ) {
+        return;
+    }
 
-	for( PendingRemoteCalls::iterator i = m_pendingRemoteCalls.begin(); i != m_pendingRemoteCalls.end(); ) {
-		if( i->second.m_timeLeft < 0 ) {
-			LogWarning( "rpc", "'%s' timed out\n", i->second.m_name.c_str() );
-			i = m_pendingRemoteCalls.erase( i );
-		} else {
-			++i;
-		}
-	}
+    for( PendingRemoteCalls::iterator i = m_pendingRemoteCalls.begin(); i != m_pendingRemoteCalls.end(); ) {
+        if( i->second.m_timeLeft < 0 ) {
+            LogWarning( "rpc", "'%s' timed out\n", i->second.m_name.c_str() );
+            i = m_pendingRemoteCalls.erase( i );
+        } else {
+            ++i;
+        }
+    }
 }
 
 } // namespace Network

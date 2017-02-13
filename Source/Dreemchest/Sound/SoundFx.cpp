@@ -37,9 +37,9 @@
 #include "Drivers/SoundBuffer.h"
 #include "Drivers/SoundEngine.h"
 
-#ifdef DC_HAVE_OPENAL
-	#include "Drivers/OpenAL/OpenAL.h"
-#endif	/*	DC_HAVE_OPENAL	*/
+#ifdef OPENAL_FOUND
+    #include "Drivers/OpenAL/OpenAL.h"
+#endif    /*    #ifdef OPENAL_FOUND    */
 
 DC_BEGIN_DREEMCHEST
 
@@ -49,24 +49,24 @@ namespace Sound {
 
 // ** SoundFx::SoundFx
 SoundFx::SoundFx( SoundHal hal, IStreamOpenerPtr streamOpener )
-	: m_hal( NULL )
-	, m_volume( 1.0f )
-	, m_pitch( 1.0f )
-	, m_streamOpener( streamOpener.valid() ? streamOpener : DC_NEW StandardStreamOpener )
+    : m_hal( NULL )
+    , m_volume( 1.0f )
+    , m_pitch( 1.0f )
+    , m_streamOpener( streamOpener.valid() ? streamOpener : DC_NEW StandardStreamOpener )
     , m_distanceModel( InverseDistanceAttenuation )
 {
     switch( hal ) {
     case None:      m_hal = NULL;           break;
     case Default:   
-                    #ifdef DC_HAVE_OPENAL
+                    #ifdef OPENAL_FOUND
                         m_hal = DC_NEW OpenAL;
                         if( !m_hal->initialize() ) {
-                            LogError( "sfx", "failed to create OpenAL backend, fallback to default\n" );
+                            LogError( "sfx", "%s", "failed to create OpenAL backend, fallback to default\n" );
                             m_hal = DC_NEW SoundEngine;
                         }
                     #else
-                        LogError( "sfx", "the default sound HAL is OpenAL, but library compiled without OpenAL\n" );
-                    #endif
+                        LogError( "sfx", "%s", "the default sound HAL is OpenAL, but library compiled without OpenAL\n" );
+                    #endif  /*  #ifdef OPENAL_FOUND */
                     break;
     }
 }
@@ -79,13 +79,13 @@ SoundFx::~SoundFx( void )
 // ** SoundFx::create
 SoundFxPtr SoundFx::create( SoundHal hal, IStreamOpenerPtr streamOpener )
 {
-	return SoundFxPtr( DC_NEW SoundFx( hal, streamOpener ) );
+    return SoundFxPtr( DC_NEW SoundFx( hal, streamOpener ) );
 }
 
 // ** SoundFx::createGroup
 SoundGroupWPtr SoundFx::createGroup( CString identifier )
 {
-    DC_ABORT_IF( identifier == NULL, "invalid identifier" );
+    NIMBLE_ABORT_IF( identifier == NULL, "invalid identifier" );
 
     if( findGroupByName( identifier ).valid() ) {
         LogWarning( "sfx", "failed to create group, group with a same name '%s' found\n", identifier );
@@ -103,8 +103,8 @@ SoundGroupWPtr SoundFx::createGroup( CString identifier )
 // ** SoundFx::createSound
 SoundDataWPtr SoundFx::createSound( CString identifier, CString uri, SoundGroupWPtr group )
 {
-    DC_ABORT_IF( identifier == NULL, "invalid identifier" );
-    DC_ABORT_IF( uri == NULL, "invalid URI" );
+    NIMBLE_ABORT_IF( identifier == NULL, "invalid identifier" );
+    NIMBLE_ABORT_IF( uri == NULL, "invalid URI" );
 
     // Ensure we don't have a sound with a same name.
     if( findSoundByName( identifier ).valid() ) {
@@ -124,7 +124,7 @@ SoundDataWPtr SoundFx::createSound( CString identifier, CString uri, SoundGroupW
 // ** SoundFx::createEvent
 SoundEventWPtr SoundFx::createEvent( CString identifier )
 {
-    DC_ABORT_IF( identifier == NULL, "invalid identifier" );
+    NIMBLE_ABORT_IF( identifier == NULL, "invalid identifier" );
 
     if( findEventByName( identifier ).valid() ) {
         LogWarning( "sfx", "failed to create event, sound with a same name '%s' found\n", identifier );
@@ -167,7 +167,7 @@ SoundDataWPtr SoundFx::findSoundByName( CString identifier )
 // ** SoundFx::removeSoundByName
 void SoundFx::removeSoundByName( CString identifier )
 {
-    DC_ABORT_IF( identifier == NULL, "invalid identifier" );
+    NIMBLE_ABORT_IF( identifier == NULL, "invalid identifier" );
     m_sounds.erase( String64( identifier ) );
 }
 
@@ -212,7 +212,7 @@ SoundGroupWPtr SoundFx::findGroupByName( CString identifier )
 // ** SoundFx::removeGroupByName
 void SoundFx::removeGroupByName( CString identifier )
 {
-    DC_ABORT_IF( identifier == NULL, "invalid identifier" );
+    NIMBLE_ABORT_IF( identifier == NULL, "invalid identifier" );
     m_groups.erase( String64( identifier ) );
 }
 
@@ -257,7 +257,7 @@ SoundEventWPtr SoundFx::findEventByName( CString identifier )
 // ** SoundFx::createSource
 SoundSourcePtr SoundFx::createSource( SoundDataWPtr data )
 {
-    DC_ABORT_IF( !data.valid(), "invalid sound data" );
+    NIMBLE_ABORT_IF( !data.valid(), "invalid sound data" );
     
     if( m_hal == NULL ) {
         LogError( "sfx", "failed to create sound source for '%s', no HAL created.\n", data->identifier() );
@@ -282,7 +282,7 @@ SoundSourcePtr SoundFx::createSource( SoundDataWPtr data )
 // ** SoundFx::createBuffer
 SoundBufferPtr SoundFx::createBuffer( SoundDataWPtr data )
 {
-    DC_ABORT_IF( !data.valid(), "invalid sound data" );
+    NIMBLE_ABORT_IF( !data.valid(), "invalid sound data" );
 
     if( !m_hal.valid() ) {
         LogError( "sfx", "failed to create sound buffer for '%s', no HAL created.\n", data->identifier() );
@@ -424,7 +424,7 @@ SoundChannelPtr SoundFx::play( CString identifier )
 // ** SoundFx::playWithParameters
 SoundChannelPtr SoundFx::playWithParameters( CString identifier, bool loop, f32 fade )
 {
-    DC_NOT_IMPLEMENTED;
+    NIMBLE_NOT_IMPLEMENTED;
     return SoundChannelPtr();
 }
 
@@ -480,16 +480,16 @@ void SoundFx::setData( const SoundFxInfo& value )
 // ** SoundFx::load
 bool SoundFx::load( const char *identifier )
 {
-    DC_NOT_IMPLEMENTED;
+    NIMBLE_NOT_IMPLEMENTED;
     return false;
 /*
     // ** Parse JSON
-    AutoPtr<io::Stream> file = m_ctx->iDiskFileSystem->openFile( identifier );
+    UPtr<io::Stream> file = m_ctx->iDiskFileSystem->openFile( identifier );
     if( file == NULL ) {
         return false;
     }
 
-    AutoPtr<io::ByteBuffer> text = file->toByteBuffer( true );
+    UPtr<io::ByteBuffer> text = file->toByteBuffer( true );
 
     JSON json = JSON::Read( ( const char* )text->data() );
     sound::sSoundFxData data;
@@ -529,9 +529,9 @@ f32 SoundFx::volume( void ) const
 // ** SoundFx::setVolume
 void SoundFx::setVolume( f32 value )
 {
-	DC_BREAK_IF( value < 0.0f, "volume could not have a negative value" );
+    NIMBLE_BREAK_IF( value < 0.0f, "volume could not have a negative value" );
     m_volume = value;
-	m_hal->setVolume( volume() );
+    m_hal->setVolume( volume() );
 }
 
 // ** SoundFx::pitch
@@ -544,7 +544,7 @@ f32 SoundFx::pitch( void ) const
 void SoundFx::setPitch( f32 value )
 {
     m_pitch = value;
-	m_hal->setPitch( pitch() );
+    m_hal->setPitch( pitch() );
 }
 
 // ** SoundGroups& SoundFx::groups

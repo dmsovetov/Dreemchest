@@ -96,10 +96,10 @@ namespace Threads {
     private:
 
         //! Task queue mutex used to lock a m_tasks variable.
-        MutexPtr				m_mutex;
+        MutexPtr                m_mutex;
 
         //! Condition to wait for tasks in sleep mode.
-        ConditionPtr			m_condition;
+        ConditionPtr            m_condition;
 
         //! Actual task queue.
         TaskPriorityQueue       m_tasks;

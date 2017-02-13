@@ -45,9 +45,9 @@ DiskFileSystem::~DiskFileSystem( void )
 // ** DiskFileSystem::open
 StreamPtr DiskFileSystem::open( const Path& fileName, StreamMode mode )
 {
-	Io::DiskFileSystem fs;
-	StreamPtr stream = fs.openFile( fileName, mode );
-	return stream;
+    Io::DiskFileSystem fs;
+    StreamPtr stream = fs.openFile( fileName, mode );
+    return stream;
 }
 
 // ** DiskFileSystem::openFile
@@ -59,7 +59,7 @@ StreamPtr DiskFileSystem::openFile( const Path& fileName, StreamMode mode ) cons
         return StreamPtr();
     }
 
-	return file;
+    return file;
 }
 
 // ** DiskFileSystem::openFile
@@ -75,10 +75,10 @@ StreamPtr DiskFileSystem::openFile( const Path& fileName ) const
     );
 #endif
 
-	char path[MaxPathLength + 1];
+    char path[MaxPathLength + 1];
 
-	for( int i = 0; i < ( int )m_paths.size(); i++ ) {
-    #if defined( DC_PLATFORM_OSX ) || defined( DC_PLATFORM_IOS )
+    for( int i = 0; i < ( int )m_paths.size(); i++ ) {
+    #if defined( DC_PLATFORM_MACOS ) || defined( DC_PLATFORM_IOS )
         if( fileName[0] == '/' ) {
             _snprintf( path, MaxPathLength, "%s", fileName );
         } else {
@@ -91,47 +91,47 @@ StreamPtr DiskFileSystem::openFile( const Path& fileName ) const
     #else
         _snprintf( path, MaxPathLength, "%s%s%s", m_baseDir.c_str(), m_paths[i].c_str(), fileName );
     #endif
-		
-		if( fileExistsAtPath( path ) ) {
-			return openFile( path, "rb" );
-		}
-	}
+        
+        if( fileExistsAtPath( path ) ) {
+            return openFile( path, "rb" );
+        }
+    }
 
-	for( ArchiveList::const_iterator i = m_packages.begin(), end = m_packages.end(); i != end; i++ ) {
-		if( (*i)->fileExists( fileName ) ) {
-			return (*i)->openFile( fileName );
-		}
-	}
+    for( ArchiveList::const_iterator i = m_packages.begin(), end = m_packages.end(); i != end; i++ ) {
+        if( (*i)->fileExists( fileName ) ) {
+            return (*i)->openFile( fileName );
+        }
+    }
 */
-	if( fileExistsAtPath( fileName ) ) {
-		return openFile( fileName, BinaryReadStream );
-	}
+    if( fileExistsAtPath( fileName ) ) {
+        return openFile( fileName, BinaryReadStream );
+    }
 
-	return StreamPtr();
+    return StreamPtr();
 }
 
 // ** DiskFileSystem::fileExists
 bool DiskFileSystem::fileExists( const Path& fileName ) const
 {
 /*
-	char path[MaxPathLength + 1];
+    char path[MaxPathLength + 1];
 
-	for( int i = 0; i < ( int )m_paths.size(); i++ ) {
-		_snprintf( path, MaxPathLength, "%s%s%s", m_baseDir.c_str(), m_paths[i].c_str(), fileName );
-		if( fileExistsAtPath( path ) ) {
-			return true;
-		}
-	}
+    for( int i = 0; i < ( int )m_paths.size(); i++ ) {
+        _snprintf( path, MaxPathLength, "%s%s%s", m_baseDir.c_str(), m_paths[i].c_str(), fileName );
+        if( fileExistsAtPath( path ) ) {
+            return true;
+        }
+    }
 
 #ifdef DC_ZIP
-	for( tPackageList::const_iterator i = packages.begin(), end = packages.end(); i != end; i++ ) {
-		if( (*i)->fileExists( fileName ) ) {
-			return true;
-		}
-	}
+    for( tPackageList::const_iterator i = packages.begin(), end = packages.end(); i != end; i++ ) {
+        if( (*i)->fileExists( fileName ) ) {
+            return true;
+        }
+    }
 #endif
 */
-	return fileExistsAtPath( fileName );
+    return fileExistsAtPath( fileName );
 }
 
 // ** DiskFileSystem::fileExistsAtPath
@@ -151,34 +151,34 @@ bool DiskFileSystem::fileExistsAtPath( const Path& fileName )
 // ** DiskFileSystem::readTextFile
 String DiskFileSystem::readTextFile( const Path& fileName )
 {
-	StreamPtr file = open( fileName );
+    StreamPtr file = open( fileName );
 
-	if( !file.valid() ) {
-		return "";
-	}
+    if( !file.valid() ) {
+        return "";
+    }
 
-	String result;
-	result.resize( file->length() );
-	file->read( &result[0], file->length() );
+    String result;
+    result.resize( file->length() );
+    file->read( &result[0], file->length() );
 
-	return result;
+    return result;
 }
 
 // ** DiskFileSystem::openPackage
 ArchivePtr DiskFileSystem::openPackage( const Path& fileName ) const
 {
-	StreamPtr file = openFile( fileName );
-	if( file == NULL ) {
-		return ArchivePtr();
-	}
+    StreamPtr file = openFile( fileName );
+    if( file == NULL ) {
+        return ArchivePtr();
+    }
 
-	// ** Open package
-	ArchivePtr package = DC_NEW Archive( this );
+    // ** Open package
+    ArchivePtr package = DC_NEW Archive( this );
     if( !package->open( file ) ) {
         return ArchivePtr();
     }
     
-	return package;
+    return package;
 }
 
 // ** DiskFileSystem::loadPackage
@@ -197,7 +197,7 @@ ArchivePtr DiskFileSystem::loadPackage( const Path& fileName )
         return archive;
     }
 
-	return NULL;
+    return NULL;
 }
 
 // ** DiskFileSystem::unloadPackage
@@ -245,7 +245,7 @@ ArchivePtr DiskFileSystem::findPackage( const Path& fileName )
 // ** DiskFileSystem::baseDir
 //const Path& DiskFileSystem::baseDir(void ) const
 //{
-//	return m_baseDir;
+//    return m_baseDir;
 //}
 
 } // namespace Io

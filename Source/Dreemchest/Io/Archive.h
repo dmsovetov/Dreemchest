@@ -47,8 +47,8 @@ namespace Io {
 
         // ** struct sFileInfo
         struct sFileInfo {
-            const char		*m_name;
-            s32				m_offset;
+            const char        *m_name;
+            s32                m_offset;
             s32             m_decompressedSize;
 
                             sFileInfo( CString name, s32 offset, s32 decompressedSize )
@@ -62,7 +62,7 @@ namespace Io {
 
         // ** struct sArchiveInfo
         struct sArchiveInfo {
-            s8				m_token[8];
+            s8                m_token[8];
             s32             m_fileInfoOffset;
             s32             m_totalFiles;
             eCompressor     m_compressor;
@@ -79,16 +79,15 @@ namespace Io {
         virtual                 ~Archive( void );
 
         //! Opens a file for reading from this archive.
-		virtual StreamPtr       openFile( const Path& fileName ) const DC_DECL_OVERRIDE;
+        virtual StreamPtr       openFile( const Path& fileName ) const NIMBLE_OVERRIDE;
 
         //! Opens a file from this archive, only reading is supported.
-		virtual StreamPtr       openFile( const Path& fileName, StreamMode mode ) const DC_DECL_OVERRIDE;
+        virtual StreamPtr       openFile( const Path& fileName, StreamMode mode ) const NIMBLE_OVERRIDE;
 
         //! Returns true if the file with a given name exists inside an archive.
-		virtual bool            fileExists( const Path& fileName ) const DC_DECL_OVERRIDE;
+        virtual bool            fileExists( const Path& fileName ) const NIMBLE_OVERRIDE;
 
         // ** Archive
-        void                    release( void );
         bool                    open( const StreamPtr& file );
         void                    create( const StreamPtr& file, eCompressor compressor = CompressorZ );
         void                    close( void );
@@ -128,4 +127,4 @@ namespace Io {
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_Io_Archive_H__	*/
+#endif        /*    !__DC_Io_Archive_H__    */

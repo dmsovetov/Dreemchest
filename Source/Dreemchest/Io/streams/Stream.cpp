@@ -29,7 +29,8 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace Io {
+namespace Io
+{
 
 // ** Stream::Stream
 Stream::Stream( void )
@@ -42,8 +43,8 @@ Stream::~Stream( void )
 
 }
 
-// ** Stream::dispose
-void Stream::dispose( void )
+// ** Stream::close
+void Stream::close( void )
 {
 
 }
@@ -51,14 +52,15 @@ void Stream::dispose( void )
 // ** Stream::readString
 s32 Stream::readString( String& str ) const
 {
-    s32 result		= 0;
-    s32 strResult	= 0;
-    u32 length		= 0;
+    s32 result        = 0;
+    s32 strResult    = 0;
+    u32 length        = 0;
 
     str     = "";
     result += read( &length, sizeof( length ) );
 
-    if( length == 0 ) {
+    if( length == 0 )
+    {
         return result;
     }
 
@@ -75,9 +77,10 @@ s32 Stream::writeString( CString str )
     u32 length = ( u32 )strlen( str );
 
     result += write( &length, sizeof( length ) );
-	if( length ) {
-		result += write( str, length );
-	}
+    if( length )
+    {
+        result += write( str, length );
+    }
     
     return result;
 }
@@ -85,21 +88,21 @@ s32 Stream::writeString( CString str )
 // ** Stream::length
 s32 Stream::length( void ) const
 {
-    DC_NOT_IMPLEMENTED;
+    NIMBLE_NOT_IMPLEMENTED;
     return 0;
 }
     
 // ** Stream::position
 s32 Stream::position( void ) const
 {
-    DC_NOT_IMPLEMENTED;
+    NIMBLE_NOT_IMPLEMENTED;
     return 0;
 }
     
 // ** Stream::setPosition
 void Stream::setPosition( s32 offset, SeekOrigin origin )
 {
-    DC_NOT_IMPLEMENTED;
+    NIMBLE_NOT_IMPLEMENTED;
 }
     
 // ** Stream::hasDataLeft
@@ -111,14 +114,14 @@ bool Stream::hasDataLeft( void ) const
 // ** Stream::read
 s32 Stream::read( void* buffer, s32 size ) const
 {
-    DC_NOT_IMPLEMENTED;
+    NIMBLE_NOT_IMPLEMENTED;
     return 0;
 }
     
 // ** Stream::write
 s32 Stream::write( const void* buffer, s32 size )
 {
-    DC_NOT_IMPLEMENTED;
+    NIMBLE_NOT_IMPLEMENTED;
     return 0;
 }
 

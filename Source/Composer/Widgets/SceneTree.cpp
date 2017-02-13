@@ -36,34 +36,34 @@ namespace Ui {
 // ** SceneTree::SceneTree
 SceneTree::SceneTree( QWidget* parent ) : QTreeView( parent )
 {
-	setHeaderHidden( true );
-	setEditTriggers( EditTrigger::EditKeyPressed );
-	setSelectionMode( ExtendedSelection );
+    setHeaderHidden( true );
+    setEditTriggers( EditTrigger::EditKeyPressed );
+    setSelectionMode( ExtendedSelection );
 
-	setDragEnabled( true );
-	setDropIndicatorShown( true );
-	setDragDropOverwriteMode( true );
-	setDragDropMode( DragDrop );
-	viewport()->setAcceptDrops( true );
+    setDragEnabled( true );
+    setDropIndicatorShown( true );
+    setDragDropOverwriteMode( true );
+    setDragDropMode( DragDrop );
+    viewport()->setAcceptDrops( true );
 
-	connect( this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&) ) );
+    connect( this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&) ) );
 }
 
 // ** SceneTree::setModel
 void SceneTree::setModel( SceneModelQPtr value )
 {
-	m_model = value;
-	QTreeView::setModel( m_model );
+    m_model = value;
+    QTreeView::setModel( m_model );
 }
 
 // ** SceneTree::keyPressEvent
 void SceneTree::keyPressEvent( QKeyEvent *event )
 {
     switch( event->key() ) {
-    case Qt::Key_Delete:	foreach( QModelIndex idx, selectedIndexes() ) {
-								m_model->remove( idx );
-							}
-							break;
+    case Qt::Key_Delete:    foreach( QModelIndex idx, selectedIndexes() ) {
+                                m_model->remove( idx );
+                            }
+                            break;
     }
 
     QTreeView::keyPressEvent( event );
@@ -72,7 +72,7 @@ void SceneTree::keyPressEvent( QKeyEvent *event )
 // ** SceneTree::contextMenuEvent
 void SceneTree::contextMenuEvent( QContextMenuEvent *e )
 {
-	MenuQPtr menu( new Menu( this ) );
+    MenuQPtr menu( new Menu( this ) );
 
 //    m_project->fillAssetMenu( menu, m_parent );
     menu->exec( e->globalPos() );
@@ -81,10 +81,10 @@ void SceneTree::contextMenuEvent( QContextMenuEvent *e )
 // ** SceneTree::itemDoubleClicked
 void SceneTree::itemDoubleClicked( const QModelIndex& index )
 {
-	// Get the scene object by index.
-	Scene::SceneObjectWPtr sceneObject = m_model->dataAt( index );
+    // Get the scene object by index.
+    Scene::SceneObjectWPtr sceneObject = m_model->dataAt( index );
 
-	// Emit the event.
+    // Emit the event.
     emit sceneObjectDoubleClicked( sceneObject );
 }
 

@@ -28,14 +28,14 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace renderer {
+namespace Renderer {
 
 // ** createOpenGLView
-OpenGLView* createOpenGLView( void* window, PixelFormat depthStencil )
+RenderViewPtr createOpenGLView(void* window, u32 options)
 {
     MacOSOpenGLView* view = DC_NEW MacOSOpenGLView;
-    view->initialize( reinterpret_cast<NSWindow*>( window ), depthStencil, nil );
-    log::verbose( "MacOS OpenGL viewport created\n" );
+    view->initialize( reinterpret_cast<NSWindow*>( window ), options, nil );
+    LogVerbose("opengl", "%s", "MacOS OpenGL viewport created\n" );
     return view;
 }
 
@@ -46,9 +46,10 @@ MacOSOpenGLView::~MacOSOpenGLView( void )
 }
 
 // ** MacOSOpenGLView::initialize
-bool MacOSOpenGLView::initialize( NSWindow* window, PixelFormat depthStencil, id delegate )
+bool MacOSOpenGLView::initialize( NSWindow* window, u32 options, id delegate )
 {
-    m_view = [[CocoaOpenGLView alloc] initWithWindow: window depthStencil:depthStencil];
+    m_view = [[CocoaOpenGLView alloc] initWithWindow: window depthStencil:options];
+    [m_view setOwner: this];
     [window setContentView: m_view];
     return true;
 }
@@ -60,9 +61,13 @@ bool MacOSOpenGLView::beginFrame( void )
 }
 
 // ** MacOSOpenGLView::endFrame
-void MacOSOpenGLView::endFrame( void )
+void MacOSOpenGLView::endFrame(bool wait)
 {
     [m_view endFrame];
+    if (wait)
+    {
+        glFinish();
+    }
 }
 
 // ** MacOSOpenGLView::makeCurrent
@@ -70,7 +75,19 @@ bool MacOSOpenGLView::makeCurrent( void )
 {
     return [m_view makeCurrent];
 }
+ 
+// ** MacOSOpenGLView::width
+s32 MacOSOpenGLView::width() const
+{
+    return m_view.frame.size.width;
+}
+   
+// ** MacOSOpenGLView::height
+s32 MacOSOpenGLView::height() const
+{
+    return m_view.frame.size.height;
+}
 
-} // namespace renderer
+} // namespace Renderer
 
 DC_END_DREEMCHEST

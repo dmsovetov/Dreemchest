@@ -39,44 +39,45 @@ ArcballRotationTool::ArcballRotationTool( f32 radius ) : m_radius( radius ), m_i
 // ** ArcballRotationTool::radius
 f32 ArcballRotationTool::radius( void ) const
 {
-	return m_radius;
+    return m_radius;
 }
 
 // ** ArcballRotationTool::isLocked
 bool ArcballRotationTool::isLocked( void ) const
 {
-	return m_isLocked;
+    return m_isLocked;
 }
 
 // ** ArcballRotationTool::lock
 void ArcballRotationTool::lock( const Quat& rotation, const Vec3& direction )
 {
-	DC_BREAK_IF( m_isLocked );
+    NIMBLE_BREAK_IF( m_isLocked );
 
-	m_initialRotation	= rotation;
-	m_initialDirection	= direction;
-	m_isLocked			= true;
+    m_initialRotation    = rotation;
+    m_initialDirection    = direction;
+    m_isLocked            = true;
 }
 
 // ** ArcballRotationTool::initialDirection
 const Vec3& ArcballRotationTool::initialDirection( void ) const
 {
-	return m_initialDirection;
+    return m_initialDirection;
 }
 
 // ** ArcballRotationTool::initialRotation
 const Quat& ArcballRotationTool::initialRotation( void ) const
 {
-	return m_initialRotation;
+    return m_initialRotation;
 }
 
 // ** ArcballRotationTool::unlock
 void ArcballRotationTool::unlock( void )
 {
-	DC_BREAK_IF( !m_isLocked );
-	m_isLocked = false;
+    NIMBLE_BREAK_IF( !m_isLocked );
+    m_isLocked = false;
 }
 
+#if DEV_DEPRECATED_SCENE_INPUT
 // ------------------------------------------------------- ArcballRotationToolSystem ------------------------------------------------------- //
 
 // ** ArcballRotationToolSystem::ArcballRotationToolSystem
@@ -88,93 +89,98 @@ ArcballRotationToolSystem::ArcballRotationToolSystem( Scene::ViewportWPtr viewpo
 // ** ArcballRotationToolSystem::touchMovedEvent
 void ArcballRotationToolSystem::touchMovedEvent( Scene::Viewport::TouchMoved& e, Ecs::Entity& entity, ArcballRotationTool& tool, Scene::Transform& transform )
 {
-	// This arcball is not locked - skip
-	if( !tool.isLocked() ) {
-		return;
-	}
+    // This arcball is not locked - skip
+    if( !tool.isLocked() ) {
+        return;
+    }
 
-	// Check for rotation tool lock
-	if( RotationTool* rotation = entity.has<RotationTool>() ) {
-		if( rotation->gizmo().state() == Gizmo::Locked ) {
-			return;
-		}
-	}
+    // Check for rotation tool lock
+    if( RotationTool* rotation = entity.has<RotationTool>() ) {
+        if( rotation->gizmo().state() == Gizmo::Locked ) {
+            return;
+        }
+    }
 
-	Vec3 direction;
-	mapToVector( tool, transform, m_viewport->pos(), direction );
+    Vec3 direction;
+    mapToVector( tool, transform, m_viewport->pos(), direction );
 
-	Vec3 v0 = m_viewport->camera()->get<Scene::Transform>()->rotation().rotate( tool.initialDirection() );
-	Vec3 v1 = m_viewport->camera()->get<Scene::Transform>()->rotation().rotate( direction );
+    Vec3 v0 = m_viewport->camera()->get<Scene::Transform>()->rotation().rotate( tool.initialDirection() );
+    Vec3 v1 = m_viewport->camera()->get<Scene::Transform>()->rotation().rotate( direction );
 
-	Quat drag = Quat( v0 % v1, v0 * v1 );
-	transform.setRotation( drag * tool.initialRotation() );
+    Quat drag = Quat( v0 % v1, v0 * v1 );
+    transform.setRotation( drag * tool.initialRotation() );
 }
 
 // ** ArcballRotationToolSystem::touchBeganEvent
 void ArcballRotationToolSystem::touchBeganEvent( Scene::Viewport::TouchBegan& e, Ecs::Entity& entity, ArcballRotationTool& arcball, Scene::Transform& transform )
 {
-	// Process only left mouse button clicks
-	if( !e.buttons.is( Ui::MouseButtons::Left ) ) {
-		return;
-	}
+    // Process only left mouse button clicks
+    if( !e.buttons.is( Ui::MouseButtons::Left ) ) {
+        return;
+    }
 
-	// Map cursor coordinates to a direction on an arcball sphere
-	Vec3 direction;
-	if( !mapToVector( arcball, transform, m_viewport->pos(), direction ) ) {
-		return;
-	}
+    // Map cursor coordinates to a direction on an arcball sphere
+    Vec3 direction;
+    if( !mapToVector( arcball, transform, m_viewport->pos(), direction ) ) {
+        return;
+    }
 
-	// Lock an arcball
-	arcball.lock( transform.rotation(), direction );
+    // Lock an arcball
+    arcball.lock( transform.rotation(), direction );
 }
 
 // ** ArcballRotationToolSystem::mapToVector
 bool ArcballRotationToolSystem::mapToVector( const ArcballRotationTool& arcball, const Scene::Transform& transform, const Vec2& cursor, Vec3& direction ) const
 {
-	// Calculate arcball radius based on distance to camera.
-	f32 radius = arcball.radius() * (m_viewport->eye() - transform.worldSpacePosition()).length();
+    // Calculate arcball radius based on distance to camera.
+    f32 radius = arcball.radius() * (m_viewport->eye() - transform.worldSpacePosition()).length();
 
-	// Construct the arcball sphere.
-	Sphere sphere = Sphere( transform.worldSpacePosition(), radius );
+    // Construct the arcball sphere.
+    Sphere sphere = Sphere( transform.worldSpacePosition(), radius );
 
-	// Project it onto the screen plane.
-	Circle circle = m_viewport->camera()->get<Scene::Camera>()->sphereToScreenSpace( sphere, m_viewport->camera()->get<Scene::Transform>() );
+    // Project it onto the screen plane.
+    Circle circle = m_viewport->camera()->get<Scene::Camera>()->sphereToScreenSpace( sphere, m_viewport->camera()->get<Scene::Transform>() );
 
-	// Map the cursor point to a vector on a sphere.
-	return circle.mapToSphere( cursor, direction );
+    // Map the cursor point to a vector on a sphere.
+    return circle.mapToSphere( cursor, direction );
 }
 
 // ** ArcballRotationToolSystem::touchEndedEvent
 void ArcballRotationToolSystem::touchEndedEvent( Scene::Viewport::TouchEnded& e, Ecs::Entity& entity, ArcballRotationTool& arcball, Scene::Transform& transform )
 {
-	// Process only left mouse button clicks
-	if( !e.buttons.is( Ui::MouseButtons::Left ) ) {
-		return;
-	}
+    // Process only left mouse button clicks
+    if( !e.buttons.is( Ui::MouseButtons::Left ) ) {
+        return;
+    }
 
-	// If it's locked - unlock it
-	if( arcball.isLocked() ) {
-		arcball.unlock();
-	}
+    // If it's locked - unlock it
+    if( arcball.isLocked() ) {
+        arcball.unlock();
+    }
 }
+#endif  /*  #if DEV_DEPRECATED_SCENE_INPUT  */
+
+#if DEV_DEPRECATED_SCENE_RENDERER
 
 // -------------------------------------------------------------- ArcballRotationToolPass -------------------------------------------------------------- //
 
 // ** ArcballRotationToolPass::render
-void ArcballRotationToolPass::render( Scene::RenderingContextPtr context, Scene::Rvm& rvm, Scene::ShaderCache& shaders, const ArcballRotationTool& tool, const Scene::Transform& transform )
+void ArcballRotationToolPass::render( Scene::RenderingContextPtr context, Scene::RenderingContext& rvm, Scene::ShaderCache& shaders, const ArcballRotationTool& tool, const Scene::Transform& transform )
 {
-	// Get batched renderer interface
-	Renderer::Renderer2DWPtr renderer = context->renderer();
+    // Get batched renderer interface
+    Renderer::Renderer2DWPtr renderer = context->renderer();
 
-	// Get the scale factor based on distance to camera
-	f32 scale = (m_transform->position() - transform.worldSpacePosition()).length();
-	
-	// Get the camera axes to align the arcball circle
-	Vec3 side = m_transform->axisX();
-	Vec3 up	  = m_transform->axisY();
+    // Get the scale factor based on distance to camera
+    f32 scale = (m_transform->position() - transform.worldSpacePosition()).length();
+    
+    // Get the camera axes to align the arcball circle
+    Vec3 side = m_transform->axisX();
+    Vec3 up      = m_transform->axisY();
 
-	// Render the circle
-	renderer->wireCircle( transform.position(), side, up, tool.radius() * scale, 32, Rgba( 0.6f, 0.6f, 0.6f ) );
+    // Render the circle
+    renderer->wireCircle( transform.position(), side, up, tool.radius() * scale, 32, Rgba( 0.6f, 0.6f, 0.6f ) );
 }
+
+#endif  /*  DEV_DEPRECATED_SCENE_RENDERER   */
 
 DC_END_COMPOSER

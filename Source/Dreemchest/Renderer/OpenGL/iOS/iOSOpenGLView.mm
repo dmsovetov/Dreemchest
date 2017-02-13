@@ -28,17 +28,18 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace renderer {
+namespace Renderer
+{
 
 // ** createOpenGLView
-OpenGLView* createOpenGLView( void* window, PixelFormat depthStencil )
+RenderViewPtr createOpenGLView(void* window, u32 options)
 {
     iOSOpenGLView* view = DC_NEW iOSOpenGLView;
-    view->initialize( reinterpret_cast<UIWindow*>( window ), depthStencil, nil );
-    log::verbose( "iOS OpenGL viewport created\n" );
+    view->initialize( reinterpret_cast<UIWindow*>( window ), options, nil );
+    LogVerbose( "opengl", "%s", "iOS OpenGL viewport created\n" );
     return view;
 }
-
+    
 // ** iOSOpenGLView::~iOSOpenGLView
 iOSOpenGLView::~iOSOpenGLView( void )
 {
@@ -46,23 +47,25 @@ iOSOpenGLView::~iOSOpenGLView( void )
 }
 
 // ** iOSOpenGLView::initialize
-bool iOSOpenGLView::initialize( UIWindow* window, PixelFormat depthStencil, id delegate )
+bool iOSOpenGLView::initialize( UIWindow* window, u32 options, id delegate )
 {
-    m_view = [[UIKitOpenGLView alloc] initWithWindow: window depthStencil:depthStencil];
-    [window setContentView: m_view];
+    m_view = [[UIKitOpenGLView alloc] initWithView:this bounds:window.bounds options:options scaleFactor: window.contentScaleFactor];
+    [window addSubview: m_view];
     return true;
 }
 
+
 // ** iOSOpenGLView::beginFrame
-void iOSOpenGLView::beginFrame( void )
+bool iOSOpenGLView::beginFrame( void )
 {
     [m_view beginFrame];
+    return true;
 }
 
 // ** iOSOpenGLView::endFrame
-void iOSOpenGLView::endFrame( void )
+void iOSOpenGLView::endFrame(bool wait)
 {
-    [m_view endFrame];
+    [m_view endFrame: wait];
 }
 
 // ** iOSOpenGLView::makeCurrent
@@ -70,7 +73,19 @@ bool iOSOpenGLView::makeCurrent( void )
 {
     return [m_view makeCurrent];
 }
+    
+// ** iOSOpenGLView::width
+s32 iOSOpenGLView::width() const
+{
+    return m_view.height;
+}
+  
+// ** iOSOpenGLView::height
+s32 iOSOpenGLView::height() const
+{
+    return m_view.height;
+}
 
-} // namespace renderer
+} // namespace Renderer
 
 DC_END_DREEMCHEST

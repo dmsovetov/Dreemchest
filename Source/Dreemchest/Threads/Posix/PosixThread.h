@@ -24,15 +24,15 @@
 
  **************************************************************************/
 
-#ifndef        __DC_PosixThread_H__
-#define        __DC_PosixThread_H__
+#ifndef __DC_PosixThread_H__
+#define __DC_PosixThread_H__
 
-#include    "Posix.h"
-#include    "../Thread.h"
+#include "Posix.h"
+#include "../Thread.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace thread {
+namespace Threads {
         
     // ** class PosixThread
     //! POSIX thread implementation.
@@ -45,10 +45,10 @@ namespace thread {
         // ** Thread
         virtual void        start( const ThreadCallback& callback, void *userData );
         virtual void        yield( void );
-		virtual void		wait( void ) const;
-		
-		// ** PosixThread
-		static void			threadYield( void );
+        virtual void        wait( void ) const;
+        
+        // ** PosixThread
+        static void            threadYield( void );
 
     private:
 
@@ -59,7 +59,7 @@ namespace thread {
         pthread_t           m_thread;
     };
 
-} // namespace thread
+} // namespace Threads
 
 DC_END_DREEMCHEST
 

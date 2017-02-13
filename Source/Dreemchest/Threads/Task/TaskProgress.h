@@ -41,7 +41,7 @@ namespace Threads {
                                 ~TaskProgress( void );
 
         //! Returns a task progress.
-        f32						progress( void ) const;
+        f32                        progress( void ) const;
 
         //! Sets a task progress.
         void                    setProgress( f32 value );
@@ -61,13 +61,13 @@ namespace Threads {
     private:
 
         //! Task mutex.
-        MutexPtr				m_mutex;
+        MutexPtr                m_mutex;
 
         //! Task wait/completed condition.
-        ConditionPtr			m_condition;
+        ConditionPtr            m_condition;
 
         //! Task progress.
-        f32						m_progress;
+        f32                        m_progress;
 
         //! A boolean flag indicating that this task is completed
         bool                    m_isCompleted;

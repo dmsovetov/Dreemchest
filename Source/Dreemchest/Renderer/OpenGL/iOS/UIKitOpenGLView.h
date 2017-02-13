@@ -28,29 +28,36 @@
 #define __DC_Renderer_UIKitOpenGLView_H__
 
 #include <UIKit/UIKit.h>
+#include "../OpenGL2.h"
 
-#include "../OpenGLHal.h"
+DC_BEGIN_DREEMCHEST
+namespace Renderer
+{
+    class iOSOpenGLView;
+}
+DC_END_DREEMCHEST
+
+DC_USE_DREEMCHEST
 
 // ** UIKitOpenGLView
-@interface UIKitOpenGLView : UIView {
+@interface UIKitOpenGLView : UIView
+{
     @private
-
-        UIWindow*       m_window;
-
-        BOOL            m_animating;
-        NSInteger       m_animationFrameInterval;
-        id              m_displayLink;
-
-        EAGLContext*    m_context;
-        GLint           m_backingWidth;
-        GLint           m_backingHeight;
-        GLuint          m_defaultFramebuffer, m_colorRenderbuffer, m_depthBuffer;
+        EAGLContext*                _context;
+        CAEAGLLayer*                _layer;
+        id                          _displayLink;
+        GLuint                      _defaultFramebuffer, _colorRenderBuffer, _depthRenderBuffer;
+        Renderer::iOSOpenGLView*    _view;
+        int                         _width;
+        int                         _height;
     }
 
-    - ( id )    initWithWindow: ( UIWindow* )window depthStencil:( int )depthStencil;
+    - ( id )    initWithView: ( Renderer::iOSOpenGLView* )view bounds:( CGRect )bounds options:( unsigned int )options scaleFactor:(float)scaleFactor;
     - ( void )  beginFrame;
-    - ( void )  endFrame;
+    - ( void )  endFrame: (BOOL) wait;
     - ( BOOL )  makeCurrent;
+    @property (readonly) int width;
+    @property (readonly) int height;
 @end
 
 #endif /*   !defined( __DC_Renderer_UIKitOpenGLView_H__ ) */

@@ -67,55 +67,55 @@ namespace Sound {
 
     public:
 
-								//! Sound data constructor.
-								/*!
-									\param identifier Sound identifier.
-									\param uri Sound asset unique identifier.
-									\param group The sound group this sound belongs to. Pass NULL for orphan sounds.
-								 */
-								SoundData( SoundFxWPtr sfx, CString identifier, CString uri, SoundGroupWPtr group );
-								~SoundData( void );
+                                //! Sound data constructor.
+                                /*!
+                                    \param identifier Sound identifier.
+                                    \param uri Sound asset unique identifier.
+                                    \param group The sound group this sound belongs to. Pass NULL for orphan sounds.
+                                 */
+                                SoundData( SoundFxWPtr sfx, CString identifier, CString uri, SoundGroupWPtr group );
+                                ~SoundData( void );
 
         //! Returns a sound identifier.
-        CString					identifier( void ) const;
+        CString                    identifier( void ) const;
         //! Sets a sound identifier.
-        void					setIdentifier( CString value );
+        void                    setIdentifier( CString value );
         //! Returns a sound URI identifier.
-        CString					uri( void ) const;
+        CString                    uri( void ) const;
         //! Sets a sound URI identifier.
-        void					setUri( CString value );
+        void                    setUri( CString value );
         //! Returns a pointer to a sound group (NULL for orphan sounds).
-		SoundGroupWPtr			group( void ) const;
+        SoundGroupWPtr            group( void ) const;
         //! Sets a pointer to a sound group.
-        void					setGroup( SoundGroupWPtr value );
+        void                    setGroup( SoundGroupWPtr value );
         //! Returns a sound type.
-        u32						type( void ) const;
+        u32                        type( void ) const;
         //! Sets a sound type.
-        void					setType( u32 value );
+        void                    setType( u32 value );
         //! Returns a sound loading flag.
-        LoadingFlags			loading( void ) const;
+        LoadingFlags            loading( void ) const;
         //! Sets a sound loading flag.
-        void					setLoading( LoadingFlags value );
-		//! Returns a sound container format.
-		SoundContainerFormat	format( void ) const;
-		//! Sets the sound container format.
-		void					setFormat( SoundContainerFormat value );
+        void                    setLoading( LoadingFlags value );
+        //! Returns a sound container format.
+        SoundContainerFormat    format( void ) const;
+        //! Sets the sound container format.
+        void                    setFormat( SoundContainerFormat value );
         //! Returns a sound fade in/fade out time.
-        f32						fadeTime( void ) const;
+        f32                        fadeTime( void ) const;
         //! Sets a sound fade in/fade out time.
-        void					setFadeTime( f32 value );
+        void                    setFadeTime( f32 value );
         //! Returns base sound playback volume.
-        f32						volume( void ) const;
+        f32                        volume( void ) const;
         //! Sets a base sound playback volume.
-        void					setVolume( f32 value );
+        void                    setVolume( f32 value );
         //! Returns base sound playback pitch.
-        f32						pitch( void ) const;
+        f32                        pitch( void ) const;
         //! Sets a base sound playback pitch.
-        void					setPitch( f32 value );
+        void                    setPitch( f32 value );
         //! Returns true if this sound is looped, otherwise false.
-        bool					isLooped( void ) const;
+        bool                    isLooped( void ) const;
         //! Sets a sound looping flag.
-        void					setLooped( bool value );
+        void                    setLooped( bool value );
         //! Returns true if this sound is positioned relatively to a listener.
         bool                    isRelative( void ) const;
         //! Sets a sound relative flag.
@@ -146,50 +146,50 @@ namespace Sound {
         //! Sets the rollof factor value.
         void                    setRolloffFactor( f32 value );
         //! Returns a sound priority.
-        u32						priority( void ) const;
+        u32                        priority( void ) const;
         //! Sets a sound priority.
-        void					setPriority( u32 value );
+        void                    setPriority( u32 value );
         //! Returns a serialized sound data.
-        SoundDataInfo			data( void ) const;
+        SoundDataInfo            data( void ) const;
         //! Loads a serialized sound data.
-        void					setData( const SoundDataInfo& value );
+        void                    setData( const SoundDataInfo& value );
         //! Returns a sound buffer with decoded PCM data.
-        SoundBufferWPtr			pcm( void ) const;
+        SoundBufferWPtr            pcm( void ) const;
         //! Sets a sound buffer with decoded PCM data.
-        void					setPcm( SoundBufferPtr value );
+        void                    setPcm( SoundBufferPtr value );
         //! Calculates and returns a sound volume with a random modifier applied.
-        f32						volumeForSound( void ) const;
+        f32                        volumeForSound( void ) const;
         //! Calculates and returns a sound pitch with a random modifier applied.
-        f32						pitchForSound( void ) const;
+        f32                        pitchForSound( void ) const;
 
     private:
 
         //! Parent sound fx.
-        SoundFxWPtr				m_soundFx;
+        SoundFxWPtr                m_soundFx;
         //! Sound identifier.
-        String					m_identifier;
+        String                    m_identifier;
         //! Asset associated with this sound.
-        String					m_uri;
+        String                    m_uri;
         //! The group this sound belongs to.
-        SoundGroupWPtr			m_group;
+        SoundGroupWPtr            m_group;
         //! Sound type.
-        u32						m_type;
-		//! The sound data container format.
-		SoundContainerFormat	m_format;
+        u32                        m_type;
+        //! The sound data container format.
+        SoundContainerFormat    m_format;
         //! The flag indicating the loading behaviour for this sound.
-        LoadingFlags			m_loading;
+        LoadingFlags            m_loading;
         //! Sound fade in/ fade out time in milliseconds.
-        f32						m_fadeTime;
+        f32                        m_fadeTime;
         //! Sound volume.
-        f32						m_volume;
+        f32                        m_volume;
         //! Sound volume random multiplicative modifier.
-        Range					m_volumeModifier;
+        Range                    m_volumeModifier;
         //! Sound pitch.
-        f32						m_pitch;
+        f32                        m_pitch;
         //! Sound pitch random multiplicative modifier.
-        Range					m_pitchModifier;
+        Range                    m_pitchModifier;
         //! The flag indicating whether this sound is looped.
-        bool					m_isLooped;
+        bool                    m_isLooped;
         //! The flag indicating whether this sound is positioned relatively to a listener.
         bool                    m_isRelative;
         //! Reference distance value (used by a distance model).
@@ -199,9 +199,9 @@ namespace Sound {
         //! Rolloff factor (used by a distance model).
         f32                     m_rolloffFactor;
         //! Sound playback priority.
-        u32						m_priority;
+        u32                        m_priority;
         //! Decoded PCM data.
-        SoundBufferPtr			m_pcm;
+        SoundBufferPtr            m_pcm;
     };
     
 } // namespace Sound

@@ -69,7 +69,7 @@ namespace Sound {
     protected:
 
         //! Attached sound stream.
-        ISoundStreamPtr				m_stream;
+        ISoundStreamPtr                m_stream;
 
         //! Sample rate.
         u32                         m_rate;

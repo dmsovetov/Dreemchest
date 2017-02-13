@@ -30,10 +30,10 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
 // ** ZLibBufferCompressor::compressToBuffer
-s64 ZLibBufferCompressor::compressToBuffer( const u8 *in, u64 size, u8 *out, u64 maxSize )
+s32 ZLibBufferCompressor::compressToBuffer( const u8 *in, s32 size, u8 *out, s32 maxSize )
 {
     s64 result = 0;
 
@@ -57,7 +57,7 @@ s64 ZLibBufferCompressor::compressToBuffer( const u8 *in, u64 size, u8 *out, u64
 }
 
 // ** ZLibBufferCompressor::decompressToBuffer
-s64 ZLibBufferCompressor::decompressToBuffer( const u8 *in, u64 size, u8 *out, u64 maxSize )
+s32 ZLibBufferCompressor::decompressToBuffer( const u8 *in, s32 size, u8 *out, s32 maxSize )
 {
     s64 result = -1;
 
@@ -103,11 +103,11 @@ void ZLibBufferCompressor::endStreamCompression( void )
 // ** ZLibBufferCompressor::beginStreamDecompression
 bool ZLibBufferCompressor::beginStreamDecompression( void )
 {
-    m_stream.zalloc		= Z_NULL;
-    m_stream.zfree		= Z_NULL;
-    m_stream.opaque		= Z_NULL;
-    m_stream.next_in	= Z_NULL;
-    m_stream.avail_in	= 0;
+    m_stream.zalloc        = Z_NULL;
+    m_stream.zfree        = Z_NULL;
+    m_stream.opaque        = Z_NULL;
+    m_stream.next_in    = Z_NULL;
+    m_stream.avail_in    = 0;
     
     if( inflateInit( &m_stream ) != Z_OK ) {
         return false;
@@ -122,6 +122,6 @@ void ZLibBufferCompressor::endStreamDecompression( void )
     inflateEnd( &m_stream );
 }
     
-} // namespace io
+} // namespace Io
     
 DC_END_DREEMCHEST

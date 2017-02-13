@@ -32,15 +32,15 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
     // ** class ZLibBufferCompressor
     class ZLibBufferCompressor : public IBufferCompressor {
     public:
 
         // ** IBufferCompressor
-        virtual s64     compressToBuffer( const u8 *in, u64 size, u8 *out, u64 maxSize );
-        virtual s64     decompressToBuffer( const u8 *in, u64 size, u8 *out, u64 maxSize );
+        virtual s32     compressToBuffer( const u8 *in, s32 size, u8 *out, s32 maxSize ) NIMBLE_OVERRIDE;
+        virtual s32     decompressToBuffer( const u8 *in, s32 size, u8 *out, s32 maxSize ) NIMBLE_OVERRIDE;
 
         // ** ZLibBufferCompressor
         bool            beginStreamCompression( void );
@@ -53,7 +53,7 @@ namespace io {
         z_stream        m_stream;
     };
 
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST
 

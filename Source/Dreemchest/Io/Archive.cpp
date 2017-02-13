@@ -30,12 +30,12 @@
 #include "streams/PackedStream.h"
 #include "DiskFileSystem.h"
 
-#ifdef HAVE_ZLIB
-	#include "processors/ZLibBufferCompressor.h"
+#ifdef ZLIB_FOUND
+    #include "processors/ZLibBufferCompressor.h"
 #endif
 
-#ifdef HAVE_FASTLZ
-	#include "processors/FastLZBufferCompressor.h"
+#ifdef FASTLZ_FOUND
+    #include "processors/FastLZBufferCompressor.h"
 #endif
 
 DC_BEGIN_DREEMCHEST
@@ -53,30 +53,24 @@ Archive::~Archive( void )
 
 }
 
-// ** Archive::release
-void Archive::release( void )
-{
-    delete this;
-}
-
 // ** Archive::createCompressor
 IBufferCompressor* Archive::createCompressor( eCompressor compressor ) const
 {
     switch( compressor ) {
-	case CompressorFastLZ:  
-							#ifdef HAVE_FASTLZ
-								return DC_NEW FastLZBufferCompressor;
-							#else
-								LogWarning( "archive", "unsupported FastLZ compressor requested\n" );
-							#endif
+    case CompressorFastLZ:  
+                            #ifdef FASTLZ_FOUND
+                                return DC_NEW FastLZBufferCompressor;
+                            #else
+                                LogWarning( "archive", "%s", "unsupported FastLZ compressor requested\n" );
+                            #endif
                             break;
 
     case CompressorZ:      
-							#ifdef HAVE_FASTLZ
-								return DC_NEW ZLibBufferCompressor;
-							#else
-								LogWarning( "archive", "unsupported ZLib compressor requested\n" );
-							#endif
+                            #ifdef ZLIB_FOUND
+                                return DC_NEW ZLibBufferCompressor;
+                            #else
+                                LogWarning( "archive", "%s", "unsupported ZLib compressor requested\n" );
+                            #endif
                             break;
 
     default:                return NULL;
@@ -121,6 +115,7 @@ bool Archive::packFile( const Path& fileName, const Path& compressedFileName )
 // ** Archive::open
 bool Archive::open( const StreamPtr& file )
 {
+#if 0
     clearFiles();
 
     m_file = StreamPtr();
@@ -143,6 +138,9 @@ bool Archive::open( const StreamPtr& file )
     }
 
     m_file = StreamPtr();
+#else
+    NIMBLE_NOT_IMPLEMENTED
+#endif
     return true;
 }
 
@@ -191,7 +189,7 @@ StreamPtr Archive::openFile( const Path& fileName ) const
         file = m_diskFileSystem->openFile( m_fileName );
     }
 
-    DC_BREAK_IF( file == NULL );
+    NIMBLE_BREAK_IF( file == NULL );
     if( file == NULL ) {
         return StreamPtr();
     }
@@ -204,12 +202,12 @@ StreamPtr Archive::openFile( const Path& fileName ) const
 // ** Archive::openFile
 StreamPtr Archive::openFile( const Path& fileName, StreamMode mode ) const
 {
-	if( mode == BinaryReadStream ) {
-		return openFile( fileName );
-	}
+    if( mode == BinaryReadStream ) {
+        return openFile( fileName );
+    }
 
-    DC_BREAK_IF( true );
-	return StreamPtr();
+    NIMBLE_BREAK_IF( true );
+    return StreamPtr();
 }
 
 // ** Archive::fileExists
@@ -234,7 +232,7 @@ bool Archive::extractFile( const Path& fileName, const Path& outputFileName )
     }
 
     const s32   kChunkSize = 16536;
-    AutoPtr<u8> chunk = DC_NEW u8[kChunkSize];
+    UPtr<u8> chunk = DC_NEW u8[kChunkSize];
     
     while( input->hasDataLeft() ) {
         s32 read = input->read( chunk.get(), kChunkSize );

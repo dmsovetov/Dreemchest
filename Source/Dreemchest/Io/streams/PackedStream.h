@@ -31,31 +31,29 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace Io {
-        
+namespace Io
+{
     class IBufferCompressor;
 
-	// ** class PackedStream
-	class PackedStream : public Stream {
-
-        DC_DECLARE_IS( PackedStream, PackedStream, this );
-
-	public:
+    // ** class PackedStream
+    class PackedStream : public Stream
+    {
+    public:
 
                                 PackedStream( const StreamPtr& file, IBufferCompressor* compressor, s32 fileSize, s32 fileOffset );
-		virtual					~PackedStream( void );
+        virtual                 ~PackedStream( void );
 
-		//! Returns a decompressed file length.
-        virtual s32             length( void ) const DC_DECL_OVERRIDE;
+        //! Returns a decompressed file length.
+        virtual s32             length( void ) const NIMBLE_OVERRIDE;
 
         //! Returns a current file position.
-        virtual s32             position( void ) const DC_DECL_OVERRIDE;
+        virtual s32             position( void ) const NIMBLE_OVERRIDE;
 
         //! Sets a position inside the file.
-        virtual void            setPosition( s32 offset, SeekOrigin origin = SeekSet ) DC_DECL_OVERRIDE;
+        virtual void            setPosition( s32 offset, SeekOrigin origin = SeekSet ) NIMBLE_OVERRIDE;
 
         //! Reads data from file.
-        virtual s32             read( void* buffer, s32 size ) const DC_DECL_OVERRIDE;
+        virtual s32             read( void* buffer, s32 size ) const NIMBLE_OVERRIDE;
 
         // ** PackedStream
         void                    reopen( void );
@@ -74,11 +72,11 @@ namespace Io {
 
         s32                     m_bytesAvailable;
         s32                     m_bufferOffset;
-        u8*						m_buffer;
-	};
+        u8*                     m_buffer;
+    };
 
 } // namespace Io
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_Io_PackedStream_H__	*/
+#endif        /*    !__DC_Io_PackedStream_H__    */

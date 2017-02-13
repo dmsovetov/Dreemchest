@@ -31,12 +31,27 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace platform {
+namespace Platform {
 
 // ** createApplication
-IApplication* createApplication( void )
+IApplication* createApplication( void* userData )
 {
     return DC_NEW MacOSApplication;
+}
+    
+// ** createServiceApplication
+IApplication* createServiceApplication( void )
+{
+    NIMBLE_NOT_IMPLEMENTED
+    return NULL;
+}
+    
+// ** currentTime
+u64 currentTime( void )
+{
+    timeval time;
+    gettimeofday(&time, NULL);
+    return static_cast<u64>(((time.tv_sec) * 1000 + time.tv_usec/1000.0) + 0.5);
 }
 
 // ** MacOSApplication::quit
@@ -55,7 +70,26 @@ int MacOSApplication::launch( Application* application )
 
     return 0;
 }
+    
+// ** MacOSApplication::resourcePath
+const String& MacOSApplication::resourcePath( void ) const
+{
+    static const String s_prefix = "file://";
+    
+    if (m_resourcePath.empty())
+    {
+        m_resourcePath = [[[[NSBundle mainBundle] resourceURL] absoluteString] UTF8String];
+        size_t prefix = m_resourcePath.find(s_prefix);
+        
+        if (prefix != String::npos)
+        {
+            m_resourcePath.replace(prefix, s_prefix.length(), "");
+        }
+    }
+    
+    return m_resourcePath;
+}
 
-} // namespace platform
+} // namespace Platform
 
 DC_END_DREEMCHEST

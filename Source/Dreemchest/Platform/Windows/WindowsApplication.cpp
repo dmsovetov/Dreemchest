@@ -26,15 +26,21 @@
 
 #include "WindowsApplication.h"
 #include "WindowsWindow.h"
+#include <direct.h>
+#define getcwd _getcwd
 
 #pragma comment( lib, "winmm.lib" )
 
+#include <Renderer/Renderer.h>
+
 DC_BEGIN_DREEMCHEST
+
+extern Renderer::RenderViewWPtr renderView;
 
 namespace Platform {
 
 // ** createApplication
-IApplication* createApplication( void )
+IApplication* createApplication( void* userData )
 {
     return DC_NEW WindowsApplication;
 }
@@ -46,7 +52,7 @@ IApplication* createServiceApplication( void )
 }
 
 // ** currentTime
-u32 currentTime( void )
+u64 currentTime( void )
 {
 	return timeGetTime();
 }
@@ -92,12 +98,28 @@ void WindowsApplication::loop( void )
             // Update an application
             m_application->notifyUpdate();
 
+            renderView->notifyUpdate();
+
             // Update all windows
 			for( WindowsWindow::Windows::iterator i = WindowsWindow::s_windows.begin(), end = WindowsWindow::s_windows.end(); i != end; ++i ) {
 				i->second->owner()->notifyUpdate();
 			}
 		}
 	}
+}
+
+// ** WindowsApplication::resourcePath
+const String& WindowsApplication::resourcePath( void ) const
+{
+    if (m_workingDirectory.empty())
+    {
+        s8 buffer[256];
+        getcwd(buffer, sizeof(buffer));
+        m_workingDirectory = buffer;
+        m_workingDirectory += "/";
+    }
+    
+    return m_workingDirectory;
 }
 
 // ------------------------------------------------------------------------ WindowsService ------------------------------------------------------------------------ //
@@ -108,7 +130,7 @@ WindowsService* WindowsService::s_instance = NULL;
 // ** WindowsService::WindowsService
 WindowsService::WindowsService( void ) : m_application( NULL ), m_statusHandle( NULL ), m_stopEvent( INVALID_HANDLE_VALUE )
 {
-    DC_ABORT_IF( s_instance != NULL, "only a single WindowsService instance is allowed" );
+    NIMBLE_ABORT_IF( s_instance != NULL, "only a single WindowsService instance is allowed" );
 
     s_instance = this;
     ZeroMemory( &m_status, sizeof( m_status ) );
@@ -132,8 +154,8 @@ s32 WindowsService::launch( Application* application )
 
     // Get the service name from arguments
     String name = args.string( "service" );
-    DC_ABORT_IF( name.empty(), "service name cannot be empty" );
-    DC_ABORT_IF( name.length() >= MaxServiceNameLength, "service name is too long" );
+    NIMBLE_ABORT_IF( name.empty(), "service name cannot be empty" );
+    NIMBLE_ABORT_IF( name.length() >= MaxServiceNameLength, "service name is too long" );
 
     // Save the service name
     memcpy( m_name, name.c_str(), name.length() );
@@ -155,6 +177,20 @@ s32 WindowsService::launch( Application* application )
     }
 
 	return 0;
+}
+
+// ** WindowsService::resourcePath
+const String& WindowsService::resourcePath( void ) const
+{
+    if (m_workingDirectory.empty())
+    {
+        s8 buffer[256];
+        getcwd(buffer, sizeof(buffer));
+        m_workingDirectory = buffer;
+        m_workingDirectory += "/";
+    }
+    
+    return m_workingDirectory;
 }
 
 // ** WindowsService::configure

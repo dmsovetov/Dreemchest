@@ -27,47 +27,44 @@
 #include "CocoaOpenGLView.h"
 #include "../../Renderer.h"
 
+#include <OpenGL/gl.h>
+#include <OpenGL/glext.h>
+
 DC_USE_DREEMCHEST
 
 // ** CocoaOpenGLView
 @implementation CocoaOpenGLView
 
-// ** getFrameForTime
-- ( CVReturn ) getFrameForTime : ( const CVTimeStamp* )outputTime
+// ** displayCallback
+static CVReturn displayCallback( CVDisplayLinkRef displayLink, const CVTimeStamp* now, const CVTimeStamp* outputTime, CVOptionFlags flagsIn, CVOptionFlags* flagsOut, void* displayLinkContext )
 {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-
-    //    [self drawView];
-    [self setNeedsDisplay: YES];
-    [pool release];
-
+    CocoaOpenGLView* view = reinterpret_cast<CocoaOpenGLView*>(displayLinkContext);
+    [view renderForTime];
     return kCVReturnSuccess;
 }
 
-// ** OnDisplay
-static CVReturn OnDisplay( CVDisplayLinkRef displayLink, const CVTimeStamp* now, const CVTimeStamp* outputTime, CVOptionFlags flagsIn, CVOptionFlags* flagsOut, void* displayLinkContext )
+// ** renderForTime
+- (void)renderForTime
 {
-    CVReturn result = [(CocoaOpenGLView*)displayLinkContext getFrameForTime:outputTime];
-    return result;
+    @autoreleasepool
+    {
+    //    [self setNeedsDisplay: YES];
+        if (m_owner)
+        {
+            m_owner->notifyUpdate();
+        }
+    }
 }
 
 // ** initWithWindow
--( id ) initWithWindow: ( NSWindow* )window depthStencil:( int )depthStencil;
+-( id ) initWithWindow: ( NSWindow* )window depthStencil:( unsigned int )options
 {
     m_window        = window;
     m_displayLink   = nil;
+    m_owner         = NULL;
 
-    int depth   = 24;
-    int stencil = 8;
-
-    switch( depthStencil ) {
-    case renderer::PixelD24S8:  depth   = 24;
-                                stencil = 8;
-                                break;
-    case renderer::PixelD24X8:  depth   = 24;
-                                stencil = 0;
-                                break;
-    }
+    int depth   = Renderer::Private::depthBitsFromOptions(options);
+    int stencil = Renderer::Private::stencilBitsFromOptions(options);
 
     NSOpenGLPixelFormatAttribute attrs[] =
     {
@@ -96,7 +93,8 @@ static CVReturn OnDisplay( CVDisplayLinkRef displayLink, const CVTimeStamp* now,
         return NO;
     }
 
-    [self makeCurrent];
+    [[self openGLContext] makeCurrentContext];
+    
     CGLError error = CGLLockContext( ( CGLContextObj )[[self openGLContext] CGLContextObj] );
     if( error != kCGLNoError ) {
         NSLog( @"CocoaOpenGLView::beginFrame : CGLLockContext error %x\n", error );
@@ -141,14 +139,14 @@ static CVReturn OnDisplay( CVDisplayLinkRef displayLink, const CVTimeStamp* now,
         NSLog( @"CocoaOpenGLView::prepareOpenGL : CVDisplayLinkCreateWithActiveCGDisplays result %d\n", result );
     }
 
-    result = CVDisplayLinkSetOutputCallback( m_displayLink, &OnDisplay, self );
+    result = CVDisplayLinkSetOutputCallback( m_displayLink, displayCallback, self );
     if( result != kCVReturnSuccess ) {
         NSLog( @"CocoaOpenGLView::prepareOpenGL : CVDisplayLinkSetOutputCallback result %d\n", result );
     }
 
     // ** Set the display link for the current renderer
-    CGLContextObj		cglContext		= ( CGLContextObj )[[self openGLContext] CGLContextObj];
-    CGLPixelFormatObj	cglPixelFormat	= ( CGLPixelFormatObj )[[self pixelFormat] CGLPixelFormatObj];
+    CGLContextObj        cglContext        = ( CGLContextObj )[[self openGLContext] CGLContextObj];
+    CGLPixelFormatObj    cglPixelFormat    = ( CGLPixelFormatObj )[[self pixelFormat] CGLPixelFormatObj];
 
     result = CVDisplayLinkSetCurrentCGDisplayFromOpenGLContext( m_displayLink, cglContext, cglPixelFormat );
     if( result != kCVReturnSuccess ) {
@@ -171,11 +169,19 @@ static CVReturn OnDisplay( CVDisplayLinkRef displayLink, const CVTimeStamp* now,
     [[self openGLContext] setValues:&swapInt forParameter:NSOpenGLCPSwapInterval];
 }
 
-// ** drawRect
-- ( void ) drawRect : ( NSRect )rect
+- ( void ) setOwner: ( Renderer::RenderView* )view
 {
-    [m_window update];
+    m_owner = view;
 }
+
+// ** drawRect
+//- ( void ) drawRect : ( NSRect )rect
+//{
+//    if (m_owner)
+//   {
+//        m_owner->notifyUpdate();
+//    }
+//}
 
 // ** dealoc
 - ( void ) dealloc

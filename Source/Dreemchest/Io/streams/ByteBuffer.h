@@ -31,32 +31,30 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace Io {
-
-	//! ByteBuffer class represents a stream located in RAM.
-	class dcInterface ByteBuffer : public Stream {
+namespace Io
+{
+    //! ByteBuffer class represents a stream located in RAM.
+    class dcInterface ByteBuffer : public Stream
+    {
     friend class FileSystem;
+    public:
 
-        DC_DECLARE_IS( ByteBuffer, ByteBuffer, this )
-
-	public:
-
-		virtual					~ByteBuffer( void );
+        virtual                 ~ByteBuffer( void );
 
         //! Returns a length of this stream.
-        virtual s32             length( void ) const DC_DECL_OVERRIDE;
+        virtual s32             length( void ) const NIMBLE_OVERRIDE;
 
         //! Returns current memory offset in bytes.
-        virtual s32             position( void ) const DC_DECL_OVERRIDE;
+        virtual s32             position( void ) const NIMBLE_OVERRIDE;
 
         //! Sets an offset inside this byte buffer.
-        virtual void            setPosition( s32 offset, SeekOrigin origin = SeekSet ) DC_DECL_OVERRIDE;
+        virtual void            setPosition( s32 offset, SeekOrigin origin = SeekSet ) NIMBLE_OVERRIDE;
 
         //! Reads data from stream.
-        virtual s32             read( void* buffer, s32 size ) const DC_DECL_OVERRIDE;
+        virtual s32             read( void* buffer, s32 size ) const NIMBLE_OVERRIDE;
 
         //! Writes data from stream.
-        virtual s32             write( const void* buffer, s32 size ) DC_DECL_OVERRIDE;
+        virtual s32             write( const void* buffer, s32 size ) NIMBLE_OVERRIDE;
 
         //! Fills this memory with a given value
         void                    fill( u8 value );
@@ -64,8 +62,8 @@ namespace Io {
         //! Returns a total number of bytes available starting from current stream position.
         s32                     bytesAvailable( void ) const;
 
-		//! Returns an array of bytes.
-		const Array<u8>&		array( void ) const;
+        //! Returns an array of bytes.
+        const Array<u8>&        array( void ) const;
 
         //! Returns a data pointer.
         const u8*               buffer( void ) const;
@@ -73,8 +71,8 @@ namespace Io {
         //! Returns a data pointer to current stream position.
         const u8*               current( void ) const;
 
-		//! Constructs the copy of a byte array.
-		ByteBufferPtr			copy( void ) const;
+        //! Constructs the copy of a byte array.
+        ByteBufferPtr           copy( void ) const;
 
         //! Trims a specified amount of bytes from the beginning of a stream.
         void                    trimFromLeft( s32 size );
@@ -88,25 +86,25 @@ namespace Io {
         //! Creates a byte buffer from data.
         static ByteBufferPtr    createFromData( const u8* pointer, s32 size );
 
-		//! Creates a byte buffer from an array of bytes.
-		static ByteBufferPtr	createFromArray( const Array<u8>& data );
+        //! Creates a byte buffer from an array of bytes.
+        static ByteBufferPtr    createFromArray( const Array<u8>& data );
 
     protected:
 
                                 //! Constructs a memory stream from data.
                                 ByteBuffer( const u8* pointer, s32 size );
 
-	private:
+    private:
 
         //! Current stream position.
         mutable s32             m_position;
 
         //! Stream buffer.
         Array<u8>               m_buffer;
-	};
+    };
 
 } // namespace Io
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_Io_ByteBuffer_H__	*/
+#endif        /*    !__DC_Io_ByteBuffer_H__    */

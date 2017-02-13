@@ -76,7 +76,7 @@ void SoundChannel::setPosition( const Vec3& value )
     SoundBufferWPtr buffer = m_source->buffer();
 
     if( !buffer.valid() ) {
-        LogError( "channel", "channel sound source does not have a sound buffer\n" );
+        LogError( "channel", "%s", "channel sound source does not have a sound buffer\n" );
         return;
     }
 
@@ -84,7 +84,7 @@ void SoundChannel::setPosition( const Vec3& value )
     SoundSampleFormat format = buffer->format();
 
     if( format != SoundSampleMono8 && format != SoundSampleMono16 ) {
-        LogWarning( "channel", "stereo sound '%s' could not be positioned in 3D\n", m_sound->identifier() );
+        LogWarning( "channel", "%s", "stereo sound '%s' could not be positioned in 3D\n", m_sound->identifier() );
     }
 
     m_source->setPosition( value );
@@ -112,7 +112,7 @@ SoundDataWPtr SoundChannel::sound( void ) const
 void SoundChannel::pause( f32 fade )
 {
     if( m_volumeFader.valid() ) {
-        DC_BREAK;
+        NIMBLE_BREAK;
         return;
     }
 
@@ -127,7 +127,7 @@ void SoundChannel::pause( f32 fade )
 void SoundChannel::resume( f32 fade )
 {
     if( m_volumeFader.valid() ) {
-        DC_BREAK;
+        NIMBLE_BREAK;
         return;
     }
 
@@ -166,17 +166,17 @@ bool SoundChannel::update( f32 dt )
     m_source->update();
 
     // Update volume fader and calculate the volume fade factor
-	f32 fade = 1.0f;
+    f32 fade = 1.0f;
 
     if( m_volumeFader.valid() ) {
-		fade = m_volumeFader->update( dt );
-	}
+        fade = m_volumeFader->update( dt );
+    }
 
-	// Calculate the final volume base on fade factor, group volume & channel volume
-	f32 volume = m_volume * m_sound->group()->volume() * fade;
+    // Calculate the final volume base on fade factor, group volume & channel volume
+    f32 volume = m_volume * m_sound->group()->volume() * fade;
 
-	// Set the sond source volume
-	m_source->setVolume( volume );
+    // Set the sond source volume
+    m_source->setVolume( volume );
 
     // Update source distance attenuation properties
     m_source->setMaximumDistance( m_sound->maximumDistance() );

@@ -62,35 +62,35 @@ namespace Sound {
         , ExponentDistanceAttenuation   //!< Exponential gain dropoff.
     };
 
-	dcDeclarePtrs( SoundFx )
-	dcDeclarePtrs( SoundChannel )
-	dcDeclarePtrs( SoundData )
-	dcDeclarePtrs( SoundGroup )
-	dcDeclarePtrs( SoundEvent )
-	dcDeclarePtrs( Fader )
+    dcDeclarePtrs( SoundFx )
+    dcDeclarePtrs( SoundChannel )
+    dcDeclarePtrs( SoundData )
+    dcDeclarePtrs( SoundGroup )
+    dcDeclarePtrs( SoundEvent )
+    dcDeclarePtrs( Fader )
 
-	dcDeclarePtrs( SoundEngine )
-	dcDeclarePtrs( SoundBuffer )
-	dcDeclarePtrs( SoundDecoder )
-	dcDeclarePtrs( SoundSource )
+    dcDeclarePtrs( SoundEngine )
+    dcDeclarePtrs( SoundBuffer )
+    dcDeclarePtrs( SoundDecoder )
+    dcDeclarePtrs( SoundSource )
 
-	dcDeclarePtrs( IStreamOpener )
-	dcDeclarePtrs( ISoundStream )
+    dcDeclarePtrs( IStreamOpener )
+    dcDeclarePtrs( ISoundStream )
 
-	//! Container type to store sound data by identifier.
+    //! Container type to store sound data by identifier.
     typedef Hash<SoundDataPtr> Sounds;
 
-	//! Container type to store sound groups by name.
+    //! Container type to store sound groups by name.
     typedef Hash<SoundGroupPtr> SoundGroups;
 
-	//! Container type to store sound events by identifier.
+    //! Container type to store sound events by identifier.
     typedef Hash<SoundEventPtr> SoundEvents;
 
-	//! Container type to store sound channel weak pointers.
-	typedef Array<SoundChannelWPtr> SoundChannelsWeak;
+    //! Container type to store sound channel weak pointers.
+    typedef Array<SoundChannelWPtr> SoundChannelsWeak;
 
-	//! Container type to store sound channel strong pointers.
-	typedef Array<SoundChannelPtr> SoundChannels;
+    //! Container type to store sound channel strong pointers.
+    typedef Array<SoundChannelPtr> SoundChannels;
 
 } // namespace Sound
 
@@ -102,7 +102,7 @@ DC_END_DREEMCHEST
     #include "SoundGroup.h"
     #include "SoundEvent.h"
     #include "SoundChannel.h"
-	#include "SoundStream.h"
+    #include "SoundStream.h"
 #endif
 
 #endif    /*    !__DC_Sound_H__    */

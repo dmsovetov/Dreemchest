@@ -1,39 +1,98 @@
+// shadertype=glsl
+
+[Features]
+F_VertexNormal         = vertexNormal
+F_VertexColor          = vertexColor
+F_AmbientColor          = ambientColor
+F_EmissionColor          = emissionColor
+F_DiffuseTexture    = texture0
+F_RimLight            = rimLight
+
 [VertexShader]
-#version 120
+varying vec4 wsVertex;
 
-uniform mat4 u_vp, u_transform;
+#if defined( F_VertexColor )
+varying vec4 v_Color;
+#endif  /*  F_VertexColor    */
 
-#ifdef USE_DIFFUSE_MAP
-	varying vec2 v_uv0;
-#endif
+#if defined( F_DiffuseTexture )
+varying vec2 v_TexCoord0;
+#endif    /*    F_DiffuseTexture    */
+
+#if defined( F_VertexNormal )
+varying vec3 wsNormal;
+#endif  /*  F_VertexNormal    */
 
 void main()
 {
-#ifdef USE_DIFFUSE_MAP
-	v_uv0 = gl_MultiTexCoord0.xy;
-#endif
+    wsVertex = Instance.transform * gl_Vertex;
+    
+    gl_Position  = View.transform * wsVertex;
+    gl_PointSize = 5.0;
 
-	gl_Position = u_vp * u_transform * gl_Vertex;
-}
+#if defined( F_VertexColor )
+    v_Color = gl_Color;
+#endif  /*  F_VertexColor    */
+
+#if defined( F_VertexNormal )
+    wsNormal = (Instance.transform * vec4( gl_Normal, 0.0)).xyz;
+#endif  /*  F_VertexNormal    */
+
+#if defined( F_DiffuseTexture )
+    v_TexCoord0 = gl_MultiTexCoord0.xy;
+#endif    /*    F_DiffuseTexture    */
+}     
 
 [FragmentShader]
-#version 120
+varying vec4 wsVertex;
 
-#ifdef USE_DIFFUSE_MAP
-	uniform sampler2D u_tex0;
-	varying vec2	  v_uv0;
-#endif
+#if defined( F_VertexColor )
+varying vec4 v_Color;
+#endif  /*  F_VertexColor    */
 
-uniform vec4 u_clr0;
-uniform vec4 u_color;
+#if defined( F_VertexNormal )
+varying vec3 wsNormal;
+#endif  /*  F_VertexNormal    */
+
+#if defined( F_DiffuseTexture )
+uniform sampler2D u_DiffuseTexture;
+varying vec2 v_TexCoord0;
+#endif    /*    F_DiffuseTexture    */
+
+//! Computes a rim light factor
+float rim( vec3 point, vec3 normal, vec3 eye, float start, float end )
+{
+    vec3 dir = normalize( eye - point );
+    return smoothstep( start, end, 1.0 - max( dot( normal, dir ), 0.0 ) );    
+}
 
 void main()
 {
-	vec4 result  = u_color * u_clr0;
+    vec4 diffuseColor = Material.diffuse;
 
-#ifdef USE_DIFFUSE_MAP
-	result *= texture2D( u_tex0, v_uv0 );
-#endif
+#if defined( F_VertexColor )
+    diffuseColor *= v_Color;
+#endif  /*  F_VertexColor    */
 
-	gl_FragColor = result;
+#if defined( F_DiffuseTexture )
+    diffuseColor *= texture2D( u_DiffuseTexture, v_TexCoord0 );
+#endif    /*    F_DiffuseTexture    */
+
+#if defined( F_AmbientColor )
+    vec4 ambientColor = Scene.ambient;
+#else
+    vec4 ambientColor = vec4( 0.0, 0.0, 0.0, 1.0 );
+#endif  /*  F_AmbientColor    */
+
+    vec4 finalColor = ambientColor * diffuseColor;
+    
+#if defined( F_EmissionColor )
+    finalColor += Material.emission;
+#endif    /*    F_EmissionColor    */
+
+#if defined( F_RimLight ) && defined( F_VertexNormal )
+    finalColor += vec4( Material.rim.color, 1.0 ) * rim( wsVertex.xyz, wsNormal, View.position, Material.rim.start, Material.rim.end ) * Material.rim.factor;
+#endif    /*    F_RimLight    */
+
+    gl_FragColor = finalColor;
 }

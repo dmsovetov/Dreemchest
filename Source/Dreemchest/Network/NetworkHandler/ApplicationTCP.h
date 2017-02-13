@@ -37,7 +37,7 @@ namespace Network {
     class ApplicationTCP : public Application {
     public:
 
-        virtual                     ~ApplicationTCP( void ) DC_DECL_OVERRIDE;
+        virtual                     ~ApplicationTCP( void ) NIMBLE_OVERRIDE;
 
         //! Connects the TCP application to a remote host.
         static ApplicationTCPPtr    connect( const Address& address, u16 port );
@@ -50,14 +50,14 @@ namespace Network {
                                     //! Constructs ApplicationTCP instance.
                                     ApplicationTCP( TCPSocketPtr socket );
 
-		//! Handles socket connection event (accepting remote connection for listening socket).
-		void			            handleSocketConnected( const TCPSocket::Connected& e );
+        //! Handles socket connection event (accepting remote connection for listening socket).
+        void                        handleSocketConnected( const TCPSocket::Connected& e );
 
-		//! Handles socket closed event (closing remote connection for listening socket).
-		void			            handleSocketClosed( const TCPSocket::Closed& e );
+        //! Handles socket closed event (closing remote connection for listening socket).
+        void                        handleSocketClosed( const TCPSocket::Closed& e );
 
-		//! Receives and processes all incoming TCP data.
-		virtual void			    update( u32 dt ) DC_DECL_OVERRIDE;
+        //! Receives and processes all incoming TCP data.
+        virtual void                update( u32 dt ) NIMBLE_OVERRIDE;
 
     private:
 

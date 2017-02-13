@@ -26,12 +26,19 @@
 
 #include "Application.h"
 
+#ifdef DC_PLATFORM_WINDOWS
+    #include <direct.h>
+    #define getcwd _getcwd
+#else
+    #include <unistd.h>
+#endif
+
 DC_BEGIN_DREEMCHEST
 
 namespace Platform {
 
 //! Platform-specific application constructor.
-extern IApplication* createApplication( void );
+extern IApplication* createApplication( void* userData );
 
 //! Platform-specific service application constructor.
 extern IApplication* createServiceApplication( void );
@@ -44,8 +51,8 @@ Application* Application::s_application = NULL;
 // ** Application::Application
 Application::Application( const Arguments& arguments, IApplication* impl ) : m_impl( impl ), m_delegate( NULL ), m_arguments( arguments )
 {
-    DC_ABORT_IF( s_application != NULL, "only a single Application instance is allowed" );
-    if( !m_impl ) LogWarning( "application", "not implemented on current platform\n" );
+    NIMBLE_ABORT_IF( s_application != NULL, "only a single Application instance is allowed" );
+    if( !m_impl ) LogWarning( "application", "%s", "not implemented on current platform\n" );
     s_application = this;
 }
 
@@ -57,7 +64,7 @@ Application::~Application( void )
 // ** Application::args
 const Arguments& Application::args( void ) const
 {
-	return m_arguments;
+    return m_arguments;
 }
 
 // ** Application::sharedInstance
@@ -65,11 +72,49 @@ Application* Application::sharedInstance( void )
 {
     return s_application;
 }
+    
+// ** Application::currentDirectory
+const String& Application::currentDirectory( void ) const
+{
+    if (m_currentDirectory.empty())
+    {
+        s8 buffer[256];
+        getcwd(buffer, sizeof(buffer));
+        m_currentDirectory = buffer;
+    }
+    
+    return m_currentDirectory;
+}
+    
+// ** Application::resourcePath
+const String& Application::resourcePath( void ) const
+{
+    if (!m_impl)
+    {
+        return currentDirectory();
+    }
+    
+    return m_impl->resourcePath();
+}
+    
+// ** Application::pathForResource
+String Application::pathForResource(const String& fileName) const
+{
+    String resources = resourcePath();
+    
+    if (resources.empty())
+    {
+        return fileName;
+    }
+    
+    NIMBLE_ABORT_IF(resources[resources.length() - 1] != '/', "a non-empty resource path should contain a trailing slash");
+    return resources + fileName;
+}
 
 // ** Application::create
-Application* Application::create( const Arguments& args )
+Application* Application::create( const Arguments& args, void* userData )
 {
-    if( IApplication* impl = createApplication() ) {
+    if( IApplication* impl = createApplication(userData) ) {
         return DC_NEW Application( args, impl );
     }
 
@@ -102,7 +147,7 @@ s32 Application::launch( ApplicationDelegate* delegate )
 void Application::notifyPrepareToLaunch( void )
 {
     if( !m_delegate ) {
-        LogDebug( "application", "no application delegate set, prepareToLaunch event ignored\n" );
+        LogDebug( "application", "%s", "no application delegate set, prepareToLaunch event ignored\n" );
         return;
     }
 
@@ -113,11 +158,13 @@ void Application::notifyPrepareToLaunch( void )
 void Application::notifyLaunched( void )
 {
     if( !m_delegate ) {
-        LogDebug( "application", "no application delegate set, launch event ignored\n" );
+        LogDebug( "application", "%s", "no application delegate set, launch event ignored\n" );
         return;
     }
 
     m_delegate->handleLaunched( this );
+    LogDebug("application", "working directory %s\n", currentDirectory().c_str());
+    LogDebug("application", "resource path %s\n", resourcePath().c_str());
 }
 
 // ** Application::notifyUpdate
@@ -126,6 +173,71 @@ void Application::notifyUpdate( void )
     if( m_delegate ) {
         m_delegate->handleUpdate( this );
     }
+}
+
+// ** Application::notifyOrientationChanged
+void Application::notifyOrientationChanged(DeviceOrientation orientation)
+{
+    if (!m_delegate)
+    {
+        LogDebug( "application", "%s", "no application delegate set, orientation changed event ignored\n" );
+        return;
+    }
+    
+    static CString s_orientation[] =
+    {
+          "portrait"
+        , "portraitUpsideDown"
+        , "landscapeLeft"
+        , "landscapeRight"
+    };
+    
+    m_delegate->handleOrientationChanged(this, orientation);
+    LogDebug("application", "device orientation was changed to '%s'\n", s_orientation[orientation]);
+}
+    
+// -------------------------------------------------------------- ApplicationDelegate ---------------------------------------------------------------- //
+
+// ** ApplicationDelegate::ApplicationDelegate
+ApplicationDelegate::ApplicationDelegate(const String& tag)
+    : m_loggerTag(tag)
+{
+    
+}
+    
+// ** ApplicationDelegate::debug
+void ApplicationDelegate::debug(CString prefix, CString format, ...)
+{
+    NIMBLE_LOGGER_FORMAT(format);
+    Logger::write(Logger::Context(NULL, NULL), Logger::Debug, m_loggerTag.c_str(), prefix, buffer);
+}
+
+// ** ApplicationDelegate::verbose
+void ApplicationDelegate::verbose(CString prefix, CString format, ...)
+{
+    NIMBLE_LOGGER_FORMAT(format);
+    Logger::write(Logger::Context(NULL, NULL), Logger::Verbose, m_loggerTag.c_str(), prefix, buffer);
+}
+
+// ** ApplicationDelegate::warning
+void ApplicationDelegate::warning(CString prefix, CString format, ...)
+{
+    NIMBLE_LOGGER_FORMAT(format);
+    Logger::write(Logger::Context(NULL, NULL), Logger::Warning, m_loggerTag.c_str(), prefix, buffer);
+}
+
+// ** ApplicationDelegate::error
+void ApplicationDelegate::error(CString prefix, CString format, ...)
+{
+    NIMBLE_LOGGER_FORMAT(format);
+    Logger::write(Logger::Context(NULL, NULL), Logger::Error, m_loggerTag.c_str(), prefix, buffer);
+}
+
+// ** ApplicationDelegate::fatal
+void ApplicationDelegate::fatal(CString prefix, CString format, ...)
+{
+    NIMBLE_LOGGER_FORMAT(format);
+    Logger::write(Logger::Context(NULL, NULL), Logger::Fatal, m_loggerTag.c_str(), prefix, buffer);
 }
 
 // -------------------------------------------------------------- ServiceApplication ---------------------------------------------------------------- //
@@ -144,7 +256,40 @@ ServiceApplication* ServiceApplication::create( const Arguments& args )
 
     return NULL;
 }
+    
+// ------------------------------------------------------------ WindowedApplicationDelegate ---------------------------------------------------------- //
 
+// ** WindowedApplicationDelegate::initialize
+bool WindowedApplicationDelegate::initialize(s32 width, s32 height)
+{
+    // Create a window
+    m_window = Window::create(width, height);
+    
+    if (!m_window.valid())
+    {
+        return false;
+    }
+    
+    // Now subscribe for window events.
+    m_window->subscribe<Window::TouchBegan>(dcThisMethod(WindowedApplicationDelegate::handleTouchBegan));
+    m_window->subscribe<Window::TouchEnded>(dcThisMethod(WindowedApplicationDelegate::handleTouchEnded));
+    m_window->subscribe<Window::TouchMoved>(dcThisMethod(WindowedApplicationDelegate::handleTouchMoved));
+#if defined( DC_PLATFORM_KEYBOARD )
+    m_window->subscribe<Window::KeyPressed>(dcThisMethod(WindowedApplicationDelegate::handleKeyPressed));
+    m_window->subscribe<Window::KeyReleased>(dcThisMethod(WindowedApplicationDelegate::handleKeyReleased));
+#endif  //  #if defined( DC_PLATFORM_KEYBOARD )
+    m_window->subscribe<Window::Update>(dcThisMethod(WindowedApplicationDelegate::handleWindowUpdate));
+    
+    return true;
+}
+ 
+// ** WindowedApplicationDelegate::initialize
+void WindowedApplicationDelegate::setCaption(const String& value)
+{
+    NIMBLE_ABORT_IF(!m_window.valid(), "invalid window");
+    m_window->setCaption(value);
+}
+    
 } // namespace Platform
 
 DC_END_DREEMCHEST

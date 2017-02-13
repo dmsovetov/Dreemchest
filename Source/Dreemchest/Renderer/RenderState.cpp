@@ -24,155 +24,561 @@
 
  **************************************************************************/
 
-#include    "RenderState.h"
+#include "RenderState.h"
+#include "PipelineFeatureLayout.h"
 
 DC_BEGIN_DREEMCHEST
 
 namespace Renderer
 {
 
-// ------------------------------- RasterizerState ------------------------------- //
+// ---------------------------------------------------------------------------- State ---------------------------------------------------------------------------- //
 
-// ** RasterizerState::RasterizerState
-RasterizerState::RasterizerState( void ) {
-    setAs( RSValueNotSet );
-}
-
-// ** RasterizerState::setAs
-void RasterizerState::setAs( RenderStateValue value )
+// ** State::State
+State::State( void )
+    : type(TotalStates)
 {
-    m_fillMode   = value;
-    m_cullMode   = value;
-    m_alphaFunc  = value;
-    m_alphaRef   = (float)value;
-    m_scissor    = value;
-    m_red        = value;
-    m_green      = value;
-    m_blue       = value;
-    m_alpha      = value;
-    m_depth      = value;
 }
 
-// ** RasterizerState::setCullMode
-void RasterizerState::setCullMode( TriangleFace mode )
+// ** State::State
+State::State(VertexBuffer_ id)
+    : resourceId(id)
+    , type(BindVertexBuffer)
 {
-    m_cullMode = mode;
 }
 
-// ** RasterizerState::setFillMode
-void RasterizerState::setFillMode( PolygonMode mode )
+// ** State::State
+State::State(IndexBuffer_ id)
+    : resourceId(id)
+    , type(BindIndexBuffer)
 {
-    m_fillMode = mode;
 }
 
-// ** RasterizerState::setCullMode
-void RasterizerState::setAlphaTest( Compare func, float ref )
+// ** State::State
+State::State(FeatureLayout id)
+    : resourceId(id)
+    , type(SetFeatureLayout)
 {
-    m_alphaFunc = func;
-    m_alphaRef  = ref;
 }
 
-// ** RasterizerState::setCullMode
-void RasterizerState::setZWrite( bool write )
+// ** State::State
+State::State(Program id)
+    : resourceId(id)
+    , type(BindProgram)
 {
-    m_depth = write ? 1 : 0;
 }
 
-// ** RasterizerState::setCullMode
-void RasterizerState::setScissorEnable( bool enable )
+// ** State::State
+State::State(InputLayout id)
+    : resourceId(id)
+    , type(SetInputLayout)
 {
-    m_scissor = enable ? 1 : 0;
 }
 
-// ** RasterizerState::setCullMode
-void RasterizerState::setColorWrite( bool red, bool green, bool blue, bool alpha )
+// ** State::State
+State::State(TriangleFace face)
+    : type(CullFace)
 {
-    m_red   = red   ? 1 : 0;
-    m_green = green ? 1 : 0;
-    m_blue  = blue  ? 1 : 0;
-    m_alpha = alpha ? 1 : 0;
+    cullFace = face;
 }
 
-// ------------------------------- BlendState ------------------------------- //
-
-
-// ** BlendState::BlendState
-BlendState::BlendState( void ) {
-    setAs( RSValueNotSet );
-}
-
-// ** BlendState::setAs
-void BlendState::setAs( RenderStateValue value )
+// ** State::State
+State::State(PolygonMode mode)
+    : type(Rasterization)
 {
-    m_src   = value;
-    m_dst   = value;
-    m_op    = value;
+    rasterization = mode;
 }
 
-// ** BlendState::setCullMode
-void BlendState::setBlendFunc( BlendFactor src, BlendFactor dst )
+// ** State::State
+State::State(Compare function, bool write)
+    : type(DepthState)
 {
-    m_src = src;
-    m_dst = dst;
+    compareFunction = function;
+    data.depthWrite = write;
 }
 
-// ** BlendState::setBlendEnabled
-void BlendState::setBlendEnabled( bool enabled )
+// ** State::State
+State::State(Compare function, f32 reference)
+    : type(AlphaTest)
 {
-    m_blend = enabled ? 1 : 0;
+    compareFunction = function;
+    data.ref        = static_cast<u8>(reference * 255);
 }
 
-// ------------------------------- DepthStencilState ------------------------------- //
-
-// ** DepthStencilState::DepthStencilState(
-DepthStencilState::DepthStencilState( void ) {
-    setAs( RSValueNotSet );
-}
-
-// ** DepthStencilState::setAs
-void DepthStencilState::setAs( RenderStateValue value )
+// ** State::State
+State::State(ConstantBuffer_ id, u8 index)
+    : type(BindConstantBuffer)
 {
-    m_depthFunc     = value;
-    m_stencilFail   = value, m_stencilZFail = value, m_stencilZPass = value;
-    m_stencilFunc   = value;
-    m_stencilValue  = value, m_stencilMask = value;
-    m_stencilEnable = value;
+    resourceId = id;
+    data.index = index;
 }
 
-// ** DepthStencilState::setDepthFunc
-void DepthStencilState::setDepthFunc( Compare func )
+// ** State::State
+State::State(BlendFactor src, BlendFactor dst)
+    : type( Blending )
 {
-    m_depthFunc = func;
+    data.blend = (src << 4) | dst;
 }
 
-// ** DepthStencilState::setStencilFunc
-void DepthStencilState::setStencilFunc( Compare func, int value, int mask )
+// ** State::State
+State::State(Texture_ id, u8 sampler)
+    : type(BindTexture)
 {
-    m_stencilFunc   = func;
-    m_stencilValue  = value;
-    m_stencilMask   = mask;
-}
-
-// ** DepthStencilState::setStencilOp
-void DepthStencilState::setStencilOp( StencilAction fail, StencilAction zFail, StencilAction zPass )
-{
-    m_stencilFail     = fail;
-    m_stencilZFail    = zFail;
-    m_stencilZPass    = zPass;
-}
-
-// ** DepthStencilState::setStencilMask
-void DepthStencilState::setStencilMask( int mask )
-{
-    m_stencilMask = mask;
-}
-
-// ** DepthStencilState::setStencilEnabled
-void DepthStencilState::setStencilEnabled( bool enabled )
-{
-    m_stencilEnable = enabled ? 1 : 0;
+    resourceId = id;
+    data.index = sampler;
 }
     
+// ** State::State
+State::State(TransientTexture id, u8 sampler)
+    : type(BindTransientTexture)
+{
+    resourceId = static_cast<u8>(id);
+    data.index = sampler;
+}
+
+// ** State::State
+State::State(f32 factor, f32 units)
+    : type(PolygonOffset)
+{
+    polygonOffset.factor = factor * 128.0f;
+    polygonOffset.units  = units * 128.0f;
+}
+
+// ** State::State
+State::State(StencilAction sfail, StencilAction dpfail, StencilAction dppass)
+    : type(StencilOp)
+{
+    stencilOp.sfail  = sfail;
+    stencilOp.dpfail = dpfail;
+    data.dppass      = dppass;
+}
+
+// ** State::State
+State::State(Compare function, u8 ref, u8 mask)
+    : type(StencilFunc)
+{
+    stencilFunction.op   = function;
+    stencilFunction.mask = mask;
+    data.ref             = ref;
+}
+
+// ** State::sourceBlendFactor
+BlendFactor State::sourceBlendFactor() const
+{
+    return static_cast<BlendFactor>(data.blend >> 4);
+}
+
+// ** State::destBlendFactor
+BlendFactor State::destBlendFactor() const
+{
+    return static_cast<BlendFactor>(data.blend & 0xF);
+}
+    
+// ** State::alphaReference
+f32 State::alphaReference() const
+{
+    return data.ref / 255.0f;
+}
+    
+// ** State::polygonOffsetFactor
+f32 State::polygonOffsetFactor() const
+{
+    return polygonOffset.factor / 128.0f;
+}
+
+// ** State::polygonOffsetUnits
+f32 State::polygonOffsetUnits() const
+{
+    return polygonOffset.units / 128.0f;
+}
+    
+// ** State::polygonMode
+PolygonMode State::polygonMode() const
+{
+    return static_cast<PolygonMode>(rasterization);
+}
+    
+// ** State::function
+Compare State::function() const
+{
+    return static_cast<Compare>(compareFunction);
+}
+    
+// ** State::depthFail
+StencilAction State::depthFail() const
+{
+    return static_cast<StencilAction>(stencilOp.dpfail);
+}
+
+
+// ** State::stencilFail
+StencilAction State::stencilFail() const
+{
+    return static_cast<StencilAction>(stencilOp.sfail);
+}
+
+
+// ** State::depthStencilPass
+StencilAction State::depthStencilPass() const
+{
+    return static_cast<StencilAction>(data.dppass);
+}
+    
+// ** State::samplerIndex
+s32 State::samplerIndex() const
+{
+    return data.index & 0xF;
+}
+    
+// ** State::bit
+u32 State::bit() const
+{
+    switch (type)
+    {
+        case BindConstantBuffer:
+            return type + data.index;
+        case BindTexture:
+        case BindTransientTexture:
+            return type + MaxConstantBuffers + data.index;
+        default:
+            break;
+    }
+    
+    return type;
+}
+    
+// ** State::bitmask
+u32 State::bitmask() const
+{
+    return BIT(bit());
+}
+
+// ** State::nameFromType
+String State::nameFromType(Type type)
+{
+    switch (type)
+    {
+        case BindVertexBuffer:      return "BindVertexBuffer";
+        case BindIndexBuffer:       return "BindIndexBuffer";
+        case SetInputLayout:        return "SetInputLayout";
+        case SetFeatureLayout:      return "SetFeatureLayout";
+        case BindProgram:           return "BindProgram";
+        case Blending:              return "Blending";
+        case PolygonOffset:         return "PolygonOffset";
+        case DepthState:            return "DepthState";
+        case AlphaTest:             return "AlphaTest";
+        case CullFace:              return "CullFace";
+        case Rasterization:         return "Rasterization";
+        case StencilOp:             return "StencilOp";
+        case StencilFunc:           return "StencilFunc";
+        case StencilMask:           return "StencilMask";
+        case ColorMask:             return "ColorMask";
+        case BindConstantBuffer:    return "BindConstantBuffer";
+        case BindTexture:           return "BindTexture";
+        case BindTransientTexture:  return "BindTransientTexture";
+        default:
+            NIMBLE_NOT_IMPLEMENTED
+    }
+    
+    return "";
+}
+
+// -------------------------------------------------------------------------- StateBlock -------------------------------------------------------------------------- //
+
+// ** StateBlock::StateBlock
+StateBlock::StateBlock(State* states, s16 maxStates)
+    : m_mask(0)
+    , m_userDefined(0)
+    , m_userDefinedMask(~0)
+    , m_resourceFeatures(0)
+    , m_count(0)
+    , m_maxStates(maxStates)
+    , m_states(states)
+{
+}
+
+// ** StateBlock::bindVertexBuffer
+void StateBlock::bindVertexBuffer(VertexBuffer_ id)
+{
+    pushState(State(id));
+}
+
+// ** StateBlock::bindIndexBuffer
+void StateBlock::bindIndexBuffer(IndexBuffer_ id)
+{
+    pushState(State(id));
+}
+
+// ** StateBlock::bindInputLayout
+void StateBlock::bindInputLayout(InputLayout id)
+{
+    pushState(State(id));
+}
+    
+// ** StateBlock::bindFeatureLayout
+void StateBlock::bindFeatureLayout(FeatureLayout id)
+{
+    pushState(State(id));
+}
+
+// ** StateBlock::bindConstantBuffer
+void StateBlock::bindConstantBuffer(ConstantBuffer_ id, u8 index)
+{
+    pushState(State(id, index));
+    m_resourceFeatures = m_resourceFeatures | PipelineFeature::constantBuffer(index);
+}
+
+// ** StateBlock::bindProgram
+void StateBlock::bindProgram(Program id)
+{
+    pushState(State(id));
+}
+
+// ** StateBlock::bindTexture
+void StateBlock::bindTexture(Texture_ id, u8 sampler)
+{
+    pushState(State(id, sampler));
+    m_resourceFeatures = m_resourceFeatures | PipelineFeature::sampler(sampler);
+}
+
+// ** StateBlock::bindTexture
+void StateBlock::bindTexture(TransientTexture id, u8 sampler)
+{
+    pushState(State(id, sampler));
+    m_resourceFeatures = m_resourceFeatures | PipelineFeature::sampler(sampler);
+}
+
+// ** StateBlock::setBlend
+void StateBlock::setBlend(BlendFactor src, BlendFactor dst)
+{
+    pushState(State(src, dst));
+}
+
+// ** StateBlock::setDepthState
+void StateBlock::setDepthState(Compare function, bool write)
+{
+    pushState(State(function, write));
+}
+
+// ** StateBlock::enableFeatures
+void StateBlock::enableFeatures(PipelineFeatures features)
+{
+    m_userDefined = m_userDefined | PipelineFeature::user(features);
+}
+
+// ** StateBlock::disableFeatures
+void StateBlock::disableFeatures(PipelineFeatures mask)
+{
+    m_userDefinedMask = m_userDefinedMask & ~PipelineFeature::user(mask);
+}
+
+// ** StateBlock::setPolygonOffset
+void StateBlock::setPolygonOffset(f32 factor, f32 units)
+{
+    pushState(State(factor, units));
+}
+
+// ** StateBlock::disablePolygonOffset
+void StateBlock::disablePolygonOffset( void )
+{
+    setPolygonOffset(0.0f, 0.0f);
+}
+    
+// ** StateBlock::setPolygonMode
+void StateBlock::setPolygonMode(PolygonMode value)
+{
+    pushState(State(value));
+}
+
+// ** StateBlock::setStencilOp
+void StateBlock::setStencilOp(StencilAction sfail, StencilAction dfail, StencilAction dppass)
+{
+    pushState(State(sfail, dfail, dppass));
+}
+
+// ** StateBlock::setStencilMask
+void StateBlock::setStencilMask(u8 value)
+{
+    State state;
+    state.type = State::StencilMask;
+    state.stencilFunction.mask = value;
+    pushState(state);
+}
+
+// ** StateBlock::setStencilFunction
+void StateBlock::setStencilFunction(Compare function, u8 ref, u8 value)
+{
+    pushState(State(function, ref, value));
+}
+    
+// ** StateBlock::disableStencilTest
+void StateBlock::disableStencilTest( void )
+{
+    setStencilFunction(CompareDisabled, 0, 0);
+}
+
+// ** StateBlock::setColorMask
+void StateBlock::setColorMask(u8 value)
+{
+    State state;
+    state.type = State::ColorMask;
+    state.mask = value;
+    pushState(state);
+}
+
+// ** StateBlock::setAlphaTest
+void StateBlock::setAlphaTest(Compare function, f32 reference)
+{
+    pushState(State(function, reference));
+}
+
+// ** StateBlock::setCullFace
+void StateBlock::setCullFace(TriangleFace face)
+{
+    pushState(State(face));
+}
+
+// ** StateBlock::disableBlending
+void StateBlock::disableAlphaTest( void )
+{
+    setAlphaTest(CompareDisabled, 0.0f);
+}
+
+// ** StateBlock::disableBlending
+void StateBlock::disableBlending( void )
+{
+    setBlend(BlendDisabled, BlendDisabled);
+}
+
+// ** StateBlock::pushState
+void StateBlock::pushState(const State& state)
+{
+    NIMBLE_BREAK_IF(m_mask & BIT(state.bit()), "a state setting could not be overriden");
+    NIMBLE_ABORT_IF(m_count + 1 > m_maxStates, "state block overflow");
+
+    // Push a state to a state block
+    m_states[m_count] = state;
+    m_count++;
+
+    // Update a state block bitmask
+    m_mask = m_mask | BIT(state.bit());
+}
+
+// ---------------------------------------------------------------------------- StateScope ------------------------------------------------------------------------------ //
+
+// ** StateScope::StateScope
+StateScope::StateScope( StateStack& stack, StateBlock* stateBlock )
+    : m_stack( stack )
+    , m_stateBlock( stateBlock )
+{
+}
+
+// ** StateScope::StateScope
+StateScope::StateScope( const StateScope& other )
+    : m_stack( other.m_stack )
+    , m_stateBlock( other.m_stateBlock )
+{
+    NIMBLE_NOT_IMPLEMENTED
+//    other.m_stateBlock = NULL;
+}
+
+// ** StateScope::~StateScope
+StateScope::~StateScope( void )
+{
+    if( m_stateBlock ) {
+        m_stack.pop();
+    }
+}
+
+// ** StateScope::operator =
+const StateScope& StateScope::operator = ( StateScope& other )
+{
+    m_stack      = other.m_stack;
+    m_stateBlock = other.m_stateBlock;
+    other.m_stateBlock = NULL;
+    return *this;
+}
+
+// -------------------------------------------------------------------------- StateStack -------------------------------------------------------------------------- //
+
+// ** StateStack::StateStack
+StateStack::StateStack(s32 maxStateBlocks, s32 maxStackSize)
+    : m_allocator(maxStateBlocks * sizeof(StateBlock) + sizeof(StateBlock*) * maxStackSize)
+    , m_stack(NULL)
+    , m_size(0)
+    , m_maxStackSize(maxStackSize)
+{
+    reset();
+}
+
+// ** StateStack::newScope
+StateScope StateStack::newScope( void )
+{
+    NIMBLE_ABORT_IF( (size() + 1) >= MaxStateStackDepth, "stack overflow" );
+
+    void* allocated = m_allocator.allocate( sizeof( StateBlock ) );
+    NIMBLE_ABORT_IF( allocated == NULL, "to much render state blocks allocated" );
+
+    StateBlock* block = new( allocated ) StateBlock8;
+    return push( block );
+}
+    
+// ** StateStack::push
+void StateStack::push(const StateBlock& block)
+{
+    for (s32 i = m_size; i > 0; i--)
+    {
+        m_stack[i] = m_stack[i - 1];
+    }
+    m_stack[0] = &block;
+    m_size++;
+}
+
+// ** StateStack::push
+StateScope StateStack::push( const StateBlock* block )
+{
+    if( block == NULL ) {
+        return StateScope( *this, NULL );
+    }
+    
+    push(*block);
+
+    return StateScope( *this, const_cast<StateBlock*>( block ) );
+}
+
+// ** StateStack::pop
+void StateStack::pop( void )
+{
+    NIMBLE_ABORT_IF( size() == 0, "stack underflow" );
+
+    for( s32 i = 0; i < m_size - 1; i++ ) {
+        m_stack[i] = m_stack[i + 1];
+    }
+
+    m_stack[m_size--] = NULL;
+}
+
+// ** StateStack::size
+s32 StateStack::size( void ) const
+{
+    return m_size;
+}
+
+// ** StateStack::states
+const StateBlock** StateStack::states( void ) const
+{
+    return m_stack;
+}
+    
+// ** StateStack::reset
+void StateStack::reset( void )
+{
+    memset(m_stack, 0, sizeof(m_stack[0]) * m_size);
+    m_allocator.reset();
+    m_stack = reinterpret_cast<const StateBlock**>(m_allocator.allocate(sizeof(StateBlock*) * m_maxStackSize));
+    m_size = 0;
+}
+
 } // namespace Renderer
 
 DC_END_DREEMCHEST

@@ -33,83 +33,83 @@ DC_BEGIN_COMPOSER
 
 namespace Editors {
 
-	//! Base class for all visual asset editors.
-	class VisualEditor : public AssetEditor {
+    //! Base class for all visual asset editors.
+    class VisualEditor : public AssetEditor {
 
         Q_OBJECT
 
-	public:
+    public:
 
-										//! Constructs the VisualEditor instance.
-										VisualEditor( void );
+                                        //! Constructs the VisualEditor instance.
+                                        VisualEditor( void );
 
-		//! Performs the visual editor initialization.
-		virtual bool					initialize( ProjectQPtr project, const FileInfo& asset, Ui::DocumentQPtr document ) DC_DECL_OVERRIDE;
+        //! Performs the visual editor initialization.
+        virtual bool                    initialize( ProjectQPtr project, const FileInfo& asset, Ui::DocumentQPtr document ) Q_DECL_OVERRIDE;
 
-		//! Returns rendering HAL.
-		Renderer::HalWPtr				hal( void ) const;
+        //! Returns rendering HAL.
+        Renderer::HalWPtr                hal( void ) const;
 
-		//! Returns scene viewport of an editor.
-		Scene::ViewportWPtr				viewport( void ) const;
+        //! Returns an editor viewport instance.
+        Scene::ViewportWPtr             viewport( void ) const;
 
-		//! Returns the background color.
-		const Rgba&						backgroundColor( void ) const;
+        //! Returns the background color.
+        const Rgba&                        backgroundColor( void ) const;
 
-	protected:
+    protected:
 
         //! Computes the view ray at specified coordinates.
         Ray                             constructViewRay( s32 x, s32 y ) const;
 
-		//! Update the editor scene.
-		virtual void					update( f32 dt );
+        //! Update the editor scene.
+        virtual void                    update( f32 dt );
 
-		//! Handles the viewport resize.
-		virtual void					handleResize( s32 width, s32 height );
+        //! Handles the viewport resize.
+        virtual void                    handleResize( s32 width, s32 height );
 
-		//! Handles the mouse press event.
-		virtual void					handleMousePress( s32 x, s32 y, const Ui::MouseButtons& button );
+        //! Handles the mouse press event.
+        virtual void                    handleMousePress( s32 x, s32 y, const Ui::MouseButtons& button );
 
-		//! Handles the mouse release event.
-		virtual void					handleMouseRelease( s32 x, s32 y, const Ui::MouseButtons& button );
+        //! Handles the mouse release event.
+        virtual void                    handleMouseRelease( s32 x, s32 y, const Ui::MouseButtons& button );
 
-		//! Handles the mouse move event.
-		virtual void					handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, const Ui::MouseButtons& buttons );
+        //! Handles the mouse move event.
+        virtual void                    handleMouseMove( s32 x, s32 y, s32 dx, s32 dy, const Ui::MouseButtons& buttons );
 
-		//! Handles the mouse wheel event.
-		virtual void					handleMouseWheel( s32 delta ) {}
+        //! Handles the mouse wheel event.
+        virtual void                    handleMouseWheel( s32 delta ) {}
 
-		//! Handles the key press event.
-		virtual void					handleKeyPress( Platform::Key key ) {}
+        //! Handles the key press event.
+        virtual void                    handleKeyPress( Platform::Key key ) {}
 
-		//! Handles the key release event.
-		virtual void					handleKeyRelease( Platform::Key key ) {}
+        //! Handles the key release event.
+        virtual void                    handleKeyRelease( Platform::Key key ) {}
 
-		//! Handles the drag enter event.
-		virtual bool					handleDragEnter( MimeDataQPtr mime ) { return false; }
+        //! Handles the drag enter event.
+        virtual bool                    handleDragEnter( MimeDataQPtr mime ) { return false; }
 
-		//! Handles the drag move event.
-		virtual void					handleDragMove( MimeDataQPtr mime, s32 x, s32 y ) {}
+        //! Handles the drag move event.
+        virtual void                    handleDragMove( MimeDataQPtr mime, s32 x, s32 y ) {}
 
-		//! Handles the drop event.
-		virtual void					handleDrop( MimeDataQPtr mime, s32 x, s32 y ) {}
+        //! Handles the drop event.
+        virtual void                    handleDrop( MimeDataQPtr mime, s32 x, s32 y ) {}
 
-		//! Handles the context menu event.
-		virtual void					handleContextMenu( Ui::MenuQPtr menu );
+        //! Handles the context menu event.
+        virtual void                    handleContextMenu( Ui::MenuQPtr menu );
 
-		//! Handles the focus in event.
-		virtual void					handleFocusIn( void );
+        //! Handles the focus in event.
+        virtual void                    handleFocusIn( void );
 
-		//! Handles the focus out event.
-		virtual void					handleFocusOut( void );
+        //! Handles the focus out event.
+        virtual void                    handleFocusOut( void );
 
-		//! Begins the frame rendering.
-		virtual void					beginFrameRendering( void );
+        //! Begins the frame rendering.
+        virtual void                    beginFrameRendering( void );
 
-		//! Performs actual frame rendering.
-		virtual void					render( f32 dt ) {}
+        //! Performs actual frame rendering.
+        virtual void                    render( f32 dt ) {}
 
-		//! Ends the frame rendering.
-		virtual void					endFrameRendering( void );
+        //! Ends the frame rendering.
+        virtual void                    endFrameRendering( void );
 
     private:
 
@@ -121,18 +121,42 @@ namespace Editors {
         //! Handles an update signal and renders the frame.
         void                            renderingFrameUpdate( f32 dt );
 
-	private:
+    private:
 
-		Renderer::HalPtr				m_hal;						//!< Rendering HAL instance.
-		Rgba							m_backgroundColor;			//!< The background color.
-		Scene::ViewportPtr				m_viewport;					//!< Scene viewport.
+        Renderer::HalPtr                m_hal;                        //!< Rendering HAL instance.
+        Rgba                            m_backgroundColor;            //!< The background color.
         QPoint                          m_lastCursorPos;            //!< Last tracked cursor position.
         Ui::MouseButtons                m_mouseButtons;             //!< Bitmask to store pressed mouse buttons.
         bool                            m_hasLostFocus;             //!< Indicates that the focus was lost.
-	};
+        Scene::ViewportPtr              m_viewport;                 //!< A scene viewport instance.
+    };
+
+    //! RenderingFrameViewport is used for rendering the scene to rendering frame.
+    class RenderingFrameViewport : public Scene::AbstractViewport {
+    public:
+
+        //! Returns the frame width.
+        virtual s32                        width( void ) const NIMBLE_OVERRIDE { return m_frame->width(); }
+
+        //! Returns the frame height.
+        virtual s32                        height( void ) const NIMBLE_OVERRIDE { return m_frame->height(); }
+
+        //! Creates the FrameViewport instance.
+        static Scene::ViewportPtr        create( const Ui::RenderingFrameQPtr& frame ) { return new RenderingFrameViewport( frame ); }
+
+    private:
+
+                                        //! Constructs the RenderingFrameViewport instance.
+                                        RenderingFrameViewport( const Ui::RenderingFrameQPtr& frame )
+                                            : m_frame( frame ) {}
+
+    private:
+
+        Ui::RenderingFrameQPtr            m_frame;    //!< The output frame.
+    };
 
 } // namespace Editors
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_VisualEditor_H__	*/
+#endif    /*    !__DC_Composer_VisualEditor_H__    */

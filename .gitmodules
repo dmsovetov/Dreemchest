@@ -4,3 +4,39 @@
 [submodule "Source/Relight"]
 	path = Source/Relight
 	url = https://github.com/dmsovetov/Relight.git
+[submodule "Externals/Box2D"]
+	path = Externals/Box2D
+	url = https://github.com/erincatto/Box2D
+[submodule "Externals/GoogleTest"]
+	path = Externals/GoogleTest
+	url = https://github.com/google/googletest
+[submodule "Externals/libpng"]
+	path = Externals/libpng
+	url = https://github.com/glennrp/libpng
+[submodule "Externals/libtiff"]
+	path = Externals/libtiff
+	url = https://github.com/LuaDist/libtiff
+[submodule "Externals/OpenAL"]
+	path = Externals/OpenAL
+	url = https://github.com/kcat/openal-soft
+[submodule "Externals/jsoncpp"]
+	path = Externals/jsoncpp
+	url = https://github.com/open-source-parsers/jsoncpp
+[submodule "Externals/zlib"]
+	path = Externals/zlib
+	url = https://github.com/madler/zlib
+[submodule "Externals/ogg"]
+	path = Externals/ogg
+	url = https://github.com/xiph/ogg
+[submodule "Externals/vorbis"]
+	path = Externals/vorbis
+	url = https://github.com/xiph/vorbis
+[submodule "Externals/curl"]
+	path = Externals/curl
+	url = https://github.com/curl/curl
+[submodule "Externals/GAF"]
+	path = Externals/GAF
+	url = https://github.com/CatalystApps/Cocos2dxGAFPlayer
+[submodule "Externals/lua"]
+	path = Externals/lua
+	url = https://github.com/dmsovetov/lua

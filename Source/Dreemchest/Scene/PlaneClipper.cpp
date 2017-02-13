@@ -31,6 +31,8 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
+#if DEV_DEPRECATED_SCENE_RENDERER
+
 // ** PlaneClipper::PlaneClipper
 PlaneClipper::PlaneClipper( u8 id ) : m_id( id )
 {
@@ -40,97 +42,97 @@ PlaneClipper::PlaneClipper( u8 id ) : m_id( id )
 // ** PlaneClipper::id
 u8 PlaneClipper::id( void ) const
 {
-	return m_id;
+    return m_id;
 }
 
 // ** PlaneClipper::add
 void PlaneClipper::add( const Plane& plane )
 {
-	m_planes.push_back( plane );
+    m_planes.push_back( plane );
 }
 
 // ** PlaneClipper::setAsFrustum
 void PlaneClipper::setAsFrustum( const Matrix4& matrix )
 {
-	const f32 *m = matrix.m;
-	Plane planes[6];
+    const f32 *m = matrix.m;
+    Plane planes[6];
 
-	planes[0] = Plane( m[3] - m[0], m[7] - m[4], m[11] - m[8], m[15] - m[12] );
-	planes[1] = Plane( m[3] + m[0], m[7] + m[4], m[11] + m[8], m[15] + m[12] );
+    planes[0] = Plane( m[3] - m[0], m[7] - m[4], m[11] - m[8], m[15] - m[12] );
+    planes[1] = Plane( m[3] + m[0], m[7] + m[4], m[11] + m[8], m[15] + m[12] );
 
-	planes[2] = Plane( m[3] + m[1], m[7] + m[5], m[11] + m[9], m[15] + m[13] );
-	planes[3] = Plane( m[3] - m[1], m[7] - m[5], m[11] - m[9], m[15] - m[13] );
+    planes[2] = Plane( m[3] + m[1], m[7] + m[5], m[11] + m[9], m[15] + m[13] );
+    planes[3] = Plane( m[3] - m[1], m[7] - m[5], m[11] - m[9], m[15] - m[13] );
 
-	planes[4] = Plane( m[3] - m[2], m[7] - m[6], m[11] - m[10], m[15] - m[14] );
-	planes[5] = Plane( m[3] + m[2], m[7] + m[6], m[11] + m[10], m[15] + m[14] );
+    planes[4] = Plane( m[3] - m[2], m[7] - m[6], m[11] - m[10], m[15] - m[14] );
+    planes[5] = Plane( m[3] + m[2], m[7] + m[6], m[11] + m[10], m[15] + m[14] );
 
-	m_planes.clear();
+    m_planes.clear();
 
-	for( s32 i = 0; i < 6; i++ ) {
-		planes[i].normalize();
-		add( planes[i] );
-	}
+    for( s32 i = 0; i < 6; i++ ) {
+        planes[i].normalize();
+        add( planes[i] );
+    }
 }
 
 // ** PlaneClipper::setAsBox
 void PlaneClipper::setAsBox( const Vec3& center, f32 radius )
 {
-	m_planes.clear();
+    m_planes.clear();
 
-	Vec3 x( 1.0f, 0.0f, 0.0f );
-	Vec3 y( 0.0f, 1.0f, 0.0f );
-	Vec3 z( 0.0f, 0.0f, 1.0f );
+    Vec3 x( 1.0f, 0.0f, 0.0f );
+    Vec3 y( 0.0f, 1.0f, 0.0f );
+    Vec3 z( 0.0f, 0.0f, 1.0f );
 
-	add( Plane::calculate(  x, center - x * radius ) );
-	add( Plane::calculate( -x, center + x * radius ) );
+    add( Plane::calculate(  x, center - x * radius ) );
+    add( Plane::calculate( -x, center + x * radius ) );
 
-	add( Plane::calculate(  y, center - y * radius ) );
-	add( Plane::calculate( -y, center + y * radius ) );
+    add( Plane::calculate(  y, center - y * radius ) );
+    add( Plane::calculate( -y, center + y * radius ) );
 
-	add( Plane::calculate(  z, center - z * radius ) );
-	add( Plane::calculate( -z, center + z * radius ) );
+    add( Plane::calculate(  z, center - z * radius ) );
+    add( Plane::calculate( -z, center + z * radius ) );
 }
 
 // ** PlaneClipper::inside
 bool PlaneClipper::inside( const Bounds& bounds ) const
 {
-	for( u32 i = 0, n = ( u32 )m_planes.size(); i < n; i++ ) {
-		if( m_planes[i].isBehind( bounds ) ) {
-			return false;
-		}
-	}
+    for( u32 i = 0, n = ( u32 )m_planes.size(); i < n; i++ ) {
+        if( m_planes[i].isBehind( bounds ) ) {
+            return false;
+        }
+    }
 
-	return true;
+    return true;
 }
 
 // ** PlaneClipper::inside
 bool PlaneClipper::inside( const Vec3& center, f32 radius ) const
 {
-	for( u32 i = 0, n = ( u32 )m_planes.size(); i < n; i++ ) {
-		if( m_planes[i].isBehind( center, radius ) ) {
-			return false;
-		}
-	}
+    for( u32 i = 0, n = ( u32 )m_planes.size(); i < n; i++ ) {
+        if( m_planes[i].isBehind( center, radius ) ) {
+            return false;
+        }
+    }
 
-	return true;
+    return true;
 }
 
 // ** PlaneClipper::createFromFrustum
 PlaneClipper PlaneClipper::createFromFrustum( const Matrix4& viewProjection, u8 id )
 {
-	PlaneClipper clipper( id );
-	clipper.setAsFrustum( viewProjection );
-	return clipper;
+    PlaneClipper clipper( id );
+    clipper.setAsFrustum( viewProjection );
+    return clipper;
 }
 
 // ** PlaneClipper::createFromBox
 PlaneClipper PlaneClipper::createFromBox( const Vec3& center, f32 radius, u8 id )
 {
-	PlaneClipper clipper( id );
-	clipper.setAsBox( center, radius );
-	return clipper;
+    PlaneClipper clipper( id );
+    clipper.setAsBox( center, radius );
+    return clipper;
 }
-
+#endif  /*  #if DEV_DEPRECATED_SCENE_RENDERER   */
 
 } // namespace Scene
 

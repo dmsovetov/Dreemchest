@@ -33,71 +33,71 @@ DC_BEGIN_DREEMCHEST
 
 namespace Platform {
 
-	//! A platform-specific input implementation interface.
-	class IInput {
-	public:
+    //! A platform-specific input implementation interface.
+    class IInput {
+    public:
 
-		virtual                 ~IInput( void ) {}
+        virtual                 ~IInput( void ) {}
 
-		//! Returns true if a specified key is down.
-		virtual bool            keyDown( const Key& key ) = 0;
+        //! Returns true if a specified key is down.
+        virtual bool            keyDown( const Key& key ) = 0;
 
-		//! Sets the mouse position.
-		virtual void			setMouse( s32 x, s32 y ) = 0;
+        //! Sets the mouse position.
+        virtual void            setMouse( s32 x, s32 y ) = 0;
 
-		//! Returns the mouse X position.
-		virtual s32				mouseX( void ) const = 0;
+        //! Returns the mouse X position.
+        virtual s32                mouseX( void ) const = 0;
 
-		//! Returns the mouse Y position.
-		virtual s32				mouseY( void ) const = 0;
-	};
+        //! Returns the mouse Y position.
+        virtual s32                mouseY( void ) const = 0;
+    };
 
-	//! Input class performs access to a keyboard and mouse state.
-	class Input {
-	public:
+    //! Input class performs access to a keyboard and mouse state.
+    class Input {
+    public:
 
-		virtual                 ~Input( void );
+        virtual                 ~Input( void );
 
-		//! Returns true if a specified key is down.
-		/*!
-		\param key The key to check.
-		*/
-		bool                    keyDown( const Key& key );
+        //! Returns true if a specified key is down.
+        /*!
+        \param key The key to check.
+        */
+        bool                    keyDown( const Key& key );
 
-		//! Returns true once after the key was pressed.
-		bool					keyPressed( const Key& key );
+        //! Returns true once after the key was pressed.
+        bool                    keyPressed( const Key& key );
 
-		//! Sets the mouse position.
-		void					setMouse( s32 x, s32 y );
+        //! Sets the mouse position.
+        void                    setMouse( s32 x, s32 y );
 
-		//! Returns the mouse X position.
-		s32						mouseX( void ) const;
+        //! Returns the mouse X position.
+        s32                        mouseX( void ) const;
 
-		//! Returns the mouse Y position.
-		s32						mouseY( void ) const;
+        //! Returns the mouse Y position.
+        s32                        mouseY( void ) const;
 
-		//! Creates a new Input instance.
-		static Input*			create( void );
+        //! Creates a new Input instance.
+        static Input*            create( void );
 
-		//! Returns a shared Input instance.
-		static Input*			sharedInstance( void );
+        //! Returns a shared Input instance.
+        static Input*            sharedInstance( void );
 
-	private:
+    private:
 
-								//! Constructs a new Input instance.
-								Input( IInput* impl );
+                                //! Constructs a new Input instance.
+                                Input( IInput* impl );
 
-	private:
+    private:
 
-		//! Shared keyboard instance.
-		static Input*			s_input;
+        //! Shared keyboard instance.
+        static Input*            s_input;
 
-		//! Platform specific input implementation.
-		IInput*					m_impl;
+        //! Platform specific input implementation.
+        IInput*                    m_impl;
 
-		//! Key down flags.
-		bool					m_isKeyDown[Key::Total];
-	};
+        //! Key down flags.
+        bool                    m_isKeyDown[Key::Total];
+    };
 
 } // namespace Platform
 

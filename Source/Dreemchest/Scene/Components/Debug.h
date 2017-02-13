@@ -33,35 +33,35 @@ DC_BEGIN_DREEMCHEST
 
 namespace Scene {
 
-	//! Grid component used for debug rendering of a grid.
-	class Grid : public Ecs::Component<Grid> {
-	public:
+    //! Grid component used for debug rendering of a grid.
+    class Grid : public Ecs::Component<Grid> {
+    public:
 
-		//! Available grid features.
-		enum Features {
-			  Cells		= BIT( 0 )	//!< Cells will be rendered.
-			, Basis		= BIT( 1 )	//!< Basis will be rendered.
-			, Outline	= BIT( 2 )	//!< Outline will be rendered
-			, Axes		= BIT( 3 )	//!< Axes will be rendered.
-		};
+        //! Available grid features.
+        enum Features {
+              Cells        = BIT( 0 )    //!< Cells will be rendered.
+            , Basis        = BIT( 1 )    //!< Basis will be rendered.
+            , Outline    = BIT( 2 )    //!< Outline will be rendered
+            , Axes        = BIT( 3 )    //!< Axes will be rendered.
+        };
 
-							Grid( f32 size = 100.0f, f32 cellSize = 1.0f, u8 features = ~0 );
+                            Grid( f32 size = 100.0f, f32 cellSize = 1.0f, u8 features = ~0 );
 
-		//! Returns grid size.
-		f32					size( void ) const;
+        //! Returns grid size.
+        f32                    size( void ) const;
 
-		//! Returns grid cell size.
-		f32					cellSize( void ) const;
+        //! Returns grid cell size.
+        f32                    cellSize( void ) const;
 
-		//! Returns grid features.
-		const FlagSet8&		features( void ) const;
+        //! Returns grid features.
+        const FlagSet8&        features( void ) const;
 
-	private:
+    private:
 
-		f32					m_size;		//!< Grid size.
-		f32					m_cellSize;	//!< Cell size.
-		FlagSet8			m_features;	//!< Grid rendering features.
-	};
+        f32                    m_size;        //!< Grid size.
+        f32                    m_cellSize;    //!< Cell size.
+        FlagSet8            m_features;    //!< Grid rendering features.
+    };
 
 } // namespace Scene
 

@@ -1,58 +1,38 @@
-add_executable(01_HelloWorld 01_HelloWorld.cpp)
-target_link_libraries(01_HelloWorld Dreemchest)
+# Converts all source files in a directory to executable targets
+function(create_examples dir)
+	file(GLOB src ${dir} "*.cpp")
 
-add_executable(02_CreatingWindows 02_CreatingWindows.cpp)
-target_link_libraries(02_CreatingWindows Dreemchest)
+	foreach(file ${src})
+		if (NOT ${file} STREQUAL ${dir})
+			get_filename_component(target_name ${file} NAME_WE)
 
-add_executable(03_WindowEvents 03_WindowEvents.cpp)
-target_link_libraries(03_WindowEvents Dreemchest)
+			if (ANDROID)
+			    add_library(${target_name} SHARED ${file})
+			else ()
+			    add_executable(${target_name} WIN32 MACOSX_BUNDLE ${file})
+			endif ()
+			target_link_libraries(${target_name} Dreemchest Framework)
+			set_property(TARGET ${target_name} PROPERTY FOLDER "Examples")
 
-add_executable(04_RendererInitialization 04_RendererInitialization.cpp)
-target_link_libraries(04_RendererInitialization Dreemchest)
+			if (IOS)
+			    if (IOS_CODESIGN_IDENTITY STREQUAL "")
+			        message(FATAL_ERROR "IOS_CODESIGN_IDENTITY variable was not set for ${target_name}")
+			    endif ()
+                set_target_properties(${target_name} PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${IOS_CODESIGN_IDENTITY}")
+			endif ()
 
-add_executable(05_Files 05_Files.cpp)
-target_link_libraries(05_Files Dreemchest)
+			install(TARGETS ${target_name} DESTINATION bin)
+		endif()
+	endforeach()
+endfunction()
 
-add_executable(06_BasicNetworking 06_BasicNetworking.cpp)
-target_link_libraries(06_BasicNetworking Dreemchest)
-
-add_executable(07_TCPSockets 07_TCPSockets.cpp)
-target_link_libraries(07_TCPSockets Dreemchest)
-
-add_executable(08_NetworkHandlers 08_NetworkHandlers.cpp)
-target_link_libraries(08_NetworkHandlers Dreemchest)
-
-#add_executable(09_ModelViewViewModel 09_ModelViewViewModel.cpp)
-#target_link_libraries(09_ModelViewViewModel Dreemchest)
-
-if (DC_QT_ENABLED)
-#	add_executable(10_MvvmQt 10_MvvmQt.cpp)
-#	target_link_libraries(10_MvvmQt Dreemchest)
-endif (DC_QT_ENABLED)
-
-add_executable(11_Particles 11_Particles.cpp)
-target_link_libraries(11_Particles Dreemchest)
+add_subdirectory(1_Introduction)
+#add_subdirectory(2_Scene)
 
 if (DC_SOUND_ENABLED)
-	add_executable(12_Sound 12_Sound.cpp)
-	target_link_libraries(12_Sound Dreemchest)
+    add_subdirectory(3_Sound)
 endif (DC_SOUND_ENABLED)
 
-add_executable(13_Scene 13_Scene.cpp)
-target_link_libraries(13_Scene Dreemchest)
-
-# Add solution folders
-set_property(TARGET 01_HelloWorld PROPERTY FOLDER "Examples")
-set_property(TARGET 02_CreatingWindows PROPERTY FOLDER "Examples")
-set_property(TARGET 03_WindowEvents PROPERTY FOLDER "Examples")
-set_property(TARGET 04_RendererInitialization PROPERTY FOLDER "Examples")
-set_property(TARGET 05_Files PROPERTY FOLDER "Examples")
-set_property(TARGET 06_BasicNetworking PROPERTY FOLDER "Examples")
-set_property(TARGET 07_TCPSockets PROPERTY FOLDER "Examples")
-set_property(TARGET 08_NetworkHandlers PROPERTY FOLDER "Examples")
-set_property(TARGET 11_Particles PROPERTY FOLDER "Examples")
-
-if (DC_SOUND_ENABLED)
-	set_property(TARGET 12_Sound PROPERTY FOLDER "Examples")
-endif()
-set_property(TARGET 13_Scene PROPERTY FOLDER "Examples")
+#add_subdirectory(4_Particles)
+add_subdirectory(5_Rendering)
+#add_subdirectory(6_Networking)

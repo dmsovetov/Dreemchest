@@ -68,7 +68,7 @@ namespace Sound {
         virtual u32                 position( void ) const                                      = 0;
 
         //! Reads all stream content to memory and returns a memory input stream.
-        virtual ISoundStreamPtr		loadToRam( void ) const                                     = 0;
+        virtual ISoundStreamPtr        loadToRam( void ) const                                     = 0;
     };
 
     //! Interface used to open input streams.
@@ -82,7 +82,7 @@ namespace Sound {
          \param uri Stream URI.
          \return ISoundStream object.
          */
-        virtual ISoundStreamPtr	open( CString uri ) = 0;
+        virtual ISoundStreamPtr    open( CString uri ) = 0;
     };
 
     //! Standard file opener.
@@ -90,7 +90,7 @@ namespace Sound {
     public:
 
         // ** IStreamOpener
-        virtual ISoundStreamPtr	open( CString uri );
+        virtual ISoundStreamPtr    open( CString uri );
     };
 
     //! Standard input stream.
@@ -102,10 +102,10 @@ namespace Sound {
         virtual u32                 read( void* buffer, u32 size );
         virtual void                setPosition( u32 offset, SeekOrigin origin = SeekSet );
         virtual u32                 position( void ) const;
-        virtual ISoundStreamPtr		loadToRam( void ) const;
+        virtual ISoundStreamPtr        loadToRam( void ) const;
 
         // ** StandardSoundStream
-        static ISoundStreamPtr		open( CString uri );
+        static ISoundStreamPtr        open( CString uri );
 
     private:
 
@@ -113,14 +113,14 @@ namespace Sound {
 
     private:
 
-        Io::StreamPtr				m_stream;	//!< Input stream.
+        Io::StreamPtr                m_stream;    //!< Input stream.
     };
 
-	//! Memory input stream.
-	class MemorySoundStream : public ISoundStream {
+    //! Memory input stream.
+    class MemorySoundStream : public ISoundStream {
     public:
 
-									MemorySoundStream( Io::ByteBufferPtr data );
+                                    MemorySoundStream( Io::ByteBufferPtr data );
         virtual                     ~MemorySoundStream( void );
 
         // ** ISoundStream
@@ -128,12 +128,12 @@ namespace Sound {
         virtual u32                 read( void* buffer, u32 size );
         virtual void                setPosition( u32 offset, SeekOrigin origin = SeekSet );
         virtual u32                 position( void ) const;
-        virtual ISoundStreamPtr		loadToRam( void ) const;
+        virtual ISoundStreamPtr        loadToRam( void ) const;
 
     private:
 
-        Io::ByteBufferPtr			m_data;		//!< Data buffer.
-	};
+        Io::ByteBufferPtr            m_data;        //!< Data buffer.
+    };
 
 } // namespace Sound
 

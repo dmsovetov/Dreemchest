@@ -59,16 +59,16 @@ namespace Network {
     public:
 
         //! Returns the packet name.
-        virtual CString         name( void ) const DC_DECL_OVERRIDE { return TypeInfo<TPacket>::name(); }
+        virtual CString         name( void ) const NIMBLE_OVERRIDE { return TypeInfo<TPacket>::name(); }
 
         //! Returns the unique packet identifier.
-        virtual PacketTypeId    id( void ) const DC_DECL_OVERRIDE { return TypeInfo<TPacket>::id(); }
+        virtual PacketTypeId    id( void ) const NIMBLE_OVERRIDE { return TypeInfo<TPacket>::id(); }
 
         //! Writes packet to a binary stream.
-        virtual void            serialize( Io::StreamWPtr stream ) const {}
+        virtual void            serialize( Io::StreamWPtr stream ) const NIMBLE_OVERRIDE {}
 
         //! Reads packet from a binary stream.
-        virtual void            deserialize( Io::StreamWPtr stream ) {}
+        virtual void            deserialize( Io::StreamWPtr stream ) NIMBLE_OVERRIDE {}
     };
 
     //! A binary blob type
@@ -76,18 +76,18 @@ namespace Network {
 
 namespace Packets {
 
-	//! RPC call packet.
-	struct RemoteCall : public Packet<RemoteCall> {
-		u16			    id;         //!< Remote call identifier.
-		u32			    method;     //!< Remote call method identifier.
+    //! RPC call packet.
+    struct RemoteCall : public Packet<RemoteCall> {
+        u16                id;         //!< Remote call identifier.
+        u32                method;     //!< Remote call method identifier.
         TypeId          returnType;
-	    BinaryBlob      payload;    //!< Remote call argument.
+        BinaryBlob      payload;    //!< Remote call argument.
 
-					    //! Constructs RemoteCall instance.
-					    RemoteCall( u16 id = 0, u32 method = 0, TypeId returnType = 0, const BinaryBlob& payload = BinaryBlob() )
-						    : id( id ), method( method ), returnType( returnType ), payload( payload ) {}
+                        //! Constructs RemoteCall instance.
+                        RemoteCall( u16 id = 0, u32 method = 0, TypeId returnType = 0, const BinaryBlob& payload = BinaryBlob() )
+                            : id( id ), method( method ), returnType( returnType ), payload( payload ) {}
 
-        virtual void    serialize( Io::StreamWPtr stream ) const DC_DECL_OVERRIDE
+        virtual void    serialize( Io::StreamWPtr stream ) const NIMBLE_OVERRIDE
         {
             u16 length = static_cast<u16>( payload.size() );
 
@@ -98,7 +98,7 @@ namespace Packets {
             stream->write( &payload[0], length );
         }
 
-        virtual void    deserialize( Io::StreamWPtr stream ) DC_DECL_OVERRIDE
+        virtual void    deserialize( Io::StreamWPtr stream ) NIMBLE_OVERRIDE
         {
             u16 length = 0;
 
@@ -109,20 +109,20 @@ namespace Packets {
             payload.resize( length );
             stream->read( &payload[0], length );
         }
-	};
+    };
 
-	//! RPC call response
-	struct RemoteCallResponse : public Packet<RemoteCallResponse> {
-		u16			id;
-		Error		error;
-		TypeId		returnType;
-		BinaryBlob	payload;
+    //! RPC call response
+    struct RemoteCallResponse : public Packet<RemoteCallResponse> {
+        u16            id;
+        Error        error;
+        TypeId        returnType;
+        BinaryBlob    payload;
 
-					//! Constructs RemoteCallResponse instance.
-					RemoteCallResponse( u16 id = 0, const Error& error = Error(), TypeId returnType = 0, const BinaryBlob& payload = BinaryBlob() )
-						: id( id ), error( error ), returnType( returnType ), payload( payload ) {}
+                    //! Constructs RemoteCallResponse instance.
+                    RemoteCallResponse( u16 id = 0, const Error& error = Error(), TypeId returnType = 0, const BinaryBlob& payload = BinaryBlob() )
+                        : id( id ), error( error ), returnType( returnType ), payload( payload ) {}
 
-        virtual void    serialize( Io::StreamWPtr stream ) const DC_DECL_OVERRIDE
+        virtual void    serialize( Io::StreamWPtr stream ) const NIMBLE_OVERRIDE
         {
             u16 length = static_cast<u16>( payload.size() );
 
@@ -134,7 +134,7 @@ namespace Packets {
             stream->write( &payload[0], length );
         }
 
-        virtual void    deserialize( Io::StreamWPtr stream ) DC_DECL_OVERRIDE
+        virtual void    deserialize( Io::StreamWPtr stream ) NIMBLE_OVERRIDE
         {
             u16 length = 0;
 
@@ -146,18 +146,18 @@ namespace Packets {
             payload.resize( length );
             stream->read( &payload[0], length );
         }
-	};
+    };
 
-	//! Network event packet
-	struct Event : public Packet<Event> {
-		TypeId			eventId;
-		BinaryBlob	    payload;
+    //! Network event packet
+    struct Event : public Packet<Event> {
+        TypeId            eventId;
+        BinaryBlob        payload;
 
-						//! Constructs Event instance.
-						Event( TypeId eventId = 0, const BinaryBlob& payload = BinaryBlob() )
-							: eventId( eventId ), payload( payload ) {}
+                        //! Constructs Event instance.
+                        Event( TypeId eventId = 0, const BinaryBlob& payload = BinaryBlob() )
+                            : eventId( eventId ), payload( payload ) {}
 
-        virtual void    serialize( Io::StreamWPtr stream ) const DC_DECL_OVERRIDE
+        virtual void    serialize( Io::StreamWPtr stream ) const NIMBLE_OVERRIDE
         {
             u16 length = static_cast<u16>( payload.size() );
 
@@ -166,7 +166,7 @@ namespace Packets {
             stream->write( &payload[0], length );
         }
 
-        virtual void    deserialize( Io::StreamWPtr stream ) DC_DECL_OVERRIDE
+        virtual void    deserialize( Io::StreamWPtr stream ) NIMBLE_OVERRIDE
         {
             u16 length = 0;
 
@@ -175,7 +175,7 @@ namespace Packets {
             payload.resize( length );
             stream->read( &payload[0], length );
         }
-	};
+    };
 
 } // namespace Packets
 

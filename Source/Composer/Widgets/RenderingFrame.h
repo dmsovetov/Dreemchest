@@ -33,8 +33,8 @@ DC_BEGIN_COMPOSER
 
 namespace Ui {
 
-	//! Extended Qt OpenGL widget implementation.
-	class RenderingFrame : public QGLWidget {
+    //! Extended Qt OpenGL widget implementation.
+    class RenderingFrame : public QGLWidget {
 
         Q_OBJECT
 
@@ -43,46 +43,46 @@ namespace Ui {
         //! Emitted each time the rendering frame is updated.
         void                        update( f32 dt );
 
-	public:
+    public:
 
-		//! Shared OpenGL format.
-		static QGLFormat			kOpenGLFormat;
+        //! Shared OpenGL format.
+        static QGLFormat            kOpenGLFormat;
 
-									//! Constructs RenderingFrame instance.
-									RenderingFrame( const QGLWidget* sharedWidget, QWidget* parent );
+                                    //! Constructs RenderingFrame instance.
+                                    RenderingFrame( const QGLWidget* sharedWidget, QWidget* parent );
 
-		//! Performs the setup of a shared OpenGL format.
-		static void					setupOpenGLFormat( void );
+        //! Performs the setup of a shared OpenGL format.
+        static void                    setupOpenGLFormat( void );
 
-		//! Sets the rendering interval.
-		virtual void				setInterval( s32 value );
+        //! Sets the rendering interval.
+        virtual void                setInterval( s32 value );
 
-		//! Enables or disables the continuous rendering.
-		void						setContinuousRendering( bool value );
+        //! Enables or disables the continuous rendering.
+        void                        setContinuousRendering( bool value );
 
-		//! Returns true if the continuous rendering is enabled.
-		bool						isContinuousRendering( void ) const;
+        //! Returns true if the continuous rendering is enabled.
+        bool                        isContinuousRendering( void ) const;
 
-		//! Sets the cursor.
-		void						setCursor( const String& cursor, bool centered );
+        //! Sets the cursor.
+        void                        setCursor( const String& cursor, bool centered );
 
-	protected:
+    protected:
 
-		//! Overrides the OpenGL widget paint method.
-		virtual void				paintGL( void ) Q_DECL_OVERRIDE;
+        //! Overrides the OpenGL widget paint method.
+        virtual void                paintGL( void ) Q_DECL_OVERRIDE;
 
-		//! Handles the widget timer event.
-		virtual void				timerEvent( QTimerEvent* e ) Q_DECL_OVERRIDE;
+        //! Handles the widget timer event.
+        virtual void                timerEvent( QTimerEvent* e ) Q_DECL_OVERRIDE;
 
-	private:
+    private:
 
-		s32							m_timer;			//!< The rendering timer.
-		QTime						m_deltaTime;		//!< Tracks the delta time.
-		bool					    m_isContinuousRendering;	//!< Continuous rendering flag.
-	};
+        s32                            m_timer;            //!< The rendering timer.
+        QTime                        m_deltaTime;        //!< Tracks the delta time.
+        bool                        m_isContinuousRendering;    //!< Continuous rendering flag.
+    };
 
 } // namespace Ui
 
 DC_END_COMPOSER
 
-#endif	/*	!__DC_Composer_RenderingFrame_H__	*/
+#endif    /*    !__DC_Composer_RenderingFrame_H__    */

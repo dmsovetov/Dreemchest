@@ -32,7 +32,7 @@
 
 DC_BEGIN_DREEMCHEST
 
-namespace io {
+namespace Io {
 
 // ** FastLZBufferCompressor::compressToBuffer
 s64 FastLZBufferCompressor::compressToBuffer( const u8 *in, u64 inSize, u8 *out, u64 maxSize )
@@ -54,6 +54,6 @@ s64 FastLZBufferCompressor::decompressToBuffer( const u8 *in, u64 inSize, u8 *ou
 #endif
 }
     
-} // namespace io
+} // namespace Io
 
 DC_END_DREEMCHEST

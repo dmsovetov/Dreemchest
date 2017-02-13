@@ -43,7 +43,7 @@ FileSystem::~FileSystem( void )
 // ** FileSystem::createByteBuffer
 ByteBufferPtr FileSystem::createByteBuffer( u8 *pointer, u32 size ) const
 {
-	return DC_NEW ByteBuffer( pointer, size );
+    return DC_NEW ByteBuffer( pointer, size );
 }
 
 // ** FileSystem::openFile

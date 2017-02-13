@@ -25,73 +25,169 @@
  **************************************************************************/
 
 #include "UIKitOpenGLView.h"
-#include "../../Renderer.h"
+#include "iOSOpenGLView.h"
 
 DC_USE_DREEMCHEST
 
 // ** UIKitOpenGLView
 @implementation UIKitOpenGLView
 
-// You must implement this method
+@synthesize width = _width;
+@synthesize height = _height;
+
+// ** layerClass
 + (Class) layerClass
 {
     return [CAEAGLLayer class];
 }
 
-// ** initWithWindow
-- ( id ) initWithWindow: ( UIWindow* )window depthStencil:( int )depthStencil;
+// ** initWithView
+- ( id ) initWithView: ( Renderer::iOSOpenGLView* )view bounds:( CGRect )bounds options:( unsigned int )options scaleFactor:(float)scaleFactor
 {
-    if( (self = [super initWithFrame: window.bounds]) )
+    if ((self = [super initWithFrame: bounds]))
     {
-        CAEAGLLayer* eaglLayer = ( CAEAGLLayer* )self.layer;
-
-        eaglLayer.opaque = TRUE;
-        eaglLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:
-                                        [NSNumber numberWithBool:FALSE], kEAGLDrawablePropertyRetainedBacking, kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];
-
-        m_window                 = window;
-        m_animating              = FALSE;
-        m_animationFrameInterval = 1;
-        m_displayLink            = nil;
-
-        if( ![self createContext] ) {
+        self.contentScaleFactor = scaleFactor;
+        self.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+        
+        [self setupLayer];
+        if (![self setupContext: kEAGLRenderingAPIOpenGLES2])
+        {
             [self release];
             return nil;
         }
-
-        [self startAnimation];
+        
+        [self setupFrameBuffer];
+        [self setupDisplayLink];
+        [self resizeFromLayer: _layer];
+        
+        _view = view;
+        return self;
     }
 
-    return self;
+    return nil;
+}
+
+// ** setupLayer
+- (void) setupLayer
+{
+    _layer = ( CAEAGLLayer* )self.layer;
+    _layer.contentsScale = self.contentScaleFactor;
+    _layer.opaque = YES;
+}
+
+// ** setupContext
+- (BOOL) setupContext: (EAGLRenderingAPI) api
+{
+    _context = [[EAGLContext alloc] initWithAPI:api];
+    
+    if (!_context)
+    {
+        Renderer::Log::error(NIMBLE_LOGGER_CONTEXT, "opengles", "failed to create context with a requested API level\n");
+        return NO;
+    }
+    
+    if (![EAGLContext setCurrentContext:_context])
+    {
+        Renderer::Log::error(NIMBLE_LOGGER_CONTEXT, "opengles", "failed set context\n");
+        return NO;
+    }
+    
+    return YES;
+}
+
+// ** setupFrameBuffer
+- (BOOL) setupFrameBuffer
+{
+    // Create color renderbuffer
+    glGenRenderbuffers(1, &_colorRenderBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, _colorRenderBuffer);
+
+    // Create depth renderbuffer
+    glGenRenderbuffers(1, &_depthRenderBuffer);
+
+    // Configure the framebuffer
+    glGenFramebuffers(1, &_defaultFramebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, _defaultFramebuffer);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, _colorRenderBuffer);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthRenderBuffer);
+    
+    return YES;
+}
+
+// ** setupDisplayLink
+- (void) setupDisplayLink
+{
+    _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(render:)];
+    [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+}
+
+// ** resizeFromLayer
+- (BOOL)resizeFromLayer:(CAEAGLLayer *)layer
+{
+    // Allocate color buffer backing based on the current layer size
+    glBindRenderbuffer(GL_RENDERBUFFER, _colorRenderBuffer);
+    
+    if( ![_context renderbufferStorage:GL_RENDERBUFFER fromDrawable:layer] )
+    {
+        Renderer::Log::error(NIMBLE_LOGGER_CONTEXT, "opengles", "failed to create renderbuffer from layer\n");
+        return NO;
+    }
+    
+    // Get the viewport dimensions
+    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &_width);
+    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &_height);
+    
+    // Update the depth buffer dimensions
+    glBindRenderbuffer(GL_RENDERBUFFER, _depthRenderBuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8_OES, _width, _height);
+    
+    Renderer::Log::verbose(NIMBLE_LOGGER_CONTEXT, "opengles", "renderbuffer resized to %dx%d\n", _width, _height);
+    return YES;
+}
+
+// ** render
+- (void)render: (CADisplayLink*)displayLink
+{
+    if (_view)
+    {
+        _view->notifyUpdate();
+    }
+}
+
+// ** layoutSubviews
+- (void) layoutSubviews
+{
+    [self resizeFromLayer: _layer];
 }
 
 // ** dealoc
 - (void) dealloc
 {
-    if( m_defaultFramebuffer )
+    if (_defaultFramebuffer)
     {
-        glDeleteFramebuffersOES( 1, &m_defaultFramebuffer );
-        m_defaultFramebuffer = 0;
+        glDeleteFramebuffersOES(1, &_defaultFramebuffer);
+        _defaultFramebuffer = 0;
     }
 
-    if( m_colorRenderbuffer )
+    if (_colorRenderBuffer)
     {
-        glDeleteRenderbuffersOES( 1, &m_colorRenderbuffer );
-        m_colorRenderbuffer = 0;
+        glDeleteRenderbuffersOES(1, &_colorRenderBuffer);
+        _colorRenderBuffer = 0;
     }
 
-    if( m_depthBuffer )
+    if (_depthRenderBuffer)
     {
-        glDeleteRenderbuffersOES( 1, &m_depthBuffer );
-        m_depthBuffer = 0;
+        glDeleteRenderbuffersOES(1, &_depthRenderBuffer);
+        _depthRenderBuffer = 0;
     }
 
-    if( [EAGLContext currentContext] == m_context ) {
+    if ([EAGLContext currentContext] == _context)
+    {
         [EAGLContext setCurrentContext: nil];
     }
 
-    [m_context release];
-    m_context = nil;
+    [_context release];
+    _context = nil;
 
     [super dealloc];
 }
@@ -99,7 +195,7 @@ DC_USE_DREEMCHEST
 // ** makeCurrent
 - ( BOOL ) makeCurrent
 {
-    return [EAGLContext setCurrentContext: m_context];
+    return [EAGLContext setCurrentContext: _context];
 }
 
 // ** beginFrame
@@ -107,105 +203,20 @@ DC_USE_DREEMCHEST
 {
     [self makeCurrent];
 
-    glBindFramebufferOES( GL_FRAMEBUFFER_OES, m_defaultFramebuffer );
-    glViewport( 0, 0, m_backingWidth, m_backingHeight );
+    glBindFramebufferOES( GL_FRAMEBUFFER_OES, _defaultFramebuffer );
+    glViewport(0, 0, self.width, self.height);
 }
 
 // ** endFrame
-- ( void ) endFrame
+- ( void ) endFrame: (BOOL) wait
 {
-    glBindRenderbufferOES( GL_RENDERBUFFER_OES, m_colorRenderbuffer );
-    [m_context presentRenderbuffer:GL_RENDERBUFFER_OES];
-}
-
-// ** createContext
-- ( BOOL ) createContext
-{
-    m_context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
-    if( !m_context ) {
-        return NO;
-    }
-
-    [self makeCurrent];
-
-    glGenFramebuffersOES( 1, &m_defaultFramebuffer );
-    glGenRenderbuffersOES( 1, &m_colorRenderbuffer );
-    glGenRenderbuffers( 1, &m_depthBuffer );
-    glBindFramebufferOES( GL_FRAMEBUFFER_OES, m_defaultFramebuffer );
-    glBindRenderbufferOES( GL_RENDERBUFFER_OES, m_colorRenderbuffer );
-    glFramebufferRenderbufferOES( GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES, GL_RENDERBUFFER_OES, m_colorRenderbuffer );
-
-    return YES;
-}
-
-// ** resizeFromLayer
-- ( BOOL ) resizeFromLayer: ( CAEAGLLayer* )layer
-{
-    glBindRenderbufferOES( GL_RENDERBUFFER_OES, m_colorRenderbuffer );
-    [m_context renderbufferStorage:GL_RENDERBUFFER_OES fromDrawable:layer];
-
-    glGetRenderbufferParameterivOES( GL_RENDERBUFFER_OES, GL_RENDERBUFFER_WIDTH_OES, &m_backingWidth );
-    glGetRenderbufferParameterivOES( GL_RENDERBUFFER_OES, GL_RENDERBUFFER_HEIGHT_OES, &m_backingHeight );
-
-    if( glCheckFramebufferStatusOES(GL_FRAMEBUFFER_OES) != GL_FRAMEBUFFER_COMPLETE_OES )
+    if (wait)
     {
-        NSLog( @"Failed to make complete framebuffer object %x", glCheckFramebufferStatusOES( GL_FRAMEBUFFER_OES ) );
-        return NO;
+        glFinish();
     }
-
-    // ** Setup depth-stencil buffer
-    glBindRenderbuffer( GL_RENDERBUFFER, m_depthBuffer );
-//  glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER, samplesToUse_, depthFormat_,backingWidth_, backingHeight_);
-    glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH24_STENCIL8_OES, m_backingWidth, m_backingHeight );
-
-    glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthBuffer );
-    glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_depthBuffer );
-
-    glBindRenderbuffer( GL_RENDERBUFFER, m_colorRenderbuffer );
-
-    return YES;
-}
-
-// ** drawView
-- (void) drawView: ( id )sender
-{
-    if( [m_window respondsToSelector:@selector(update)] ) {
-        [m_window update];
-    }
-}
-
-// ** layoutSubviews
-- (void) layoutSubviews
-{
-    [self resizeFromLayer: (CAEAGLLayer*)self.layer];
-    [self drawView:nil];
-}
-
-// ** startAnimation
-- (void) startAnimation
-{
-    if( m_animating ) {
-        return;
-    }
-
-    m_displayLink = [NSClassFromString(@"CADisplayLink") displayLinkWithTarget:self selector:@selector(drawView:)];
-    [m_displayLink setFrameInterval:m_animationFrameInterval];
-    [m_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-
-    m_animating = TRUE;
-}
-
-// ** stopAnimation
-- (void)stopAnimation
-{
-    if( !m_animating ) {
-        return;
-    }
-
-    [m_displayLink invalidate];
-    m_displayLink = nil;
-
-    m_animating = FALSE;
+    
+    glBindRenderbufferOES(GL_RENDERBUFFER_OES, _colorRenderBuffer);
+    [_context presentRenderbuffer:GL_RENDERBUFFER_OES];
 }
 
 @end

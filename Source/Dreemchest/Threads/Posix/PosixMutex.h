@@ -24,15 +24,15 @@
 
  **************************************************************************/
 
-#ifndef        __DC_PosixMutex_H__
-#define        __DC_PosixMutex_H__
+#ifndef __DC_PosixMutex_H__
+#define __DC_PosixMutex_H__
 
-#include    "Posix.h"
-#include    "../Mutex.h"
+#include "Posix.h"
+#include "../Mutex.h"
 
 DC_BEGIN_DREEMCHEST
 
-namespace thread {
+namespace Threads {
         
     // ** class PosixMutex
     class PosixMutex : public Mutex {
@@ -69,7 +69,7 @@ namespace thread {
         pthread_mutex_t     m_mutex;
     };
 
-} // namespace thread
+} // namespace Threads
 
 DC_END_DREEMCHEST
 

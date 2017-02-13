@@ -35,35 +35,35 @@ namespace Io {
 // ** VariantTextStream::stringify
 String VariantTextStream::stringify( const Variant& kv, bool formatted )
 {
-#ifdef HAVE_JSON
-	Json::Value json = toJson( kv );
-	return formatted ? json.toStyledString() : Json::FastWriter().write( json );
+#ifdef JSONCPP_FOUND
+    Json::Value json = toJson( kv );
+    return formatted ? json.toStyledString() : Json::FastWriter().write( json );
 #else
-	LogError( "variant", "failed to convert to string, built with no JSON support.\n" );
-	return "";
-#endif	/*	HAVE_JSON	*/
+    LogError( "variant", "%s", "failed to convert to string, built with no JSON support.\n" );
+    return "";
+#endif    /*    #ifdef JSONCPP_FOUND    */
 }
 
 // ** VariantTextStream::parse
 Variant VariantTextStream::parse( const String& text )
 {
-#ifdef HAVE_JSON
-	Json::Value json;
-	Json::Reader reader;
-	
-	if( !reader.parse( text, json ) ) {
-		LogError( "keyValue", "failed to parse JSON string.\n" );
-		return Variant();
-	}
+#ifdef JSONCPP_FOUND
+    Json::Value json;
+    Json::Reader reader;
+    
+    if( !reader.parse( text, json ) ) {
+        LogError( "keyValue", "%s", "failed to parse JSON string.\n" );
+        return Variant();
+    }
 
-	return fromJson( json );
+    return fromJson( json );
 #else
-	LogError( "variant", "failed to parse from string, built with no JSON support.\n" );
-	return Variant();
-#endif	/*	HAVE_JSON	*/
+    LogError( "variant", "%s", "failed to parse from string, built with no JSON support.\n" );
+    return Variant();
+#endif    /*    #ifdef JSONCPP_FOUND    */
 }
 
-#ifdef HAVE_JSON
+#ifdef JSONCPP_FOUND
 
 // ** VariantTextStream::toJson
 Json::Value VariantTextStream::toJson( const Variant& value )
@@ -83,7 +83,7 @@ Json::Value VariantTextStream::toJson( const Variant& value )
         return value.as<String>();
     }
     else if( type->is<Guid>() ) {
-	    return toJson( KvBuilder() << "typeID" << "guid" << "value" << value.as<Guid>().toString() );
+        return toJson( KvBuilder() << "typeID" << "guid" << "value" << value.as<Guid>().toString() );
     }
     else if( type->is<Vec2>() ) {
         return toJson( KvBuilder() <<  "x" << value.as<Vec2>().x <<  "y" << value.as<Vec2>().y );
@@ -104,32 +104,32 @@ Json::Value VariantTextStream::toJson( const Variant& value )
         return toJson( KvBuilder() <<  "r" << value.as<Rgba>().r <<  "g" << value.as<Rgba>().g  <<  "b" << value.as<Rgba>().b  <<  "a" << value.as<Rgba>().a );
     }
     else if( type->is<KeyValue>() ) {
-		Json::Value		  json( Json::objectValue );
+        Json::Value          json( Json::objectValue );
         KeyValue          kv = value.as<KeyValue>();
-		const KeyValue::Properties& properties = kv.properties();
+        const KeyValue::Properties& properties = kv.properties();
 
-		for( KeyValue::Properties::const_iterator i = properties.begin(), end = properties.end(); i != end; ++i ) {
-			json[i->first] = toJson( i->second );
-		}
+        for( KeyValue::Properties::const_iterator i = properties.begin(), end = properties.end(); i != end; ++i ) {
+            json[i->first] = toJson( i->second );
+        }
 
-		return json;    
+        return json;    
     }
     else if( type->is<VariantArray>() ) {
-    	Json::Value	json( Json::arrayValue );
+        Json::Value    json( Json::arrayValue );
         VariantArray ar = value.as<VariantArray>();
         const VariantArray::Container& items = ar;
 
-		for( s32 i = 0, n = items.size(); i < n; i++ ) {
-			json[i] = toJson( items[i] );
-		}
+        for( s32 i = 0, n = items.size(); i < n; i++ ) {
+            json[i] = toJson( items[i] );
+        }
 
-		return json;
+        return json;
     }
     else {
         LogError( "variantTextStream", "unhandled variant type '%s'\n", type->name() );
     }
 
-	return Json::Value::null;
+    return Json::Value::null;
 }
 
 // ** VariantTextStream::fromJson
@@ -256,24 +256,24 @@ Variant VariantTextStream::fromJson( const Json::Value& json )
     Rgba rgba;
     Guid guid;
 
-	switch( json.type() ) {
-	case Json::nullValue:		return Variant();
-    case Json::intValue:		return Variant::fromValue<s32>( json.asInt() );
-	case Json::uintValue:		return Variant::fromValue<u32>( json.asUInt() );
-	case Json::realValue:		return Variant::fromValue<f64>( json.asDouble() );
-	case Json::stringValue:		return Variant::fromValue<String>( json.asString() );
-	case Json::booleanValue:	return Variant::fromValue<bool>( json.asBool() );
-	case Json::arrayValue:		{
-									VariantArray ar;
+    switch( json.type() ) {
+    case Json::nullValue:        return Variant();
+    case Json::intValue:        return Variant::fromValue<s32>( json.asInt() );
+    case Json::uintValue:        return Variant::fromValue<u32>( json.asUInt() );
+    case Json::realValue:        return Variant::fromValue<f64>( json.asDouble() );
+    case Json::stringValue:        return Variant::fromValue<String>( json.asString() );
+    case Json::booleanValue:    return Variant::fromValue<bool>( json.asBool() );
+    case Json::arrayValue:        {
+                                    VariantArray ar;
 
-									for( s32 i = 0, n = json.size(); i < n; i++ ) {
-										ar << fromJson( json[i] );
-									}
+                                    for( s32 i = 0, n = json.size(); i < n; i++ ) {
+                                        ar << fromJson( json[i] );
+                                    }
 
-									return Variant::fromValue<VariantArray>( ar );
-								}
-								break;
-	case Json::objectValue:		{
+                                    return Variant::fromValue<VariantArray>( ar );
+                                }
+                                break;
+    case Json::objectValue:        {
                                     if( Parser::quat( json, quat ) ) return Variant::fromValue<Quat>( quat );
                                     if( Parser::rgba( json, rgba ) ) return Variant::fromValue<Rgba>( rgba );
                                     if( Parser::rgb( json, rgb ) )   return Variant::fromValue<Rgb>( rgb );
@@ -282,170 +282,170 @@ Variant VariantTextStream::fromJson( const Json::Value& json )
                                     if( Parser::vec2( json, vec2 ) ) return Variant::fromValue<Vec2>( vec2 );
                                     if( Parser::guid( json, guid ) ) return Variant::fromValue<Guid>( guid );
 
-                                    DC_BREAK_IF( !json["typeID"].isNull() );
-									KeyValue kv;
+                                    NIMBLE_BREAK_IF( !json["typeID"].isNull() );
+                                    KeyValue kv;
 
-									for( Json::Value::const_iterator i = json.begin(), end = json.end(); i != end; i++ ) {
-										String key = i.key().asString();
-										kv.setValueAtKey( key, fromJson( *i ) );
-									}
+                                    for( Json::Value::const_iterator i = json.begin(), end = json.end(); i != end; i++ ) {
+                                        String key = i.key().asString();
+                                        kv.setValueAtKey( key, fromJson( *i ) );
+                                    }
 
-									return Variant::fromValue<KeyValue>( kv );
-								}
-								break;
-	default:					DC_BREAK;
-	}
+                                    return Variant::fromValue<KeyValue>( kv );
+                                }
+                                break;
+    default:                    NIMBLE_BREAK;
+    }
 
-	return Variant();
+    return Variant();
 }
 
-#endif	/*	HAVE_JSON*/
+#endif    /*    #ifdef JSONCPP_FOUND   */
 
 // ** BinaryVariantStream::BinaryVariantStream
 BinaryVariantStream::BinaryVariantStream( StreamPtr stream ) : m_stream( stream )
 {
-    DC_BREAK_IF( !m_stream.valid(), "invalid stream" );
+    NIMBLE_BREAK_IF( !m_stream.valid(), "invalid stream" );
 }
 
 // ** BinaryVariantStream::write
 s32 BinaryVariantStream::write( const Variant& value )
 {
-	DC_BREAK_IF( !m_stream.valid() );
+    NIMBLE_BREAK_IF( !m_stream.valid() );
 
-	// KeyValue layout type placeholder.
-	u32 type = 0;
+    // KeyValue layout type placeholder.
+    u32 type = 0;
 
-	// Save the starting position
-	s32 start = m_stream->position();
+    // Save the starting position
+    s32 start = m_stream->position();
 
-	// Write the layout type.
-	m_stream->write( &type, 4 );
+    // Write the layout type.
+    m_stream->write( &type, 4 );
 
-	// Write the value.
-	writeValue( value );
+    // Write the value.
+    writeValue( value );
 
-	return m_stream->position() - start;
+    return m_stream->position() - start;
 }
 
 // ** BinaryVariantStream::read
 s32 BinaryVariantStream::read( Variant& value )
 {
-	// Save the starting position
-	s32 start = m_stream->position();
+    // Save the starting position
+    s32 start = m_stream->position();
 
-	// KeyValue layout type placeholder.
-	u32 type = 0;
+    // KeyValue layout type placeholder.
+    u32 type = 0;
 
-	// Read the layout type.
-	m_stream->read( &type, 4 );
+    // Read the layout type.
+    m_stream->read( &type, 4 );
 
-	// Read actual data.
-	value = readValue();
+    // Read actual data.
+    value = readValue();
 
-	return m_stream->position() - start;
+    return m_stream->position() - start;
 }
 
 // ** BinaryVariantStream::readValue
 Variant BinaryVariantStream::readValue( void )
 {
-	// Read value type.
+    // Read value type.
     u8 type;
-	m_stream->read( &type, 1 );
+    m_stream->read( &type, 1 );
 
-	switch( type ) {
-	case kNull:		break;
-	case kBoolean:	{
+    switch( type ) {
+    case kNull:        break;
+    case kBoolean:    {
                         bool value;
                         m_stream->read( &value, 1 );
                         return Variant::fromValue( value );
                     }
                     break;
-	case kInt8:		{
+    case kInt8:        {
                         s8 value;
                         m_stream->read( &value, 1 );
                         return Variant::fromValue( value );
                     }
                     break;
-	case kInt16:	{
+    case kInt16:    {
                         s16 value;
                         m_stream->read( &value, 2 );
                         return Variant::fromValue( value );
                     }
                     break;
-	case kInt32:	{
+    case kInt32:    {
                         s32 value;
                         m_stream->read( &value, 4 );
                         return Variant::fromValue( value );
                     }
                     break;
-	case kInt64:	{
+    case kInt64:    {
                         s64 value;
                         m_stream->read( &value, 8 );
                         return Variant::fromValue( value );
                     }
                     break;
-	case kFloat32:	{
+    case kFloat32:    {
                         f32 value;
                         m_stream->read( &value, 4 );
                         return Variant::fromValue( value );
                     }
                     break;
-	case kFloat64:	{
+    case kFloat64:    {
                         f64 value;
                         m_stream->read( &value, 8 );
                         return Variant::fromValue( value );
                     }
                     break;
-	case kGuid:		{
-						u8 bytes[Guid::Size];
-						m_stream->read( bytes, Guid::Size );
-						return Variant::fromValue<Guid>( bytes );
-					}
-					break;
+    case kGuid:        {
+                        u8 bytes[Guid::Size];
+                        m_stream->read( bytes, Guid::Size );
+                        return Variant::fromValue<Guid>( bytes );
+                    }
+                    break;
 
-	case kObject:	{
-						KeyValue object;
+    case kObject:    {
+                        KeyValue object;
 
-						while( m_stream->hasDataLeft() ) {
-							String key;
+                        while( m_stream->hasDataLeft() ) {
+                            String key;
 
-							// Read the property key
-							m_stream->readString( key );
+                            // Read the property key
+                            m_stream->readString( key );
 
-							if( key.empty() ) {
-								break;
-							}
+                            if( key.empty() ) {
+                                break;
+                            }
 
                             object.setValueAtKey( key, readValue() );
-						}
+                        }
 
                         return Variant::fromValue<KeyValue>( object );
-					}
-					break;
+                    }
+                    break;
 
-	case kArray:	{
-						VariantArray array;
+    case kArray:    {
+                        VariantArray array;
 
-						u16 count;
-						m_stream->read( &count, 2 );
+                        u16 count;
+                        m_stream->read( &count, 2 );
 
-						for( u16 i = 0; i < count; i++ ) {
+                        for( u16 i = 0; i < count; i++ ) {
                             array << readValue();
-						}
+                        }
 
                         return Variant::fromValue<VariantArray>( array );
-					}
-					break;
+                    }
+                    break;
 
-	case kString:	{
-						String value;
-						m_stream->readString( value );
+    case kString:    {
+                        String value;
+                        m_stream->readString( value );
                         return Variant::fromValue<String>( value );
-					}
-					break;
+                    }
+                    break;
 
-	default:		LogError( "binaryVariantStream", "unknown variant type id '%d'\n", type );
-	}
+    default:        LogError( "binaryVariantStream", "unknown variant type id '%d'\n", type );
+    }
 
     return Variant();
 }
@@ -453,83 +453,83 @@ Variant BinaryVariantStream::readValue( void )
 // ** BinaryVariantStream::writeValue
 void BinaryVariantStream::writeValue( const Variant& value )
 {
-	// Write value type.
-	u8 type = valueType( value );
-	m_stream->write( &type, 1 );
+    // Write value type.
+    u8 type = valueType( value );
+    m_stream->write( &type, 1 );
 
-	// Now write the value.
-	switch( type ) {
-	case kNull:		break;
-	case kBoolean:	{
+    // Now write the value.
+    switch( type ) {
+    case kNull:        break;
+    case kBoolean:    {
                         bool v = value.as<bool>();
-                        m_stream->write( &v, 1 );				
+                        m_stream->write( &v, 1 );                
                     }
                     break;
-	case kInt8:		{
+    case kInt8:        {
                         s8 v = value.as<s8>();
-                        m_stream->write( &v, 1 );				
+                        m_stream->write( &v, 1 );                
                     }
                     break;
-	case kInt16:	{
+    case kInt16:    {
                         s16 v = value.as<s16>();
-                        m_stream->write( &v, 2 );				
+                        m_stream->write( &v, 2 );                
                     }
                     break;
-	case kInt32:	{
+    case kInt32:    {
                         s32 v = value.as<s32>();
-                        m_stream->write( &v, 4 );				
+                        m_stream->write( &v, 4 );                
                     }
                     break;
-	case kInt64:	{
+    case kInt64:    {
                         s64 v = value.as<s64>();
-                        m_stream->write( &v, 8 );				
+                        m_stream->write( &v, 8 );                
                     }
                     break;
-	case kFloat32:	{
+    case kFloat32:    {
                         f32 v = value.as<f32>();
-                        m_stream->write( &v, 4 );				
+                        m_stream->write( &v, 4 );                
                     }
                     break;
-	case kFloat64:	{
+    case kFloat64:    {
                         f64 v = value.as<f64>();
-                        m_stream->write( &v, 8 );				
+                        m_stream->write( &v, 8 );                
                     }
                     break;
-	case kString:	{
+    case kString:    {
                         String v = value.as<String>();
-                        m_stream->writeString( v.c_str() );				
+                        m_stream->writeString( v.c_str() );                
                     }
                     break;
-	case kGuid:		{
-                        m_stream->write( value.as<Guid>().bytes(), Guid::Size );				
+    case kGuid:        {
+                        m_stream->write( value.as<Guid>().bytes(), Guid::Size );                
                     }
                     break;
 
-	case kObject:	{
+    case kObject:    {
                         KeyValue::Properties properties = value.as<KeyValue>().properties();
-						for( KeyValue::Properties::const_iterator i = properties.begin(), end = properties.end(); i != end; ++i ) {
-							m_stream->writeString( i->first.c_str() );
-							writeValue( i->second );
-						}
-						m_stream->writeString( "" );
-					}
-					break;
+                        for( KeyValue::Properties::const_iterator i = properties.begin(), end = properties.end(); i != end; ++i ) {
+                            m_stream->writeString( i->first.c_str() );
+                            writeValue( i->second );
+                        }
+                        m_stream->writeString( "" );
+                    }
+                    break;
 
-	case kArray:	{
+    case kArray:    {
                         VariantArray::Container array = value.as<VariantArray>();
-						DC_BREAK_IF( array.size() >= USHRT_MAX );
+                        NIMBLE_BREAK_IF( array.size() >= USHRT_MAX );
 
-						u16 count = array.size();
-						m_stream->write( &count, 2 );
+                        u16 count = array.size();
+                        m_stream->write( &count, 2 );
 
-						for( u16 i = 0; i < count; i++ ) {
-							writeValue( array[i] );
-						}
-					}
-					break;
+                        for( u16 i = 0; i < count; i++ ) {
+                            writeValue( array[i] );
+                        }
+                    }
+                    break;
 
-	default:		DC_BREAK;
-	}
+    default:        NIMBLE_BREAK;
+    }
 }
 
 #define RETURN_TYPEID_IF( typeA, typeB, id ) if( type->is<typeA>() || type->is<typeB>() ) return id
@@ -546,8 +546,8 @@ BinaryVariantStream::Type BinaryVariantStream::valueType( const Variant& value )
     RETURN_TYPEID_IF( u16, s16, kInt16 );
     RETURN_TYPEID_IF( u32, s32, kInt32 );
     RETURN_TYPEID_IF( u64, s64, kInt64 );
-	RETURN_TYPEID_IF( f32, f32, kFloat32 );
-	RETURN_TYPEID_IF( f64, f64, kFloat32 );
+    RETURN_TYPEID_IF( f32, f32, kFloat32 );
+    RETURN_TYPEID_IF( f64, f64, kFloat32 );
     RETURN_TYPEID_IF( bool, bool, kBoolean );
     RETURN_TYPEID_IF( String, String, kString );
     RETURN_TYPEID_IF( VariantArray, VariantArray, kArray );
@@ -556,7 +556,7 @@ BinaryVariantStream::Type BinaryVariantStream::valueType( const Variant& value )
 
     LogError( "binaryVariantStream", "unhandled variant type '%s'\n", type->name() );
 
-    //DC_NOT_IMPLEMENTED;
+    //NIMBLE_NOT_IMPLEMENTED;
     return kNull;
 }
 

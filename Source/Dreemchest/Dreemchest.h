@@ -27,22 +27,33 @@
 #ifndef DREEMCHEST_H
 #define DREEMCHEST_H
 
+#include "BuildConfig.h"
+
 #define dcInterface
 
+#if CPLUSPLUS_STD == 11
+    #define DREEMCHEST_CPP11    (1)
+#endif  /*  #if CPLUSPLUS_STD == 11  */
+
+#if CPLUSPLUS_STD == 14
+    #define DREEMCHEST_CPP11    (1)
+    #define DREEMCHEST_CPP14    (1)
+#endif  /*  CPLUSPLUS_STD > 11  */
+
 #ifdef DC_BUILD_ENGINE
-	#ifndef DC_NAMESPACE
-		#define DC_NAMESPACE    dreemchest
-	#endif
+    #ifndef DC_NAMESPACE
+        #define DC_NAMESPACE    Dreemchest
+    #endif
 #endif
 
 #ifdef DC_NAMESPACE
     #define DC_USE_DREEMCHEST    using namespace DC_NAMESPACE;
-	#define DC_DREEMCHEST_NS	 DC_NAMESPACE::
+    #define DC_DREEMCHEST_NS     DC_NAMESPACE::
     #define DC_BEGIN_DREEMCHEST  namespace DC_NAMESPACE {
     #define DC_END_DREEMCHEST    }
 #else
     #define DC_USE_DREEMCHEST
-	#define DC_DREEMCHEST_NS
+    #define DC_DREEMCHEST_NS
     #define DC_BEGIN_DREEMCHEST
     #define DC_END_DREEMCHEST
 #endif
@@ -62,24 +73,84 @@
 #define LogFatal( prefix, message, ... )     Log::fatal( NIMBLE_LOGGER_CONTEXT_FULL, prefix, message, __VA_ARGS__ )
 #define LogInternal( prefix, message, ... )  Log::internalError( NIMBLE_LOGGER_CONTEXT_FULL, prefix, message, __VA_ARGS__ )
 
-#ifdef HAVE_JSON
-	#include <json/json.h>
-#endif	/*	HAVE_JSON	*/
+#ifdef JSONCPP_FOUND
+    #include <json/json.h>
+#endif    /*    #ifdef JSONCPP_FOUND    */
+
+DC_BEGIN_DREEMCHEST
+
+    namespace Platform {
+    
+        //! Returns current time in milliseconds.
+        extern u64 currentTime( void );
+
+    } // namespace Platform
+
+    namespace Io {
+    
+        dcDeclarePtrs( Stream )
+
+    } // namespace Io
+
+    namespace Assets {
+    
+        NIMBLE_LOGGER_TAG( Assets )
+
+        class Assets;
+        class Asset;
+        class Handle;
+        class AbstractAssetCache;
+
+        //! Opaque 32 bit handle.
+        typedef OpaqueHandle<12, 20> Index;
+
+        //! Asset index hasher.
+        typedef OpaqueHandleHasher<Index> IndexHasher;
+
+        //! Forward declaration of an AssetDataHandle type.
+        template<typename TAsset> class DataHandle;
+
+        //! Forward declaration of an asset WriteLock type.
+        template<typename TAsset> class WriteLock;
+
+        //! Asset identifier type.
+        typedef String AssetId;
+
+        //! Asset type identifier type.
+        typedef u16 TypeId;
+
+        //! Set of assets.
+        typedef Set<DC_DREEMCHEST_NS Assets::Handle> AssetSet;
+
+        //! List of assets.
+        typedef List<DC_DREEMCHEST_NS Assets::Handle> AssetList;
+
+        // Unique ptr for asset source.
+        typedef UPtr<class AbstractSource> SourceUPtr;
+
+        //! Loading queue unique pointer type.
+        typedef UPtr<class LoadingQueue> LoadingQueueUPtr;
+
+        dcDeclarePtrs( Assets )
+
+    } // namespace Assets
+
+DC_END_DREEMCHEST
 
 #ifndef DC_BUILD_LIBRARY
-	#include <Network/Network.h>
-	#include <Io/Io.h>
+    #include <Network/Network.h>
+    #include <Io/Io.h>
     #include <Assets/Assets.h>
-	#include <Event/Event.h>
-	#include <Threads/Threads.h>
+    #include <Event/Event.h>
+    #include <Threads/Threads.h>
     #include <Reflection/Reflection.h>
-	#include <Ecs/Ecs.h>
-	#include <Platform/Platform.h>
-	#include <Threads/Threads.h>
-	#include <Scene/Scene.h>
-	#include <Renderer/Renderer.h>
-	#include <Sound/Sound.h>
-	#include <Fx/Fx.h>
+    #include <Ecs/Ecs.h>
+    #include <Platform/Platform.h>
+    #include <Threads/Threads.h>
+    #include <Scene/Scene.h>
+    #include <Renderer/Renderer.h>
+    #include <Sound/Sound.h>
+    #include <Fx/Fx.h>
 #endif
 
 #endif  /*  !defined( DREEMCHEST_H )    */

@@ -33,71 +33,71 @@ DC_BEGIN_DREEMCHEST
 
 namespace Ecs {
 
-	//! Entity aspect to filter entities for systems & families. 
-	/*!
-	Aspects are used to check if a system is interested in an entity or a given entity belongs to a family.
-	*/
-	class Aspect {
-	public:
+    //! Entity aspect to filter entities for systems & families. 
+    /*!
+    Aspects are used to check if a system is interested in an entity or a given entity belongs to a family.
+    */
+    class Aspect {
+    public:
 
-		//! Aspect bitsets
-		enum AspectType { All, Any, Exclude };
+        //! Aspect bitsets
+        enum AspectType { All, Any, Exclude };
 
-						//! Constructs an Apsect instance.
-						Aspect( AspectType type, const Bitset& mask );
+                        //! Constructs an Apsect instance.
+                        Aspect( AspectType type, const Bitset& mask );
 
-		//! Retutns true if entity has an intersection with this aspect.
-		bool			hasIntersection( const EntityPtr& entity ) const;
+        //! Retutns true if entity has an intersection with this aspect.
+        bool            hasIntersection( const EntityPtr& entity ) const;
 
-		//! Compares two aspects.
-		bool			operator < ( const Aspect& other ) const;
+        //! Compares two aspects.
+        bool            operator < ( const Aspect& other ) const;
 
-    #ifndef DC_CPP11_DISABLED
-		//! Returns an aspect with all mask.
-		template<typename... TComponents>
-		static Aspect	all( void );
+    #if DREEMCHEST_CPP11
+        //! Returns an aspect with all mask.
+        template<typename... TComponents>
+        static Aspect    all( void );
 
-		//! Returns an aspect with any mask.
-		template<typename... TComponents>
-		static Aspect	any( void );
+        //! Returns an aspect with any mask.
+        template<typename... TComponents>
+        static Aspect    any( void );
 
         //! Returns an aspect with exclusion mask.
-		template<typename... TComponents>
-		static Aspect	exclude( void );
+        template<typename... TComponents>
+        static Aspect    exclude( void );
 
         //! Expands the variadic template arguments to a components bitset.
         template<typename... TComponents>
         static Bitset   expandComponentBits( void );
-    #endif  /*  !DC_CPP11_DISABLED  */
+    #endif  /*  #if DREEMCHEST_CPP11 */
 
-	private:
+    private:
 
-		Bitset			m_any;	//!< Entity should have at least one component from this set.
-		Bitset			m_all;	//!< Entity should contain all components from this set.
-		Bitset			m_exc;	//!< Entity should not contain a components from this set.
-	};
+        Bitset            m_any;    //!< Entity should have at least one component from this set.
+        Bitset            m_all;    //!< Entity should contain all components from this set.
+        Bitset            m_exc;    //!< Entity should not contain a components from this set.
+    };
 
-#ifndef DC_CPP11_DISABLED
-	// ** Aspect::all
-	template<typename... TComponents>
-	Aspect Aspect::all( void )
+#if DREEMCHEST_CPP11
+    // ** Aspect::all
+    template<typename... TComponents>
+    Aspect Aspect::all( void )
     {
-		return Aspect( All, expandComponentBits<TComponents...>() );
-	}
+        return Aspect( All, expandComponentBits<TComponents...>() );
+    }
 
-	// ** Aspect::any
-	template<typename... TComponents>
-	Aspect Aspect::any( void )
+    // ** Aspect::any
+    template<typename... TComponents>
+    Aspect Aspect::any( void )
     {
-		return Aspect( Any, expandComponentBits<TComponents...>() );
-	}
+        return Aspect( Any, expandComponentBits<TComponents...>() );
+    }
 
-	// ** Aspect::exclude
-	template<typename... TComponents>
-	Aspect Aspect::exclude( void )
+    // ** Aspect::exclude
+    template<typename... TComponents>
+    Aspect Aspect::exclude( void )
     {
-		return Aspect( Exclude, expandComponentBits<TComponents...>() );
-	}
+        return Aspect( Exclude, expandComponentBits<TComponents...>() );
+    }
 
     // ** Aspect::expandComponentBits
     template<typename... TComponents>
@@ -112,10 +112,10 @@ namespace Ecs {
 
         return result;
     }
-#endif  /*  !DC_CPP11_DISABLED  */
+#endif  /*  #if DREEMCHEST_CPP11  */
 
 } // namespace Ecs
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Ecs_Aspect_H__	*/
+#endif    /*    !__DC_Ecs_Aspect_H__    */

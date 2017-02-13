@@ -33,59 +33,59 @@ DC_BEGIN_DREEMCHEST
 
 namespace Ecs {
 
-	//! System is a base class for all systems that process components.
-	/*!
-	System contains all the code for the one aspect of the entities, with
-	each System running continuously as if it has a private internal thread,
-	performing global actions on every Entity that possesses a Component of
-	the same aspect as that System.
-	*/
-	class System : public InjectEventEmitter<RefCounted> {
-	public:
+    //! System is a base class for all systems that process components.
+    /*!
+    System contains all the code for the one aspect of the entities, with
+    each System running continuously as if it has a private internal thread,
+    performing global actions on every Entity that possesses a Component of
+    the same aspect as that System.
+    */
+    class System : public InjectEventEmitter<RefCounted> {
+    public:
 
-		virtual			~System( void ) {}
+        virtual            ~System( void ) {}
 
-		//! Returns system name.
-		const String&	name( void ) const;
+        //! Returns system name.
+        const String&    name( void ) const;
 
-		//! Attaches the system instance to ecs.
-		virtual bool	initialize( EcsWPtr ecs );
+        //! Attaches the system instance to ecs.
+        virtual bool    initialize( EcsWPtr ecs );
 
-		//! System logic is done here.
-		virtual void	update( u32 currentTime, f32 dt ) = 0;
+        //! System logic is done here.
+        virtual void    update( u32 currentTime, f32 dt ) = 0;
 
-	protected:
+    protected:
 
-						//! Constructs System instance.
-						System( const String& name );
+                        //! Constructs System instance.
+                        System( const String& name );
 
-	protected:
+    protected:
 
-		EcsWPtr			m_ecs;	//!< Parent ECS instance.
-		String			m_name;	//!< System name.
-	};
+        EcsWPtr            m_ecs;    //!< Parent ECS instance.
+        String            m_name;    //!< System name.
+    };
 
-	// ** System::System
-	inline System::System( const String& name ) : m_name( name )
-	{
-	
-	}
+    // ** System::System
+    inline System::System( const String& name ) : m_name( name )
+    {
+    
+    }
 
-	// ** System::name
-	inline const String& System::name( void ) const
-	{
-		return m_name;
-	}
+    // ** System::name
+    inline const String& System::name( void ) const
+    {
+        return m_name;
+    }
 
-	// ** System::initialize
-	inline bool System::initialize( EcsWPtr ecs )
-	{
-		m_ecs = ecs;
-		return true;
-	}
+    // ** System::initialize
+    inline bool System::initialize( EcsWPtr ecs )
+    {
+        m_ecs = ecs;
+        return true;
+    }
 
 } // namespace Ecs
 
 DC_END_DREEMCHEST
 
-#endif	/*	!__DC_Ecs_System_H__	*/
+#endif    /*    !__DC_Ecs_System_H__    */

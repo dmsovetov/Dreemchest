@@ -33,15 +33,15 @@ DC_BEGIN_DREEMCHEST
 
 namespace Ecs {
 
-	//! Entity handle contains an entity id & parent world.
-	/*!
-	Entity is just a unique ID that tags each game-object as a separate
-	item. Entity should not contain any processing logic or object-specific
-	game data. Entity's behaviour in a game world is defined by a set of
-	data components.
-	*/
-	class Entity : public RefCounted {
-	friend class Ecs;
+    //! Entity handle contains an entity id & parent world.
+    /*!
+    Entity is just a unique ID that tags each game-object as a separate
+    item. Entity should not contain any processing logic or object-specific
+    game data. Entity's behaviour in a game world is defined by a set of
+    data components.
+    */
+    class Entity : public RefCounted {
+    friend class Ecs;
     friend class Serializer;
 
         INTROSPECTION_ABSTRACT( Entity
@@ -49,33 +49,33 @@ namespace Ecs {
             , PROPERTY( id, id, setId, "The unique entity identifier." )
             )
 
-	public:
+    public:
 
-		//! Available entity flags
-		enum Flags {
-			  Disabled	    = BIT( 0 )	//!< Marks this entity as disabled.
-			, Removed	    = BIT( 1 )  //!< Marks this entity as removed.
+        //! Available entity flags
+        enum Flags {
+              Disabled        = BIT( 0 )    //!< Marks this entity as disabled.
+            , Removed        = BIT( 1 )  //!< Marks this entity as removed.
             , Serializable  = BIT( 2 )  //!< Marks this entity as serializable.
-			, TotalFlags    = 3		    //!< Total number of entity flags.
-		};
+            , TotalFlags    = 3            //!< Total number of entity flags.
+        };
 
-		//! Container type to store components.
-		typedef Map<TypeIdx, ComponentPtr> Components;
+        //! Container type to store components.
+        typedef Map<TypeIdx, ComponentPtr> Components;
 
-		//! Returns an entity identifier.
-		const EntityId&			id( void ) const;
+        //! Returns an entity identifier.
+        const EntityId&            id( void ) const;
 
-		//! Returns a component mask.
-		const Bitset&			mask( void ) const;
+        //! Returns a component mask.
+        const Bitset&            mask( void ) const;
 
         //! Removes all attached components.
         void                    clear( void );
 
-		//! Returns entity flags.
-		u8						flags( void ) const;
+        //! Returns entity flags.
+        u8                        flags( void ) const;
 
-		//! Sets entity flags.
-		void					setFlags( u8 value );
+        //! Sets entity flags.
+        void                    setFlags( u8 value );
 
         //! Returns true if this entity is serializable.
         bool                    isSerializable( void ) const;
@@ -83,40 +83,40 @@ namespace Ecs {
         //! Sets entity's serializable flag.
         void                    setSerializable( bool value );
 
-		//! Returns entity components.
-		const Components&		components( void ) const;
-		Components&				components( void );
+        //! Returns entity components.
+        const Components&        components( void ) const;
+        Components&                components( void );
 
-		//! Returns parent entity component system.
-		EcsWPtr					ecs( void ) const;
+        //! Returns parent entity component system.
+        EcsWPtr                    ecs( void ) const;
 
-		//! Returns true if entity has a component of given type.
-		template<typename TComponent>
-		TComponent*				has( void ) const;
+        //! Returns true if entity has a component of given type.
+        template<typename TComponent>
+        TComponent*                has( void ) const;
 
-		//! Resturns an entity's component by type.
-		template<typename TComponent>
-		TComponent*				get( void ) const;
+        //! Resturns an entity's component by type.
+        template<typename TComponent>
+        TComponent*                get( void ) const;
 
-		//! Enables the component of specified type.
-		template<typename TComponent>
-		void					enable( void );
+        //! Enables the component of specified type.
+        template<typename TComponent>
+        void                    enable( void );
 
-		//! Disables the component of specified type.
-		template<typename TComponent>
-		void					disable( void );
+        //! Disables the component of specified type.
+        template<typename TComponent>
+        void                    disable( void );
 
-		//! Enables of disables the component of specified type.
-		template<typename TComponent>
-		void					setComponentEnabled( bool value );
+        //! Enables of disables the component of specified type.
+        template<typename TComponent>
+        void                    setComponentEnabled( bool value );
 
-		//! Returns true if the component of specified type is enabled.
-		template<typename TComponent>
-		bool					isEnabled( void ) const;
+        //! Returns true if the component of specified type is enabled.
+        template<typename TComponent>
+        bool                    isEnabled( void ) const;
 
-		//! Attaches the created component to an entity.
-		template<typename TComponent>
-		TComponent*				attachComponent( TComponent* component );
+        //! Attaches the created component to an entity.
+        template<typename TComponent>
+        TComponent*                attachComponent( TComponent* component );
 
     #if DC_ECS_ENTITY_CLONING
         //! Copies component from a specified entity and attaches it.
@@ -127,85 +127,85 @@ namespace Ecs {
         virtual EntityPtr       deepCopy( const EntityId& id = EntityId() ) const;
     #endif  /*  DC_ECS_ENTITY_CLONING   */
 
-	#ifndef DC_CPP11_DISABLED
-		//! Constructs a new component and attaches it to this entity.
-		template<typename TComponent, typename ... Args>
-		TComponent*				attach( Args ... args );
-	#endif	/*	!DC_CPP11_DISABLED	*/
+    #if DREEMCHEST_CPP11
+        //! Constructs a new component and attaches it to this entity.
+        template<typename TComponent, typename ... Args>
+        TComponent*                attach( Args ... args );
+    #endif    /*    #if DREEMCHEST_CPP11    */
 
         //! Removes a component by type id from this entity.
         void                    detachById( TypeIdx id );
 
-		//! Removes a component from this entity.
-		template<typename TComponent>
-		void					detach( void );
+        //! Removes a component from this entity.
+        template<typename TComponent>
+        void                    detach( void );
 
-		//! Queues removal of this entity from the world and all systems.
-		void					queueRemoval( void );
+        //! Queues removal of this entity from the world and all systems.
+        void                    queueRemoval( void );
 
-	protected:
+    protected:
 
-								//! Constructs Entity instance.
-								Entity( void );
+                                //! Constructs Entity instance.
+                                Entity( void );
 
-		//! Marks this entity as queued for removal.
-		void					markAsRemoved( void );
+        //! Marks this entity as queued for removal.
+        void                    markAsRemoved( void );
 
-		//! Sets the entity id.
-		void					setId( const EntityId& value );
+        //! Sets the entity id.
+        void                    setId( const EntityId& value );
 
-		//! Sets the parent entity component system reference.
-		void					setEcs( EcsWPtr value );
+        //! Sets the parent entity component system reference.
+        void                    setEcs( EcsWPtr value );
 
-		//! Updates the entity component mask.
-		void					updateComponentBit( u32 bit, bool value );
+        //! Updates the entity component mask.
+        void                    updateComponentBit( u32 bit, bool value );
 
-	private:
+    private:
 
-		EcsWPtr					m_ecs;			//!< Parent ECS instance.
-		EntityId				m_id;			//!< Entity identifier.
-		Components				m_components;	//!< Attached components.
-		Bitset					m_mask;			//!< Component mask.
-		FlagSet8				m_flags;		//!< Entity flags.
-	};
+        EcsWPtr                    m_ecs;            //!< Parent ECS instance.
+        EntityId                m_id;            //!< Entity identifier.
+        Components                m_components;    //!< Attached components.
+        Bitset                    m_mask;            //!< Component mask.
+        FlagSet8                m_flags;        //!< Entity flags.
+    };
 
-	// ** Entity::has
-	template<typename TComponent>
-	TComponent* Entity::has( void ) const
-	{
-		Components::const_iterator i = m_components.find( ComponentBase::typeId<TComponent>() );
-		return i == m_components.end() ? NULL : static_cast<TComponent*>( i->second.get() );
-	}
+    // ** Entity::has
+    template<typename TComponent>
+    TComponent* Entity::has( void ) const
+    {
+        Components::const_iterator i = m_components.find( ComponentBase::typeId<TComponent>() );
+        return i == m_components.end() ? NULL : static_cast<TComponent*>( i->second.get() );
+    }
 
-	// ** Entity::get
-	template<typename TComponent>
-	TComponent* Entity::get( void ) const
-	{
-		TypeIdx idx = ComponentBase::typeId<TComponent>();
-		Components::const_iterator i = m_components.find( idx );
-		DC_ABORT_IF( i == m_components.end(), "the specified component does not exist" );
+    // ** Entity::get
+    template<typename TComponent>
+    TComponent* Entity::get( void ) const
+    {
+        TypeIdx idx = ComponentBase::typeId<TComponent>();
+        Components::const_iterator i = m_components.find( idx );
+        NIMBLE_ABORT_IF( i == m_components.end(), "the specified component does not exist" );
 
         TComponent* result = static_cast<TComponent*>( i->second.get() );
-		return result;
-	}
+        return result;
+    }
 
-	// ** Entity::attachComponent
-	template<typename TComponent>
-	TComponent* Entity::attachComponent( TComponent* component )
-	{
-		DC_BREAK_IF( m_flags.is( Removed ), "this entity was removed" );
-        DC_BREAK_IF( ComponentBase::typeId<ComponentBase>() != ComponentBase::typeId<TComponent>() && component->typeIndex() != ComponentBase::typeId<TComponent>(), "component type mismatch" );
-		DC_ABORT_IF( has<TComponent>(), "entity already has this component" );
+    // ** Entity::attachComponent
+    template<typename TComponent>
+    TComponent* Entity::attachComponent( TComponent* component )
+    {
+        NIMBLE_BREAK_IF( m_flags.is( Removed ), "this entity was removed" );
+        NIMBLE_BREAK_IF( ComponentBase::typeId<ComponentBase>() != ComponentBase::typeId<TComponent>() && component->typeIndex() != ComponentBase::typeId<TComponent>(), "component type mismatch" );
+        NIMBLE_ABORT_IF( has<TComponent>(), "entity already has this component" );
 
-		TypeIdx idx = component->typeIndex();
+        TypeIdx idx = component->typeIndex();
 
-		m_components[idx] = component;
-		updateComponentBit( idx, true );
+        m_components[idx] = component;
+        updateComponentBit( idx, true );
 
         component->setParentEntity( this );
-		
-		return component;	
-	}
+        
+        return component;    
+    }
 
     // ** Entity::attachFrom
     template<typename TComponent>
@@ -218,55 +218,55 @@ namespace Ecs {
         return NULL;
     }
 
-	// ** Entity::enable
-	template<typename TComponent>
-	void Entity::enable( void )
-	{
-		setComponentEnabled<TComponent>( true );
-	}
+    // ** Entity::enable
+    template<typename TComponent>
+    void Entity::enable( void )
+    {
+        setComponentEnabled<TComponent>( true );
+    }
 
-	// ** Entity::disable
-	template<typename TComponent>
-	void Entity::disable( void )
-	{
-		setComponentEnabled<TComponent>( false );	
-	}
+    // ** Entity::disable
+    template<typename TComponent>
+    void Entity::disable( void )
+    {
+        setComponentEnabled<TComponent>( false );    
+    }
 
-	// ** Entity::setComponentEnabled
-	template<typename TComponent>
-	void Entity::setComponentEnabled( bool value )
-	{
-		TComponent* component = get<TComponent>();
-		component->setEnabled( value );
-		updateComponentBit( component->typeIndex(), value );		
-	}
+    // ** Entity::setComponentEnabled
+    template<typename TComponent>
+    void Entity::setComponentEnabled( bool value )
+    {
+        TComponent* component = get<TComponent>();
+        component->setEnabled( value );
+        updateComponentBit( component->typeIndex(), value );        
+    }
 
-	// ** Entity::isEnabled
-	template<typename TComponent>
-	bool Entity::isEnabled( void ) const
-	{
-		return get<TComponent>()->isEnabled();
-	}
+    // ** Entity::isEnabled
+    template<typename TComponent>
+    bool Entity::isEnabled( void ) const
+    {
+        return get<TComponent>()->isEnabled();
+    }
 
-	// ** Entity::attach
-#ifndef DC_CPP11_DISABLED
-	template<typename TComponent, typename ... Args>
-	TComponent* Entity::attach( Args ... args )
-	{
-		TComponent* component = m_ecs->createComponent<TComponent>( args... );
-		return attachComponent<TComponent>( component );
-	}
-#endif	/*	!DC_CPP11_DISABLED	*/
+    // ** Entity::attach
+#if DREEMCHEST_CPP11
+    template<typename TComponent, typename ... Args>
+    TComponent* Entity::attach( Args ... args )
+    {
+        TComponent* component = m_ecs->createComponent<TComponent>( args... );
+        return attachComponent<TComponent>( component );
+    }
+#endif    /*    #if DREEMCHEST_CPP11    */
 
-	// ** Entity::detach
-	template<typename TComponent>
-	void Entity::detach( void )
-	{
+    // ** Entity::detach
+    template<typename TComponent>
+    void Entity::detach( void )
+    {
         detachById( ComponentBase::typeId<TComponent>() );
-	}
+    }
 
 } // namespace Ecs
 
 DC_END_DREEMCHEST
 
-#endif	/*	! __DC_Ecs_Entity_H__	*/
+#endif    /*    ! __DC_Ecs_Entity_H__    */

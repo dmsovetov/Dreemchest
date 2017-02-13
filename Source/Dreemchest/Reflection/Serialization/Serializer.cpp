@@ -38,7 +38,7 @@ namespace Reflection {
 // ** Serializer::serialize
 bool Serializer::serialize( InstanceConst instance, KeyValue& ar ) const
 {
-    DC_ABORT_IF( !instance, "invalid asset instance" );
+    NIMBLE_ABORT_IF( !instance, "invalid asset instance" );
 
     // Get the meta-class
     const Class* cls = instance.type();
@@ -70,7 +70,7 @@ bool Serializer::serialize( InstanceConst instance, KeyValue& ar ) const
                 serializeMap( *cls, *property, instance, *map, ar );
             }
             else {
-                DC_NOT_IMPLEMENTED;
+                NIMBLE_NOT_IMPLEMENTED;
             }
         } else {
             serializeValue( *cls, *property, instance, ar );
@@ -83,7 +83,7 @@ bool Serializer::serialize( InstanceConst instance, KeyValue& ar ) const
 // ** Serializer::deserialize
 Instance Serializer::deserialize( AssemblyWPtr assembly, const KeyValue& ar )
 {
-    DC_ABORT_IF( !assembly.valid(), "invalid assembly" );
+    NIMBLE_ABORT_IF( !assembly.valid(), "invalid assembly" );
 
     // Read an instance type
     String name = ar.get<String>( "class" );
@@ -150,7 +150,7 @@ void Serializer::deserialize( const Instance& instance, const KeyValue& ar ) con
                 deserializeMap( *cls, *property, instance, value, *map );
             }
             else {
-                DC_NOT_IMPLEMENTED;
+                NIMBLE_NOT_IMPLEMENTED;
             }
         } else {
             deserializeValue( *cls, *property, instance, value );
@@ -289,31 +289,31 @@ void Serializer::serializeValue( const Class& cls, const Property& property, con
 // ** Serializer::readPropertyValue
 Variant Serializer::readPropertyValue( const Class* cls, const Property* property, const KeyValue& ar ) const
 {
-	DC_ABORT_IF( cls == NULL, "invalid class" );
-	DC_ABORT_IF( property == NULL, "invalid property" );
+    NIMBLE_ABORT_IF( cls == NULL, "invalid class" );
+    NIMBLE_ABORT_IF( property == NULL, "invalid property" );
 
-	// First try to lookup value inside an archive
-	const Variant& v = ar.valueAtKey( property->name() );
+    // First try to lookup value inside an archive
+    const Variant& v = ar.valueAtKey( property->name() );
 
-	if( v.isValid() ) {
-		return v;
-	}
+    if( v.isValid() ) {
+        return v;
+    }
 
-	// No value inside an archive - try a default one
-	PropertyDefaults::const_iterator i = m_defaults.find( calculatePropertyReaderHash( cls, property->name() ) );
+    // No value inside an archive - try a default one
+    PropertyDefaults::const_iterator i = m_defaults.find( calculatePropertyReaderHash( cls, property->name() ) );
 
-	if( i != m_defaults.end() ) {
-		return i->second( ar );
-	}
+    if( i != m_defaults.end() ) {
+        return i->second( ar );
+    }
 
-	// Return a void value
-	return Variant();
+    // Return a void value
+    return Variant();
 }
 
 // ** Serializer::calculatePropertyReaderHash
 String64 Serializer::calculatePropertyReaderHash( const Class* cls, CString name ) const
 {
-	return String64( (String( cls->name() ) + "." + name).c_str() );
+    return String64( (String( cls->name() ) + "." + name).c_str() );
 }
 
 // ** Serializer::calculateTypeConverterHash

@@ -270,7 +270,7 @@ Archive EntityInspector::saveState( void ) const
         LogDebug( "entityInspector", "%s\n", Io::VariantTextStream().stringify( Variant::fromValue( ar ), true ).c_str() );
     }
 #else
-    LogError( "entityInspector", "saveState is not implemented\n" );
+    LogError( "entityInspector", "%s", "saveState is not implemented\n" );
 #endif
     return state;
 }
@@ -286,7 +286,7 @@ void EntityInspector::restoreState( const Archive& state )
     Ecs::SerializationContext ctx( m_entity->ecs() );
     m_entity->deserialize( ctx, state );
 #else
-    LogError( "entityInspector", "entity deserialization is not implemented\n" );
+    LogError( "entityInspector", "%s", "entity deserialization is not implemented\n" );
 #endif
 }
 
@@ -310,7 +310,7 @@ Ecs::ComponentWeakList EntityInspector::buildComponentList( void ) const
     // Sort list by a component name
     std::sort( list.begin(), list.end(), LessThan::compare );
 #else
-    LogWarning( "entityInspector", "component list was not sorted\n" );
+    LogWarning( "entityInspector", "%s", "component list was not sorted\n" );
 #endif
 
     return list;
@@ -332,23 +332,23 @@ QMenu* EntityInspector::createComponentMenu( TypeIdx component ) const
 // ** EntityInspector::refresh
 void EntityInspector::refresh( void )
 {
-	// Destroy old layout & mapper
-	qDeleteLayout( m_layout ); m_layout = NULL;
+    // Destroy old layout & mapper
+    qDeleteLayout( m_layout ); m_layout = NULL;
 
-	// Return if the model is not valid
-	if( !m_entity.valid() ) {
-		return;
-	}
+    // Return if the model is not valid
+    if( !m_entity.valid() ) {
+        return;
+    }
 
     // Clear object inspectors
     m_inspectors.clear();
 
-	// Create root layout.
-	m_layout = new QVBoxLayout( this );
+    // Create root layout.
+    m_layout = new QVBoxLayout( this );
     m_layout->setMargin( 0 );
     m_layout->setSpacing( 0 );
 
-	// Construct component property inspectors
+    // Construct component property inspectors
     Ecs::ComponentWeakList components = buildComponentList();
 
     foreach( Ecs::ComponentWPtr component, components ) {
@@ -414,8 +414,8 @@ void EntityInspector::reset( void )
 void EntityInspector::attachComponent( const QString& type )
 {
     // Create component by name
-    Ecs::ComponentPtr component = m_entity->ecs()->createComponentByName( type.toStdString() );
-    DC_BREAK_IF( !component.valid() );
+    Ecs::ComponentPtr component = qComposer->assembly()->createInstance( type.toStdString() ).upCast<Ecs::ComponentBase>();
+    NIMBLE_BREAK_IF( !component.valid() );
 
     // Attach it to an entity
     m_entity->attachComponent<Ecs::ComponentBase>( component.get() );

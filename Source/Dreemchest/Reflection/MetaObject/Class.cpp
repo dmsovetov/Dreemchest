@@ -95,14 +95,14 @@ s32 Class::memberCount( void ) const
 // ** Class::member
 const Member* Class::member( s32 index ) const
 {
-    DC_BREAK_IF( index < 0 || index >= memberCount() );
+    NIMBLE_BREAK_IF( index < 0 || index >= memberCount() );
     return m_members[index];
 }
 
 // ** Class::member
 Member* Class::member( s32 index )
 {
-    DC_BREAK_IF( index < 0 || index >= memberCount() );
+    NIMBLE_BREAK_IF( index < 0 || index >= memberCount() );
     return m_members[index];
 }
 

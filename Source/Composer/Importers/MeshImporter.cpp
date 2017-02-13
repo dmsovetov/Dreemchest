@@ -35,71 +35,71 @@ namespace Importers {
 // ** MeshImporter::import
 bool MeshImporter::import( FileSystemQPtr fs, const Io::Path& sourceFileName, const Io::Path& destinationFileName )
 {
-	// Import mesh nodes from file
-	if( !importNodes( fs, sourceFileName ) ) {
-		return false;
-	}
+    // Import mesh nodes from file
+    if( !importNodes( fs, sourceFileName ) ) {
+        return false;
+    }
 
-	// Write nodes to file
-	Io::StreamPtr stream = Io::DiskFileSystem::open( destinationFileName, Io::BinaryWriteStream );
-	DC_BREAK_IF( !stream.valid() );
+    // Write nodes to file
+    Io::StreamPtr stream = Io::DiskFileSystem::open( destinationFileName, Io::BinaryWriteStream );
+    NIMBLE_BREAK_IF( !stream.valid() );
 
-	s32 chunkCount = ( s32 )m_nodes.size();
-	stream->write( &chunkCount, 4 );
+    s32 chunkCount = ( s32 )m_nodes.size();
+    stream->write( &chunkCount, 4 );
 
-	for( s32 i = 0; i < chunkCount; i++ ) {
-		// Get mesh buffers
-		const Mesh::VertexBuffer& vertices = m_nodes[i].mesh.vertexBuffer();
-		const Mesh::IndexBuffer&  indices  = m_nodes[i].mesh.indexBuffer();
+    for( s32 i = 0; i < chunkCount; i++ ) {
+        // Get mesh buffers
+        const Mesh::VertexBuffer& vertices = m_nodes[i].mesh.vertexBuffer();
+        const Mesh::IndexBuffer&  indices  = m_nodes[i].mesh.indexBuffer();
 
-		// Write texture base name to stream
-		FileInfo fileInfo = fs->extractFileInfo( m_nodes[i].texture );
-		String	 fileName = fileInfo.fileName();
-		stream->writeString( fileName.c_str() );
+        // Write texture base name to stream
+        FileInfo fileInfo = fs->extractFileInfo( m_nodes[i].texture );
+        String     fileName = fileInfo.fileName();
+        stream->writeString( fileName.c_str() );
 
-		// Write buffer size to stream
-		s32 vertexCount = ( s32 )vertices.size();
-		s32 indexCount  = ( s32 )indices.size();
+        // Write buffer size to stream
+        s32 vertexCount = ( s32 )vertices.size();
+        s32 indexCount  = ( s32 )indices.size();
 
-		stream->write( &vertexCount, 4 );
-		stream->write( &indexCount, 4 );
+        stream->write( &vertexCount, 4 );
+        stream->write( &indexCount, 4 );
 
-		// Write vertices to stream
-		for( s32 j = 0; j < vertexCount; j++ ) {
-			const Vertex& v = vertices[j];
+        // Write vertices to stream
+        for( s32 j = 0; j < vertexCount; j++ ) {
+            const Vertex& v = vertices[j];
 
-			stream->write( &v.position, sizeof( v.position ) );
-			stream->write( &v.normal, sizeof( v.normal ) );
-			stream->write( &v.uv[0], sizeof( v.uv[0] ) );
-			stream->write( &v.uv[1], sizeof( v.uv[1] ) );
-		}
+            stream->write( &v.position, sizeof( v.position ) );
+            stream->write( &v.normal, sizeof( v.normal ) );
+            stream->write( &v.uv[0], sizeof( v.uv[0] ) );
+            stream->write( &v.uv[1], sizeof( v.uv[1] ) );
+        }
 
-		// Write indices to stream
-		stream->write( &indices[0], sizeof( u16 ) * indexCount );
-	}
+        // Write indices to stream
+        stream->write( &indices[0], sizeof( u16 ) * indexCount );
+    }
 
-	return true;
+    return true;
 }
 
 // ** MeshImporter::VertexCompare::operator()
 bool MeshImporter::VertexCompare::operator()( const Vertex& a, const Vertex& b ) const
 {
-	for( s32 i = 0; i < 3; i++ ) {
-		if( a.position[i] != b.position[i] ) return a.position[i] < b.position[i];
-	}
-	for( s32 i = 0; i < 3; i++ ) {
-		if( a.normal[i] != b.normal[i] ) return a.normal[i] < b.normal[i];
-	}
-	for( s32 j = 0; j < 2; j++ ) {
-		for( s32 i = 0; i < 2; i++ ) {
-			if( a.uv[j][i] != b.uv[j][i] ) return a.uv[j][i] < b.uv[j][i];
-		}
-	}
+    for( s32 i = 0; i < 3; i++ ) {
+        if( a.position[i] != b.position[i] ) return a.position[i] < b.position[i];
+    }
+    for( s32 i = 0; i < 3; i++ ) {
+        if( a.normal[i] != b.normal[i] ) return a.normal[i] < b.normal[i];
+    }
+    for( s32 j = 0; j < 2; j++ ) {
+        for( s32 i = 0; i < 2; i++ ) {
+            if( a.uv[j][i] != b.uv[j][i] ) return a.uv[j][i] < b.uv[j][i];
+        }
+    }
 
-	return false;
+    return false;
 }
 
-#ifdef HAVE_FBX
+#ifdef FBX_FOUND
 
 // ---------------------------------------------------- MeshImporterFBX ---------------------------------------------------- //
 
@@ -112,78 +112,78 @@ FbxImporter* MeshImporterFBX::s_importer = NULL;
 // ** MeshImporterFBX::MeshImporterFBX
 MeshImporterFBX::MeshImporterFBX( void ) : m_scene( NULL )
 {
-	// Create the FBX manager instance
-	if( !s_manager ) {
-		s_manager = FbxManager::Create();
-		DC_BREAK_IF( !s_manager );
-	}
+    // Create the FBX manager instance
+    if( !s_manager ) {
+        s_manager = FbxManager::Create();
+        NIMBLE_BREAK_IF( !s_manager );
+    }
 
-	// Create an importer
-	if( !s_importer ) {
-		s_importer = FbxImporter::Create( s_manager, "" );
-		DC_BREAK_IF( !s_importer );
-	}
+    // Create an importer
+    if( !s_importer ) {
+        s_importer = FbxImporter::Create( s_manager, "" );
+        NIMBLE_BREAK_IF( !s_importer );
+    }
 }
 
 MeshImporterFBX::~MeshImporterFBX( void )
 {
-	if( m_scene ) m_scene->Destroy();
+    if( m_scene ) m_scene->Destroy();
 }
 
 // ** MeshImporterFBX::importNodes
 bool MeshImporterFBX::importNodes( FileSystemQPtr fs, const Io::Path& sourceFileName )
 {
-	// Create the scene instance
-	m_scene = FbxScene::Create( s_manager, "" );
-	DC_BREAK_IF( !m_scene );
+    // Create the scene instance
+    m_scene = FbxScene::Create( s_manager, "" );
+    NIMBLE_BREAK_IF( !m_scene );
 
-	// Initialize the importer by providing a filename.
-	if( !s_importer->Initialize( sourceFileName.c_str() ) ) {
-		DC_BREAK;
-		return false;
-	}
+    // Initialize the importer by providing a filename.
+    if( !s_importer->Initialize( sourceFileName.c_str() ) ) {
+        NIMBLE_BREAK;
+        return false;
+    }
 
-	// Import the scene
-	if( !s_importer->Import( m_scene ) ) {
-		DC_BREAK;
-		return false;
-	}
+    // Import the scene
+    if( !s_importer->Import( m_scene ) ) {
+        NIMBLE_BREAK;
+        return false;
+    }
 
-	// Import scene nodes
-	importNode( m_scene->GetRootNode() );
+    // Import scene nodes
+    importNode( m_scene->GetRootNode() );
 
-	return true;
+    return true;
 }
 
 // ** MeshImporterFBX::importNode
 void MeshImporterFBX::importNode( FbxNode* node )
 {
-	if( !node ) {
-		return;
-	}
+    if( !node ) {
+        return;
+    }
 
-	// Import data from node attributes
-	importAttributes( node );
+    // Import data from node attributes
+    importAttributes( node );
 
-	// Import each child node
-	for( s32 i = 0; i < node->GetChildCount(); i++ ) {
-		importNode( node->GetChild( i ) );
-	}
+    // Import each child node
+    for( s32 i = 0; i < node->GetChildCount(); i++ ) {
+        importNode( node->GetChild( i ) );
+    }
 }
 
 // ** MeshImporterFBX::importAttributes
 void MeshImporterFBX::importAttributes( FbxNode* node )
 {
     for( s32 i = 0, n = node->GetNodeAttributeCount(); i < n; i++) {
-		// Get attribute by index
-		FbxNodeAttribute* attribute = node->GetNodeAttributeByIndex( i );
+        // Get attribute by index
+        FbxNodeAttribute* attribute = node->GetNodeAttributeByIndex( i );
 
-		// Check attribute type
-		if( attribute->GetAttributeType() != FbxNodeAttribute::eMesh ) {
-			continue;
-		}
+        // Check attribute type
+        if( attribute->GetAttributeType() != FbxNodeAttribute::eMesh ) {
+            continue;
+        }
 
-		// Import mesh
+        // Import mesh
         importMesh( node, static_cast<FbxMesh*>( attribute ) );
     }
 }
@@ -191,111 +191,111 @@ void MeshImporterFBX::importAttributes( FbxNode* node )
 // ** MeshImporterFBX::importMesh
 void MeshImporterFBX::importMesh( FbxNode* node, FbxMesh* mesh )
 {
-	// Triangulate mesh node
-	if( !mesh->IsTriangleMesh() ) {
-		FbxGeometryConverter converter( s_manager );
-		converter.Triangulate( node->GetNodeAttribute(), true );
-		mesh = static_cast<FbxMesh*>( node->GetNodeAttribute() );
-	}
+    // Triangulate mesh node
+    if( !mesh->IsTriangleMesh() ) {
+        FbxGeometryConverter converter( s_manager );
+        converter.Triangulate( node->GetNodeAttribute(), true );
+        mesh = static_cast<FbxMesh*>( node->GetNodeAttribute() );
+    }
 
-	// Extract the number of vertices & faces
-	s32			vertexCount = mesh->GetControlPointsCount();
-    FbxVector4* vertices	= mesh->GetControlPoints();
-    s32			faceCount   = mesh->GetPolygonCount();
+    // Extract the number of vertices & faces
+    s32            vertexCount = mesh->GetControlPointsCount();
+    FbxVector4* vertices    = mesh->GetControlPoints();
+    s32            faceCount   = mesh->GetPolygonCount();
 
-	// Extract the texture coordinate names
+    // Extract the texture coordinate names
     FbxStringList texCoordNames;
     mesh->GetUVSetNames( texCoordNames );
-	
-	while( texCoordNames.GetCount() > Vertex::MaxTexCoords ) {
-		texCoordNames.RemoveLast();
-	}
+    
+    while( texCoordNames.GetCount() > Vertex::MaxTexCoords ) {
+        texCoordNames.RemoveLast();
+    }
 
-	// Vertex attributes
-	Array<FbxVector2>	texCoords;
-	FbxVector4			normal;
-	FbxVector4			position;
+    // Vertex attributes
+    Array<FbxVector2>    texCoords;
+    FbxVector4            normal;
+    FbxVector4            position;
 
-	texCoords.resize( texCoordNames.GetCount() );
+    texCoords.resize( texCoordNames.GetCount() );
 
-	// Declare mesh indexer
-	MeshIndexer<Vertex, VertexCompare> meshIndexer;
+    // Declare mesh indexer
+    MeshIndexer<Vertex, VertexCompare> meshIndexer;
 
     for( s32 i = 0; i < faceCount; i++ ) {
-		// Get the number of vertices in face
+        // Get the number of vertices in face
         s32 faceSize = mesh->GetPolygonSize( i );
 
         for( s32 j = 0; j < faceSize; j++ ) {
             s32 vertexIndex = mesh->GetPolygonVertex( i, j );
-			DC_BREAK_IF( vertexIndex >= vertexCount )
+            NIMBLE_BREAK_IF( vertexIndex >= vertexCount )
 
-			// Get vertex position
+            // Get vertex position
             position = vertices[vertexIndex];
 
-			// Get texture coordinates
-			for( s32 k = 0; k < texCoordNames.GetCount(); k++ ) {
-				bool pUnmapped = true;
-				mesh->GetPolygonVertexUV( i, j, texCoordNames.GetStringAt( k ), texCoords[k], pUnmapped );
-			}
+            // Get texture coordinates
+            for( s32 k = 0; k < texCoordNames.GetCount(); k++ ) {
+                bool pUnmapped = true;
+                mesh->GetPolygonVertexUV( i, j, texCoordNames.GetStringAt( k ), texCoords[k], pUnmapped );
+            }
 
-			// Get normal
-			mesh->GetPolygonVertexNormal( i, j, normal );
+            // Get normal
+            mesh->GetPolygonVertexNormal( i, j, normal );
 
-			// Initialize vertex
+            // Initialize vertex
             Vertex vertex;
             vertex.position = Vec3( position );
-            vertex.normal	= Vec3( normal );
+            vertex.normal    = Vec3( normal );
 
-			for( s32 k = 0; k < texCoordNames.GetCount(); k++ ) {
-				vertex.uv[k] = Vec2( texCoords[k] );
-			}
+            for( s32 k = 0; k < texCoordNames.GetCount(); k++ ) {
+                vertex.uv[k] = Vec2( texCoords[k] );
+            }
 
             meshIndexer += vertex;
         }
     }
 
-	// Push imported node to an array
-	Node result;
-	result.mesh = meshIndexer;
-	result.texture = extractDiffuseTexture( node );
-	m_nodes.push_back( result );
+    // Push imported node to an array
+    Node result;
+    result.mesh = meshIndexer;
+    result.texture = extractDiffuseTexture( node );
+    m_nodes.push_back( result );
 }
 
 // ** MeshImporterFBX::extractDiffuseTexture
 String MeshImporterFBX::extractDiffuseTexture( FbxNode* node ) const
 {
-	// Get total number of materials inside node
-	s32 materialCount = node->GetMaterialCount();
-	DC_BREAK_IF( materialCount != 1 );
+    // Get total number of materials inside node
+    s32 materialCount = node->GetMaterialCount();
+    NIMBLE_BREAK_IF( materialCount != 1 );
 
-	// Resulting texture array
-	StringArray textures;
+    // Resulting texture array
+    StringArray textures;
 
-	for( s32 i = 0; i < materialCount; i++ ) {
-		// Get the surface material by index
-		FbxSurfaceMaterial* material = node->GetMaterial( i );
-		DC_BREAK_IF( material == NULL );
+    for( s32 i = 0; i < materialCount; i++ ) {
+        // Get the surface material by index
+        FbxSurfaceMaterial* material = node->GetMaterial( i );
+        NIMBLE_BREAK_IF( material == NULL );
 
-		// Get the diffuse material
-		FbxProperty diffuse = material->FindProperty( FbxSurfaceMaterial::sDiffuse );
-	
-		s32 layersCount = diffuse.GetSrcObjectCount<FbxLayeredTexture>();
-		DC_BREAK_IF( layersCount > 0 );
+        // Get the diffuse material
+        FbxProperty diffuse = material->FindProperty( FbxSurfaceMaterial::sDiffuse );
+    
+        s32 layersCount = diffuse.GetSrcObjectCount<FbxLayeredTexture>();
+        NIMBLE_BREAK_IF( layersCount > 0 );
 
         s32 textureCount = diffuse.GetSrcObjectCount<FbxTexture>();
-		DC_BREAK_IF( textureCount != 1 );
+        NIMBLE_BREAK_IF( textureCount != 1 );
 
         for( s32 j = 0; j < textureCount; j++ )
         {
             FbxFileTexture* texture = FbxCast<FbxFileTexture>( FbxCast<FbxTexture>( diffuse.GetSrcObject<FbxTexture>(j) ) );
-			textures.push_back( texture->GetFileName() );
+            textures.push_back( texture->GetFileName() );
         }
-	}
+    }
 
-	return textures[0];
+    return textures[0];
 }
 
-#endif	/*	HAVE_FBX	*/
+#endif    /*    #ifdef FBX_FOUND    */
 
 } // namespace Importers
 

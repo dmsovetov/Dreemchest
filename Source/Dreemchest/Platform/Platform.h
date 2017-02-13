@@ -29,6 +29,10 @@
 
 #include "../Dreemchest.h"
 
+#if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_MACOS )
+    #define DC_PLATFORM_KEYBOARD
+#endif  //  #if defined( DC_PLATFORM_WINDOWS ) || defined( DC_PLATFORM_MACOS )
+
 DC_BEGIN_DREEMCHEST
 
 namespace Platform {
@@ -37,32 +41,41 @@ namespace Platform {
 
     //! Available key mappings.
     struct Key {
-		enum Mapping {
-			_0, _1, _2, _3, _4, _5, _6, _7, _8, _9,
-			Num0, Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8, Num9,
-			A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
-			F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12,
-			Escape, Tab, Capital, Shift, Control, Win, Alt, Space,
-			Return, Back,
-			Pause, Snapshot, Scroll,
-			PgDown, PgUp, Home, End, Insert, Delete,
-			Up, Down, Left, Right,
-			Numlock, Divide, Multiply, Subtract, Add, Decimal,
-			RButton, LButton, MButton,
+        enum Mapping {
+            _0, _1, _2, _3, _4, _5, _6, _7, _8, _9,
+            Num0, Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8, Num9,
+            A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
+            F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12,
+            Escape, Tab, Capital, Shift, Control, Win, Alt, Space,
+            Return, Back,
+            Pause, Snapshot, Scroll,
+            PgDown, PgUp, Home, End, Insert, Delete,
+            Up, Down, Left, Right,
+            Numlock, Divide, Multiply, Subtract, Add, Decimal,
+            RButton, LButton, MButton,
 
-			Total
-		} m_mapping;
+            Total
+        } m_mapping;
 
         operator int() const { return m_mapping; }
 
-		Key( Mapping mapping = Total ) : m_mapping( mapping ) {}
+        Key( Mapping mapping = Total ) : m_mapping( mapping ) {}
     };
 
     class Application;
     class Window;
-	class Arguments;
+    class Arguments;
+    
+    // Supported device orientations
+    enum DeviceOrientation
+    {
+          OrientationPortrait
+        , OrientationPortraitUpsideDown
+        , OrientationLandscapeLeft
+        , OrientationLandscapeRight
+    };
 
-	dcDeclarePtrs( Window )
+    dcDeclarePtrs( Window )
 
 } // namespace Platform
 
@@ -71,9 +84,9 @@ DC_END_DREEMCHEST
 #ifndef DC_BUILD_LIBRARY
     #include "Window.h"
     #include "Application.h"
-	#include "Input.h"
-	#include "Arguments.h"
-	#include "Time.h"
+    #include "Input.h"
+    #include "Arguments.h"
+    #include "Time.h"
 #endif
 
 #endif  /*  !defined( __DC_Platform_Platform_H__ )  */

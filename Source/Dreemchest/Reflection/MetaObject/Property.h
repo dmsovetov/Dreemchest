@@ -29,6 +29,7 @@
 
 #include "Class.h"
 #include "Iterator.h"
+#include "instance.h"
 
 DC_BEGIN_DREEMCHEST
 

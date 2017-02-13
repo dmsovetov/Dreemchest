@@ -38,7 +38,7 @@ namespace Scene {
     protected:
 
         //! Loads image data from an input stream.
-        virtual bool    constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, Image& image ) DC_DECL_OVERRIDE;
+        virtual bool    constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, Image& image ) NIMBLE_OVERRIDE;
     };
 
     //! Loads a mesh from a raw binary format.
@@ -46,7 +46,7 @@ namespace Scene {
     protected:
 
         //! Loads mesh data from an input stream.
-        virtual bool    constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, Mesh& image ) DC_DECL_OVERRIDE;
+        virtual bool    constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, Mesh& image ) NIMBLE_OVERRIDE;
     };
 
     //! Loads a material from a key-value storage.
@@ -54,7 +54,7 @@ namespace Scene {
     protected:
 
         //! Loads material data from an input stream.
-        virtual bool    constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, Material& image ) DC_DECL_OVERRIDE;
+        virtual bool    constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, Material& image ) NIMBLE_OVERRIDE;
     };
 
 } // namespace Scene

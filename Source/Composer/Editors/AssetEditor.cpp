@@ -34,29 +34,29 @@ namespace Editors {
 // ** AssetEditor::hasChanges
 bool AssetEditor::hasChanges( void ) const
 {
-	return true;
+    return true;
 }
 
 // ** AssetEditor::initialize
 bool AssetEditor::initialize( ProjectQPtr project, const FileInfo& asset, Ui::DocumentQPtr document )
 {
-	m_project	= project;
-	m_asset		= asset;
-	m_document	= document;
+    m_project    = project;
+    m_asset        = asset;
+    m_document    = document;
 
-	return true;
+    return true;
 }
 
 // ** AssetEditor::setAsset
 const FileInfo& AssetEditor::asset( void ) const
 {
-	return m_asset;
+    return m_asset;
 }
 
 // ** AssetEditor::setAsset
 Ui::DocumentQPtr AssetEditor::document( void ) const
 {
-	return m_document;
+    return m_document;
 }
 
 } // namespace Editors

@@ -35,93 +35,93 @@ namespace Fx {
 
     NIMBLE_LOGGER_TAG( Fx )
 
-	typedef Array<f32> FloatArray;
+    typedef Array<f32> FloatArray;
 
-	struct Particle;
+    struct Particle;
 
-	dcDeclarePtrs( Emitter )
-	dcDeclarePtrs( EmitterInstance )
-	dcDeclarePtrs( Particles )
-	dcDeclarePtrs( ParticlesInstance )
-	dcDeclarePtrs( ParticleSystem )
-	dcDeclarePtrs( ParticleSystemInstance )
-	dcDeclarePtrs( Zone )
-	dcDeclarePtrs( ParticleRenderer )
-	dcDeclarePtrs( IRenderingInterface )
-	dcDeclarePtrs( IMaterial )
-	dcDeclarePtrs( IMaterialFactory )
+    dcDeclarePtrs( Emitter )
+    dcDeclarePtrs( EmitterInstance )
+    dcDeclarePtrs( Particles )
+    dcDeclarePtrs( ParticlesInstance )
+    dcDeclarePtrs( ParticleSystem )
+    dcDeclarePtrs( ParticleSystemInstance )
+    dcDeclarePtrs( Zone )
+    dcDeclarePtrs( ParticleRenderer )
+    dcDeclarePtrs( IRenderingInterface )
+    dcDeclarePtrs( IMaterial )
+    dcDeclarePtrs( IMaterialFactory )
 
-	dcDeclareNamedPtrs( AbstractModule, Module )
+    dcDeclareNamedPtrs( AbstractModule, Module )
 
-	//! Container type to store particle system emitters.
-	typedef Array<EmitterPtr>			EmittersArray;
-	typedef Array<EmitterInstancePtr>	EmitterInstancesArray;
+    //! Container type to store particle system emitters.
+    typedef Array<EmitterPtr>            EmittersArray;
+    typedef Array<EmitterInstancePtr>    EmitterInstancesArray;
 
-	//! Container type to store particles.
-	typedef Array<ParticlesPtr>			ParticlesArray;
-	typedef Array<ParticlesInstancePtr>	ParticlesInstancesArray;
+    //! Container type to store particles.
+    typedef Array<ParticlesPtr>            ParticlesArray;
+    typedef Array<ParticlesInstancePtr>    ParticlesInstancesArray;
 
-	//! Modifier type.
-	enum ModifierType {
-		  ModifierFriction
-		, ModifierForce
-		, ModifierForceField
+    //! Modifier type.
+    enum ModifierType {
+          ModifierFriction
+        , ModifierForce
+        , ModifierForceField
 
-		, TotalModifierTypes
-	};
+        , TotalModifierTypes
+    };
         
-	//! Particle rendering modes.
-	enum RenderingMode {
-		  RenderPoints
-		, RenderQuads
+    //! Particle rendering modes.
+    enum RenderingMode {
+          RenderPoints
+        , RenderQuads
         , RenderLines
         , RenderThickLines
         , RenderPaths
         , RenderThickPaths
 
         , TotalRenderingModes
-	};
+    };
 
-	//! Rendering blending modes.
-	enum BlendingMode {
-		  BlendAlpha
-		, BlendAdditive
-		, BlendPremultiplied
+    //! Rendering blending modes.
+    enum BlendingMode {
+          BlendAlpha
+        , BlendAdditive
+        , BlendPremultiplied
 
-		, TotalBlendingModes
-	};
+        , TotalBlendingModes
+    };
 
-	//! Parameter sampling mode.
-	enum SamplingMode {
-		  SampleConstant
-		, SampleCurve
-		, SampleRandomBetweenConstants
-		, SampleRandomBetweenCurves
-		
-		, TotalSamplingModes
-	};
+    //! Parameter sampling mode.
+    enum SamplingMode {
+          SampleConstant
+        , SampleCurve
+        , SampleRandomBetweenConstants
+        , SampleRandomBetweenCurves
+        
+        , TotalSamplingModes
+    };
 
     //! Available particle emission zones.
     enum ZoneType {
           ZoneDisk
         , ZoneLine
-		, ZoneBox
-		, ZoneHemiSphere
-		, ZoneSphere
+        , ZoneBox
+        , ZoneHemiSphere
+        , ZoneSphere
 
         , TotalZoneTypes
-	};
+    };
 
 } // namespace Fx
 
 DC_END_DREEMCHEST
 
 #ifndef DC_BUILD_LIBRARY
-	#include "ParticleSystem.h"
-	#include "Emitter.h"
-	#include "Particles.h"
-	#include "Renderers.h"
-	#include "Modules.h"
+    #include "ParticleSystem.h"
+    #include "Emitter.h"
+    #include "Particles.h"
+    #include "Renderers.h"
+    #include "Modules.h"
 #endif
 
-#endif	/*	!__DC_Fx_H__	*/
+#endif    /*    !__DC_Fx_H__    */

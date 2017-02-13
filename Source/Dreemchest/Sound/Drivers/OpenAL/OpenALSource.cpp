@@ -41,11 +41,11 @@ u32 OpenALSource::s_aliveCount = 0;
 OpenALSource::OpenALSource( void )
 {
     s_aliveCount++;
-    DC_BREAK_IF( s_aliveCount > OpenAL::maxSources(), "too much sound sources created" );
+    NIMBLE_BREAK_IF( s_aliveCount > OpenAL::maxSources(), "too much sound sources created" );
 
     alGenSources( 1, &m_id );
     alSourcei( m_id, AL_LOOPING, AL_FALSE );
-    DC_BREAK_IF( !alIsSource( m_id ), "the generated id expected to be a sound source" );
+    NIMBLE_BREAK_IF( !alIsSource( m_id ), "the generated id expected to be a sound source" );
 
     OpenAL::dumpErrors( "OpenALSource::OpenALSource" );
 }
@@ -108,7 +108,7 @@ void OpenALSource::setState( SourceState value )
 
     OpenAL::dumpErrors( "OpenALSource::setState" );
     if( state() != value ) {
-        LogWarning( "openal", "failed to change source state\n" );
+        LogWarning( "openal", "%s", "failed to change source state\n" );
     }
 }
 
@@ -183,7 +183,7 @@ bool OpenALSource::isStreamed( void ) const
 // ** OpenALSource::update
 void OpenALSource::update( void )
 {
-	DC_ABORT_IF( !m_buffer.valid(), "invalid buffer" );
+    NIMBLE_ABORT_IF( !m_buffer.valid(), "invalid buffer" );
 
     // ** Ensure we have a valid source state for a streamed sources
     if( m_state != state() && isStreamed() ) {

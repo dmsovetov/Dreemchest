@@ -55,12 +55,12 @@ namespace Network {
         typedef TPacket         Packet; //!< Save the packet type handled by this class.
 
         //! Returns the handled packet type.
-        virtual PacketTypeId    packetTypeId( void ) const DC_DECL_OVERRIDE { return TypeInfo<TPacket>::id(); }
+        virtual PacketTypeId    packetTypeId( void ) const NIMBLE_OVERRIDE { return TypeInfo<TPacket>::id(); }
 
     private:
 
         //! Casts the incoming abstract packet to a requested type and runs the processing function
-        virtual void            process( ConnectionWPtr connection, const AbstractPacket& packet ) DC_DECL_OVERRIDE;
+        virtual void            process( ConnectionWPtr connection, const AbstractPacket& packet ) NIMBLE_OVERRIDE;
 
     protected:
 
