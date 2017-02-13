@@ -122,7 +122,7 @@ class CMake:
         """Build a CMake-generated project binary tree."""
 
         # Generate a command line string
-        command_line = '{bin}/cmake --build {source} --target {target} --config {configuration} {rest}'.format(
+        command_line = '{bin}/cmake --build {source} --target {target} --config {configuration} -- {rest}'.format(
             bin=self._home,
             source=source,
             target=target,
@@ -165,7 +165,9 @@ class Command:
                             help='a configuration to be built.',
                             choices=['debug', 'release'],
                             default='release')
-        parser.add_argument('--api-level')
+        parser.add_argument('--api-level',
+                            help='specifies the Android API level.',
+                            default=24)
 
         parser.set_defaults(function=self.configure)
 

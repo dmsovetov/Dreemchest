@@ -50,6 +50,8 @@
     disabled: True
   macos:
     disabled: True
+  emscripten:
+    disabled: True
 
 - name: ogg
 - name: vorbis
