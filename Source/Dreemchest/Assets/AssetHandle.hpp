@@ -146,7 +146,8 @@ template<typename TAsset>
 void DataHandle<TAsset>::setHandle( Assets* assets, Index index )
 {
     Handle::setHandle( assets, index );
-    m_data = &data<TAsset>();
+    m_data = NULL;
+//    m_data = &readLock<TAsset>();
 }
 #endif  /*  DC_DEBUG    */
 

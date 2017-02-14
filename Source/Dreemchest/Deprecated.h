@@ -59,4 +59,8 @@ DC_END_DREEMCHEST
 
 #define DC_NEW new
 
+#ifdef NIMBLE_DEBUG
+    #define DC_DEBUG
+#endif  //  #ifdef NIMBLE_DEBUG
+
 #endif  /*  !DEPRECATED_H   */
