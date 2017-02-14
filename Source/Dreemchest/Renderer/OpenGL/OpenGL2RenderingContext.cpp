@@ -136,9 +136,16 @@ OpenGL2RenderingContext::OpenGL2RenderingContext(RenderViewPtr view)
     m_shaderLibrary.addPreprocessor(DC_NEW AddDefinitionPreprocessor("lowp"));
     m_shaderLibrary.addPreprocessor(DC_NEW AddDefinitionPreprocessor("midp"));
     m_shaderLibrary.addPreprocessor(DC_NEW AddDefinitionPreprocessor("highp"));
+    m_shaderLibrary.addPreprocessor(DC_NEW AddDefinitionPreprocessor("float2", "vec2"));
+    m_shaderLibrary.addPreprocessor(DC_NEW AddDefinitionPreprocessor("float3", "vec3"));
+    m_shaderLibrary.addPreprocessor(DC_NEW AddDefinitionPreprocessor("float4", "vec4"));
     m_shaderLibrary.addPreprocessor(DC_NEW ShaderPreprocessor(false));
 #else
+    m_shaderLibrary.addPreprocessor(DC_NEW ShaderPrecisionPreprocessor("highp", "float"));
     m_shaderLibrary.addPreprocessor(DC_NEW ShaderPreprocessor(true));
+    m_shaderLibrary.addPreprocessor(DC_NEW AddDefinitionPreprocessor("float2", "highp vec2"));
+    m_shaderLibrary.addPreprocessor(DC_NEW AddDefinitionPreprocessor("float3", "highp vec3"));
+    m_shaderLibrary.addPreprocessor(DC_NEW AddDefinitionPreprocessor("float4", "highp vec4"));
 #endif  //  #if !defined(DC_OPENGLES2_ENABLED)
     
 #if !defined(DC_OPENGLES2_ENABLED)

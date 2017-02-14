@@ -89,8 +89,8 @@ static String s_vertexShader =
     "attribute vec3 a_normal;                                   \n"
     "attribute vec2 a_texCoord0;                                \n"
     "                                                           \n"
-    "varying vec2 v_texCoord;                                   \n"
-    "varying vec3 v_color;                                      \n"
+    "varying float2 v_texCoord;                                 \n"
+    "varying float3 v_color;                                    \n"
     "                                                           \n"
     "void main()                                                \n"
     "{                                                          \n"
@@ -115,13 +115,13 @@ static String s_vertexShader =
 static String s_fragmentShader =
     "uniform sampler2D Texture0;                                \n"
     "                                                           \n"
-    "varying vec2 v_texCoord;                                   \n"
-    "varying vec3 v_color;                                      \n"
+    "varying float2 v_texCoord;                                 \n"
+    "varying float3 v_color;                                    \n"
     "                                                           \n"
     "void main()                                                \n"
     "{                                                          \n"
     "#if defined(F_TexCoord)                                    \n"
-    "   vec3  color = texture2D(Texture0, v_texCoord).rgb;      \n" // When F_TexCoord option is set sample a 2D
+    "   float3 color = texture2D(Texture0, v_texCoord).rgb;     \n" // When F_TexCoord option is set sample a 2D
     "   gl_FragColor = vec4(1.0 - color, 1.0);                  \n" // texture, then invert it and pass to an output.
     "#elif defined(F_NormalAsColor)                             \n"
     "   gl_FragColor = vec4(v_color, 1.0);                      \n" // Use a color value that was passed from a

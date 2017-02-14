@@ -53,9 +53,9 @@ static String s_vertexMesh =
     "attribute vec4 a_position;                             \n"
     "attribute vec3 a_normal;                               \n"
 
-    "varying vec3 v_normal;                                 \n"
-    "varying vec3 v_camera;                                 \n"
-    "varying vec3 v_vertex;                                 \n"
+    "varying highp vec3 v_normal;                           \n"
+    "varying highp vec3 v_camera;                           \n"
+    "varying highp vec3 v_vertex;                           \n"
 
     "void main()                                            \n"
     "{                                                      \n"
@@ -75,16 +75,16 @@ static String s_fragmentMesh =
     "uniform samplerCube Texture0;                          \n"
     "uniform samplerCube Texture1;                          \n"
 
-    "varying vec3 v_normal;                                 \n"
-    "varying vec3 v_camera;                                 \n"
-    "varying vec3 v_vertex;                                 \n"
+    "varying highp vec3 v_normal;                           \n"
+    "varying highp vec3 v_camera;                           \n"
+    "varying highp vec3 v_vertex;                           \n"
 
     "void main()                                            \n"
     "{                                                      \n"
-    "   vec3  n = normalize(v_normal);                      \n"
-    "   vec3  c = normalize(v_vertex - v_camera);           \n"
-    "   vec3  r = reflect(c, n);                            \n"
-    "   float f = f_schlick(dot(-c, n), 0.2, 5.0);          \n"
+    "   highp vec3  n = normalize(v_normal);                \n"
+    "   highp vec3  c = normalize(v_vertex - v_camera);     \n"
+    "   highp vec3  r = reflect(c, n);                      \n"
+    "   highp float f = f_schlick(dot(-c, n), 0.2, 5.0);    \n"
 
     "   vec4 diffuse    = textureCube(Texture0, n);         \n"
     "   vec4 reflection = textureCube(Texture1, r);         \n"
@@ -98,7 +98,7 @@ static String s_vertexConvolution =
 
     "attribute vec4 a_position;                                                 \n"
 
-    "varying vec4 v_ray;                                                        \n"
+    "varying highp vec4 v_ray;                                                  \n"
 
     "void main()                                                                \n"
     "{                                                                          \n"
@@ -112,21 +112,21 @@ static String s_fragmentConvolution =
     "cbuffer Convolution convolution : 2;                   \n"
     "cbuffer Kernel      kernel      : 3;                   \n"
 
-    "varying vec4 v_ray;                                    \n"
+    "varying highp vec4 v_ray;                              \n"
 
-    "void main()                                                                        \n"
+    "void main()                                                                                    \n"
     "{                                                                                              \n"
-    "   vec3 n = -normalize(v_ray.xyz);  \n"
-    "   vec3 t = vec3(0.0, 1.0, 0.0);                                                               \n"
-    "   vec3 b = cross(n, t);                                                                       \n"
-    "   vec4 final = vec4(0.0);                                                                     \n"
+    "   highp vec3 n = -normalize(v_ray.xyz);  \n"
+    "   highp vec3 t = vec3(0.0, 1.0, 0.0);                                                         \n"
+    "   highp vec3 b = cross(n, t);                                                                 \n"
+    "   highp vec4 final = vec4(0.0);                                                               \n"
 
-    "   float factor = ((convolution.power + 2.0) / 2.0 * M_PI);                                    \n"
+    "   highp float factor = ((convolution.power + 2.0) / 2.0 * M_PI);                              \n"
 
     "   for (int i = 0; i < kernel.size; i++)                                                       \n"
     "   {                                                                                           \n"
-    "       vec4  sample = kernel.samples[i];                                                       \n"
-    "       vec3  dir   = directionFromHemisphere(t, b, n, sample);                                 \n"
+    "       highp vec4  sample = kernel.samples[i];                                                 \n"
+    "       highp vec3  dir    = directionFromHemisphere(t, b, n, sample);                          \n"
     "       final += textureCube(Texture0, dir) * pow(sample.z, convolution.power) * sample.w;      \n"
     "   }                                                                                           \n"
 

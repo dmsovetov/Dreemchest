@@ -152,7 +152,7 @@ namespace Framework
     
         "attribute vec4 a_position;                                 \n"
     
-        "varying vec3 v_texCoord;                                   \n"
+        "varying float3 v_texCoord;                                 \n"
         
         "void main()                                                \n"
         "{                                                          \n"
@@ -166,7 +166,7 @@ namespace Framework
     const String FragmentSkyBox =
         "uniform samplerCube Texture0;                              \n"
         
-        "varying vec3 v_texCoord;                                   \n"
+        "varying float3 v_texCoord;                                 \n"
         
         "void main()                                                \n"
         "{                                                          \n"
@@ -197,7 +197,7 @@ namespace Framework
     
         "attribute vec4 a_position;                                                 \n"
     
-        "varying vec4 v_color;                                                      \n"
+        "varying float4 v_color;                                                    \n"
     
         "void main()                                                                \n"
         "{                                                                          \n"
@@ -210,7 +210,7 @@ namespace Framework
         ;
     
     const String FragmentDebug =
-        "varying vec4 v_color;                                                      \n"
+        "varying float4 v_color;                                                    \n"
         
         "void main()                                                                \n"
         "{                                                                          \n"

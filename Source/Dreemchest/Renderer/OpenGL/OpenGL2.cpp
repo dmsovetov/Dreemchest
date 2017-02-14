@@ -509,6 +509,14 @@ GLuint OpenGL2::Texture::createCube(const void* data, u16 size, u16 mipLevels, u
     TextureFilter filter = Private::textureFilterFromOptions(options);
     PixelFormat   format = Private::pixelFormatFromOptions(options);
     
+#if defined(DC_OPENGLES2_ENABLED)
+    if (filter == FilterBilinear || filter == FilterTrilinear)
+    {
+        LogWarning("opengles", "%s", "cubemap mipmaping is disabled on OpenGLES2\n");
+        filter = FilterLinear;
+    }
+#endif  //  #if defined(DC_OPENGLES2_ENABLED)
+    
     GLuint id;
     GLint  align = textureAlign(format);
     
@@ -519,12 +527,18 @@ GLuint OpenGL2::Texture::createCube(const void* data, u16 size, u16 mipLevels, u
     
     if (align)
     {
+    #if defined(DC_OPENGLES2_ENABLED)
+        LogWarning("opengles", "unpack alignment %d ignored\n", align);
+    #else
         glPixelStorei(GL_UNPACK_ALIGNMENT, align);
+        DREEMCHEST_GL_ERRORS
+    #endif  //  #if defined(DC_OPENGLES2_ENABLED)
     }
     
     if (filter != FilterNearest && filter != FilterLinear && mipLevels == 1)
     {
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_GENERATE_MIPMAP, GL_TRUE);
+        DREEMCHEST_GL_ERRORS
     }
     
     const GLbyte* pixels = reinterpret_cast<const GLbyte*>(data);
@@ -773,6 +787,43 @@ void OpenGL2::clear(const GLclampf* color, u8 mask, GLclampf depth, GLint stenci
     }
 }
     
+// ** OpenGL2::dumpErrors
+bool OpenGL2::dumpErrors(CString fileName, s32 line)
+{
+    GLenum err;
+    bool errorRecorded = false;
+
+    while((err = glGetError()) != GL_NO_ERROR)
+    {
+        errorRecorded = true;
+        
+        switch (err)
+        {
+            case GL_INVALID_ENUM:
+                LogError("opengl", "GL_INVALID_ENUM recorded at %s:%d\n", fileName, line);
+                break;
+            case GL_INVALID_VALUE:
+                LogError("opengl", "GL_INVALID_VALUE recorded at %s:%d\n", fileName, line);
+                break;
+            case GL_INVALID_OPERATION:
+                LogError("opengl", "GL_INVALID_OPERATION recorded at %s:%d\n", fileName, line);
+                break;
+            case GL_STACK_OVERFLOW:
+                LogError("opengl", "GL_STACK_OVERFLOW recorded at %s:%d\n", fileName, line);
+                break;
+            case GL_STACK_UNDERFLOW:
+                LogError("opengl", "GL_STACK_UNDERFLOW recorded at %s:%d\n", fileName, line);
+                break;
+            case GL_OUT_OF_MEMORY:
+                LogError("opengl", "GL_OUT_OF_MEMORY recorded at %s:%d\n", fileName, line);
+                break;
+        }
+    }
+    
+    return errorRecorded;
+}
+
+    
 #if DEV_RENDERER_DEPRECATED_INPUT_LAYOUTS
 // ** OpenGL2::enableInputLayout
 void OpenGL2::enableInputLayout(GLbyte* pointer, const VertexBufferLayout& layout)
@@ -888,11 +939,10 @@ void OpenGL2::setInputLayout(const GLint* locations, const VertexBufferLayout& l
         if (locations[i] == -1)
         {
             DREEMCHEST_GL_SENTINEL
-            glDisableVertexAttribArray(location);
+        //    glDisableVertexAttribArray(location);
         }
         else
         {
-            DREEMCHEST_GL_SENTINEL
             const VertexBufferLayout::Element& element = layout[i];
             
             glEnableVertexAttribArray(location);

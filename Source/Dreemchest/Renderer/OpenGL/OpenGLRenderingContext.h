@@ -109,6 +109,22 @@ namespace Renderer
 
             s32                             m_version;  //!< A shader version to be inserted.
         };
+        
+        //! Adds a precision directive to a shader source code
+        class ShaderPrecisionPreprocessor : public ShaderPreprocessor
+        {
+        public:
+            
+                                            ShaderPrecisionPreprocessor(const String& precision, const String& type);
+            
+            //! Adds a precision directive to a shader source code
+            virtual bool                    preprocess(const RenderingContext& renderingContext, String& shader) const;
+            
+        private:
+            
+            String                          m_precision;    //!< A shader precision to be set.
+            String                          m_type;         //!< A data type to be changed.
+        };
     
         //! A container type to store program permutations.
         typedef HashMap<PipelineFeatures, Permutation> ProgramPermutations;

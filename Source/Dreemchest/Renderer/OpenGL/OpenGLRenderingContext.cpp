@@ -46,6 +46,22 @@ bool OpenGLRenderingContext::ShaderVersionPreprocessor::preprocess(const Renderi
     shader = "#version " + toString(m_version) + "\n" + shader;
     return true;
 }
+    
+// ------------------------------------------------ OpenGLRenderingContext::ShaderPrecisionPreprocessor -------------------------------------------- //
+
+// ** OpenGLRenderingContext::ShaderPrecisionPreprocessor::ShaderPrecisionPreprocessor
+OpenGLRenderingContext::ShaderPrecisionPreprocessor::ShaderPrecisionPreprocessor(const String& precision, const String& type)
+    : m_precision(precision)
+    , m_type(type)
+{
+}
+
+// ** OpenGLRenderingContext::ShaderPrecisionPreprocessor::preprocess
+bool OpenGLRenderingContext::ShaderPrecisionPreprocessor::preprocess(const RenderingContext& renderingContext, String& shader) const
+{
+    shader = "precision " + m_precision + " " + m_type + ";\n" + shader;
+    return true;
+}
 
 // ------------------------------------------------------ OpenGLRenderingContext --------------------------------------------------- //
 

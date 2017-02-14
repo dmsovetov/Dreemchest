@@ -76,7 +76,11 @@ s32 OpenGLFramebufferCache::acquire(u16 width, u16 height, u32 options)
     s32 depthBits = Private::depthBitsFromOptions(options);
     if (depthBits)
     {
+    #if defined(DC_OPENGLES2_ENABLED)
+        item.depth = OpenGL2::Framebuffer::renderbuffer(item.id, width, height, GL_DEPTH_ATTACHMENT, GL_DEPTH_COMPONENT24);
+    #else
         item.depth = OpenGL2::Framebuffer::renderbuffer(item.id, width, height, GL_DEPTH_ATTACHMENT, GL_DEPTH_COMPONENT);
+    #endif  //  #if defined(DC_OPENGLES2_ENABLED)
     }
     
     s32 index = m_items.push(item);

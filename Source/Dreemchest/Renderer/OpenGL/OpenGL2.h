@@ -377,6 +377,9 @@ namespace Renderer
         //! Initializes an OpenGL 2 wrapper.
         static bool     initialize();
         
+        //! Outputs all recorded errors to console.
+        static bool     dumpErrors(CString fileName, s32 line);
+        
         //! Clears an active viewport.
         static void     clear(const GLclampf* color, u8 mask, GLclampf depth, GLint stencil);
         
@@ -449,5 +452,11 @@ namespace Renderer
 } // namespace Renderer
 
 DC_END_DREEMCHEST
+
+#ifdef DC_DEBUG
+    #define DREEMCHEST_GL_ERRORS OpenGL2::dumpErrors(NIMBLE_PRETTY_FUNCTION, __LINE__);
+#else
+    #define DREEMCHEST_GL_ERRORS
+#endif  //  #ifdef DC_DEBUG
 
 #endif  /*  !__DC_Renderer_OpenGL2_H__  */

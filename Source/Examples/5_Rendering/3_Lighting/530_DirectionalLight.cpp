@@ -40,8 +40,8 @@ static String s_vertexShader =
     "attribute vec4 a_position;                                                 \n"
     "attribute vec3 a_normal;                                                   \n"
     "                                                                           \n"
-    "varying vec3 v_wsVertex;                                                   \n"
-    "varying vec3 v_wsNormal;                                                   \n"
+    "varying float3 v_wsVertex;                                                 \n"
+    "varying float3 v_wsNormal;                                                 \n"
     "                                                                           \n"
     "void main()                                                                \n"
     "{                                                                          \n"
@@ -63,8 +63,8 @@ static String s_fragmentShader =
     "cbuffer Instance   instance : 2;                                           \n"
     "cbuffer Light      light    : 3;                                           \n"
 
-    "varying vec3 v_wsVertex;                                                   \n"
-    "varying vec3 v_wsNormal;                                                   \n"
+    "varying float3 v_wsVertex;                                                 \n"
+    "varying float3 v_wsNormal;                                                 \n"
 
     "vec2 phong(vec3 L, vec3 N, vec3 V)                                         \n"
     "{                                                                          \n"

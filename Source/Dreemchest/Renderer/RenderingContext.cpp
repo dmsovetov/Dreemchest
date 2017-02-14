@@ -179,7 +179,7 @@ RenderingContext::RenderingContext(RenderViewPtr view)
     setDefaultProgram(defaultProgram);
     
     // Add shared functions
-    m_shaderLibrary.addSharedFunction("f_schlick", NIMBLE_STRINGIFY(float f_schlick(float dp, float f0, float pow)
+    m_shaderLibrary.addSharedFunction("f_schlick", NIMBLE_STRINGIFY(float f_schlick(highp float dp, float f0, float pow)
                                                                     {
                                                                         float facing = (1.0 - dp);
                                                                         return max(f0 + (1.0 - f0) * pow(facing, pow), 0.0);
@@ -198,22 +198,22 @@ RenderingContext::RenderingContext(RenderViewPtr view)
                                                                          }
                                                                          ));
     
-    m_shaderLibrary.addSharedFunction("d_blinn", NIMBLE_STRINGIFY(vec2 d_blinn(vec4 products)
+    m_shaderLibrary.addSharedFunction("d_blinn", NIMBLE_STRINGIFY(float2 d_blinn(float4 products)
                                                                   {
                                                                       float diff = max(0.0, products.x);
                                                                       float spec = step(0.0, products.x) * max(0.0, products.z);
-                                                                      return vec2(diff, spec);
+                                                                      return float2(diff, spec);
                                                                   }
                                                                   ));
     
-    m_shaderLibrary.addSharedFunction("d_blinnPhong", NIMBLE_STRINGIFY(vec2 d_blinnPhong(vec4 products, float roughness)
+    m_shaderLibrary.addSharedFunction("d_blinnPhong", NIMBLE_STRINGIFY(float2 d_blinnPhong(float4 products, float roughness)
                                                                         {
                                                                             float a = max(0.001, roughness * roughness);
-                                                                            return vec2((1.0 / ((3.1415926535897932384626433832795) * a * a)) * pow(products.z, 2.0 / (a * a) - 2.0), 0.0);
+                                                                            return float2((1.0 / ((3.1415926535897932384626433832795) * a * a)) * pow(products.z, 2.0 / (a * a) - 2.0), 0.0);
                                                                         }
                                                                         ));
 
-    m_shaderLibrary.addSharedFunction("l_products", NIMBLE_STRINGIFY(vec4 l_products(vec3 n, vec3 v, vec3 l, vec3 r)
+    m_shaderLibrary.addSharedFunction("l_products", NIMBLE_STRINGIFY(float4 l_products(float3 n, float3 v, float3 l, float3 r)
                                                                      {
                                                                          float ndotl = dot(n, l);
                                                                          float ndotv = dot(n, v);
@@ -222,7 +222,7 @@ RenderingContext::RenderingContext(RenderViewPtr view)
                                                                      }
                                                                      ));
     
-    m_shaderLibrary.addSharedFunction("f_reflectance", NIMBLE_STRINGIFY(float f_reflectance(float eta)
+    m_shaderLibrary.addSharedFunction("f_reflectance", NIMBLE_STRINGIFY(float f_reflectance(highp float eta)
                                                                         {
                                                                             float one_minus_eta = 1.0 - eta;
                                                                             float one_plus_eta  = 1.0 + eta;
@@ -230,14 +230,14 @@ RenderingContext::RenderingContext(RenderViewPtr view)
                                                                         }
                                                                         ));
     
-    m_shaderLibrary.addSharedFunction("directionFromHemisphere", NIMBLE_STRINGIFY(vec3 directionFromHemisphere(vec3 t, vec3 b, vec3 n, vec2 spherical)
+    m_shaderLibrary.addSharedFunction("directionFromHemisphere", NIMBLE_STRINGIFY(float3 directionFromHemisphere(float3 t, float3 b, float3 n, float2 spherical)
                                                                                   {
-                                                                                      vec4 angles = vec4(cos(spherical.x), sin(spherical.x), cos(spherical.y), sin(spherical.y));
+                                                                                      float4 angles = vec4(cos(spherical.x), sin(spherical.x), cos(spherical.y), sin(spherical.y));
                                                                                       return t * angles.x * angles.w + b * angles.y * angles.w + n * angles.z;
                                                                                   }
                                                                                   ));
     
-    m_shaderLibrary.addSharedFunction("directionFromHemisphere", NIMBLE_STRINGIFY(vec3 directionFromHemisphere(vec3 t, vec3 b, vec3 n, vec4 angles)
+    m_shaderLibrary.addSharedFunction("directionFromHemisphere", NIMBLE_STRINGIFY(float3 directionFromHemisphere(float3 t, float3 b, float3 n, float4 angles)
                                                                                   {
                                                                                       return t * angles.x * angles.w + b * angles.y * angles.w + n * angles.z;
                                                                                   }

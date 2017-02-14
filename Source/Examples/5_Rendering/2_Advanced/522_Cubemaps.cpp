@@ -38,7 +38,7 @@ static String s_vertexShader =
 
     "attribute vec4 a_position;                                 \n"
 
-    "varying vec3 v_texCoord;                                   \n"
+    "varying float3 v_texCoord;                                 \n"
 
     "void main()                                                \n"
     "{                                                          \n"
@@ -52,7 +52,7 @@ static String s_vertexShader =
 static String s_fragmentShader =
     "uniform samplerCube Texture0;                              \n"
 
-    "varying vec3 v_texCoord;                                   \n"
+    "varying float3 v_texCoord;                                 \n"
 
     "void main()                                                \n"
     "{                                                          \n"
