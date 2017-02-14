@@ -29,22 +29,6 @@
 
 #include "../Renderer.h"
 
-#ifdef DC_DEBUG
-    #ifdef DC_THREADS_ENABLED
-        #define CHECK_THREAD DC_ASSERT( m_renderThread == thread::Thread::currentThread(), "Accessing OpenGL from another thread" )
-    #else
-        #define CHECK_THREAD
-    #endif  //  DC_DEBUG
-
-    #define DC_CHECK_GL_CONTEXT DC_ASSERT( glGetString( GL_EXTENSIONS ) != NULL, "OpenGL context should be initialized" )
-    #define DC_CHECK_GL         sOpenGLErrorCheck __gl_check; CHECK_THREAD
-    #define DC_CHECK_GL_ERROR   DC_EXPECT( glGetError() == GL_NO_ERROR, "Unexpected OpenGL error occured" )
-#else
-    #define DC_CHECK_GL_CONTEXT
-    #define DC_CHECK_GL
-    #define DC_CHECK_GL_ERROR
-#endif
-
 // ** OpenGL headers and libraries
 #if defined( DC_PLATFORM_WINDOWS )
     #include <windows.h>
@@ -158,6 +142,68 @@
         #define GL_SAMPLER_3D 2
     #endif  //  #ifndef GL_SAMPLER_3D
 #endif  //  #ifdef DC_OPENGLES2_ENABLED
+
+#ifdef DC_DEBUG
+    #ifdef DC_THREADS_ENABLED
+        #define CHECK_THREAD DC_ASSERT( m_renderThread == thread::Thread::currentThread(), "Accessing OpenGL from another thread" )
+    #else
+        #define CHECK_THREAD
+    #endif  //  DC_DEBUG
+
+    DC_BEGIN_DREEMCHEST
+
+    namespace Renderer
+    {
+        struct OpenGLErrorCheck
+        {
+             OpenGLErrorCheck() { dump(); }
+            ~OpenGLErrorCheck() { dump(); }
+            
+            void dump()
+            {
+                GLenum err;
+                bool errorRecorded = false;
+                while((err = glGetError()) != GL_NO_ERROR)
+                {
+                    errorRecorded = true;
+                    
+                    switch (err)
+                    {
+                        case GL_INVALID_ENUM:
+                            LogError("opengl", "%s", "invalid enum\n");
+                            break;
+                        case GL_INVALID_VALUE:
+                            LogError("opengl", "%s", "invalid value\n");
+                            break;
+                        case GL_INVALID_OPERATION:
+                            LogError("opengl", "%s", "invalid operation\n");
+                            break;
+                        case GL_STACK_OVERFLOW:
+                            LogError("opengl", "%s", "stack overflow\n");
+                            break;
+                        case GL_STACK_UNDERFLOW:
+                            LogError("opengl", "%s", "stack underflow\n");
+                            break;
+                        case GL_OUT_OF_MEMORY:
+                            LogError("opengl", "%s", "out of memory\n");
+                            break;
+                    }
+                }
+                
+                NIMBLE_BREAK_IF(errorRecorded, "unexpected OpenGL error occured");
+            }
+        };
+    } // namespace Renderer
+
+    DC_END_DREEMCHEST
+
+    #define DREEMCHEST_GL_SENTINEL                                                                              \
+                NIMBLE_ABORT_IF( glGetString( GL_EXTENSIONS ) == NULL, "OpenGL context should be initialized" ) \
+                DC_DREEMCHEST_NS Renderer::OpenGLErrorCheck __gl_check;                                         \
+                CHECK_THREAD
+#else
+    #define DREEMCHEST_GL_SENTINEL
+#endif  //  #ifdef DC_DEBUG
 
 DC_BEGIN_DREEMCHEST
 

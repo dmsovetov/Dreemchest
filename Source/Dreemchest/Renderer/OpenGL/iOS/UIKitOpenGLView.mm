@@ -98,6 +98,8 @@ DC_USE_DREEMCHEST
 // ** setupFrameBuffer
 - (BOOL) setupFrameBuffer
 {
+    DREEMCHEST_GL_SENTINEL
+    
     // Create color renderbuffer
     glGenRenderbuffers(1, &_colorRenderBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, _colorRenderBuffer);
@@ -107,9 +109,6 @@ DC_USE_DREEMCHEST
 
     // Configure the framebuffer
     glGenFramebuffers(1, &_defaultFramebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, _defaultFramebuffer);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, _colorRenderBuffer);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthRenderBuffer);
     
     return YES;
 }
@@ -124,6 +123,8 @@ DC_USE_DREEMCHEST
 // ** resizeFromLayer
 - (BOOL)resizeFromLayer:(CAEAGLLayer *)layer
 {
+    DREEMCHEST_GL_SENTINEL
+    
     // Allocate color buffer backing based on the current layer size
     glBindRenderbuffer(GL_RENDERBUFFER, _colorRenderBuffer);
     
@@ -140,6 +141,11 @@ DC_USE_DREEMCHEST
     // Update the depth buffer dimensions
     glBindRenderbuffer(GL_RENDERBUFFER, _depthRenderBuffer);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8_OES, _width, _height);
+    
+    // Attach renderbuffers to framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, _defaultFramebuffer);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, _colorRenderBuffer);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthRenderBuffer);
     
     Renderer::Log::verbose(NIMBLE_LOGGER_CONTEXT, "opengles", "renderbuffer resized to %dx%d\n", _width, _height);
     return YES;
@@ -163,6 +169,8 @@ DC_USE_DREEMCHEST
 // ** dealoc
 - (void) dealloc
 {
+    DREEMCHEST_GL_SENTINEL
+    
     if (_defaultFramebuffer)
     {
         glDeleteFramebuffersOES(1, &_defaultFramebuffer);
@@ -201,6 +209,8 @@ DC_USE_DREEMCHEST
 // ** beginFrame
 - ( void ) beginFrame
 {
+    DREEMCHEST_GL_SENTINEL
+    
     [self makeCurrent];
 
     glBindFramebufferOES( GL_FRAMEBUFFER_OES, _defaultFramebuffer );
@@ -210,6 +220,8 @@ DC_USE_DREEMCHEST
 // ** endFrame
 - ( void ) endFrame: (BOOL) wait
 {
+    DREEMCHEST_GL_SENTINEL
+    
     if (wait)
     {
         glFinish();

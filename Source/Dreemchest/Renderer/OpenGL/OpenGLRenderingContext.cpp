@@ -58,6 +58,8 @@ OpenGLRenderingContext::OpenGLRenderingContext(RenderViewPtr view)
         m_view->makeCurrent();
     }
     
+    DREEMCHEST_GL_SENTINEL
+    
     m_framebuffers = new OpenGLFramebufferCache;
 
 #if !defined(DC_OPENGLES2_ENABLED)

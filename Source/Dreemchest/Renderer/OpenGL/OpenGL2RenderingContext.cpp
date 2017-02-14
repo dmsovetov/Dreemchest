@@ -219,6 +219,8 @@ ResourceId OpenGL2RenderingContext::allocateTexture(u8 type, const void* data, u
 // ** OpenGL2RenderingContext::executeCommandBuffer
 void OpenGL2RenderingContext::executeCommandBuffer(const CommandBuffer& commands)
 {
+    DREEMCHEST_GL_SENTINEL
+    
     GLuint                    id;
     const Permutation*        permutation = NULL;
     const VertexBufferLayout* vertexBufferLayout = NULL;
@@ -339,8 +341,7 @@ void OpenGL2RenderingContext::executeCommandBuffer(const CommandBuffer& commands
             case OpCode::RenderToTexture:
             case OpCode::RenderToTransientTexture:
             {
-                DC_CHECK_GL_CONTEXT;
-                DC_CHECK_GL;
+                DREEMCHEST_GL_SENTINEL
                 
                 NIMBLE_ABORT_IF(opCode.renderToTextures.count > m_caps.maxRenderTargets, "to much render targets");
                 

@@ -109,7 +109,7 @@ extern u32 bytesPerMip(PixelFormat format, u16 width, u16 height);
 // ** OpenGL2::Buffer::create
 GLuint OpenGL2::Buffer::create(GLenum type, const void* data, s32 size, GLenum usage)
 {
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     
     GLuint id;
     glGenBuffers(1, &id);
@@ -122,7 +122,8 @@ GLuint OpenGL2::Buffer::create(GLenum type, const void* data, s32 size, GLenum u
 // ** OpenGL2::Buffer::subData
 void OpenGL2::Buffer::subData(GLenum target, GLuint id, GLintptr offset, GLsizeiptr size, const GLvoid* data)
 {
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
+    
     glBindBuffer(target, id);
     glBufferSubData(target, offset, size, data);
     glBindBuffer(target, 0);
@@ -131,7 +132,7 @@ void OpenGL2::Buffer::subData(GLenum target, GLuint id, GLintptr offset, GLsizei
 // ** OpenGL2::Buffer::bind
 void OpenGL2::Buffer::bind(GLenum type, GLuint id)
 {
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     glBindBuffer(type, id);
 }
     
@@ -140,8 +141,7 @@ void OpenGL2::Buffer::bind(GLenum type, GLuint id)
 // ** OpenGL2::Framebuffer::bind
 void OpenGL2::Framebuffer::bind(GLuint id)
 {
-    DC_CHECK_GL_CONTEXT;
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     
     glBindFramebuffer(GL_FRAMEBUFFER, id);
 }
@@ -149,8 +149,7 @@ void OpenGL2::Framebuffer::bind(GLuint id)
 // ** OpenGL2::Framebuffer::create
 GLuint OpenGL2::Framebuffer::create()
 {
-    DC_CHECK_GL_CONTEXT;
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     
     GLuint id;
     glGenFramebuffers(1, &id);
@@ -160,8 +159,7 @@ GLuint OpenGL2::Framebuffer::create()
 // ** OpenGL2::Framebuffer::renderbuffer
 GLuint OpenGL2::Framebuffer::renderbuffer(GLuint id, GLsizei width, GLsizei height, GLenum attachment, GLenum internalFormat)
 {
-    DC_CHECK_GL_CONTEXT;
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     
     GLuint rid;
 
@@ -179,14 +177,14 @@ GLuint OpenGL2::Framebuffer::renderbuffer(GLuint id, GLsizei width, GLsizei heig
 // ** OpenGL2::Framebuffer::texture2D
 void OpenGL2::Framebuffer::texture2D(GLuint id, GLenum attachment, GLenum target, GLint level)
 {
+    DREEMCHEST_GL_SENTINEL
     glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, target, id, level);
 }
     
 // ** OpenGL2::Framebuffer::check
 bool OpenGL2::Framebuffer::check(GLuint id)
 {
-    DC_CHECK_GL_CONTEXT;
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
         
     glBindFramebuffer(GL_FRAMEBUFFER, id);
     GLenum status = glCheckFramebufferStatus( GL_FRAMEBUFFER );
@@ -226,24 +224,21 @@ bool OpenGL2::Framebuffer::check(GLuint id)
 // ** OpenGL2::Framebuffer::destroyRenderBuffer
 void OpenGL2::Framebuffer::destroyRenderBuffer(GLuint id)
 {
-    DC_CHECK_GL_CONTEXT;
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     glDeleteRenderbuffers(1, &id);
 }
 
 // ** OpenGL2::Framebuffer::destroy
 void OpenGL2::Framebuffer::destroy(GLuint id)
 {
-    DC_CHECK_GL_CONTEXT;
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     glDeleteFramebuffers(1, &id);
 }
 
 // ** OpenGL2::Framebuffer::save
 GLuint OpenGL2::Framebuffer::save(GLint viewport[4])
 {
-    DC_CHECK_GL_CONTEXT;
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     
     GLint id;
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &id);
@@ -254,8 +249,7 @@ GLuint OpenGL2::Framebuffer::save(GLint viewport[4])
 // ** OpenGL2::Framebuffer::restore
 void OpenGL2::Framebuffer::restore(GLuint id, GLint viewport[4])
 {
-    DC_CHECK_GL_CONTEXT;
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     
     glBindFramebuffer(GL_FRAMEBUFFER, id);
     glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
@@ -266,21 +260,21 @@ void OpenGL2::Framebuffer::restore(GLuint id, GLint viewport[4])
 // ** OpenGL2::Program::deleteProgram
 void OpenGL2::Program::deleteProgram(GLuint id)
 {
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     glDeleteProgram(id);
 }
 
 // ** OpenGL2::Program::deleteShader
 void OpenGL2::Program::deleteShader(GLuint id)
 {
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     glDeleteShader(id);
 }
 
 // ** OpenGL2::Program::compileShader
 GLuint OpenGL2::Program::compileShader(GLenum type, CString source, s8* error, s32 maxErrorSize)
 {
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     
     GLint result;
     
@@ -316,6 +310,7 @@ GLuint OpenGL2::Program::compileShader(GLenum type, CString source, s8* error, s
 // ** OpenGL2::Program::uniformCount
 GLint OpenGL2::Program::uniformCount(GLuint id)
 {
+    DREEMCHEST_GL_SENTINEL
     GLint value;
     glGetProgramiv(id, GL_ACTIVE_UNIFORMS, &value);
     return value;
@@ -324,13 +319,14 @@ GLint OpenGL2::Program::uniformCount(GLuint id)
 // ** OpenGL2::Program::uniformAt
 void OpenGL2::Program::uniformAt(GLuint program, GLuint index, Uniform& uniform)
 {
+    DREEMCHEST_GL_SENTINEL
     glGetActiveUniform(program, index, sizeof(uniform.name), &uniform.length, &uniform.size, &uniform.type, uniform.name);
 }
 
 // ** OpenGL2::Program::createProgram
 GLuint OpenGL2::Program::createProgram(const GLuint* shaders, s32 count, s8* error, s32 maxErrorSize)
 {
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     
     // Create a shader program
     GLuint program = glCreateProgram();
@@ -384,81 +380,84 @@ GLuint OpenGL2::Program::createProgram(const GLuint* shaders, s32 count, s8* err
 // ** OpenGL2::Program::attributeLocation
 GLint OpenGL2::Program::attributeLocation(GLuint program, CString name)
 {
+    DREEMCHEST_GL_SENTINEL
     return glGetAttribLocation(program, name);
 }
     
 // ** OpenGL2::Program::uniformLocation
 GLint OpenGL2::Program::uniformLocation(GLuint program, CString name)
 {
+    DREEMCHEST_GL_SENTINEL
     return uniformLocation(program, FixedString(name));
 }
 
 // ** OpenGL2::Program::uniformLocation
 GLint OpenGL2::Program::uniformLocation(GLuint program, const FixedString& name)
 {
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     return glGetUniformLocation(program, name) + 1;
 }
     
 // ** OpenGL2::Program::uniformMatrix4
 void OpenGL2::Program::uniformMatrix4(GLint location, const f32 value[16], s32 count, GLboolean transpose)
 {
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     glUniformMatrix4fv(location - 1, max2(1, count), transpose, value);
 }
 
 // ** OpenGL2::Program::uniform1i
 void OpenGL2::Program::uniform1i(GLint location, const s32* value, s32 count)
 {
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     glUniform1iv(location - 1, max2(1, count), value);
 }
     
 // ** OpenGL2::Program::uniform1i
 void OpenGL2::Program::uniform1i(GLint location, s32 value)
 {
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     glUniform1i(location - 1, value);
 }
 
 // ** OpenGL2::Program::uniform1f
 void OpenGL2::Program::uniform1f(GLint location, f32 value)
 {
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     glUniform1f(location - 1, value);
 }
 
 // ** OpenGL2::Program::uniform1f
 void OpenGL2::Program::uniform1f(GLint location, const f32* value, s32 count)
 {
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     glUniform1fv(location - 1, max2(1, count), value);
 }
 
 // ** OpenGL2::Program::uniform2f
 void OpenGL2::Program::uniform2f(GLint location, const f32* value, s32 count)
 {
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     glUniform2fv(location - 1, max2(1, count), value);
 }
 
 // ** OpenGL2::Program::uniform3f
 void OpenGL2::Program::uniform3f(GLint location, const f32* value, s32 count)
 {
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     glUniform3fv(location - 1, max2(1, count), value);
 }
 
 // ** OpenGL2::Program::uniform4f
 void OpenGL2::Program::uniform4f(GLint location, const f32* value, s32 count)
 {
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     glUniform4fv(location - 1, max2(1, count), value);
 }
 
 // ** OpenGL2::Program::use
 void OpenGL2::Program::use(GLuint program)
 {
+    DREEMCHEST_GL_SENTINEL
     glUseProgram(program);
 }
     
@@ -467,7 +466,7 @@ void OpenGL2::Program::use(GLuint program)
 // ** OpenGL2::Texture::create2D
 GLuint OpenGL2::Texture::create2D(const void* data, u16 width, u16 height, u16 mipLevels, u32 options)
 {
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     
     TextureFilter filter = Private::textureFilterFromOptions(options);
     PixelFormat   format = Private::pixelFormatFromOptions(options);
@@ -505,8 +504,7 @@ GLuint OpenGL2::Texture::create2D(const void* data, u16 width, u16 height, u16 m
 // ** OpenGL2::Texture::createCube
 GLuint OpenGL2::Texture::createCube(const void* data, u16 size, u16 mipLevels, u32 options)
 {
-    DC_CHECK_GL_CONTEXT;
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     
     TextureFilter filter = Private::textureFilterFromOptions(options);
     PixelFormat   format = Private::pixelFormatFromOptions(options);
@@ -549,8 +547,7 @@ GLuint OpenGL2::Texture::createCube(const void* data, u16 size, u16 mipLevels, u
 // ** OpenGL2::Texture::texImage
 GLsizei OpenGL2::Texture::texImage(GLenum target, const GLbyte* data, u16 width, u16 height, s32 mipLevels, PixelFormat pixelFormat)
 {
-    DC_CHECK_GL_CONTEXT;
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     
     // Get texture parameters from a pixel format
     GLenum internalFormat = textureInternalFormat(pixelFormat);
@@ -593,8 +590,7 @@ GLsizei OpenGL2::Texture::texImage(GLenum target, const GLbyte* data, u16 width,
 // ** OpenGL2::Texture::texDepthStencil
 void OpenGL2::Texture::texDepthStencil(GLenum target, u16 width, u16 height, u32 options)
 {
-    DC_CHECK_GL_CONTEXT;
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     
     s32 depth   = Private::depthBitsFromOptions(options);
     s32 stencil = Private::stencilBitsFromOptions(options);
@@ -630,7 +626,7 @@ void OpenGL2::Texture::texDepthStencil(GLenum target, u16 width, u16 height, u32
 // ** OpenGL2::Texture::bind
 void OpenGL2::Texture::bind(TextureType type, GLuint id, GLuint sampler)
 {
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     
     GLenum targets[TotalTextureTypes] =
     {
@@ -648,7 +644,7 @@ void OpenGL2::Texture::bind(TextureType type, GLuint id, GLuint sampler)
 // ** OpenGL2::Texture::destroy
 void OpenGL2::Texture::destroy(GLuint id)
 {
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     glDeleteTextures(1, &id);
 }
   
@@ -657,12 +653,15 @@ void OpenGL2::Texture::destroy(GLuint id)
 // ** OpenGL2::Stencil::setOperations
 void OpenGL2::Stencil::setOperations(StencilAction sfail, StencilAction dfail, StencilAction pass)
 {
+    DREEMCHEST_GL_SENTINEL
     glStencilOp(convertStencilAction(sfail), convertStencilAction(dfail), convertStencilAction(pass));
 }
 
 // ** OpenGL2::Stencil::setFunction
 void OpenGL2::Stencil::setFunction(Compare function, u8 ref, u8 mask)
 {
+    DREEMCHEST_GL_SENTINEL
+    
     if (function == CompareDisabled)
     {
         glDisable(GL_STENCIL_TEST);
@@ -736,7 +735,7 @@ bool OpenGL2::initialize()
 // ** OpenGL2::clear
 void OpenGL2::clear(const GLclampf* color, u8 mask, GLclampf depth, GLint stencil)
 {
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     
     GLbitfield flags = 0;
     GLboolean  activeDepthMask;
@@ -778,7 +777,7 @@ void OpenGL2::clear(const GLclampf* color, u8 mask, GLclampf depth, GLint stenci
 // ** OpenGL2::enableInputLayout
 void OpenGL2::enableInputLayout(GLbyte* pointer, const VertexBufferLayout& layout)
 {
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     
     s32 stride = layout.vertexSize();
     
@@ -826,7 +825,7 @@ void OpenGL2::enableInputLayout(GLbyte* pointer, const VertexBufferLayout& layou
 // ** OpenGL2::disableInputLayout
 void OpenGL2::disableInputLayout(const VertexBufferLayout& layout)
 {
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     
     if(layout.normal())
     {
@@ -860,6 +859,8 @@ void OpenGL2::disableInputLayout(const VertexBufferLayout& layout)
 // ** OpenGL2::setInputLayout
 void OpenGL2::setInputLayout(const GLint* locations, const VertexBufferLayout& layout)
 {
+    DREEMCHEST_GL_SENTINEL
+    
     static GLenum s_attributeType[] =
     {
           GL_FLOAT
@@ -886,10 +887,12 @@ void OpenGL2::setInputLayout(const GLint* locations, const VertexBufferLayout& l
         
         if (locations[i] == -1)
         {
+            DREEMCHEST_GL_SENTINEL
             glDisableVertexAttribArray(location);
         }
         else
         {
+            DREEMCHEST_GL_SENTINEL
             const VertexBufferLayout::Element& element = layout[i];
             
             glEnableVertexAttribArray(location);
@@ -902,6 +905,9 @@ void OpenGL2::setInputLayout(const GLint* locations, const VertexBufferLayout& l
 // ** OpenGL2::setAlphaTest
 void OpenGL2::setAlphaTest(Compare function, u8 ref)
 {
+#if !defined(DC_OPENGLES2_ENABLED)
+    DREEMCHEST_GL_SENTINEL
+    
     if (function == CompareDisabled)
     {
         glDisable(GL_ALPHA_TEST);
@@ -909,15 +915,16 @@ void OpenGL2::setAlphaTest(Compare function, u8 ref)
     else
     {
         glEnable(GL_ALPHA_TEST);
-    #ifndef DC_PLATFORM_EMSCRIPTEN
         glAlphaFunc(convertCompareFunction(function), ref);
-    #endif  //  #ifndef DC_PLATFORM_EMSCRIPTEN
     }
+#endif  //  #if !defined(DC_OPENGLES2_ENABLED)
 }
 
 // ** OpenGL2::setCullFace
 void OpenGL2::setCullFace(TriangleFace value)
 {
+    DREEMCHEST_GL_SENTINEL
+    
     if (value == TriangleFaceNone)
     {
         glDisable(GL_CULL_FACE);
@@ -933,6 +940,8 @@ void OpenGL2::setCullFace(TriangleFace value)
 // ** OpenGL2::setPolygonOffset
 void OpenGL2::setPolygonOffset(f32 factor, f32 units)
 {
+    DREEMCHEST_GL_SENTINEL
+    
     if (equal3(factor, units, 0.0f))
     {
         glDisable(GL_POLYGON_OFFSET_FILL);
@@ -948,6 +957,8 @@ void OpenGL2::setPolygonOffset(f32 factor, f32 units)
 void OpenGL2::setRasterization(PolygonMode value)
 {
 #if !defined(DC_OPENGLES2_ENABLED)
+    DREEMCHEST_GL_SENTINEL
+    
     switch (value)
     {
         case PolygonFill:
@@ -965,6 +976,8 @@ void OpenGL2::setRasterization(PolygonMode value)
 // ** OpenGL2::setBlending
 void OpenGL2::setBlending(BlendFactor src, BlendFactor dst)
 {
+    DREEMCHEST_GL_SENTINEL
+    
     // Apply the blend state
     if(src == BlendDisabled || dst == BlendDisabled)
     {
@@ -980,6 +993,8 @@ void OpenGL2::setBlending(BlendFactor src, BlendFactor dst)
 // ** OpenGL2::setDepthState
 void OpenGL2::setDepthState(Compare function, bool depthWrite)
 {
+    DREEMCHEST_GL_SENTINEL
+    
     glDepthMask(depthWrite ? GL_TRUE : GL_FALSE);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(convertCompareFunction(function));
@@ -988,6 +1003,8 @@ void OpenGL2::setDepthState(Compare function, bool depthWrite)
 // **  OpenGL2::setColorMask
 void OpenGL2::setColorMask(u8 value)
 {
+    DREEMCHEST_GL_SENTINEL
+    
     glColorMask(value & ColorMaskRed, value & ColorMaskGreen, value & ColorMaskBlue, value & ColorMaskAlpha);
 }
 
@@ -995,7 +1012,7 @@ void OpenGL2::setColorMask(u8 value)
 void OpenGL2::drawElements(PrimitiveType primType, GLenum type, u32 firstIndex, u32 count)
 {
 #if !DEV_RENDERER_SKIP_DRAW_CALLS
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
     
     static GLenum mode[TotalPrimitiveTypes] =
     {
@@ -1017,7 +1034,7 @@ void OpenGL2::drawElements(PrimitiveType primType, GLenum type, u32 firstIndex, 
 void OpenGL2::drawArrays(PrimitiveType primType, u32 offset, u32 count)
 {
 #if !DEV_RENDERER_SKIP_DRAW_CALLS
-    DC_CHECK_GL;
+    DREEMCHEST_GL_SENTINEL
 
     static GLenum mode[TotalPrimitiveTypes] =
     {
