@@ -1114,7 +1114,11 @@ GLenum OpenGL2::textureInternalFormat(PixelFormat pixelFormat)
 {
     switch (pixelFormat)
     {
+    #if defined( DC_OPENGLES2_ENABLED )
+        case PixelLuminance8:   return GL_LUMINANCE;
+    #else
         case PixelLuminance8:   return GL_LUMINANCE8;
+    #endif  //  #if defined( DC_OPENGLES2_ENABLED )
         case PixelRgb8:         return GL_RGB;  // ** OpenGL ES doesnt accept GL_RGB8
         case PixelRgba8:        return GL_RGBA; // ** OpenGL ES doesnt accept GL_RGBA8
     #if !defined( DC_OPENGLES2_ENABLED ) && !defined( DC_PLATFORM_HTML5 )
