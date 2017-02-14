@@ -89,11 +89,11 @@ class Meshes : public RenderingApplicationDelegate
         // Now configure a render item from a loaded mesh
         VertexFormat vertexFormat  = mesh.vertexFormat;
         InputLayout inputLayout    = m_renderingContext->requestInputLayout(vertexFormat);
-        VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(&mesh.vertices[0], mesh.vertices.size());
+        VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(&mesh.vertexBuffer[0], mesh.vertexBuffer.size());
         
         m_renderItem.primitives = mesh.primitives;
         m_renderItem.first      = 0;
-        m_renderItem.count      = mesh.vertices.size();
+        m_renderItem.count      = mesh.vertexCount;
         m_renderItem.states.bindInputLayout(inputLayout);
         m_renderItem.states.bindVertexBuffer(vertexBuffer);
 

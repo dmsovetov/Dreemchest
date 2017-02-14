@@ -39,14 +39,15 @@ namespace Framework
     struct Mesh
     {
         Array<u16>      indices;        //!< An index buffer.
-        Array<u8>       vertices;       //!< A vertex buffer.
+        Array<u8>       vertexBuffer;   //!< A vertex buffer.
+        s32             vertexCount;    //!< A total number of vertices.
         u8              vertexFormat;   //!< Mesh vertex format.
         PrimitiveType   primitives;     //!< A primitive type used by a mesh.
         
                         Mesh()
                             : primitives(TotalPrimitiveTypes) {}
         
-        operator bool() const { return vertices.size() > 0; }
+        operator bool() const { return vertexBuffer.size() > 0; }
     };
     
     //! Loads an OBJ mesh from a file.
@@ -189,7 +190,8 @@ namespace Framework
         // Build final mesh
         mesh.vertexFormat = vertexFormat;
         mesh.primitives   = verticesPerFace == 3 ? PrimTriangles : PrimQuads;
-        mesh.vertices.resize(faces.size() * verticesPerFace * vertexFormat.vertexSize());
+        mesh.vertexCount  = faces.size() * verticesPerFace;
+        mesh.vertexBuffer.resize(mesh.vertexCount * vertexFormat.vertexSize());
         
         for (size_t f = 0, n = faces.size(); f < n; f++)
         {
@@ -197,15 +199,15 @@ namespace Framework
             
             for (s32 v = 0; v < verticesPerFace; v++)
             {
-                vertexFormat.setVertexAttribute(VertexFormat::Position, vertices[face.v[v] - 1], &mesh.vertices[0], f * verticesPerFace + v);
+                vertexFormat.setVertexAttribute(VertexFormat::Position, vertices[face.v[v] - 1], &mesh.vertexBuffer[0], f * verticesPerFace + v);
                 
                 if (vertexFormat & VertexFormat::Normal)
                 {
-                    vertexFormat.setVertexAttribute(VertexFormat::Normal, normals[face.vn[v] - 1], &mesh.vertices[0], f * verticesPerFace + v);
+                    vertexFormat.setVertexAttribute(VertexFormat::Normal, normals[face.vn[v] - 1], &mesh.vertexBuffer[0], f * verticesPerFace + v);
                 }
                 if (vertexFormat & VertexFormat::TexCoord0)
                 {
-                    vertexFormat.setVertexAttribute(VertexFormat::TexCoord0, uvs[face.vt[v] - 1], &mesh.vertices[0], f * verticesPerFace + v);
+                    vertexFormat.setVertexAttribute(VertexFormat::TexCoord0, uvs[face.vt[v] - 1], &mesh.vertexBuffer[0], f * verticesPerFace + v);
                 }
             }
         }

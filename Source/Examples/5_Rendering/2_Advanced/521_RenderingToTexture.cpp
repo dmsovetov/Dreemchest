@@ -172,7 +172,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
             s_transform.view       = Matrix4::lookAt(Vec3(0.0f, 2.0f, -2.0f), Vec3(0.0f, 0.5f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
             
             VertexFormat vertexFormat = m_mesh.vertexFormat;
-            VertexBuffer_ vb = m_renderingContext->requestVertexBuffer(&m_mesh.vertices[0], m_mesh.vertices.size());
+            VertexBuffer_ vb = m_renderingContext->requestVertexBuffer(&m_mesh.vertexBuffer[0], m_mesh.vertexBuffer.size());
             InputLayout il = m_renderingContext->requestInputLayout(vertexFormat);
             UniformLayout layout = m_renderingContext->requestUniformLayout("Transform", Transform::s_layout);
             m_transformCBuffer = m_renderingContext->requestConstantBuffer(&s_transform, sizeof(s_transform), layout);
@@ -224,7 +224,7 @@ class RenderingToTexture : public RenderingApplicationDelegate
             s_transform.instance = Matrix4::rotateXY(0.0f, s_time);
             renderToTarget.clear(Rgba(0.0f, 1.0f, 0.0f), ClearAll);
             renderToTarget.uploadConstantBuffer(m_transformCBuffer, &s_transform, sizeof(s_transform));
-            renderToTarget.drawPrimitives(0, m_mesh.primitives, 0, m_mesh.vertices.size());
+            renderToTarget.drawPrimitives(0, m_mesh.primitives, 0, m_mesh.vertexCount);
         }
         
         // Render a 2D quad with a rendered texture

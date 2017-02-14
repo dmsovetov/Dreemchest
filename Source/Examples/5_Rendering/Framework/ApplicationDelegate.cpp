@@ -254,12 +254,12 @@ RenderItem ApplicationDelegate::createMesh(const String& fileName)
     
     VertexFormat vertexFormat  = mesh.vertexFormat;
     InputLayout inputLayout    = m_renderingContext->requestInputLayout(vertexFormat);
-    VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(&mesh.vertices[0], mesh.vertices.size());
+    VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(&mesh.vertexBuffer[0], mesh.vertexBuffer.size());
     
     RenderItem renderItem;
     renderItem.primitives = mesh.primitives;
     renderItem.first      = 0;
-    renderItem.count      = mesh.vertices.size();
+    renderItem.count      = mesh.vertexCount;
     renderItem.states.bindInputLayout(inputLayout);
     renderItem.states.bindVertexBuffer(vertexBuffer);
     
