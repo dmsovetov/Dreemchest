@@ -55,7 +55,7 @@ class FirstTriangle : public RenderingApplicationDelegate
         
         // We will use the initialization method declared in Renderer::RenderingApplicationDelegate class
         // to create a window instance and a rendering context.
-        if (!initialize(800, 600))
+        if (!initialize(DefaultRenderer, 800, 600))
         {
             application->quit(-1);
         }

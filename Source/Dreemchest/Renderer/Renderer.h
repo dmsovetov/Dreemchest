@@ -381,10 +381,19 @@ namespace Renderer {
     typedef UPtr<class CommandBuffer> CommandBufferUPtr;
 
     //! Hardware rendering API.
-    enum RenderingHal {
-        OpenGL,
-        Direct3D
+    enum RenderingBackend
+    {
+          DefaultRenderer
+        , OpenGL2Renderer
+        , OpenGLES2Renderer
+        , MetalRenderer
     };
+    
+    //! Creates an rendering view.
+    RenderViewPtr createRenderView(RenderingBackend backend, void* handle);
+    
+    //! Creates a rendering context.
+    RenderingContextPtr createRenderingContext(RenderingBackend backend, RenderViewWPtr view);
 
     //! Clear mask bits that are passed to Hal::clear method.
     enum ClearMask
@@ -634,7 +643,7 @@ namespace Renderer {
     protected:
         
         //! Creates a window and a context.
-        virtual bool            initialize(s32 width, s32 height) NIMBLE_OVERRIDE;
+        virtual bool            initialize(RenderingBackend backend, s32 width, s32 height);
         
         //! Renders a single frame.
         virtual void            handleRenderFrame(f32 dt) NIMBLE_ABSTRACT;

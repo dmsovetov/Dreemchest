@@ -46,7 +46,7 @@ namespace Framework
         void                setCameraPosition(const Vec3& value);
         f32                 time() const;
         
-        virtual bool        initialize(s32 width, s32 height) NIMBLE_OVERRIDE;
+        virtual bool        initialize(RenderingBackend backend, s32 width, s32 height) NIMBLE_OVERRIDE;
         virtual void        handleTouchBegan(const Platform::Window::TouchBegan& e) NIMBLE_OVERRIDE;
         virtual void        handleTouchEnded(const Platform::Window::TouchEnded& e) NIMBLE_OVERRIDE;
         virtual void        handleTouchMoved(const Platform::Window::TouchMoved& e) NIMBLE_OVERRIDE;

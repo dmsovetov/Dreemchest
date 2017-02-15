@@ -73,9 +73,9 @@ Matrix4 ApplicationDelegate::cameraTransform() const
     return Camera::fromQuat(m_camera.position, rotation).transform;
 }
 
-bool ApplicationDelegate::initialize(s32 width, s32 height)
+bool ApplicationDelegate::initialize(RenderingBackend backend, s32 width, s32 height)
 {
-    if (!RenderingApplicationDelegate::initialize(width, height))
+    if (!RenderingApplicationDelegate::initialize(backend, width, height))
     {
         return false;
     }

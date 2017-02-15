@@ -33,10 +33,110 @@ DC_BEGIN_DREEMCHEST
 
 namespace Renderer {
     
+#define DC_METAL_ENABLED
+    
+#ifdef DC_OPENGL_ENABLED
+    //! Platform-specific OpenGL view constructor.
+    RenderViewPtr createOpenGLView(void* window, u32 options);
+    
+    //! Creates a rendering context that uses an OpenGL 2 rendering API.
+    RenderingContextPtr createOpenGL2RenderingContext(RenderViewPtr view);
+#endif  //  #ifdef DC_OPENGL_ENABLED
+    
+#ifdef DC_METAL_ENABLED
+    //! Platform-specific Metal view constructor.
+    RenderViewPtr createMetalView(void* window, u32 options);
+    
+    //! Creates a rendering context that uses an Metal rendering API.
+    RenderingContextPtr createMetalRenderingContext(RenderViewPtr view);
+#endif  //  #ifdef DC_METAL_ENABLED
+    
+// ** defaultRenderingBackend
+RenderingBackend defaultRenderingBackend()
+{
+#if defined (DC_PLATFORM_WINDOWS)
+    return OpenGL2Renderer;
+#elif defined (DC_PLATFORM_IOS)
+    return MetalRenderer;
+#elif defined (DC_PLATFORM_MACOS)
+    return MetalRenderer;
+#else
+    return OpenGL2Renderer;
+#endif  //  #if defined (DC_PLATFORM_WINDOWS)
+}
+
+// ** createRenderView
+RenderViewPtr createRenderView(RenderingBackend backend, void* handle)
+{
+    if (backend == DefaultRenderer)
+    {
+        backend = defaultRenderingBackend();
+    }
+    
+    switch (backend)
+    {
+        case OpenGLES2Renderer:
+        case OpenGL2Renderer:
+        #ifdef DC_OPENGL_ENABLED
+            return createOpenGLView(handle, TextureD24 | TextureS8);
+        #else
+            LogError("renderer", "%s", "built with no OpenGL support");
+            return NULL;
+        #endif  //  #ifdef DC_OPENGL_ENABLED
+            
+        case MetalRenderer:
+        #ifdef DC_METAL_ENABLED
+            return createMetalView(handle, TextureD24 | TextureS8);
+        #else
+            LogError("renderer", "%s", "built with no Metal support");
+            return NULL;
+        #endif  //  #ifdef DC_METAL_ENABLED
+            
+        default:
+            break;
+    }
+    
+    return NULL;
+}
+
+// ** createRenderingContext
+RenderingContextPtr createRenderingContext(RenderingBackend backend, RenderViewWPtr view)
+{
+    if (backend == DefaultRenderer)
+    {
+        backend = defaultRenderingBackend();
+    }
+    
+    switch (backend)
+    {
+        case OpenGLES2Renderer:
+        case OpenGL2Renderer:
+        #ifdef DC_OPENGL_ENABLED
+            return createOpenGL2RenderingContext(view);
+        #else
+            LogError("renderer", "%s", "built with no OpenGL support");
+            return NULL;
+        #endif  //  #ifdef DC_OPENGL_ENABLED
+            
+        case MetalRenderer:
+        #ifdef DC_METAL_ENABLED
+            return createMetalRenderingContext(view);
+        #else
+            LogError("renderer", "%s", "built with no Metal support");
+            return NULL;
+        #endif  //  #ifdef DC_METAL_ENABLED
+            
+        default:
+            break;
+    }
+    
+    return NULL;
+}
+    
 // ---------------------------------------------------------------- RenderingApplicationDelegate ---------------------------------------------------------------- //
     
 // ** RenderingApplicationDelegate::initialize
-bool RenderingApplicationDelegate::initialize(s32 width, s32 height)
+bool RenderingApplicationDelegate::initialize(RenderingBackend backend, s32 width, s32 height)
 {
     // First create a window
     if (!WindowedApplicationDelegate::initialize(width, height))
@@ -45,15 +145,31 @@ bool RenderingApplicationDelegate::initialize(s32 width, s32 height)
     }
     
     // Create a rendering view.
-#ifdef DC_OPENGL_ENABLED
-    m_view = createOpenGLView(m_window->handle(), TextureD24 | TextureS8);
+    m_view = createRenderView(backend, m_window->handle());
+    if (m_view == NULL)
+    {
+        return false;
+    }
+    
     m_view->subscribe<RenderView::Update>(dcThisMethod(RenderingApplicationDelegate::handleViewUpdate));
-#else
-    LogError("renderer", "%s", "built with no OpenGL support");
-#endif  //  #ifdef DC_OPENGL_ENABLED
+    
+    
+    
+//#ifdef DC_OPENGL_ENABLED
+//    m_view = createOpenGLView(m_window->handle(), TextureD24 | TextureS8);
+//    m_view->subscribe<RenderView::Update>(dcThisMethod(RenderingApplicationDelegate::handleViewUpdate));
+//#else
+//    LogError("renderer", "%s", "built with no OpenGL support");
+//#endif  //  #ifdef DC_OPENGL_ENABLED
     
     // Now create a rendering context that is attached to a created window instance
-    m_renderingContext = createOpenGL2RenderingContext(m_view);
+    m_renderingContext = createRenderingContext(backend, m_view);
+    
+    if (m_renderingContext == NULL)
+    {
+        return false;
+    }
+    
     m_lastFrameTime = -1;
     
     return m_renderingContext.valid();

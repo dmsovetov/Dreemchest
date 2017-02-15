@@ -225,14 +225,6 @@ namespace Renderer
         return allocateIdentifier(static_cast<RenderResourceType::Enum>(TResourceIdentifier::ResourceType));
     }
     
-#ifdef DC_OPENGL_ENABLED
-    //! Platform-specific OpenGL view constructor.
-    extern RenderViewPtr createOpenGLView(void* window, u32 options);
-    
-    //! Creates a rendering context that uses an OpenGL 2 rendering API.
-    RenderingContextPtr createOpenGL2RenderingContext(RenderViewPtr view);
-#endif    /*    DC_OPENGL_ENABLED    */
-    
 } // namespace Renderer
 
 DC_END_DREEMCHEST
