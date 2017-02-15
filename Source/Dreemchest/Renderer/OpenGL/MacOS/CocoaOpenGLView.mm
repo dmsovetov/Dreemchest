@@ -174,15 +174,6 @@ static CVReturn displayCallback( CVDisplayLinkRef displayLink, const CVTimeStamp
     m_owner = view;
 }
 
-// ** drawRect
-//- ( void ) drawRect : ( NSRect )rect
-//{
-//    if (m_owner)
-//   {
-//        m_owner->notifyUpdate();
-//    }
-//}
-
 // ** dealoc
 - ( void ) dealloc
 {

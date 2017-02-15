@@ -31,11 +31,20 @@
 #import <Metal/Metal.h>
 #import "../Renderer.h"
 
-@interface MetalView : MTKView <MTKViewDelegate>
-    - (instancetype)initWithFrame:(CGRect)frameRect;
+DC_USE_DREEMCHEST
 
-    - (void)drawInMTKView:(MTKView *)view;
-    - (void)mtkView:(MTKView *)view drawableSizeWillChange:(CGSize)size;
+@interface MetalView : MTKView <MTKViewDelegate>
+
+- (instancetype)initWithFrame:(CGRect)frameRect;
+
+- (void)drawInMTKView:(MTKView *)view;
+- (void)mtkView:(MTKView *)view drawableSizeWillChange:(CGSize)size;
+- (void)beginFrame;
+- (void)endFrame:(bool) wait;
+
+@property Renderer::RenderView* owner;
+@property (assign) id <MTLTexture> defaultFramebuffer;
+
 @end
 
 DC_BEGIN_DREEMCHEST

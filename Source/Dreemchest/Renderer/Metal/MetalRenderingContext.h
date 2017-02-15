@@ -28,7 +28,7 @@
 #define __DC_Renderer_MetalRenderingContext_H__
 
 #include "../RenderingContext.h"
-#include <Metal/Metal.h>
+#include "MetalRenderView.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -40,17 +40,30 @@ namespace Renderer
     {
     public:
         
-                            //! Constructs MetalRenderingContext instance.
-                            MetalRenderingContext(RenderViewWPtr view, id<MTLDevice> device);
+                                            //! Constructs MetalRenderingContext instance.
+                                            MetalRenderingContext(MetalRenderView* view);
         
     protected:
         
         //! Executes a specified command buffer.
-        virtual void        executeCommandBuffer(const CommandBuffer& commands) NIMBLE_OVERRIDE;
+        virtual void                        executeCommandBuffer(const CommandBuffer& commands) NIMBLE_OVERRIDE;
+        
+        //! Creates a new vertex descriptor.
+        MTLVertexDescriptor*                createVertexDescriptor(const VertexBufferLayout& layout) const;
+        
+        //! Creates a new buffer from bytes.
+        id <MTLBuffer>                      createBuffer(const void* data, s32 size) const;
         
     private:
         
-        id<MTLDevice>       m_device;   //!< A Metal device instance.
+        id <MTLDevice>                      m_device;            //!< A Metal device instance.
+        id <MTLCommandQueue>                m_commandQueue;      //!< A command queue.
+        id <MTLLibrary>                     m_library;           //!< A default library.
+        id <MTLRenderPipelineState>         m_debugPipeline;     //!< A default pipeline used for debugging.
+        MetalView*                          m_metal;             //!< A Metal render view instance.
+        FixedArray<MTLVertexDescriptor*>    m_vertexDescriptors; //!< Available input layouts.
+        FixedArray<id<MTLBuffer>>           m_vertexBuffers;     //!< Constructed vertex buffers.
+        FixedArray<id<MTLBuffer>>           m_indexBuffers;      //!< Constructed index buffers.
     };
     
 } // namespace Renderer

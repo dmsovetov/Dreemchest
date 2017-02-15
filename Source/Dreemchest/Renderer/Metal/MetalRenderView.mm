@@ -27,9 +27,9 @@
 #import "MetalRenderView.h"
 
 @implementation MetalView
-{
-    id <MTLCommandQueue> _commandQueue;
-}
+
+@synthesize owner;
+@synthesize defaultFramebuffer;
 
 // ** initWithFrame
 - (instancetype)initWithFrame:(CGRect)frameRect
@@ -39,31 +39,41 @@
     if (self = [super initWithFrame:frameRect device:device])
     {
         self.delegate         = self;
+    #ifdef DC_PLATFORM_IOS
         self.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+    #endif  //  #ifdef DC_PLATFORM_IOS
         self.clearColor       = MTLClearColorMake(0.3, 0.3, 0.3, 1.0);
-        _commandQueue         = [device newCommandQueue];
         return self;
     }
     
     return nil;
 }
 
+// ** beginFrame
+- (void)beginFrame
+{
+    defaultFramebuffer = self.currentDrawable.texture;
+}
+
+// ** endFrame
+- (void)endFrame: (bool)wait
+{
+    
+}
+
 // ** drawInMTKView
 - (void)drawInMTKView:(MTKView *)view
 {
-    id <MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
-    
-    id <MTLRenderCommandEncoder> encoder = [commandBuffer renderCommandEncoderWithDescriptor:view.currentRenderPassDescriptor];
-    [encoder endEncoding];
-    
-    [commandBuffer presentDrawable: view.currentDrawable];
-    [commandBuffer commit];
+    if (owner)
+    {
+        owner->notifyUpdate();
+    }
 }
 
 // ** mtkView
 - (void)mtkView:(MTKView *)view drawableSizeWillChange:(CGSize)size
 {
-    NSLog(@"drawInMTKView\n");
+//    NSLog(@"drawInMTKView\n");
 }
 
 @end
@@ -100,13 +110,14 @@ bool MetalRenderView::makeCurrent( void )
 // ** MetalRenderView::beginFrame
 bool MetalRenderView::beginFrame( void )
 {
+    [m_nativeView beginFrame];
     return true;
 }
     
 // ** MetalRenderView::endFrame
 void MetalRenderView::endFrame(bool wait)
 {
-    
+    [m_nativeView endFrame:wait];
 }
     
 // ** MetalRenderView::nativeView
@@ -130,7 +141,9 @@ RenderViewPtr createMetalView(void* window, u32 options)
     LogVerbose("metal", "%s", "iOS Metal render view created\n" );
 #endif  //  #if defined(DC_PLATFORM_MACOS)
     
-    return DC_NEW MetalRenderView(nativeView);
+    MetalRenderView* view = DC_NEW MetalRenderView(nativeView);
+    nativeView.owner = view;
+    return view;
 }
 
 } // namespace Renderer
