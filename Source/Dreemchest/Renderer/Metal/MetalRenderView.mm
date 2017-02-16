@@ -30,6 +30,8 @@
 
 @synthesize owner;
 @synthesize defaultFramebuffer;
+@synthesize commandBuffer;
+@synthesize commandQueue;
 
 // ** initWithFrame
 - (instancetype)initWithFrame:(CGRect)frameRect
@@ -43,6 +45,7 @@
         self.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
     #endif  //  #ifdef DC_PLATFORM_IOS
         self.clearColor       = MTLClearColorMake(0.3, 0.3, 0.3, 1.0);
+        commandQueue     = [device newCommandQueue];
         return self;
     }
     
@@ -53,12 +56,14 @@
 - (void)beginFrame
 {
     defaultFramebuffer = self.currentDrawable.texture;
+    commandBuffer      = [commandQueue commandBuffer];
 }
 
 // ** endFrame
 - (void)endFrame: (bool)wait
 {
-    
+    [commandBuffer presentDrawable: self.currentDrawable];
+    [commandBuffer commit];
 }
 
 // ** drawInMTKView

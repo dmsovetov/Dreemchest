@@ -74,9 +74,6 @@ MetalRenderingContext::MetalRenderingContext(MetalRenderView* view)
     , m_device(view->nativeView().device)
     , m_metal(view->nativeView())
 {
-    // Create the command queue
-    m_commandQueue = [m_device newCommandQueue];
-    
     // Create the default library
     m_library = [m_device newLibraryWithSource:[NSString stringWithUTF8String:s_defaultLibrarySource]
                                        options:0
@@ -91,6 +88,7 @@ MetalRenderingContext::MetalRenderingContext(MetalRenderView* view)
 void MetalRenderingContext::executeCommandBuffer(const CommandBuffer& commands)
 {
     MTLRenderPassDescriptor* activeRenderPass = [MTLRenderPassDescriptor renderPassDescriptor];
+    id <MTLCommandBuffer>    commandBuffer    = m_metal.commandBuffer;
 
     for (s32 i = 0, n = commands.size(); i < n; i++)
     {
@@ -169,35 +167,33 @@ void MetalRenderingContext::executeCommandBuffer(const CommandBuffer& commands)
                 break;
                 
             case OpCode::DrawIndexed:
-                NIMBLE_NOT_IMPLEMENTED;
+            {
+                id <MTLRenderCommandEncoder> encoder  = [commandBuffer renderCommandEncoderWithDescriptor:activeRenderPass];
+                id <MTLRenderPipelineState>  pipeline = requestDebugPipeline();
+
+                [encoder setRenderPipelineState:pipeline];
+                [encoder setVertexBuffer:m_vertexBuffers[1] offset:0 atIndex:0];
+                [encoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle //  opCode.drawCall.primitives
+                                    indexCount:opCode.drawCall.count
+                                     indexType:MTLIndexTypeUInt16
+                                   indexBuffer:m_indexBuffers[1]
+                             indexBufferOffset:opCode.drawCall.first];
+                [encoder endEncoding];
+            }
                 break;
                 
             case OpCode::DrawPrimitives:
             {
-                if (m_debugPipeline == nil)
-                {
-                    MTLRenderPipelineDescriptor* pipelineDescriptor = [MTLRenderPipelineDescriptor new];
-                    pipelineDescriptor.vertexFunction   = [m_library newFunctionWithName:@"vertex_main"];
-                    pipelineDescriptor.fragmentFunction = [m_library newFunctionWithName:@"fragment_main"];
-                    pipelineDescriptor.vertexDescriptor = m_vertexDescriptors[1];
-                    pipelineDescriptor.colorAttachments[0].pixelFormat = m_metal.colorPixelFormat;
-                    
-                    m_debugPipeline = [m_device newRenderPipelineStateWithDescriptor:pipelineDescriptor
-                                                                               error:NULL];
-                }
+                id <MTLRenderCommandEncoder> encoder  = [commandBuffer renderCommandEncoderWithDescriptor:activeRenderPass];
+                id <MTLRenderPipelineState>  pipeline = requestDebugPipeline();
                 
-                id <MTLCommandBuffer>        commandBuffer = [m_commandQueue commandBuffer];
-                id <MTLRenderCommandEncoder> encoder = [commandBuffer renderCommandEncoderWithDescriptor:activeRenderPass];
-                
-                [encoder setRenderPipelineState:m_debugPipeline];
+                [encoder setRenderPipelineState:pipeline];
                 [encoder setVertexBuffer:m_vertexBuffers[1] offset:0 atIndex:0];
-                [encoder drawPrimitives:MTLPrimitiveTypeTriangle
+                [encoder drawPrimitives:MTLPrimitiveTypeTriangle    //  opCode.drawCall.primitives
                             vertexStart:opCode.drawCall.first
                             vertexCount:opCode.drawCall.count
                           instanceCount:1];
                 [encoder endEncoding];
-                [commandBuffer presentDrawable: m_metal.currentDrawable];
-                [commandBuffer commit];
             }
                 break;
                 
@@ -244,6 +240,26 @@ MTLVertexDescriptor* MetalRenderingContext::createVertexDescriptor(const VertexB
     }
     
     return descriptor;
+}
+    
+// ** MetalRenderingContext::requestDebugPipeline
+id <MTLRenderPipelineState> MetalRenderingContext::requestDebugPipeline()
+{
+    if (m_debugPipeline != nil)
+    {
+        return m_debugPipeline;
+    }
+    
+    MTLRenderPipelineDescriptor* pipelineDescriptor = [MTLRenderPipelineDescriptor new];
+    pipelineDescriptor.vertexFunction   = [m_library newFunctionWithName:@"vertex_main"];
+    pipelineDescriptor.fragmentFunction = [m_library newFunctionWithName:@"fragment_main"];
+    pipelineDescriptor.vertexDescriptor = m_vertexDescriptors[1];
+    pipelineDescriptor.colorAttachments[0].pixelFormat = m_metal.colorPixelFormat;
+    
+    m_debugPipeline = [m_device newRenderPipelineStateWithDescriptor:pipelineDescriptor
+                                                               error:NULL];
+    
+    return m_debugPipeline;
 }
 
 } // namespace Renderer

@@ -54,10 +54,12 @@ namespace Renderer
         //! Creates a new buffer from bytes.
         id <MTLBuffer>                      createBuffer(const void* data, s32 size) const;
         
+        //! Returns a debug pipeline instance.
+        id <MTLRenderPipelineState>         requestDebugPipeline();
+        
     private:
         
         id <MTLDevice>                      m_device;            //!< A Metal device instance.
-        id <MTLCommandQueue>                m_commandQueue;      //!< A command queue.
         id <MTLLibrary>                     m_library;           //!< A default library.
         id <MTLRenderPipelineState>         m_debugPipeline;     //!< A default pipeline used for debugging.
         MetalView*                          m_metal;             //!< A Metal render view instance.

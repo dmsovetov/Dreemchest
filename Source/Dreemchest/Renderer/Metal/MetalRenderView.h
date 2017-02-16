@@ -44,6 +44,8 @@ DC_USE_DREEMCHEST
 
 @property Renderer::RenderView* owner;
 @property (assign) id <MTLTexture> defaultFramebuffer;
+@property (readonly) id <MTLCommandBuffer> commandBuffer;
+@property (readonly) id <MTLCommandQueue> commandQueue;
 
 @end
 
