@@ -67,6 +67,11 @@ if (DC_OPENGL_ENABLED)
     set(RENDERER_SRCS ${RENDERER_SRCS} ${OPENGL_SRCS} ${OPENGL_PLATFORM_SRCS})
 endif ()
 
+if (DC_METAL_ENABLED)
+	add_files(Renderer/Metal METAL_SRCS)
+	set(RENDERER_SRCS ${RENDERER_SRCS} ${METAL_SRCS})
+endif ()
+
 # Sound module sources
 if (DC_SOUND_ENABLED)
     add_files(Sound SOUND_SRCS)
@@ -152,11 +157,19 @@ if (DC_PLATFORM MATCHES "MacOS")
     if (DC_OPENGL_ENABLED)
         target_link_libraries(Dreemchest "-framework CoreVideo")
     endif ()
+
+    if (DC_METAL_ENABLED)
+    	target_link_libraries(Dreemchest "-framework Metal -framework MetalKit")
+    endif ()
 elseif (DC_PLATFORM MATCHES "iOS")
     target_link_libraries(Dreemchest "-framework UIKit -framework Foundation")
 
     if (DC_OPENGL_ENABLED)
         target_link_libraries(Dreemchest "-framework QuartzCore")
+    endif ()
+
+    if (DC_METAL_ENABLED)
+    	target_link_libraries(Dreemchest "-framework Metal -framework MetalKit")
     endif ()
 endif ()
 

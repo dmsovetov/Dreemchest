@@ -39,6 +39,9 @@
 //! Indicates that a library was build with OpenGL support.
 #cmakedefine DC_OPENGL_ENABLED
 
+//! Indicates that a library was build with Metal support.
+#cmakedefine DC_METAL_ENABLED
+
 //! Indicates that a library was built with sound support.
 #cmakedefine DC_SOUND_ENABLED
 

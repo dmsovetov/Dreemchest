@@ -54,7 +54,7 @@ class IndexBuffers : public RenderingApplicationDelegate
     {
         Logger::setStandardLogger();
 
-        if (!initialize(800, 600))
+        if (!initialize(DefaultRenderer, 800, 600))
         {
             application->quit(-1);
         }

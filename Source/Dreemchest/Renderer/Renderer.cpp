@@ -33,8 +33,6 @@ DC_BEGIN_DREEMCHEST
 
 namespace Renderer {
     
-#define DC_METAL_ENABLED
-    
 #ifdef DC_OPENGL_ENABLED
     //! Platform-specific OpenGL view constructor.
     RenderViewPtr createOpenGLView(void* window, u32 options);
