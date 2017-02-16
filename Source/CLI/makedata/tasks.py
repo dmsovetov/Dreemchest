@@ -26,51 +26,58 @@
 
 import threading, collections
 
-# Creates a new task manager
+
 def create(workers):
+    """Creates a new task manager"""
     return Tasks(workers)
 
-# Task manager
+
 class Tasks:
-    # ctor
+    """A task manager class"""
+
     def __init__(self, workers):
+        """Constructs a task manager instance"""
         self._workers = []
         self._current = 0
         
         for i in range(0, workers):
             self._workers.append(Worker())
-            
-    # Pushes a new task to a worker
+
     def push(self, task):
+        """Pushes a new task to a worker"""
         idx = self._current % len(self._workers)
         self._workers[idx].push(task)
-        self._current = self._current + 1
+        self._current += 1
 
-    # Starts an action processing
     def start(self):
+        """Starts an action processing"""
         for w in self._workers:
             w.start()
 
         [w.join() for w in self._workers if w.isAlive()]
 
-# Thread worker to perform an action queue.
+
 class Worker(threading.Thread):
-    # ctor
-	def __init__(self):
-		threading.Thread.__init__(self)
-		self._tasks = collections.deque()
+    """Thread worker to perform an action queue."""
 
-	# Pushes a new task to worker
-	def push(self, task):
-		self._tasks.append(task)
+    def __init__(self):
+        """Constructs worker instance"""
 
-	# run
-	def run(self):
-		count = len(self._tasks)
+        threading.Thread.__init__(self)
+        self._tasks = collections.deque()
 
-		if count == 0:
-			return
+    def push(self, task):
+        """Pushes a new task to worker"""
+        self._tasks.append(task)
 
-		while len(self._tasks) != 0:
-			task = self._tasks.popleft()
-			task()
+    def run(self):
+        """Runs a worker thread"""
+        count = len(self._tasks)
+
+        if count == 0:
+            return
+
+        while len(self._tasks) != 0:
+            task = self._tasks.popleft()
+            task()
+

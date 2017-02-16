@@ -24,9 +24,15 @@
 #
 #################################################################################
 
-import shutil, os, struct, collections, module, fbx
+import shutil, os, struct, collections, module
+
+try:
+    import fbx
+except ImportError as e:
+    print e
 
 from PIL import Image, ImageOps
+
 
 # action
 class action:
@@ -39,6 +45,7 @@ class action:
         print('{0} <= {1}'.format(type, self.source))
         self.item['type'] = type
 
+
 # copy
 class copy(action):
     # ctor
@@ -49,6 +56,7 @@ class copy(action):
     def __call__(self):
         print('Copying {0} from {1}'.format(self.source, self.dest))
         shutil.copyfile(self.source, self.dest)
+
 
 # image
 class image(action):
@@ -69,6 +77,7 @@ class image(action):
 
         return img
 
+
 # compress
 class compress(action):
     # ctor
@@ -79,6 +88,7 @@ class compress(action):
     def __call__(self):
         print('Compress {0}'.format(self.source))
 
+
 # png_quant
 class png_quant(action):
     # ctor
@@ -87,6 +97,7 @@ class png_quant(action):
         
         if not 'PNG_QUANT' in os.environ:
             raise Exception('Pngquant not found, make sure that PNG_QUANT enviroment variable is set')
+
 
 # convert_to_raw
 class convert_to_raw(image):
@@ -113,6 +124,7 @@ class convert_to_raw(image):
             data = struct.pack('HHB%us' % len(pixels), width, height, channels, pixels)
             fh.write(data)
             fh.close()
+
 
 # convert_fbx
 class convert_fbx(action):

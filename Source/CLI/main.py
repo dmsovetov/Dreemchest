@@ -29,6 +29,7 @@
 import argparse
 import bootstrap
 import configure
+import makedata
 import command_line
 import sys
 
@@ -42,6 +43,7 @@ class Main(command_line.Tool):
         command_line.Tool.__init__(self, parser, 'available commands')
 
         self._add_command('configure', configure.Command)
+        self.add_command_line('makedata', makedata.command_line)
 
         if sys.platform == 'darwin':
             self._add_command('bootstrap', bootstrap.MacOSBootstrapCommand)

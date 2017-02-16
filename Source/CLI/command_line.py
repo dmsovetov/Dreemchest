@@ -37,6 +37,10 @@ class Tool:
 
         cls(self._commands.add_parser(name))
 
+    def add_command_line(self, name, function):
+        """Adds a nested command"""
+        function(self._commands.add_parser(name))
+
 
 def add_component(parser, name, description=None, options=[], default=True):
     """Adds a library component option to a parser object"""

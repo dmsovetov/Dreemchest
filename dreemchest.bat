@@ -1,2 +1,2 @@
 @echo off
-@python "./Source/CLI/command_line/main.py" %*
+@python "./Source/CLI/main.py" %*

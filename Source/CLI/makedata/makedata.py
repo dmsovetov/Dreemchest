@@ -26,22 +26,25 @@
 #
 #################################################################################
 
-import argparse, time, files, os, actions, tasks, unity
+import time, files, os, actions, tasks, unity
+
 
 # substitute_variables
-def substitute_variables( args, *variables ):
-	argv = vars( args )
+def substitute_variables(args, *variables):
+    argv = vars(args)
 
-	for k, v in argv.items():
-		if isinstance( v, str ):
-			for var in variables:
-				argv[k] = argv[k].replace( '[' + var + ']', argv[var] )
+    for k, v in argv.items():
+        if isinstance(v, str):
+            for var in variables:
+                argv[k] = argv[k].replace( '[' + var + ']', argv[var] )
+
 
 # class TextureQuality
 class TextureQuality:
     HD = 'hd'
     SD = 'sd'
     Available = [HD, SD]
+
 
 # class TargetPlatform
 class TargetPlatform:
@@ -51,18 +54,22 @@ class TargetPlatform:
     Android = 'android'
     Available = [Win, Mac, iOS, Android]
 
+
 # class TextureCompression
 class TextureCompression:
     Disabled = 'disabled'
     Pvr = 'pvr'
     Dxt = 'dxt'
     Etc = 'etc'
+    Available = [Disabled, Pvr, Dxt, Etc]
+
 
 # class TextureFormat
 class TextureFormat:
     Raw = 'raw'
     Png = 'png'
-    Tga = 'tga'
+    QPng = 'qpng'
+    Available = [Raw, Png, QPng]
 
     @staticmethod
     def convert_to(format):
@@ -70,10 +77,12 @@ class TextureFormat:
         if format == TextureFormat.Png: return actions.png_quant
         if format == TextureFormat.Tga: return actions.compress
 
+
 # class ExportError
 class ExportError(Exception):
     def __init__(self, msg):
         Exception.__init__(self, msg)
+
 
 # Imports the project
 def import_project(args, source, output):
@@ -96,27 +105,97 @@ def import_project(args, source, output):
     # Save the assets
     assets.save(output)
 
+
 # Builds the data to a specified folder
-def build(args, source, output):
+def build(args):
+    substitute_variables(args, 'version', 'compression', 'platform', 'quality', 'source')
+
     rules = {
-            '*.tga': TextureFormat.convert_to(args.texFormat)
-        ,   '*.png': TextureFormat.convert_to(args.texFormat)
+            '*.tga': TextureFormat.convert_to(args.texture_format)
+        ,   '*.png': TextureFormat.convert_to(args.texture_format)
         ,   '*.fbx': actions.convert_fbx
         }
 
-    queue    = tasks.create(args.workers)
-    outdated = files.find_outdated(source)
+    queue = tasks.create(args.workers)
+    outdated = files.find_outdated(args.source)
 
-    files.build(queue, outdated, output, rules)
+    files.build(queue, outdated, args.output, rules)
 
     queue.start()
 
     # Write the manifest file
-    with open(os.path.join(output, 'assets.json'), 'wt') as fh:
+    with open(os.path.join(args.output, 'assets.json'), 'wt') as fh:
         fh.write(files.generate_manifest(outdated))
         fh.close()
 
+
+def command_line(parser):
+    parser.add_argument("--action",
+                        default='build',
+                        help="Build action.",
+                        choices=["clean", "build", "install", "import"])
+
+    parser.add_argument("--source",
+                        required=True,
+                        help="input resource path.")
+
+    parser.add_argument("--output",
+                        required=True,
+                        help="output path.")
+
+    parser.add_argument("--compression",
+                        default=TextureCompression.Disabled,
+                        choices=TextureCompression.Available,
+                        help="hardware texture compression.")
+
+    parser.add_argument("--texture-format",
+                        default=TextureFormat.Raw,
+                        choices=TextureFormat.Available,
+                        help="exported image format.")
+
+    parser.add_argument("--platform",
+                        default=TargetPlatform.Win,
+                        help="target platform.",
+                        choices=TargetPlatform.Available)
+
+    parser.add_argument("--version",
+                        default='1.0',
+                        help="resource version")
+
+    parser.add_argument("--workers",
+                        type=int,
+                        default=8,
+                        help="The number of concurrent workers.")
+
+    parser.add_argument("--quality",
+                        default=TextureQuality.HD,
+                        help="Texture quality.",
+                        choices=TextureQuality.Available)
+
+    parser.add_argument("--cache",
+                        default='[source]/[platform]/cache',
+                        help="cache folder.")
+
+    parser.set_defaults(function=build)
+
+    #parser.add_argument("--strip-unused",
+    #                    type=bool,
+    #                    default=False,
+    #                    help="the unused assets won't be imported.")
+
+    #parser.add_argument("--use-uuids",
+    #                    type=int,
+    #                    default=1,
+    #                    help="the UUIDs will be used instead of file names.")
+
+    #parser.add_argument("--skip-scenes",
+    #                    type=int,
+    #                    default=0,
+    #                    help="scenes wont be imported.")
+
+
 # Entry point
+'''
 if __name__ == "__main__":
     # Parse arguments
     parser = argparse.ArgumentParser( description = 'Dreemchest make data tool', formatter_class = argparse.ArgumentDefaultsHelpFormatter )
@@ -159,3 +238,4 @@ if __name__ == "__main__":
         print(e.message)
 
     print('--- {0} seconds ---'.format(int(time.time() - start)))
+'''

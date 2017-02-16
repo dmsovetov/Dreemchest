@@ -24,7 +24,9 @@
 #
 #################################################################################
 
-import os, json, collections, shutil, actions, module, math, yaml, patcher
+import os, json, collections, shutil, math, yaml, patcher
+
+from .. import actions, module
 
 from assets import Assets
 from asset_type import AssetType

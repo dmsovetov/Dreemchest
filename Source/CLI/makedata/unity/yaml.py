@@ -24,7 +24,8 @@
 #
 #################################################################################
 
-import module, json
+import json
+from .. import module
 
 # Import the YAML parsing module
 yaml = module.require('yaml', True)
