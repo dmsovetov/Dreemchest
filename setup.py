@@ -69,8 +69,10 @@ class Environment:
 
         self._paths = paths
         self.set_variable(DREEMCHEST_HOME, paths.home)
-        self.set_variable(DREEMCHEST_ANDROID, paths.android)
         self.set_variable(DREEMCHEST_CMAKE, paths.cmake)
+
+        if paths.android:
+            self.set_variable(DREEMCHEST_ANDROID, paths.android)
 
         if paths.emscripten:
             self.set_variable(DREEMCHEST_EMSCRIPTEN, paths.emscripten)
@@ -179,7 +181,7 @@ class WindowsEnvironment(Environment):
         """Constructs the WindowsEnvironment instance."""
 
         Environment.__init__(self)
-        self._path = os.environ['PATH']
+        self._path = ';'.join(list(set(os.environ['PATH'].split(';'))))
 
     def set_variable(self, name, value):
         """Sets an environment variable"""
@@ -208,7 +210,7 @@ class WindowsEnvironment(Environment):
         self.set_variable(DREEMCHEST_CMAKE_BIN, cmake_bin)
 
         # Add DREEMCHEST_HOME to path
-        self.add_path('%' + DREEMCHEST_HOME + '%')
+        self.add_path(paths.home)
 
     def add_path(self, path):
         """Adds a specified path to an environment"""
@@ -507,13 +509,19 @@ def main():
 
     # Download CMake
     cmake_path = install_cmake(args.cmake)
-    android_path = install_android(args.android, [24], ['arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'])
-    emscripten_path = install_emscripten('1.35.0')
-
-    # Make all paths absolute
     cmake_path = os.path.abspath(cmake_path)
-    android_path = os.path.abspath(android_path)
-    emscripten_path = os.path.abspath(emscripten_path)
+
+    if args.no_android is not True:
+        android_path = install_android(args.android, [24], ['arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'])
+        android_path = os.path.abspath(android_path)
+    else:
+        android_path = None
+
+    if args.no_emscripten is not True:
+        emscripten_path = install_emscripten('1.35.0')
+        emscripten_path = os.path.abspath(emscripten_path)
+    else:
+        emscripten_path = None
 
     # First setup environment variables
     paths = EnvironmentPaths(os.getcwd(), cmake_path, android_path, emscripten_path)
