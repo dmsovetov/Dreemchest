@@ -24,61 +24,16 @@
 #
 #################################################################################
 
-import threading
-import collections
+from ..importer import Importer
 
 
-def create(workers):
-    """Creates a new task manager"""
-    return Tasks(workers)
+class MeshFormats(object):
+    """Available mesh input formats"""
+
+    OBJ = 'obj'
+    FBX = 'fbx'
+    AVAILABLE = [OBJ, FBX]
 
 
-class Tasks:
-    """A task manager class"""
-
-    def __init__(self, workers):
-        """Constructs a task manager instance"""
-        self._workers = []
-        self._current = 0
-        
-        for i in range(0, workers):
-            self._workers.append(Worker())
-
-    def push(self, task):
-        """Pushes a new task to a worker"""
-        idx = self._current % len(self._workers)
-        self._workers[idx].push(task)
-        self._current += 1
-
-    def start(self):
-        """Starts an action processing"""
-        for w in self._workers:
-            w.start()
-
-        [w.join() for w in self._workers if w.isAlive()]
-
-
-class Worker(threading.Thread):
-    """Thread worker to perform an action queue."""
-
-    def __init__(self):
-        """Constructs worker instance"""
-
-        threading.Thread.__init__(self)
-        self._tasks = collections.deque()
-
-    def push(self, task):
-        """Pushes a new task to worker"""
-        self._tasks.append(task)
-
-    def run(self):
-        """Runs a worker thread"""
-        count = len(self._tasks)
-
-        if count == 0:
-            return
-
-        while len(self._tasks) != 0:
-            task = self._tasks.popleft()
-            task()
-
+class MeshImporter(Importer):
+    pass

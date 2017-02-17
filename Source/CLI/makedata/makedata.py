@@ -26,56 +26,47 @@
 #
 #################################################################################
 
-import time, files, os, actions, tasks, unity
+import time
+import os
+import tasks
+#import unity
+import importers
+from assets import Assets
+from assets import Cache
 
 
 # substitute_variables
 def substitute_variables(args, *variables):
     argv = vars(args)
+    has_changes = True
 
-    for k, v in argv.items():
-        if isinstance(v, str):
-            for var in variables:
-                argv[k] = argv[k].replace( '[' + var + ']', argv[var] )
+    while has_changes:
+        has_changes = False
+
+        for k, v in argv.items():
+            if isinstance(v, str):
+                for var in variables:
+                    key = '[' + var + ']'
+
+                    if argv[k].find(key) != -1:
+                        argv[k] = argv[k].replace(key, argv[var])
+                        has_changes = True
 
 
 # class TextureQuality
-class TextureQuality:
+class TextureQuality(object):
     HD = 'hd'
     SD = 'sd'
     Available = [HD, SD]
 
 
 # class TargetPlatform
-class TargetPlatform:
+class TargetPlatform(object):
     Win = 'win'
     Mac = 'mac'
     iOS = 'ios'
     Android = 'android'
     Available = [Win, Mac, iOS, Android]
-
-
-# class TextureCompression
-class TextureCompression:
-    Disabled = 'disabled'
-    Pvr = 'pvr'
-    Dxt = 'dxt'
-    Etc = 'etc'
-    Available = [Disabled, Pvr, Dxt, Etc]
-
-
-# class TextureFormat
-class TextureFormat:
-    Raw = 'raw'
-    Png = 'png'
-    QPng = 'qpng'
-    Available = [Raw, Png, QPng]
-
-    @staticmethod
-    def convert_to(format):
-        if format == TextureFormat.Raw: return actions.convert_to_raw
-        if format == TextureFormat.Png: return actions.png_quant
-        if format == TextureFormat.Tga: return actions.compress
 
 
 # class ExportError
@@ -106,27 +97,49 @@ def import_project(args, source, output):
     assets.save(output)
 
 
-# Builds the data to a specified folder
 def build(args):
-    substitute_variables(args, 'version', 'compression', 'platform', 'quality', 'source')
+    """Builds the data to a specified folder"""
 
-    rules = {
-            '*.tga': TextureFormat.convert_to(args.texture_format)
-        ,   '*.png': TextureFormat.convert_to(args.texture_format)
-        ,   '*.fbx': actions.convert_fbx
-        }
+    substitute_variables(args, 'version', 'compression', 'platform', 'quality', 'source', 'output')
 
-    queue = tasks.create(args.workers)
-    outdated = files.find_outdated(args.source)
+    # Check the input arguments
+    if not os.path.exists(args.source):
+        raise AssertionError('the input folder does not exist')
 
-    files.build(queue, outdated, args.output, rules)
+    # Create the output folder
+    if not os.path.exists(args.output):
+        os.makedirs(args.output)
 
-    queue.start()
+    print('--- Building [{0}] data package to [{1}] with [{2}] image compression ---'.format(args.platform, args.output, args.compression))
+    start = time.time()
 
-    # Write the manifest file
-    with open(os.path.join(args.output, 'assets.json'), 'wt') as fh:
-        fh.write(files.generate_manifest(outdated))
-        fh.close()
+    rules = []
+
+    for image_format in importers.ImageFormats.AVAILABLE:
+        rules.append(('*.panorama.%s' % image_format, importers.PanoramaImporter))
+        rules.append(('*.%s' % image_format, importers.TextureImporter))
+
+    for mesh_format in importers.MeshFormats.AVAILABLE:
+        rules.append(('*.%s' % mesh_format, importers.MeshImporter))
+
+    try:
+        queue = tasks.create(args.workers)
+        asset_bundle = Assets(args.source, args.output, Cache(args.cache), rules)
+        asset_bundle.scan()
+
+        print '%d files to build' % len(asset_bundle.outdated)
+        asset_bundle.build(queue)
+
+        queue.start()
+
+        # Write the manifest file
+        #with open(os.path.join(args.output, 'assets.json'), 'wt') as fh:
+        #    fh.write(assets.generate_manifest(outdated))
+        #    fh.close()
+    except ExportError as e:
+        print e.message
+
+    print '--- %s seconds ---' % int(time.time() - start)
 
 
 def command_line(parser):
@@ -144,14 +157,9 @@ def command_line(parser):
                         help="output path.")
 
     parser.add_argument("--compression",
-                        default=TextureCompression.Disabled,
-                        choices=TextureCompression.Available,
-                        help="hardware texture compression.")
-
-    parser.add_argument("--texture-format",
-                        default=TextureFormat.Raw,
-                        choices=TextureFormat.Available,
-                        help="exported image format.")
+                        default=importers.TextureCompression.DISABLED,
+                        choices=importers.TextureCompression.AVAILABLE,
+                        help="hardware image compression.")
 
     parser.add_argument("--platform",
                         default=TargetPlatform.Win,
@@ -177,65 +185,3 @@ def command_line(parser):
                         help="cache folder.")
 
     parser.set_defaults(function=build)
-
-    #parser.add_argument("--strip-unused",
-    #                    type=bool,
-    #                    default=False,
-    #                    help="the unused assets won't be imported.")
-
-    #parser.add_argument("--use-uuids",
-    #                    type=int,
-    #                    default=1,
-    #                    help="the UUIDs will be used instead of file names.")
-
-    #parser.add_argument("--skip-scenes",
-    #                    type=int,
-    #                    default=0,
-    #                    help="scenes wont be imported.")
-
-
-# Entry point
-'''
-if __name__ == "__main__":
-    # Parse arguments
-    parser = argparse.ArgumentParser( description = 'Dreemchest make data tool', formatter_class = argparse.ArgumentDefaultsHelpFormatter )
-
-    parser.add_argument( "-a",  "--action",      type = str,  default  = 'build',                            help = "Build action.", choices = ["clean", "build", "install", "import"] )
-    parser.add_argument( "-s",  "--source",      type = str,  required = True,                               help = "Input resource path." )
-    parser.add_argument( "-o",  "--output",      type = str,  required = True,                               help = "Output path." )
-    parser.add_argument( "-tc", "--compression", type = str,  default  = TextureCompression.Disabled,        help = "Hardware texture compression." )
-    parser.add_argument( "-tf", "--texFormat",   type = str,  default  = TextureFormat.Raw,                  help = "Exported image format." )
-    parser.add_argument( "-p",  "--platform",    type = str,  default  = TargetPlatform.Win,                 help = "Target platform.", choices = TargetPlatform.Available )
-    parser.add_argument( "-v",  "--version",     type = str,  default  = '1.0',                              help = "Resource version" )
-    parser.add_argument( "-w",  "--workers",     type = int,  default  = 8,                                  help = "The number of concurrent workers." )
-    parser.add_argument( "-q",  "--quality",     type = str,  default  = TextureQuality.HD,                  help = "Texture quality.", choices = TextureQuality.Available )
-    parser.add_argument( "-c",  "--cache",       type = str,  default  = '[source]/[platform]/cache',        help = "Cache file name." )
-    parser.add_argument( "--strip-unused",       type = bool, default  = False,                              help = "The unused assets won't be imported." )
-    parser.add_argument( "--use-uuids",          type = int,  default  = 1,                                  help = "The UUIDs will be used instead of file names." )
-    parser.add_argument( "--skip-scenes",        type = int,  default  = 0,                                  help = "Scenes wont be imported." )
-
-    args = parser.parse_args()
-
-    substitute_variables( args, 'version', 'compression', 'platform', 'quality', 'source' )
-
-    # Check the input arguments
-    if not os.path.exists(args.source):
-        raise AssertionError('the input folder does not exist')
-
-    # Create the output folder
-    if not os.path.exists(args.output):
-        os.makedirs(args.output)
-
-    print('--- Building [{0}] data package to [{1}] with [{2}] texture compression ---'.format(args.platform, args.output, args.compression) )
-    start = time.time()
-
-    try:
-        if args.action == 'build':
-            build(args, args.source, args.output)
-        elif args.action == 'import':
-            import_project(args, args.source, args.output)
-    except ExportError as e:
-        print(e.message)
-
-    print('--- {0} seconds ---'.format(int(time.time() - start)))
-'''

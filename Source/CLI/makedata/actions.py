@@ -42,8 +42,13 @@ class action:
 
     # call
     def __call__(self, type):
-        print('{0} <= {1}'.format(type, self.source))
+        print('{0} <= {1}'.format(type, self.item['identifier']))
         self.item['type'] = type
+
+        target_folder = os.path.dirname(self.dest)
+
+        if not os.path.exists(target_folder):
+            os.makedirs(target_folder)
 
 
 # copy
@@ -124,6 +129,17 @@ class convert_to_raw(image):
             data = struct.pack('HHB%us' % len(pixels), width, height, channels, pixels)
             fh.write(data)
             fh.close()
+
+
+class convert_obj(action):
+    # ctor
+    def __init__(self, item, source, dest):
+        action.__init__(self, item, source, dest)
+
+    # call
+    def __call__(self):
+        action.__call__(self, 'mesh')
+        shutil.copyfile(self.source, self.dest)
 
 
 # convert_fbx

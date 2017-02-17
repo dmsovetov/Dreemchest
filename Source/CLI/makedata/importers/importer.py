@@ -24,61 +24,24 @@
 #
 #################################################################################
 
-import threading
-import collections
+import shutil
+import os
 
 
-def create(workers):
-    """Creates a new task manager"""
-    return Tasks(workers)
-
-
-class Tasks:
-    """A task manager class"""
-
-    def __init__(self, workers):
-        """Constructs a task manager instance"""
-        self._workers = []
-        self._current = 0
-        
-        for i in range(0, workers):
-            self._workers.append(Worker())
-
-    def push(self, task):
-        """Pushes a new task to a worker"""
-        idx = self._current % len(self._workers)
-        self._workers[idx].push(task)
-        self._current += 1
-
-    def start(self):
-        """Starts an action processing"""
-        for w in self._workers:
-            w.start()
-
-        [w.join() for w in self._workers if w.isAlive()]
-
-
-class Worker(threading.Thread):
-    """Thread worker to perform an action queue."""
+class Importer(object):
+    """Base class for all asset importers"""
 
     def __init__(self):
-        """Constructs worker instance"""
+        """Constructs an asset importer instance"""
 
-        threading.Thread.__init__(self)
-        self._tasks = collections.deque()
+    def process(self, output_path, asset):
+        """Invokes an importing process for a passed asset"""
 
-    def push(self, task):
-        """Pushes a new task to worker"""
-        self._tasks.append(task)
+        absolute_output_path = os.path.join(output_path, asset.local_output_path)
+        target_folder = os.path.dirname(absolute_output_path)
 
-    def run(self):
-        """Runs a worker thread"""
-        count = len(self._tasks)
+        if not os.path.exists(target_folder):
+            os.makedirs(target_folder)
 
-        if count == 0:
-            return
-
-        while len(self._tasks) != 0:
-            task = self._tasks.popleft()
-            task()
-
+        print 'Copying asset %s...' % asset.uuid
+        shutil.copyfile(asset.absolute_input_path, absolute_output_path)

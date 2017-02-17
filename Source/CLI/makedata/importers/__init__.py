@@ -24,53 +24,7 @@
 #
 #################################################################################
 
-import os, hashlib, base64
-
-# 
-
-# Computes file hash
-def file_hash(file_path):
-    hash = hashlib.md5()
-
-
-
-    return base64.b64encode(hash.digest())
-
-# class Hash
-class Hash:
-	# getFileHash
-	def getFileHash( self, fullPath ):
-		self.beginHash()
-		self.updateHash( fullPath )
-
-		return self.endHash()
-
-	# getFolderHash
-	def getFolderHash( self, fullPath ):
-		self.beginHash()
-
-		for root, dirnames, files in os.walk( fullPath ):
-			for fileName in files:
-				self.updateHash( os.path.join( root, fileName ) )
-
-		return self.endHash()
-
-	# beginHash
-#	def beginHash( self ):
-#		self.hash = hashlib.md5()
-
-	# endHash
-#	def endHash( self ):
-#		result = base64.b64encode(self.hash.digest())
-#		self.hash = None
-#		return result
-
-	# updateHash
-	def updateHash( self, fileName ):
-		fh = open( fileName, 'rb' )
-
-		while True:
-			data = fh.read( 8192 )
-			if not data:
-				break
-			self.hash.update( data )
+from mesh.mesh import *
+from image.texture import *
+from image.cubemap import *
+from image.panorama import *

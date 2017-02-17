@@ -24,41 +24,64 @@
 #
 #################################################################################
 
-import sqlite3, os
+import sqlite3
+import os
 
-# Stores signatures and preprocessed resource info
+
 class Cache:
-    # ctor
+    """Stores signatures and preprocessed resource info"""
+
     def __init__(self, file_name):
+        """Constructs a cache instance"""
+
         first_use = not os.path.exists(file_name)
+
+        if first_use:
+            os.makedirs(os.path.dirname(file_name))
 
         self._db = sqlite3.connect(file_name)
         self._cursor = self._db.cursor()
 
         if first_use:
             print('Creating cache...')
-            self._query('CREATE TABLE resources(key text, data text)')
+            self._query('CREATE TABLE meta(uuid text, hash text)')
 
-    # Saves resource info to cache
-    def save(self, key, data):
-        self.dbCursor.execute("SELECT data FROM resources WHERE key = '%s'" % key)
+    def set_meta_hash(self, uuid, value):
+        """Saves resource meta file hash"""
+
+        self._cursor.execute("SELECT hash FROM meta WHERE uuid = '%s'" % uuid)
         result = self._cursor.fetchone()
 
         # No cache entry - insert
-        if result == None:
-            self._query("INSERT INTO resources VALUES('{0}', '{1}')".format(key, data))
+        if result is None:
+            self._query("INSERT INTO meta VALUES('{uuid}','{hash}')".format(uuid=uuid, hash=value))
         else:
-            self._query("UPDATE resources SET key='{0}' WHERE data='{1}'".format(key, data))
+            self._query("UPDATE meta SET hash='{hash}' WHERE uuid='{uuid}'".format(hash=value, uuid=uuid))
 
         self._db.commit()
 
-    # Loads resource info from cache
-    def load(self, key):
-        self._query("SELECT data FROM resources WHERE key = '%s'" % key)
+    def meta_hash(self, uuid):
+        """Loads resource meta file hash"""
+
+        self._query("SELECT hash FROM meta WHERE uuid = '{uuid}'".format(uuid=uuid))
         result = self._cursor.fetchone()
 
-        return result[0] if result else None
+        if result is None:
+            return None
 
-    # Performs a database query
+        return result[0]
+
+    def update_meta_hash(self, uuid, value):
+        """Updates meta hash, returns true if hash values are distinct"""
+
+        meta_hash = self.meta_hash(uuid)
+
+        if meta_hash == value:
+            return False
+
+        self.set_meta_hash(uuid, value)
+        return True
+
     def _query(self, text):
+        """Performs a database query"""
         self._cursor.execute(text)

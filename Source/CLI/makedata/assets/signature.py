@@ -24,61 +24,39 @@
 #
 #################################################################################
 
-import threading
-import collections
+import os
+import hashlib
+import base64
 
 
-def create(workers):
-    """Creates a new task manager"""
-    return Tasks(workers)
+def update_hash(hash_value, input_file):
+    while True:
+        data = input_file.read(8192)
+
+        if not data:
+            break
+
+        hash_value.update(data)
 
 
-class Tasks:
-    """A task manager class"""
+def file_hash(file_path):
+    """Computes file hash"""
 
-    def __init__(self, workers):
-        """Constructs a task manager instance"""
-        self._workers = []
-        self._current = 0
-        
-        for i in range(0, workers):
-            self._workers.append(Worker())
+    hash_value = hashlib.md5()
 
-    def push(self, task):
-        """Pushes a new task to a worker"""
-        idx = self._current % len(self._workers)
-        self._workers[idx].push(task)
-        self._current += 1
+    with open(file_path) as fh:
+        update_hash(hash_value, fh)
 
-    def start(self):
-        """Starts an action processing"""
-        for w in self._workers:
-            w.start()
-
-        [w.join() for w in self._workers if w.isAlive()]
+    return base64.b64encode(hash_value.digest())
 
 
-class Worker(threading.Thread):
-    """Thread worker to perform an action queue."""
+def folder_hash(path):
+    """Computes folder hash"""
 
-    def __init__(self):
-        """Constructs worker instance"""
+    hash_value = hashlib.md5()
 
-        threading.Thread.__init__(self)
-        self._tasks = collections.deque()
+    for root, dir_names, files in os.walk(path):
+        for file_name in files:
+            update_hash(hash_value, os.path.join(root, file_name))
 
-    def push(self, task):
-        """Pushes a new task to worker"""
-        self._tasks.append(task)
-
-    def run(self):
-        """Runs a worker thread"""
-        count = len(self._tasks)
-
-        if count == 0:
-            return
-
-        while len(self._tasks) != 0:
-            task = self._tasks.popleft()
-            task()
-
+    return base64.b64encode(hash_value.digest())

@@ -24,61 +24,23 @@
 #
 #################################################################################
 
-import threading
-import collections
+from texture import TextureImporter
 
 
-def create(workers):
-    """Creates a new task manager"""
-    return Tasks(workers)
-
-
-class Tasks:
-    """A task manager class"""
-
-    def __init__(self, workers):
-        """Constructs a task manager instance"""
-        self._workers = []
-        self._current = 0
-        
-        for i in range(0, workers):
-            self._workers.append(Worker())
-
-    def push(self, task):
-        """Pushes a new task to a worker"""
-        idx = self._current % len(self._workers)
-        self._workers[idx].push(task)
-        self._current += 1
-
-    def start(self):
-        """Starts an action processing"""
-        for w in self._workers:
-            w.start()
-
-        [w.join() for w in self._workers if w.isAlive()]
-
-
-class Worker(threading.Thread):
-    """Thread worker to perform an action queue."""
+class CubeMapImporter(TextureImporter):
+    """Imports a cube map image from an image"""
 
     def __init__(self):
-        """Constructs worker instance"""
+        """Constructs a cube map importer instance"""
+        TextureImporter.__init__(self)
+        self._seamless = False
 
-        threading.Thread.__init__(self)
-        self._tasks = collections.deque()
+    @property
+    def seamless(self):
+        """Returns true if a seamless cube map filtering should be enabled for this asset"""
+        return self._seamless
 
-    def push(self, task):
-        """Pushes a new task to worker"""
-        self._tasks.append(task)
-
-    def run(self):
-        """Runs a worker thread"""
-        count = len(self._tasks)
-
-        if count == 0:
-            return
-
-        while len(self._tasks) != 0:
-            task = self._tasks.popleft()
-            task()
-
+    @seamless.setter
+    def seamless(self, value):
+        """Enables or disables seamless cube map filtering"""
+        self._seamless = value

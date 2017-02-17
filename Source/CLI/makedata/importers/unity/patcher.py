@@ -276,7 +276,7 @@ MaterialPatcher = {
     , 'm_Shader': Patcher.shader('shader')
 }
 
-# Material texture patcher
+# Material image patcher
 MaterialTexturePatcher = {
       'm_Texture': Patcher.asset('asset')
     , 'm_Scale': Patcher.vector('scale', ['x', 'y'])
