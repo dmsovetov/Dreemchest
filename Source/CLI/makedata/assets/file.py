@@ -25,9 +25,9 @@
 #################################################################################
 
 import os
+
 import signature
-import yaml
-from .. import serializer
+from ..serialization import serializer
 
 
 class File:
@@ -35,12 +35,13 @@ class File:
 
     META_EXT = ".meta"
 
-    def __init__(self, input_path, uuid=None, importer=None):
+    def __init__(self, bundle, input_path, uuid=None, importer=None):
         """Constructs an input asset file"""
 
         self._input_path = input_path
         self._uuid = uuid
         self._importers = dict()
+        self._bundle = bundle
 
         if importer:
             self._importers[importer.name] = importer
@@ -49,6 +50,11 @@ class File:
     def absolute_input_path(self):
         """Returns absolute asset source path"""
         return self._input_path
+
+    @property
+    def bundle(self):
+        """Returns asset bundle that contains this file"""
+        return self._bundle
 
     @property
     def local_output_path(self):
@@ -91,9 +97,7 @@ class File:
         document = serializer.write(self, save_type=False)
         document['importers'] = self.save_importers()
 
-        with open(self.meta_file, 'wt') as fh:
-            fh.write(yaml.dump(document, default_flow_style=False))
-            fh.close()
+        self.bundle.format.write_document(document, self.meta_file)
 
     def save_importers(self):
         """Saves attached asset importers to dictionary"""
@@ -104,14 +108,19 @@ class File:
         self._importers = {k: serializer.read_instance(getattr(package, k)(), v) for k, v in importers.items()}
 
     @classmethod
-    def load(cls, file_name, importers):
+    def load(cls, bundle, file_name, importers):
         meta_file_name = file_name + File.META_EXT
 
         if not os.path.exists(meta_file_name):
             return None
 
-        with open(meta_file_name) as fh:
-            document = yaml.load(fh.read())
-            asset = serializer.read_instance(File(input_path=file_name), document, importers)
-            asset.load_importers(document['importers'], importers)
-            return asset
+        document = bundle.format.read_document(meta_file_name)
+
+        if document is None:
+            return None
+
+        asset = serializer.read_instance(File(bundle=bundle, input_path=file_name), document, importers)
+        asset.load_importers(document['importers'], importers)
+
+        return asset
+

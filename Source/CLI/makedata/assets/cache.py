@@ -35,9 +35,10 @@ class Cache:
         """Constructs a cache instance"""
 
         first_use = not os.path.exists(file_name)
+        db_dir = os.path.dirname(file_name)
 
-        if first_use:
-            os.makedirs(os.path.dirname(file_name))
+        if first_use and not os.path.exists(db_dir):
+            os.makedirs(db_dir)
 
         self._db = sqlite3.connect(file_name)
         self._cursor = self._db.cursor()

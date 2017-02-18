@@ -31,6 +31,7 @@ import os
 import tasks
 #import unity
 import importers
+import serialization
 from assets import Assets
 from assets import Cache
 
@@ -122,9 +123,16 @@ def build(args):
     for mesh_format in importers.MeshFormats.AVAILABLE:
         rules.append(('*.%s' % mesh_format, importers.MeshImporter))
 
+    document_format = serialization.document_formats[args.format]
+
     try:
         queue = tasks.create(args.workers)
-        asset_bundle = Assets(args.source, args.output, Cache(args.cache), rules, importers=importers)
+        asset_bundle = Assets(args.source,
+                              args.output,
+                              Cache(args.cache),
+                              rules,
+                              importers=importers,
+                              document_format=document_format)
         asset_bundle.scan()
 
         print '%d files to build' % len(asset_bundle.outdated)
@@ -143,11 +151,6 @@ def build(args):
 
 
 def command_line(parser):
-    parser.add_argument("--action",
-                        default='build',
-                        help="Build action.",
-                        choices=["clean", "build", "install", "import"])
-
     parser.add_argument("--source",
                         required=True,
                         help="input resource path.")
@@ -156,15 +159,24 @@ def command_line(parser):
                         required=True,
                         help="output path.")
 
-    parser.add_argument("--compression",
-                        default=importers.TextureCompression.DISABLED,
-                        choices=importers.TextureCompression.AVAILABLE,
-                        help="hardware image compression.")
+    parser.add_argument('--format',
+                        choices=serialization.document_formats.keys(),
+                        default=serialization.document_formats.keys()[0],
+                        help="document format to be used.")
+
+    parser.add_argument("--cache",
+                        default='[source]/[platform]/cache',
+                        help="cache folder.")
 
     parser.add_argument("--platform",
                         default=TargetPlatform.Win,
                         help="target platform.",
                         choices=TargetPlatform.Available)
+
+    parser.add_argument("--compression",
+                        default=importers.TextureCompression.DISABLED,
+                        choices=importers.TextureCompression.AVAILABLE,
+                        help="hardware image compression.")
 
     parser.add_argument("--version",
                         default='1.0',
@@ -179,9 +191,5 @@ def command_line(parser):
                         default=TextureQuality.HD,
                         help="Texture quality.",
                         choices=TextureQuality.Available)
-
-    parser.add_argument("--cache",
-                        default='[source]/[platform]/cache',
-                        help="cache folder.")
 
     parser.set_defaults(function=build)

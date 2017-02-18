@@ -33,8 +33,12 @@ from file import File
 class Assets(object):
     """Loaded assets"""
 
-    def __init__(self, input_path, output_path, cache, build_rules, importers=None):
+    def __init__(self, input_path, output_path, cache, build_rules, importers=None, document_format=None):
         """Constructs assets instance that are loaded from a specified path"""
+
+        if not document_format:
+            raise ValueError('document format was not set')
+
         self._input_path = input_path
         self._output_path = output_path
         self._files = {}
@@ -42,6 +46,7 @@ class Assets(object):
         self._build_rules = build_rules
         self._cache = cache
         self._importers = importers
+        self._format = document_format
 
     @property
     def outdated(self):
@@ -52,6 +57,11 @@ class Assets(object):
     def files(self):
         """Returns all known asset files"""
         return self._files
+
+    @property
+    def format(self):
+        """Returns asset bundle document format"""
+        return self._format
 
     @property
     def input_path(self):
@@ -111,7 +121,7 @@ class Assets(object):
         if not importer:
             return None
 
-        asset = File(absolute_input_path, uuid=self.generate_uuid(), importer=importer)
+        asset = File(self, absolute_input_path, uuid=self.generate_uuid(), importer=importer)
         asset.save()
 
         return asset
@@ -133,7 +143,7 @@ class Assets(object):
                 if file_name.endswith(File.META_EXT):
                     continue
 
-                asset = File.load(input_path, self.importers)
+                asset = File.load(self, input_path, self.importers)
 
                 if asset is None:
                     asset = self._create_asset(relative_path)
