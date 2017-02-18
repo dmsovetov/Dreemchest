@@ -124,7 +124,7 @@ def build(args):
 
     try:
         queue = tasks.create(args.workers)
-        asset_bundle = Assets(args.source, args.output, Cache(args.cache), rules)
+        asset_bundle = Assets(args.source, args.output, Cache(args.cache), rules, importers=importers)
         asset_bundle.scan()
 
         print '%d files to build' % len(asset_bundle.outdated)

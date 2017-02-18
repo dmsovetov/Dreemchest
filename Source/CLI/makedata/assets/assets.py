@@ -26,17 +26,14 @@
 
 import os
 import fnmatch
-import json
-import yaml
 import random
 from file import File
-from .. import serializer
 
 
 class Assets(object):
     """Loaded assets"""
 
-    def __init__(self, input_path, output_path, cache, build_rules):
+    def __init__(self, input_path, output_path, cache, build_rules, importers=None):
         """Constructs assets instance that are loaded from a specified path"""
         self._input_path = input_path
         self._output_path = output_path
@@ -44,6 +41,7 @@ class Assets(object):
         self._outdated = []
         self._build_rules = build_rules
         self._cache = cache
+        self._importers = importers
 
     @property
     def outdated(self):
@@ -75,12 +73,17 @@ class Assets(object):
         """Returns build rules"""
         return self._build_rules
 
+    @property
+    def importers(self):
+        """Returns available asset importers"""
+        return self._importers
+
     @classmethod
     def generate_uuid(cls):
         return '%032x' % random.getrandbits(128)
 
     def importer_by_file_name(self, file_name):
-        """Returns an asset importer"""
+        """Returns a default asset importer by a file name"""
 
         for k, importer in self.build_rules:
             if fnmatch.fnmatch(file_name, k):
@@ -98,20 +101,6 @@ class Assets(object):
         if asset_file.uuid in self.files.keys():
             raise ValueError("duplicate asset id '%s'" % asset_file.uuid)
 
-    def _load_asset(self, local_path):
-        """Loads an asset by its file name"""
-
-        absolute_input_path = os.path.join(self.input_path, local_path)
-
-        if not os.path.exists(absolute_input_path + File.META_EXT):
-            return None
-
-        with open(os.path.join(self.input_path, local_path) + File.META_EXT) as fh:
-            document = yaml.load(fh.read())
-            asset = serializer.read(document, globals())
-            asset.set_absolute_input_path(absolute_input_path)
-            return asset
-
     def _create_asset(self, local_path):
         """Creates an asset from file"""
 
@@ -123,7 +112,6 @@ class Assets(object):
             return None
 
         asset = File(absolute_input_path, uuid=self.generate_uuid(), importer=importer)
-        asset.update_hash()
         asset.save()
 
         return asset
@@ -145,35 +133,24 @@ class Assets(object):
                 if file_name.endswith(File.META_EXT):
                     continue
 
-                asset = self._load_asset(relative_path)
+                asset = File.load(input_path, self.importers)
 
                 if asset is None:
                     asset = self._create_asset(relative_path)
 
-                if not asset.importer:
+                if not asset:
                     continue
 
-                meta_hash = asset.meta_hash
-
-                if self.cache.update_meta_hash(asset.uuid, meta_hash):
-                    self.update_asset(asset, meta_hash)
-                elif asset.update_hash():
-                    self.update_asset(asset, meta_hash)
+                if self.cache.update_asset_hash(asset.uuid, meta_hash=asset.meta_hash, file_hash=asset.file_hash):
+                    self.outdated.append(asset)
                 elif not os.path.exists(os.path.join(self.output_path, asset.local_output_path)):
                     self.outdated.append(asset)
-
-    def update_asset(self, asset, meta_hash):
-        """Puts an asset to an outdated list and updates hash values"""
-
-        self.outdated.append(asset)
-        asset.save()
-        self.cache.update_meta_hash(asset.uuid, meta_hash)
 
     def build(self, task_manager):
         """Builds each outdated file to an output folder"""
 
         def make_importer(asset_path, asset):
-            return lambda: asset.importer.process(asset_path, asset)
+            return lambda: {importer.process(asset_path, asset) for name, importer in asset.importers.items()}
 
         for item in self.outdated:
             task_manager.push(make_importer(self.output_path, item))

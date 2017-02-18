@@ -35,13 +35,15 @@ class File:
 
     META_EXT = ".meta"
 
-    def __init__(self, input_path=None, uuid=None, importer=None):
+    def __init__(self, input_path, uuid=None, importer=None):
         """Constructs an input asset file"""
 
         self._input_path = input_path
         self._uuid = uuid
-        self._hash = None
-        self._importer = importer
+        self._importers = dict()
+
+        if importer:
+            self._importers[importer.name] = importer
 
     @property
     def absolute_input_path(self):
@@ -64,29 +66,14 @@ class File:
         return signature.file_hash(self.meta_file)
 
     @property
-    def hash(self):
-        """Returns an asset input file hash"""
-        return self._hash
-
-    @property
     def file_hash(self):
         """Returns actual input file hash"""
         return signature.file_hash(self.absolute_input_path)
 
-    @hash.setter
-    def hash(self, value):
-        """Sets an asset input file hash"""
-        self._hash = value
-
     @property
-    def importer(self):
-        """Returns an attached asset importer"""
-        return self._importer
-
-    @importer.setter
-    def importer(self, value):
-        """Sets an asset importer"""
-        self._importer = value
+    def importers(self):
+        """Returns an attached asset importers"""
+        return self._importers
 
     @property
     def uuid(self):
@@ -97,30 +84,34 @@ class File:
     def uuid(self, value):
         self._uuid = value
 
-    def set_absolute_input_path(self, value):
-        """Sets an asset input file path"""
-        self._input_path = value
-
-    def set_importer(self, value):
-        """Sets an asset importer"""
-        self._importer = value
-
-    def update_hash(self):
-        """Updates an input file hash, returns true if hash values were distinct"""
-
-        if self.file_hash == self.hash:
-            return False
-
-        self.hash = self.file_hash
-        return True
-
     def save(self):
         """Saves asset meta file"""
 
-        assert self.importer is not None, 'asset %s has no importer' % self.absolute_input_path
-
-        document = serializer.write(self)
+        # Write asset properties
+        document = serializer.write(self, save_type=False)
+        document['importers'] = self.save_importers()
 
         with open(self.meta_file, 'wt') as fh:
             fh.write(yaml.dump(document, default_flow_style=False))
             fh.close()
+
+    def save_importers(self):
+        """Saves attached asset importers to dictionary"""
+        return {name: serializer.write(importer, save_type=False) for name, importer in self.importers.items()}
+
+    def load_importers(self, importers, package):
+        """Loads importers from a dictionary"""
+        self._importers = {k: serializer.read_instance(getattr(package, k)(), v) for k, v in importers.items()}
+
+    @classmethod
+    def load(cls, file_name, importers):
+        meta_file_name = file_name + File.META_EXT
+
+        if not os.path.exists(meta_file_name):
+            return None
+
+        with open(meta_file_name) as fh:
+            document = yaml.load(fh.read())
+            asset = serializer.read_instance(File(input_path=file_name), document, importers)
+            asset.load_importers(document['importers'], importers)
+            return asset

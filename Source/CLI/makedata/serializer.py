@@ -61,10 +61,10 @@ def read(document, package):
         if 'type' in document.keys():
             type_name = document.get('type')
 
-            if type_name not in package.keys():
+            if not hasattr(package, type_name):
                 raise AssertionError('unknown type %s' % type_name)
 
-            cls = package[type_name]
+            cls = getattr(package, type_name)
             instance = cls()
 
             for key, v in document.items():
@@ -84,3 +84,21 @@ def read(document, package):
             return {key: read(v, package) for (key, v) in document.items()}
 
     return document
+
+
+def read_instance(instance, document, package=None):
+    """Reads instance properties from a document"""
+
+    if not isinstance(document, dict):
+        raise ValueError('dict object expected')
+
+    properties = serializable_properties(instance)
+
+    for key, class_property in properties:
+        if key not in document.keys():
+            continue
+
+        value = read(document[key], package)
+        class_property.fset(instance, value)
+
+    return instance

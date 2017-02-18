@@ -44,42 +44,40 @@ class Cache:
 
         if first_use:
             print('Creating cache...')
-            self._query('CREATE TABLE meta(uuid text, hash text)')
+            self._query('CREATE TABLE hash(uuid text, meta text, file text)')
 
-    def set_meta_hash(self, uuid, value):
+    def set_asset_hash(self, uuid, meta_hash, file_hash):
         """Saves resource meta file hash"""
 
-        self._cursor.execute("SELECT hash FROM meta WHERE uuid = '%s'" % uuid)
+        self._cursor.execute("SELECT meta, file FROM hash WHERE uuid = '%s'" % uuid)
         result = self._cursor.fetchone()
 
         # No cache entry - insert
         if result is None:
-            self._query("INSERT INTO meta VALUES('{uuid}','{hash}')".format(uuid=uuid, hash=value))
+            self._query("INSERT INTO hash VALUES('{uuid}','{meta}', '{file}')"
+                        .format(uuid=uuid, meta=meta_hash, file=file_hash))
         else:
-            self._query("UPDATE meta SET hash='{hash}' WHERE uuid='{uuid}'".format(hash=value, uuid=uuid))
+            self._query("UPDATE hash SET meta='{meta}', file='{file}' WHERE uuid='{uuid}'"
+                        .format(meta=meta_hash, file=file_hash, uuid=uuid))
 
         self._db.commit()
 
-    def meta_hash(self, uuid):
+    def asset_hash(self, uuid):
         """Loads resource meta file hash"""
 
-        self._query("SELECT hash FROM meta WHERE uuid = '{uuid}'".format(uuid=uuid))
+        self._query("SELECT meta, file FROM hash WHERE uuid = '{uuid}'".format(uuid=uuid))
         result = self._cursor.fetchone()
+        return result
 
-        if result is None:
-            return None
-
-        return result[0]
-
-    def update_meta_hash(self, uuid, value):
+    def update_asset_hash(self, uuid, meta_hash, file_hash):
         """Updates meta hash, returns true if hash values are distinct"""
 
-        meta_hash = self.meta_hash(uuid)
+        asset_hash = self.asset_hash(uuid)
 
-        if meta_hash == value:
+        if asset_hash and meta_hash == asset_hash[0] and file_hash == asset_hash[1]:
             return False
 
-        self.set_meta_hash(uuid, value)
+        self.set_asset_hash(uuid, meta_hash=meta_hash, file_hash=file_hash)
         return True
 
     def _query(self, text):

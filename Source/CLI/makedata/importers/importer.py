@@ -34,6 +34,11 @@ class Importer(object):
     def __init__(self):
         """Constructs an asset importer instance"""
 
+    @property
+    def name(self):
+        """Returns an importer name"""
+        return type(self).__name__
+
     def process(self, output_path, asset):
         """Invokes an importing process for a passed asset"""
 
