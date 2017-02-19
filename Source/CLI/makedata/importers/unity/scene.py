@@ -24,7 +24,7 @@
 #
 #################################################################################
 
-import yaml, patcher
+import file_format, patcher
 
 # Holds the info about a single scene
 class Scene:
@@ -40,11 +40,11 @@ class Scene:
         objects  = instance.parse(source)
 
         # Save parsed scene to a JSON file
-        yaml.save_to_json(output, objects)
+        file_format.save_to_json(output, objects)
 
     # Parses the scene from YAML file
     def parse(self, file_name):
-        objects = yaml.objects_from_file(file_name)
+        objects = file_format.objects_from_file(file_name)
 
         # Only this object types will be exported
         types = {

@@ -24,7 +24,8 @@
 #
 #################################################################################
 
-import collections, os, yaml
+import time
+import collections, os, file_format
 from asset_type import AssetType
 
 # The single project asset
@@ -113,15 +114,24 @@ class Assets:
         for item in self.filter_by_type(AssetType.SCENE):
             result.append(dict(identifier=item.identifier, uuid=self.asset_identifier(item), type=item.type))
 
-        yaml.save_to_json(file_name, result)
+        file_format.save_to_json(file_name, result)
 
     # Returns an asset identifier
     def asset_identifier(self, asset):
         return asset.uuid if self.use_uuids else asset.file_name
 
     # Parses the project assets
-    def parse(self):
-        print('Parsing assets from {0}'.format(self._path))
+    def parse(self, queue):
+        print('Scanning directory {0}'.format(self._path))
+
+        def parse_asset(full_path, name, folder):
+            meta = file_format.from_file(full_path)
+            self._files[meta['guid']] = Asset(name, os.path.relpath(os.path.join(folder, name), self._path), meta)
+
+        def make_parser(name, full_path, folder):
+            return lambda: parse_asset(full_path, name, folder)
+
+        start = time.time()
 
         for folder, dirs, files in os.walk(os.path.join(self._path, 'Assets')):
             for file in files:
@@ -129,10 +139,12 @@ class Assets:
                 name, ext = os.path.splitext(file)
 
                 if ext == '.meta':
-                    meta = yaml.from_file(full_path)
-                    self._files[meta['guid']] = Asset(name, os.path.relpath(os.path.join(folder, name), self._path), meta)
+                    queue.push(make_parser(name, full_path, folder))
 
-        print('{0} assets parsed'.format(len(self._files)))
+        print 'Parsing scanned assets...'
+        queue.start()
+
+        print('{0} assets parsed in {1} seconds'.format(len(self._files), int(time.time() - start)))
 
     # Marks an asset as used
     def use(self, uuid):

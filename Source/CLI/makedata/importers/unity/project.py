@@ -24,10 +24,13 @@
 #
 #################################################################################
 
-import os, json, collections, shutil, math, yaml, patcher
-
-from .. import actions, module
-
+import os
+import json
+import collections
+import shutil
+import math
+import file_format
+import patcher
 from assets import Assets
 from asset_type import AssetType
 from scene import Scene
@@ -37,14 +40,11 @@ class material:
     # Converts material to JSON
     @staticmethod
     def convert(assets, source, output):
-        objects = yaml.objects_from_file(source)
+        objects = file_format.objects_from_file(source)
         result = None
 
         for k, v in objects.items():
-            if k != 'Material':
-                continue
-
-            result   = v['Material']
+            result = v['Material']
             properties = patcher.Patcher.patch(assets, result['m_SavedProperties'], patcher.MaterialPropertiesPatcher)
             result = patcher.Patcher.patch(assets, result, patcher.MaterialPatcher)
 
@@ -52,7 +52,7 @@ class material:
                 result[k] = v
 
         # Save parsed scene to a JSON file
-        yaml.save_to_json(output, result)
+        file_format.save_to_json(output, result)
 
 # Emitter shape type enumeration
 class ShapeType:
@@ -351,7 +351,7 @@ class ParticleSystemParser:
     # Converts particles to JSON
     @staticmethod
     def convert(assets, source, output):
-        objects = yaml.objects_from_file(source)
+        objects = file_format.objects_from_file(source)
         result  = None
 
         for k, v in objects.items():
@@ -364,12 +364,12 @@ class ParticleSystemParser:
 
         # Save parsed scene to a JSON file
         if result is not None:
-            yaml.save_to_json(output, result.data)
+            file_format.save_to_json(output, result.data)
 
 # Parses assets from a path
-def parse_assets(args):
-    result = Assets(args.source, args.strip_unused, args.use_uuids)
-    result.parse()
+def parse_assets(source, queue):
+    result = Assets(source, False, True)
+    result.parse(queue)
     return result
 
 # Imports all scenes

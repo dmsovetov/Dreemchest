@@ -28,3 +28,4 @@ from mesh.mesh import *
 from image.texture import *
 from image.cubemap import *
 from image.panorama import *
+import unity

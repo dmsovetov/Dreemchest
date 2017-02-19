@@ -25,10 +25,8 @@
 #################################################################################
 
 import json
-from .. import module
+import yaml
 
-# Import the YAML parsing module
-yaml = module.require('yaml', True)
 
 # Saves object to a JSON file
 def save_to_json(file_name, data):
@@ -38,7 +36,7 @@ def save_to_json(file_name, data):
 
 # Loads YAML from a string.
 def from_string(str):
-    return yaml.safe_load( str )
+    return yaml.load(str)
 
 # Loads YAML from a file.
 def from_file(file_name):

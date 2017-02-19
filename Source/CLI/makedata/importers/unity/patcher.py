@@ -27,24 +27,22 @@
 import math
 from parameter import ParameterType, Curve, Gradient, Rgba
 
+
+def rename(name, converter=None):
+    """Renames property"""
+
+    def invoke(assets, target, key):
+        if name == key:
+            target[property] = converter(target[key]) if converter else target[key]
+            return
+
+        target[name] = converter(target[key]) if converter else target[key]
+        del target[key]
+
+    return invoke
+
 # Patches the object properties
 class Patcher:
-    # Renames the property
-    class rename:
-        # __init__
-        def __init__(self, name, converter=None):
-            self.name = name
-            self.converter = converter
-
-        # __call__
-        def __call__(self, assets, object, property):
-            if self.name == property:
-                object[property] = self.converter(object[property]) if self.converter is not None else object[property]
-                return
-
-            object[self.name] = self.converter(object[property]) if self.converter is not None else object[property]
-            del object[property]
-
     # Patches an object
     class object:
         # __init__
@@ -272,7 +270,7 @@ class Patcher:
 
 # Material
 MaterialPatcher = {
-	  'm_Name': Patcher.rename('name')
+	  'm_Name': rename('name')
     , 'm_Shader': Patcher.shader('shader')
 }
 
@@ -290,7 +288,7 @@ MaterialTexturesPatcher = {
 
 # Material parameters
 MaterialParametersPatcher = {
-    '_Shininess': Patcher.rename('shininess')
+    '_Shininess': rename('shininess')
 }
 
 # Material colors
@@ -309,10 +307,10 @@ MaterialPropertiesPatcher = {
 
 # Renderer patcher
 RendererPatcher = {
-	  'm_CastShadows': Patcher.rename('castShadows')
-	, 'm_ReceiveShadows': Patcher.rename('receiveShadows')
+	  'm_CastShadows': rename('castShadows')
+	, 'm_ReceiveShadows': rename('receiveShadows')
 	, 'm_Materials': Patcher.asset('materials')
-	, 'm_Enabled': Patcher.rename('enabled')
+	, 'm_Enabled': rename('enabled')
 	, 'm_GameObject': Patcher.reference('sceneObject')
 }
 
@@ -321,40 +319,40 @@ TransformPatcher = {
 	  'm_LocalRotation': Patcher.vector('rotation', ['x', 'y', 'z', 'w'])
 	, 'm_LocalScale': Patcher.vector('scale', ['x', 'y', 'z'])
 	, 'm_LocalPosition': Patcher.vector('position', ['x', 'y', 'z'])
-	, 'm_Enabled': Patcher.rename('enabled')
+	, 'm_Enabled': rename('enabled')
 	, 'm_GameObject': Patcher.reference('sceneObject')
     , 'm_Father': Patcher.reference('parent')
 }
 
 # GameObject
 GameObjectPatcher = {
-	  'm_Name': Patcher.rename('name')
-	, 'm_IsActive': Patcher.rename('active')
-	, 'm_Layer': Patcher.rename('layer')
-	, 'm_StaticEditorFlags': Patcher.rename('flags')
+	  'm_Name': rename('name')
+	, 'm_IsActive': rename('active')
+	, 'm_Layer': rename('layer')
+	, 'm_StaticEditorFlags': rename('flags')
 }
 
 # Light
 LightPatcher = {
-	  'm_Intensity': Patcher.rename('intensity')
-	, 'm_SpotAngle': Patcher.rename('spotAngle')
-	, 'm_Type': Patcher.rename('type')
-	, 'm_Range': Patcher.rename('range')
+	  'm_Intensity': rename('intensity')
+	, 'm_SpotAngle': rename('spotAngle')
+	, 'm_Type': rename('type')
+	, 'm_Range': rename('range')
 	, 'm_Color': Patcher.vector('color', ['r', 'g', 'b', 'a'])
-	, 'm_Lightmapping': Patcher.rename('backed')
-	, 'm_Enabled': Patcher.rename('enabled')
+	, 'm_Lightmapping': rename('backed')
+	, 'm_Enabled': rename('enabled')
 	, 'm_GameObject': Patcher.reference('sceneObject')
 }
 
 # Camera
 CameraPatcher = {
-	  'near clip plane': Patcher.rename('near')
-	, 'far clip plane': Patcher.rename('far')
-	, 'field of view': Patcher.rename('fov')
-	, 'm_OcclusionCulling': Patcher.rename('occlusionCulling')
+	  'near clip plane': rename('near')
+	, 'far clip plane': rename('far')
+	, 'field of view': rename('fov')
+	, 'm_OcclusionCulling': rename('occlusionCulling')
 	, 'm_BackGroundColor': Patcher.vector('backgroundColor', ['r', 'g', 'b', 'a'])
 	, 'm_NormalizedViewPortRect': Patcher.vector('ndc', ['x', 'y', 'width', 'height'])
-	, 'm_Enabled': Patcher.rename('enabled')
+	, 'm_Enabled': rename('enabled')
 	, 'm_GameObject': Patcher.reference('sceneObject')
 }
 
@@ -371,8 +369,8 @@ def multiply(factor):
 
 # InitialModulePatcher
 InitialModulePatcher = {
-      'gravityModifier': Patcher.rename('gravity', multiply(12))
-    , 'maxNumParticles': Patcher.rename('maxParticles')
+      'gravityModifier': rename('gravity', multiply(12))
+    , 'maxNumParticles': rename('maxParticles')
     , 'startLifetime': Patcher.curve('life')
     , 'startSpeed': Patcher.curve('speed', rescale)
     , 'startColor': Patcher.gradient('rgb', 'alpha')
@@ -417,15 +415,15 @@ ForceModulePatcher = {
 
 # ShapeModulePatcher
 ShapeModulePatcher = {
-      'type': Patcher.rename('type')
-    , 'radius': Patcher.rename('radius', rescale)
-    , 'angle': Patcher.rename('angle')
-    , 'length': Patcher.rename('length', rescale)
-    , 'boxX': Patcher.rename('width', rescale)
-    , 'boxY': Patcher.rename('height', rescale)
-    , 'boxZ': Patcher.rename('depth', rescale)
-    , 'arc': Patcher.rename('arc')
-    , 'randomDirection': Patcher.rename('randomDirection')
+      'type': rename('type')
+    , 'radius': rename('radius', rescale)
+    , 'angle': rename('angle')
+    , 'length': rename('length', rescale)
+    , 'boxX': rename('width', rescale)
+    , 'boxY': rename('height', rescale)
+    , 'boxZ': rename('depth', rescale)
+    , 'arc': rename('arc')
+    , 'randomDirection': rename('randomDirection')
 }
 
 # ClampVelocity
@@ -435,10 +433,10 @@ ClampVelocityPatcher = {
 
 # ParticleSystem
 ParticleSystemPatcher = {
-      'lengthInSec': Patcher.rename('duration')
-    , 'speed': Patcher.rename('velocity')
-    , 'looping': Patcher.rename('isLooped')
-    , 'moveWithTransform': Patcher.rename('isLocal')
+      'lengthInSec': rename('duration')
+    , 'speed': rename('velocity')
+    , 'looping': rename('isLooped')
+    , 'moveWithTransform': rename('isLocal')
     , 'InitialModule': Patcher.module('initial', InitialModulePatcher)
     , 'EmissionModule': Patcher.module('emission', EmissionModulePatcher)
     , 'SizeModule': Patcher.module('size', SizeModulePatcher)
@@ -454,7 +452,7 @@ ParticleSystemPatcher = {
 # ParticleSystemRendererPatcher
 ParticleSystemRendererPatcher = {
       'm_Materials': Patcher.asset('materials')
-    , 'm_Enabled': Patcher.rename('enabled')
+    , 'm_Enabled': rename('enabled')
     , 'm_GameObject': Patcher.reference('sceneObject')
 }
 

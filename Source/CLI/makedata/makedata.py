@@ -34,6 +34,7 @@ import importers
 import serialization
 from assets import Assets
 from assets import Cache
+from importers import unity
 
 
 # substitute_variables
@@ -79,20 +80,19 @@ class ExportError(Exception):
 # Imports the project
 def import_project(args, source, output):
     # Parse project assets
-    assets = unity.project.parse_assets(args)
+    assets = unity.project.parse_assets(source, tasks.create(args.workers))
     
     # Import scenes
-    if args.skip_scenes == 0:
-        unity.project.import_scenes(assets, source, output)
+    #unity.project.import_scenes(assets, source, output)
 
     # Import prefabs
-    unity.project.import_prefabs(assets, source, output)
+    #unity.project.import_prefabs(assets, source, output)
 
     # Import materials
     unity.project.import_materials(assets, source, output)
 
     # Import assets
-    unity.project.import_assets(assets, source, output)
+    #unity.project.import_assets(assets, source, output)
 
     # Save the assets
     assets.save(output)
