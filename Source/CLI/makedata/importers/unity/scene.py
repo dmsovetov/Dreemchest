@@ -24,7 +24,8 @@
 #
 #################################################################################
 
-import file_format, patcher
+import file_format
+import patcher
 
 # Holds the info about a single scene
 class Scene:
@@ -87,7 +88,7 @@ class Scene:
             sceneObject = object[type]['m_GameObject']['fileID'] if type != 'GameObject' else id
 
             # Get the actual properties
-            data = patcher.Patcher.patch(self._assets, object[type], patcher.ScenePatchers[type])
+            data = patcher.patch_instance(self._assets, object[type], patcher.scene.scene[type])
 
             # Link the mesh asset with renderer
             if type == 'Renderer':
