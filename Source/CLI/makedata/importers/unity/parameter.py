@@ -24,6 +24,8 @@
 #
 #################################################################################
 
+from color import Rgba
+
 # Parameter type enumeration
 class ParameterType:
     VALUE = -1
@@ -43,31 +45,6 @@ class ParameterType:
 
         return None
 
-# The color value type
-class Rgba:
-    # Constructs Rgba instance.
-    def __init__(self, value=0):
-        self._value = value
-
-    # Returns the red color component
-    @property
-    def red(self):
-        return float(self._value >> 0 & 255) / 255
-
-    # Returns the green color component
-    @property
-    def green(self):
-        return float(self._value >> 8 & 255) / 255
-
-    # Returns the blue color component
-    @property
-    def blue(self):
-        return float(self._value >> 16 & 255) / 255
-
-    # Returns the alpha color component
-    @property
-    def alpha(self):
-        return float(self._value >> 24 & 255) / 255
 
 # The curve class
 class Curve:
@@ -95,6 +72,7 @@ class Curve:
 
             self._keyframes.append(v['time'])
             self._keyframes.append(value)
+
 
 # The gradient class
 class Gradient:

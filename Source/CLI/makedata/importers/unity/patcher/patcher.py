@@ -25,7 +25,8 @@
 #################################################################################
 
 import math
-from ..parameter import ParameterType, Curve, Gradient, Rgba
+from ..parameter import ParameterType, Curve, Gradient
+from ..color import Rgba
 
 
 def field(name, converter=None):
@@ -174,14 +175,11 @@ def gradient(color_name, transparency_name):
             target[color_name] = dict(type="randomBetweenCurves", value=[min_curve.rgb, max_curve.rgb])
             target[transparency_name] = dict(type="randomBetweenCurves", value=[min_curve.alpha, max_curve.alpha])
         elif curve_type == ParameterType.CONSTANT:
-            color_value = 0
-
             if 'rgba' not in value['maxColor'].keys():
-                max_color = value['maxColor']
-                color_value = int(max_color['r'] * 255) << 24 | int(max_color['g'] * 255) << 16 | int(max_color['b'] * 255) << 8 | int(max_color['a'] * 255)
+                rgba = Rgba.from_object(value['maxColor'])
             else:
-                color_value = value['maxColor']['rgba']
-            rgba = Rgba(color_value)
+                rgba = Rgba(value['maxColor']['rgba'])
+
             target[color_name] = dict(type="constant", value=[rgba.red, rgba.green, rgba.blue])
             target[transparency_name] = dict(type="constant", value=rgba.alpha)
         else:
