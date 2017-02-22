@@ -11,7 +11,6 @@ find_package(Lua)
 find_package(TIFF)
 find_package(PNG)
 find_package(JsonCpp)
-find_package(GTest)
 find_package(Box2D)
 
 # Glob all source files

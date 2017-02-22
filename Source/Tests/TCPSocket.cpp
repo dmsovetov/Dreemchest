@@ -28,11 +28,9 @@
 
 DC_USE_DREEMCHEST
 
-using namespace net;
+using namespace Network;
 
-Network network;
-
-struct ListenerDelegate : public TCPSocketListenerDelegate
+/*struct ListenerDelegate : public TCPSocketListenerDelegate
 {
     virtual void handleReceivedData( TCPSocketListener* sender, TCPSocket* socket, TCPStream* stream )
     {
@@ -244,4 +242,4 @@ TEST_F(TCPListenerWithConnection, ReceivesData)
     for( int i = 0; i < delegate->receivedData.size(); i++ ) {
         EXPECT_EQ( data[i], delegate->receivedData[i] );
     }
-}
+}*/

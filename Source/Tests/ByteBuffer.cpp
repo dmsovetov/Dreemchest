@@ -26,9 +26,7 @@
 
 #include "UnitTests.h"
 
-DC_USE_DREEMCHEST
-
-using namespace io;
+using namespace Io;
 
 char data[] = "Hello world!";
 

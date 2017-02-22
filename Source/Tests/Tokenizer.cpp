@@ -1,11 +1,11 @@
 /**************************************************************************
-
+ 
  The MIT License (MIT)
-
+ 
  Copyright (c) 2015 Dmitry Sovetov
-
+ 
  https://github.com/dmsovetov
-
+ 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
@@ -21,48 +21,9 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
-
+ 
  **************************************************************************/
 
 #include "UnitTests.h"
 
-TEST(PrimitiveValue, Constructor)
-{
-	mvvm::Text value( kTestString );
-	EXPECT_EQ( kTestString, value.get() );
-}
-
-TEST(PrimitiveValue, Setter)
-{
-	mvvm::Text value;
-	value.set( kTestString );
-	EXPECT_EQ( kTestString, value.get() );
-}
-
-TEST(Value, CastingToValueType)
-{
-	mvvm::ValuePtr value = DC_NEW mvvm::Text();
-	EXPECT_TRUE( mvvm::castTo<mvvm::Text>( value ).valid() );
-	EXPECT_FALSE( mvvm::castTo<mvvm::Integer>( value ).valid() );
-}
-
-TEST(Object, AddingProperties)
-{
-	TestableObject	m_object;
-	m_object.add<mvvm::Text>( "name" );
-	EXPECT_TRUE( m_object.has( "name" ) );
-}
-
-TEST(Object, CastingToValueType)
-{
-	TestableObject	m_object;
-	mvvm::ValuePtr value = DC_NEW UserInfo;
-	EXPECT_TRUE( mvvm::castTo<UserInfo>( value ).valid() );
-	EXPECT_FALSE( mvvm::castTo<Session>( value ).valid() );
-}
-
-TEST(Object, ResolvesNestedProperties)
-{
-	Session session;
-	EXPECT_TRUE( session.resolve( "userInfo.name" ).valid() );
-}
+DC_USE_DREEMCHEST
