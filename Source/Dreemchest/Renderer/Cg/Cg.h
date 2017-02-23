@@ -37,24 +37,25 @@ namespace Renderer
 namespace Cg
 {
 
-    //! Available Cg operators
+    //! Available Cg operators ordered by precedence, operators with lower precedence go first.
     enum OperatorType
     {
-          OpEqual
-        , OpPlus
-        , OpPlusEqual
-        , OpMinus
+          OpPlusEqual
         , OpMinusEqual
-        , OpDivide
         , OpDevideEqual
-        , OpMultiply
         , OpMultiplyEqual
+        , OpEqual
+        , OpPlus
+        , OpMinus
+        , OpDivide
+        , OpMultiply
         , OpCompare
         , OpLess
         , OpLessEqual
         , OpGreater
         , OpGreaterEqual
         , OpMember
+        , TotalOperatorTypes
     };
     
     //! Available built-in types.

@@ -72,6 +72,10 @@ namespace Cg
             , ForNode
             , ReturnNode
             , DiscardNode
+            , OperatorNode
+            , ConstantTermNode
+            , VariableTermNode
+            , FunctionCallNode
         };
         
         virtual             ~Ast();

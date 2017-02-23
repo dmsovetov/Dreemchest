@@ -42,7 +42,7 @@ namespace Cg
     protected:
         
                             //! Constructs an Expression instance.
-                            Expression(Type type, s32 line, u16 column);
+                            Expression(NodeType type, s32 line, u16 column);
     };
     
     //! A binary/unary operator node.
@@ -52,10 +52,11 @@ namespace Cg
     private:
         
                             //! Constructs an Operator instance.
-                            Operator(Expression* lhs, Expression* rhs, s32 line, u16 column);
+                            Operator(OperatorType type, Expression* lhs, Expression* rhs, s32 line, u16 column);
         
     private:
         
+        OperatorType        m_type; //!< An operator type.
         Expression*         m_lhs;  //!< A left hand side.
         Expression*         m_rhs;  //!< A right hand side.
     };

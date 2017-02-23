@@ -35,6 +35,27 @@ namespace Renderer
     
 namespace Cg
 {
+    
+// ** Parser::s_operators
+Parser::OperatorInfo Parser::s_operators[TotalOperatorTypes + 1] =
+{
+      {  0, false } // OpPlusEqual
+    , {  0, false } // OpMinusEqual
+    , {  2, false } // OpDevideEqual
+    , {  2, false } // OpMultiplyEqual
+    , {  3, false } // OpEqual
+    , {  4, false } // OpPlus
+    , {  4, false } // OpMinus
+    , {  5, false } // OpDivide
+    , {  5, false } // OpMultiply
+    , {  6, false } // OpCompare
+    , {  7, false } // OpLess
+    , {  7, false } // OpLessEqual
+    , {  7, false } // OpGreater
+    , {  7, false } // OpGreaterEqual
+    , {  8, false } // OpMember
+    , { -1, false } // TotalOperatorTypes
+};
 
 // ** Parser::Parser
 Parser::Parser(LinearAllocator& allocator)
@@ -535,11 +556,79 @@ For* Parser::parseFor()
     return for_;
 }
     
-// ** Parser::parseExpression
-Expression* Parser::parseExpression()
+// ** Parser::parseFunctionCall
+FunctionCall* Parser::parseFunctionCall()
 {
-    next();
-    return NULL;
+    Identifier* identifier = expectIdentifier();
+    
+    FunctionCall* call = newAst(FunctionCall, identifier, identifier->line(), identifier->column());
+    
+    expect(TokenParenthesesOpen);
+    do
+    {
+        call->addArgument(parseExpression());
+    } while (parse(TokenComma));
+    expect(TokenParenthesesClose);
+    
+    return call;
+}
+    
+// ** Parser::parseExpression
+Expression* Parser::parseExpression(s32 precedence)
+{
+    // Parse a left hand side expression
+    Expression* lhs = parseTerm();
+    
+    while (true)
+    {
+        // Save an operator line and column
+        s32 line = current().line();
+        u16 column = current().column();
+        
+        // Operator is expected after an lhs term
+        OperatorType op = expectOperator();
+        
+        // Get an operator info
+        const OperatorInfo& info = s_operators[op];
+        
+        // Calculate next precedence value
+        s32 nextPrecedence = info.left ? precedence + 1 : precedence;
+        
+        // Parse a right hand side expression
+        Expression* rhs = parseExpression(nextPrecedence);
+        
+        // Compose an operator
+        lhs = newAst(Operator, op, lhs, rhs, line, column);
+    }
+    
+    return lhs;
+}
+    
+// ** Parser::parseTerm
+Expression* Parser::parseTerm()
+{
+    const Token& token = current();
+    Expression*  term  = NULL;
+
+    switch (token.type()) {
+        case TokenIdentifier:
+            if (check(TokenParenthesesOpen, 1))
+            {
+                term = parseFunctionCall();
+            }
+            else
+            {
+                term = newAst(VariableTerm, token.text(), token.line(), token.column());
+                next();
+            }
+            break;
+            
+        default:
+            emitExpected("term");
+            next();
+    }
+    
+    return term;
 }
     
 // ** Parser::expectConditionalExpression
@@ -577,6 +666,20 @@ Type* Parser::expectType()
     next();
     
     return NULL;
+}
+    
+// ** Parser::expectOperator
+OperatorType Parser::expectOperator()
+{
+    if (check(TokenOperator))
+    {
+        OperatorType op = static_cast<OperatorType>(current().subtype());
+        next();
+        return op;
+    }
+    
+    emitExpected("operator");
+    return TotalOperatorTypes;
 }
     
 // ** Parser::expectIdentifier

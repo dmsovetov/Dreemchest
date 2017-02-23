@@ -24,7 +24,7 @@
  
  **************************************************************************/
 
-#include "Ast.h"
+#include "Expressions.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -33,6 +33,64 @@ namespace Renderer
 
 namespace Cg
 {
+    
+// ------------------------------------------------------------- Expression ------------------------------------------------------------- //
+ 
+// ** Expression::Expression
+Expression::Expression(NodeType type, s32 line, u16 column)
+    : Statement(type, line, column)
+{
+    
+}
+    
+// -------------------------------------------------------------- Operator -------------------------------------------------------------- //
+    
+// ** Operator::Operator
+Operator::Operator(OperatorType type, Expression* lhs, Expression* rhs, s32 line, u16 column)
+    : Expression(OperatorNode, line, column)
+    , m_type(type)
+    , m_lhs(lhs)
+    , m_rhs(rhs)
+{
+    
+}
+    
+// ------------------------------------------------------------- ConstantTerm ----------------------------------------------------------- //
+    
+// ** ConstantTerm::ConstantTerm
+ConstantTerm::ConstantTerm(const StringView& value, s32 line, u16 column)
+    : Expression(ConstantTermNode, line, column)
+    , m_value(value)
+{
+    
+}
+    
+// ------------------------------------------------------------- VariableTerm ----------------------------------------------------------- //
+    
+// ** VariableTerm::VariableTerm
+VariableTerm::VariableTerm(const StringView& value, s32 line, u16 column)
+    : Expression(VariableTermNode, line, column)
+    , m_value(value)
+{
+        
+}
+    
+// ------------------------------------------------------------- FunctionCall ----------------------------------------------------------- //
+    
+// ** FunctionCall::FunctionCall
+FunctionCall::FunctionCall(const Identifier* identifier, s32 line, u16 column)
+    : Expression(FunctionCallNode, line, column)
+    , m_identifier(identifier)
+{
+    
+}
+
+// ** FunctionCall::addArgument
+void FunctionCall::addArgument(Expression* expression)
+{
+    m_arguments.push_back(expression);
+}
+    
 } // namespace Cg
     
 } // namespace Renderer

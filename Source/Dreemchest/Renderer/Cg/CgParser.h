@@ -91,7 +91,10 @@ namespace Cg
         Structure*              parseStructure();
         
         //! Parses an expression from an input stream.
-        Expression*             parseExpression();
+        Expression*             parseExpression(s32 precedence = 0);
+        
+        //! Parses an expression term from an input stream.
+        Expression*             parseTerm();
         
         //! Parses a statement from an input stream.
         Statement*              parseStatement();
@@ -101,6 +104,9 @@ namespace Cg
         
         //! Parses a register semantic specification.
         SemanticType            parseRegisterSemantic();
+        
+        //! Parses a function call.
+        FunctionCall*           parseFunctionCall();
         
         //! Parses an if statement.
         If*                     parseIf();
@@ -125,6 +131,9 @@ namespace Cg
         
         //! Expects to read an identifier.
         Identifier*             expectIdentifier();
+        
+        //! Expects to read an operator.
+        OperatorType            expectOperator();
         
         //! Expects an input semantic name.
         SemanticType            expectSemantic();
@@ -152,9 +161,17 @@ namespace Cg
         //! A container type to map from an identifier to a semantic name.
         typedef HashMap<String64, SemanticType> RegisterSemanticTypes;
         
+        //! Describes an operator priority and associativity.
+        struct OperatorInfo
+        {
+            s32                 precedence; //!< Operator precedence.
+            bool                left;       //!< Operator associativity.
+        };
+        
         LinearAllocator&        m_allocator;
         ExpressionTokenizer     m_tokenizer;
         RegisterSemanticTypes   m_registerSemantics;
+        static OperatorInfo     s_operators[TotalOperatorTypes + 1];
     };
     
 } // namespace Cg
