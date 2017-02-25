@@ -101,7 +101,7 @@ class Camera : public Framework::RenderingApplicationDelegate
         // Now configure a mesh rendering states
         VertexFormat vertexFormat = mesh.vertexFormat;
         InputLayout inputLayout = m_renderingContext->requestInputLayout(vertexFormat);
-        VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(&mesh.vertices[0], mesh.vertices.size());
+        VertexBuffer_ vertexBuffer = m_renderingContext->requestVertexBuffer(&mesh.vertexBuffer[0], mesh.vertexBuffer.size());
         
         m_renderStates.bindInputLayout(inputLayout);
         m_renderStates.bindVertexBuffer(vertexBuffer);
@@ -189,7 +189,7 @@ class Camera : public Framework::RenderingApplicationDelegate
         commands.uploadConstantBuffer(m_cameraConstantBuffer, &camera, sizeof(camera));
 
         // Render the mesh
-        commands.drawPrimitives(0, mesh.primitives, 0, mesh.vertices.size(), m_renderStates);
+        commands.drawPrimitives(0, mesh.primitives, 0, mesh.vertexCount, m_renderStates);
     
         m_renderingContext->display(frame);
     }
