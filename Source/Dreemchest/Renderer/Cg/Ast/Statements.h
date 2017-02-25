@@ -58,6 +58,9 @@ namespace Cg
         
         //! Adds a new statement to this block.
         void                addStatement(Statement* statment);
+
+        //! Invokes visitor's method to process this statement block.
+        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
         
     private:
         
@@ -72,6 +75,9 @@ namespace Cg
         
                             //! Constructs If statement instance.
                             If(Expression* condition, Statement* then, Statement* otherwise, s32 line, u16 column);
+
+        //! Invokes visitor's method to process this 'if' statement.
+        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
         
     private:
         
@@ -88,6 +94,9 @@ namespace Cg
         
                             //! Constructs While statement instance.
                             While(Expression* condition, Statement* body, s32 line, u16 column);
+
+        //! Invokes visitor's method to process this 'while' statement.
+        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
         
     private:
         
@@ -103,6 +112,9 @@ namespace Cg
         
                             //! Constructs For statement instance.
                             For(Expression* initial, Expression* condition, Expression* increment, Statement* body, s32 line, u16 column);
+
+        //! Invokes visitor's method to process this 'for' statement.
+        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
         
     private:
         
@@ -120,6 +132,9 @@ namespace Cg
         
                             //! Constructs Return statement instance.
                             Return(Expression* value, s32 line, u16 column);
+
+        //! Invokes visitor's method to process this 'return' statement.
+        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
         
     private:
         
@@ -134,6 +149,9 @@ namespace Cg
         
                             //! Constructs Discard statement instance.
                             Discard(s32 line, u16 column);
+
+        //! Invokes visitor's method to process this 'discard' statement.
+        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
     };
     
 } // namespace Cg

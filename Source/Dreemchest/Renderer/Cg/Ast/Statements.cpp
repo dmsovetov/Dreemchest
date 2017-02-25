@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "Statements.h"
+#include "AstVisitor.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -57,6 +58,12 @@ void StatementBlock::addStatement(Statement* statment)
 {
     m_children.push_back(statment);
 }
+
+// ** StatementBlock::accept
+void StatementBlock::accept(Visitor& visitor)
+{
+    visitor.visit(*this);
+}
     
 // -------------------------------------------------------------------- If ------------------------------------------------------------------- //
     
@@ -70,6 +77,12 @@ If::If(Expression* condition, Statement* then, Statement* otherwise, s32 line, u
     
 }
 
+// ** If::accept
+void If::accept(Visitor& visitor)
+{
+    visitor.visit(*this);
+}
+
 // ------------------------------------------------------------------- While ----------------------------------------------------------------- //
 
 // ** While::While
@@ -79,6 +92,12 @@ While::While(Expression* condition, Statement* body, s32 line, u16 column)
     , m_body(body)
 {
     
+}
+
+// ** While::accept
+void While::accept(Visitor& visitor)
+{
+    visitor.visit(*this);
 }
 
 // ------------------------------------------------------------------- For ------------------------------------------------------------------- //
@@ -93,6 +112,12 @@ For::For(Expression* initial, Expression* condition, Expression* increment, Stat
 {
     
 }
+
+// ** For::accept
+void For::accept(Visitor& visitor)
+{
+    visitor.visit(*this);
+}
     
 // ------------------------------------------------------------------ Return ---------------------------------------------------------------- //
 
@@ -104,6 +129,12 @@ Return::Return(Expression* value, s32 line, u16 column)
     
 }
 
+// ** Return::accept
+void Return::accept(Visitor& visitor)
+{
+    visitor.visit(*this);
+}
+
 // ------------------------------------------------------------------ Discard --------------------------------------------------------------- //
 
 // ** Discard::Discard
@@ -111,6 +142,12 @@ Discard::Discard(s32 line, u16 column)
     : Statement(DiscardNode, line, column)
 {
     
+}
+
+// ** Discard::accept
+void Discard::accept(Visitor& visitor)
+{
+    visitor.visit(*this);
 }
     
 } // namespace Cg

@@ -36,6 +36,9 @@ namespace Renderer
     
 namespace Cg
 {    
+    // A forward declaration of a AST visitor
+    class Visitor;
+
     // Forward declarations that refelect an AST architecture
     class Ast;
         class Program;
@@ -46,6 +49,12 @@ namespace Cg
             class Function;
             class Structure;
         class Statement;
+            class StatementBlock;
+            class If;
+            class For;
+            class While;
+            class Return;
+            class Discard;
             class Expression;
                 class Operator;
                 class VariableTerm;
@@ -90,6 +99,9 @@ namespace Cg
         
         //! Returns node column number.
         u16                 column() const;
+
+        //! Passes this node to a visitor.
+        virtual void        accept(Visitor& visitor) NIMBLE_ABSTRACT;
         
     protected:
         
@@ -116,6 +128,9 @@ namespace Cg
         
                             //! Constructs an Identifier instance.
                             Identifier(const StringView& value, s32 line, u16 column);
+
+        //! Invokes visitor's method to process this identifier.
+        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
         
     private:
         
@@ -138,6 +153,9 @@ namespace Cg
         
                             //! Constructs a Type node instance.
                             Type(const Identifier* name, BuiltInType builtInType, s32 line, u16 column);
+
+        //! Invokes visitor's method to process this type.
+        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
         
     private:
         
@@ -156,6 +174,9 @@ namespace Cg
         
         //! Returns a declaration at specified index.
         const Declaration*  declaration(s32 index) const;
+
+        //! Invokes visitor's method to process this program.
+        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
         
     private:
         

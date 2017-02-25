@@ -53,6 +53,9 @@ namespace Cg
         
                             //! Constructs an Operator instance.
                             Operator(OperatorType type, Expression* lhs, Expression* rhs, s32 line, u16 column);
+
+        //! Invokes visitor's method to process this operator.
+        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
         
     private:
         
@@ -69,6 +72,9 @@ namespace Cg
         
                             //! Constructs a ConstantTerm instance.
                             ConstantTerm(const StringView& value, s32 line, u16 column);
+
+        //! Invokes visitor's method to process this constant term.
+        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
         
     private:
         
@@ -83,6 +89,9 @@ namespace Cg
         
                             //! Constructs a VariableTerm instance.
                             VariableTerm(const StringView& value, s32 line, u16 column);
+
+        //! Invokes visitor's method to process this variable term.
+        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
         
     private:
         
@@ -100,6 +109,9 @@ namespace Cg
         
         //! Adds a function call argument.
         void                addArgument(Expression* expression);
+
+        //! Invokes visitor's method to process this function call.
+        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
         
     private:
         
@@ -118,6 +130,9 @@ namespace Cg
         
         //! Adds a new field initializer expression.
         void                addFieldInitializer(Expression* expression);
+
+        //! Invokes visitor's method to process this object initializer.
+        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
         
     private:
 

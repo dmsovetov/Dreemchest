@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "Declarations.h"
+#include "AstVisitor.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -61,6 +62,12 @@ const StringView& Variable::name() const
 {
     return m_identifier->value();
 }
+
+// ** Variable::accept
+void Variable::accept(Visitor& visitor)
+{
+    visitor.visit(*this);
+}
     
 // -------------------------------------------------------------- Structure ------------------------------------------------------------- //
 
@@ -75,6 +82,12 @@ Structure::Structure(const Identifier* identifier)
 void Structure::addField(Variable* field)
 {
     m_fields.push_back(field);
+}
+
+// ** Structure::accept
+void Structure::accept(Visitor& visitor)
+{
+    visitor.visit(*this);
 }
     
 // -------------------------------------------------------------- Function -------------------------------------------------------------- //
@@ -106,6 +119,12 @@ void Function::setBody(Statement* value)
 void Function::setSemantic(SemanticType value)
 {
     m_semantic = value;
+}
+
+// ** Function::accept
+void Function::accept(Visitor& visitor)
+{
+    visitor.visit(*this);
 }
 
 } // namespace Cg

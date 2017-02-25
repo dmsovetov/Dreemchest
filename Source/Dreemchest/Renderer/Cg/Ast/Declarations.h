@@ -57,6 +57,9 @@ namespace Cg
         
                             //! Constructs Variable node instance.
                             Variable(const Identifier* identifier, const Type* type, Expression* initializer, SemanticType semantic);
+
+        //! Invokes visitor's method to process this variable.
+        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
         
     private:
         
@@ -77,6 +80,9 @@ namespace Cg
         
         //! Adds new field to a structure.
         void                addField(Variable* field);
+
+        //! Invokes visitor's method to process this structure.
+        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
         
     private:
         
@@ -101,6 +107,9 @@ namespace Cg
         
         //! Sets a function semantic.
         void                setSemantic(SemanticType value);
+
+        //! Invokes visitor's method to process this function.
+        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
         
     private:
         

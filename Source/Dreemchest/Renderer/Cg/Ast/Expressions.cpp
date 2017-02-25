@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "Expressions.h"
+#include "AstVisitor.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -54,6 +55,12 @@ Operator::Operator(OperatorType type, Expression* lhs, Expression* rhs, s32 line
 {
     
 }
+
+// ** Operator::accept
+void Operator::accept(Visitor& visitor)
+{
+    visitor.visit(*this);
+}
     
 // ------------------------------------------------------------- ConstantTerm ----------------------------------------------------------- //
     
@@ -64,6 +71,12 @@ ConstantTerm::ConstantTerm(const StringView& value, s32 line, u16 column)
 {
     
 }
+
+// ** ConstantTerm::accept
+void ConstantTerm::accept(Visitor& visitor)
+{
+    visitor.visit(*this);
+}
     
 // ------------------------------------------------------------- VariableTerm ----------------------------------------------------------- //
     
@@ -73,6 +86,12 @@ VariableTerm::VariableTerm(const StringView& value, s32 line, u16 column)
     , m_value(value)
 {
         
+}
+
+// ** VariableTerm::accept
+void VariableTerm::accept(Visitor& visitor)
+{
+    visitor.visit(*this);
 }
     
 // ------------------------------------------------------------- FunctionCall ----------------------------------------------------------- //
@@ -91,6 +110,12 @@ void FunctionCall::addArgument(Expression* expression)
     m_arguments.push_back(expression);
 }
 
+// ** FunctionCall::accept
+void FunctionCall::accept(Visitor& visitor)
+{
+    visitor.visit(*this);
+}
+
 // ----------------------------------------------------------- ObjectInitializer -------------------------------------------------------- //
 
 // ** ObjectInitializer::ObjectInitializer
@@ -103,6 +128,12 @@ ObjectInitializer::ObjectInitializer(s32 line, u16 column)
 void ObjectInitializer::addFieldInitializer(Expression* expression)
 {
     m_initializers.push_back(expression);
+}
+
+// ** ObjectInitializer::accept
+void ObjectInitializer::accept(Visitor& visitor)
+{
+    visitor.visit(*this);
 }
     
 } // namespace Cg

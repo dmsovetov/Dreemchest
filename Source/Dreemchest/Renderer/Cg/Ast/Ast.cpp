@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "Ast.h"
+#include "AstVisitor.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -95,6 +96,12 @@ void Program::addDeclaration(Declaration* declaration)
 {
     m_declarations.push_back(declaration);
 }
+
+// ** Program::accept
+void Program::accept(Visitor& visitor)
+{
+    visitor.visit(*this);
+}
     
 // --------------------------------------------------------------- Identifier -------------------------------------------------------------- //
     
@@ -110,6 +117,12 @@ Identifier::Identifier(const StringView& value, s32 line, u16 column)
 const StringView& Identifier::value() const
 {
     return m_value;
+}
+
+// ** Identifier::accept
+void Identifier::accept(Visitor& visitor)
+{
+    visitor.visit(*this);
 }
     
 // ------------------------------------------------------------------ Type ---------------------------------------------------------------- //
@@ -133,6 +146,12 @@ const StringView& Type::name() const
 BuiltInType Type::builtInType() const
 {
     return m_builtInType;
+}
+
+// ** Type::accept
+void Type::accept(Visitor& visitor)
+{
+    visitor.visit(*this);
 }
     
 } // namespace Cg
