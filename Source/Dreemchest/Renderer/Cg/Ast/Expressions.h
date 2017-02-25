@@ -106,6 +106,23 @@ namespace Cg
         const Identifier*   m_identifier;   //!< A function identifier.
         Array<Expression*>  m_arguments;    //!< A list of expressions that are passed to a function call.
     };
+
+    //! An object initializer expression.
+    class ObjectInitializer : public Expression
+    {
+    friend class Parser;
+    private:
+
+                            //! Constructs a ObjectInitializer instance.
+                            ObjectInitializer(s32 line, u16 column);
+        
+        //! Adds a new field initializer expression.
+        void                addFieldInitializer(Expression* expression);
+        
+    private:
+
+        Array<Expression*>  m_initializers; //!< A list of field initializer expressions.
+    };
     
 } // namespace Cg
     

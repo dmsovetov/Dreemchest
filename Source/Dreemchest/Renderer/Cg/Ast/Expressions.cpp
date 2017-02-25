@@ -90,6 +90,20 @@ void FunctionCall::addArgument(Expression* expression)
 {
     m_arguments.push_back(expression);
 }
+
+// ----------------------------------------------------------- ObjectInitializer -------------------------------------------------------- //
+
+// ** ObjectInitializer::ObjectInitializer
+ObjectInitializer::ObjectInitializer(s32 line, u16 column)
+    : Expression(ObjectInitializerNode, line, column)
+{
+}
+        
+// ** ObjectInitializer::addFieldInitializer
+void ObjectInitializer::addFieldInitializer(Expression* expression)
+{
+    m_initializers.push_back(expression);
+}
     
 } // namespace Cg
     

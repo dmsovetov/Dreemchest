@@ -51,6 +51,7 @@ namespace Cg
                 class VariableTerm;
                 class ConstantTerm;
                 class FunctionCall;
+                class ObjectInitializer;
     
     //! Base class for all abstract syntax tree nodes.
     class Ast
@@ -76,6 +77,7 @@ namespace Cg
             , ConstantTermNode
             , VariableTermNode
             , FunctionCallNode
+            , ObjectInitializerNode
         };
         
         virtual             ~Ast();

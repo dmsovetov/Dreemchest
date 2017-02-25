@@ -116,6 +116,9 @@ namespace Cg
         
         //! Parses a function call.
         FunctionCall*           parseFunctionCall();
+
+        //! Parses an object initializer.
+        ObjectInitializer*      parseObjectInitializer();
         
         //! Parses an if statement.
         If*                     parseIf();

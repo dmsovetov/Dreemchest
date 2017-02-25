@@ -203,13 +203,40 @@ Variable* Parser::parseVariableDeclaration()
     
     if (parse("="))
     {
-        initializer = parseExpression();
+        if (check(TokenBraceOpen))
+        {
+            initializer = parseObjectInitializer();
+        }
+        else
+        {
+            initializer = parseExpression();
+        }
     }
     
     // Allocate a variable instance
     Variable* variable = newAst(Variable, identifier, type, initializer, semantic);
 
     return variable;
+}
+
+// ** Parser::parseObjectInitializer
+ObjectInitializer* Parser::parseObjectInitializer()
+{
+    // Allocate an initializer instance
+    ObjectInitializer* initializer = newAst(ObjectInitializer, current().line(), current().column());
+
+    // Starts from a '{' token
+    expect(TokenBraceOpen);
+
+    while (!check(TokenBraceClose))
+    {
+        initializer->addFieldInitializer(parseExpression());
+    }
+
+    // Ends with a '}' token
+    expect(TokenBraceClose);
+
+    return initializer;
 }
     
 // ** Parser::parseFunctionDeclaration
