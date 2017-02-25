@@ -787,7 +787,7 @@ void Parser::registerSemantic(const s8* name, SemanticType semantic)
 void Parser::emitError(const s8* format, ...)
 {
     NIMBLE_LOGGER_FORMAT(format);
-    printf("ERROR: %d:%d: %s\n", current().line(), current().column(), buffer);
+    LogError("cg", "ERROR: %d:%d: %s\n", current().line(), current().column(), buffer);
 }
     
 // ** Parser::emitExpected
