@@ -80,6 +80,15 @@ namespace Cg
             , TokenSemicolon
             , TokenComma
         };
+
+        //! Describes an operator priority and associativity.
+        struct OperatorInfo
+        {
+            OperatorType        type;       //!< An operator type.
+            s32                 precedence; //!< Operator precedence.
+            bool                left;       //!< Operator associativity.
+            bool                binary;     //!< Indicates that an operator is binary.
+        };
         
         //! Parses a variable declaration from an input stream.
         Variable*               parseVariableDeclaration();
@@ -125,6 +134,9 @@ namespace Cg
         
         //! Parses a statement block.
         StatementBlock*         parseStatementBlock();
+
+        //! Returns an operator info by a current token
+        bool                    checkOperator(OperatorInfo& op) const;
         
         //! Expects to read a built-in data type or an identifier.
         Type*                   expectType();
@@ -160,13 +172,6 @@ namespace Cg
         
         //! A container type to map from an identifier to a semantic name.
         typedef HashMap<String64, SemanticType> RegisterSemanticTypes;
-        
-        //! Describes an operator priority and associativity.
-        struct OperatorInfo
-        {
-            s32                 precedence; //!< Operator precedence.
-            bool                left;       //!< Operator associativity.
-        };
         
         LinearAllocator&        m_allocator;
         ExpressionTokenizer     m_tokenizer;

@@ -39,22 +39,22 @@ namespace Cg
 // ** Parser::s_operators
 Parser::OperatorInfo Parser::s_operators[TotalOperatorTypes + 1] =
 {
-      {  0, false } // OpPlusEqual
-    , {  0, false } // OpMinusEqual
-    , {  2, false } // OpDevideEqual
-    , {  2, false } // OpMultiplyEqual
-    , {  3, false } // OpEqual
-    , {  4, false } // OpPlus
-    , {  4, false } // OpMinus
-    , {  5, false } // OpDivide
-    , {  5, false } // OpMultiply
-    , {  6, false } // OpCompare
-    , {  7, false } // OpLess
-    , {  7, false } // OpLessEqual
-    , {  7, false } // OpGreater
-    , {  7, false } // OpGreaterEqual
-    , {  8, false } // OpMember
-    , { -1, false } // TotalOperatorTypes
+      { OpPlusEqual,         0, false, true }
+    , { OpMinusEqual,        0, false, true }
+    , { OpDevideEqual,       2, false, true }
+    , { OpMultiplyEqual,     2, false, true }
+    , { OpEqual,             3, false, true }
+    , { OpPlus,              4, false, true }
+    , { OpMinus,             4, false, true }
+    , { OpDivide,            5, false, true }
+    , { OpMultiply,          5, false, true }
+    , { OpCompare,           6, false, true }
+    , { OpLess,              7, false, true }
+    , { OpLessEqual,         7, false, true }
+    , { OpGreater,           7, false, true }
+    , { OpGreaterEqual,      7, false, true }
+    , { OpMember,            8, false, true }
+    , { TotalOperatorTypes, -1, false, true }
 };
 
 // ** Parser::Parser
@@ -373,6 +373,10 @@ Statement* Parser::parseStatement()
         case TokenBraceOpen:
             statement = parseStatementBlock();
             break;
+
+        case TokenSemicolon:
+            next();
+            break;
             
         default:
             if (check(TokenIdentifier) && check(TokenIdentifier, 1))
@@ -383,6 +387,7 @@ Statement* Parser::parseStatement()
             {
                 statement = parseExpression();
             }
+            expect(TokenSemicolon);
     }
     
     return statement;
@@ -578,27 +583,33 @@ Expression* Parser::parseExpression(s32 precedence)
 {
     // Parse a left hand side expression
     Expression* lhs = parseTerm();
+
+    // Save an operator line and column
+    s32 line = current().line();
+    u16 column = current().column();
+
+    // Parse a binary operator and rhs if possible
+    OperatorInfo op;
     
-    while (true)
+    while (checkOperator(op))
     {
-        // Save an operator line and column
-        s32 line = current().line();
-        u16 column = current().column();
-        
-        // Operator is expected after an lhs term
-        OperatorType op = expectOperator();
-        
-        // Get an operator info
-        const OperatorInfo& info = s_operators[op];
-        
+        // Should we consume the next operator?
+        if (!op.binary || op.precedence < precedence)
+        {
+            break;
+        }
+
+        // Consume
+        next();
+
         // Calculate next precedence value
-        s32 nextPrecedence = info.left ? precedence + 1 : precedence;
+        s32 nextPrecedence = op.left ? op.precedence + 1 : op.precedence;
         
         // Parse a right hand side expression
         Expression* rhs = parseExpression(nextPrecedence);
         
         // Compose an operator
-        lhs = newAst(Operator, op, lhs, rhs, line, column);
+        lhs = newAst(Operator, op.type, lhs, rhs, line, column);
     }
     
     return lhs;
@@ -622,6 +633,11 @@ Expression* Parser::parseTerm()
                 next();
             }
             break;
+
+        case TokenNumber:
+            term = newAst(ConstantTerm, token.text(), token.line(), token.column());
+            next();
+            break;
             
         default:
             emitExpected("term");
@@ -629,6 +645,21 @@ Expression* Parser::parseTerm()
     }
     
     return term;
+}
+
+// ** Parser::checkOperator
+bool Parser::checkOperator(OperatorInfo& info) const
+{
+    if (!check(TokenOperator))
+    {
+        return false;
+    }
+
+    // Extract an operator type
+    OperatorType op = static_cast<OperatorType>(current().subtype());
+    info = s_operators[op];
+
+    return true;
 }
     
 // ** Parser::expectConditionalExpression
