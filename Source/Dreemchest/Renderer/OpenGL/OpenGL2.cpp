@@ -81,7 +81,7 @@ static PFNGLUNIFORM4FVARBPROC           glUniform4fv            = NULL;
 static PFNGLUNIFORMMATRIX4FVARBPROC     glUniformMatrix4fv      = NULL;
 
 // GL_framebuffer_object
-PFNGLDRAWBUFFERSPROC             glDrawBuffers               = NULL;
+PFNGLDRAWBUFFERSPROC                    glDrawBuffers               = NULL;
 static PFNGLDELETEFRAMEBUFFERSPROC      glDeleteFramebuffers        = NULL;
 static PFNGLFRAMEBUFFERTEXTURE2DPROC    glFramebufferTexture2D      = NULL;
 static PFNGLGENFRAMEBUFFERSPROC         glGenFramebuffers           = NULL;
@@ -95,6 +95,10 @@ static PFNGLFRAMEBUFFERRENDERBUFFERPROC glFramebufferRenderbuffer   = NULL;
 
 // GL_ARB_texture_compression
 static PFNGLCOMPRESSEDTEXIMAGE2DARBPROC glCompressedTexImage2D      = NULL;
+
+static PFNGLVERTEXATTRIBPOINTERPROC     glVertexAttribPointer       = NULL;
+static PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray   = NULL;
+static PFNGLGETATTRIBLOCATIONPROC       glGetAttribLocation         = NULL;
 
 #elif defined(DC_PLATFORM_MACOS)
     #define GL_RGBA16F  GL_RGBA16F_ARB
@@ -742,6 +746,10 @@ bool OpenGL2::initialize()
     glFramebufferRenderbuffer   = ( PFNGLFRAMEBUFFERRENDERBUFFERPROC )  wglGetProcAddress( "glFramebufferRenderbuffer" );
 
     glCompressedTexImage2D      = ( PFNGLCOMPRESSEDTEXIMAGE2DARBPROC )  wglGetProcAddress( "glCompressedTexImage2DARB" );
+
+    glVertexAttribPointer       = ( PFNGLVERTEXATTRIBPOINTERPROC )      wglGetProcAddress( "glVertexAttribPointer" );
+    glEnableVertexAttribArray   = ( PFNGLENABLEVERTEXATTRIBARRAYPROC )  wglGetProcAddress( "glEnableVertexAttribArray" );
+    glGetAttribLocation         = ( PFNGLGETATTRIBLOCATIONPROC )        wglGetProcAddress( "glGetAttribLocation" );
 #endif  //  #ifdef DC_PLATFORM_WINDOWS
     return true;
 }

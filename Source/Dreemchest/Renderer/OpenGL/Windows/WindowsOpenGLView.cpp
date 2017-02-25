@@ -124,6 +124,22 @@ bool WindowsOpenGLView::makeCurrent( void )
 	return result;
 }
 
+// ** WindowsOpenGLView::width
+s32 WindowsOpenGLView::width() const
+{
+    RECT rect;
+	GetClientRect(m_window, &rect);
+	return rect.right - rect.left;
+}
+
+// ** WindowsOpenGLView::height
+s32 WindowsOpenGLView::height() const
+{
+	RECT rect;
+	GetClientRect(m_window, &rect);
+	return rect.bottom - rect.top;
+}
+
 } // namespace Renderer
 
 DC_END_DREEMCHEST
