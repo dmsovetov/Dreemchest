@@ -168,12 +168,13 @@ namespace Cg
     {
     friend class Parser;
     public:
-        
-        //! Returns a total number of declaration items.
-        s32                 declarationCount() const;
-        
-        //! Returns a declaration at specified index.
-        const Declaration*  declaration(s32 index) const;
+
+        //! A container type to store nested declarations.
+        typedef List<Declaration*> Declarations;
+
+        //! Returns a list of nested declarations.
+        const Declarations& declarations() const;
+        Declarations&       declarations();
 
         //! Invokes visitor's method to process this program.
         virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
@@ -188,7 +189,7 @@ namespace Cg
         
     private:
         
-        Array<Declaration*> m_declarations; //!< An array of declarations.
+        Declarations        m_declarations; //!< An list of declarations.
     };
     
 } // namespace Cg

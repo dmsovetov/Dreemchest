@@ -63,6 +63,30 @@ const StringView& Variable::name() const
     return m_identifier->value();
 }
 
+// ** Variable::type
+const Type* Variable::type() const
+{
+    return m_type;
+}
+
+// ** Variable::initializer
+const Expression* Variable::initializer() const
+{
+    return m_initializer;
+}
+
+// ** Variable::initializer
+Expression* Variable::initializer()
+{
+    return m_initializer;
+}   
+
+// ** Variable::semantic
+SemanticType Variable::semantic() const
+{
+    return m_semantic;
+}
+
 // ** Variable::accept
 void Variable::accept(Visitor& visitor)
 {
@@ -101,6 +125,48 @@ Function::Function(const Identifier* identifier, const Type* type)
     , m_body(NULL)
 {
     
+}
+
+// ** Function::name
+const StringView& Function::name() const
+{
+    return m_identifier->value();
+}
+
+// ** Function::type
+const Type& Function::type() const
+{
+    return *m_type;
+}
+
+// ** Function::arguments
+const Function::Arguments& Function::arguments() const
+{
+    return m_arguments;
+}
+
+// ** Function::arguments
+Function::Arguments& Function::arguments()
+{
+    return m_arguments;
+}
+
+// ** Function::semantic
+SemanticType Function::semantic() const
+{
+    return m_semantic;
+}
+
+// ** Function::body
+const Statement* Function::body() const
+{
+    return m_body;
+}
+
+// ** Function::body
+Statement* Function::body()
+{
+    return m_body;
 }
 
 // ** Function::addArgument

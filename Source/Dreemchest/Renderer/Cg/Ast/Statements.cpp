@@ -53,6 +53,18 @@ StatementBlock::StatementBlock(s32 line, u16 column)
     
 }
 
+// ** StatementBlock::statments
+const StatementBlock::Statements& StatementBlock::statements() const
+{
+    return m_children;
+}
+
+// ** StatementBlock::statements
+StatementBlock::Statements& StatementBlock::statements()
+{
+    return m_children;
+}
+
 // ** StatementBlock::addStatement
 void StatementBlock::addStatement(Statement* statment)
 {

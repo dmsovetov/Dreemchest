@@ -49,13 +49,20 @@ namespace Cg
     class StatementBlock : public Statement
     {
     friend class Parser;
+    public:
+
+        //! A container type to store nested statements.
+        typedef List<Statement*> Statements;
+
+        //! Returns a list of nested statements.
+        const Statements&   statements() const;
+        Statements&         statements();
+
     protected:
         
                             //! Constructs a statement block node.
                             StatementBlock(s32 line, u16 column);
-        
-    private:
-        
+     
         //! Adds a new statement to this block.
         void                addStatement(Statement* statment);
 
@@ -64,7 +71,7 @@ namespace Cg
         
     private:
         
-        Array<Statement*>   m_children; //!< Child statement nodes.
+        Statements          m_children; //!< Child statement nodes.
     };
     
     //! If control statement node.

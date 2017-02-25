@@ -26,6 +26,8 @@
 
 #include "AstVisitor.h"
 #include "Ast.h"
+#include "Declarations.h"
+#include "Expressions.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -38,9 +40,36 @@ namespace Cg
 // ** TreeVisitor::visit
 void TreeVisitor::visit(Program& program)
 {
-    for (s32 i = 0, n = program.declarationCount(); i < n; i++)
+    Program::Declarations& declarations = program.declarations();
+
+    for (Program::Declarations::iterator i = declarations.begin(), end = declarations.end(); i != end; ++i)
     {
-    //    program.declaration(i)->accept(*this);
+        (*i)->accept(*this);
+    }
+}
+
+// ** TreeVisitor::visit
+void TreeVisitor::visit(StatementBlock& node)
+{
+    StatementBlock::Statements& statements = node.statements();
+
+    for (StatementBlock::Statements::iterator i = statements.begin(), end = statements.end(); i != end; ++i)
+    {
+        (*i)->accept(*this);
+    }
+}
+
+// ** TreeVisitor::visit
+void TreeVisitor::visit(Operator& node)
+{
+    if (Expression* lhs = node.lhs())
+    {
+        lhs->accept(*this);
+    }
+
+    if (Expression* rhs = node.rhs())
+    {
+        rhs->accept(*this);
     }
 }
     

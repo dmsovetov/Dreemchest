@@ -39,6 +39,18 @@ namespace Renderer
     {
     public:
 
+        //! Generates a function declaration from an AST node.
+        virtual void        visit(Cg::Function& node) NIMBLE_OVERRIDE;
+
+        //! Generates a variable declaration from an AST node.
+        virtual void        visit(Cg::Variable& node) NIMBLE_OVERRIDE;
+
+        //! Generates an operator
+
+    private:
+
+        //! Writes a type name to an output stream.
+        void                writeType(const Cg::Type& type);
     };
     
 } // namespace Renderer

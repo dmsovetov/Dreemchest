@@ -52,7 +52,17 @@ namespace Cg
         
         //! Returns a variable name.
         const StringView&   name() const;
+
+        //! Returns a variable type.
+        const Type*         type() const;
+
+        //! Returns a variable initializer expression.
+        const Expression*   initializer() const;
+        Expression*         initializer();
         
+        //! Returns variable binding semantic.
+        SemanticType        semantic() const;
+
     private:
         
                             //! Constructs Variable node instance.
@@ -94,6 +104,28 @@ namespace Cg
     class Function : public Declaration
     {
     friend class Parser;
+    public:
+
+        //! A container type to store function arguments.
+        typedef Array<Variable*> Arguments;
+
+        //! Returns a function name.
+        const StringView&   name() const;
+
+        //! Returns a function type.
+        const Type&         type() const;
+
+        //! Returns function arguments.
+        const Arguments&    arguments() const;
+        Arguments&          arguments();
+
+        //! Returns return value semantic binding.
+        SemanticType        semantic() const;
+
+        //! Returns a function body.
+        const Statement*    body() const;
+        Statement*          body();
+
     private:
         
                             //! Constructs a function instance.
@@ -115,7 +147,7 @@ namespace Cg
         
         const Identifier*   m_identifier;   //!< A function identifier.
         const Type*         m_type;         //!< Return type of a function.
-        Array<Variable*>    m_arguments;    //!< Function arguments.
+        Arguments           m_arguments;    //!< Function arguments.
         SemanticType        m_semantic;     //!< An output function semantic.
         Statement*          m_body;         //!< A function body instance.
     };

@@ -78,17 +78,16 @@ Program::Program()
     
 }
     
-// ** Program::Program
-s32 Program::declarationCount() const
+// ** Program::declarations
+const Program::Declarations& Program::declarations() const
 {
-    return static_cast<s32>(m_declarations.size());
+    return m_declarations;
 }
     
-// ** Program::Program
-const Declaration* Program::declaration(s32 index) const
+// ** Program::declarations
+Program::Declarations& Program::declarations()
 {
-    NIMBLE_ABORT_IF(index < 0 || index >= declarationCount(), "index is out of range");
-    return m_declarations[index];
+    return m_declarations;
 }
     
 // ** Program::addDeclaration

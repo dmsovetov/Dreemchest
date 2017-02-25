@@ -56,6 +56,36 @@ Operator::Operator(OperatorType type, Expression* lhs, Expression* rhs, s32 line
     
 }
 
+// ** Operator::type
+OperatorType Operator::type() const
+{
+    return m_type;
+}
+
+// ** Operator::lhs
+const Expression* Operator::lhs() const
+{
+    return m_lhs;
+}
+
+// ** Operator::lhs
+Expression* Operator::lhs()
+{
+    return m_lhs;
+}
+
+// ** Operator::rhs
+const Expression* Operator::rhs() const
+{
+    return m_rhs;
+}
+
+// ** Operator::rhs
+Expression* Operator::rhs()
+{
+    return m_rhs;
+}
+
 // ** Operator::accept
 void Operator::accept(Visitor& visitor)
 {

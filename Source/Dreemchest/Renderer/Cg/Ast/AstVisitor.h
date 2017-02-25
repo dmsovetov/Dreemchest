@@ -102,7 +102,13 @@ namespace Cg
     public:
 
         //! Visits all declarations nested inside a program.
-        virtual void        visit(Program& program) NIMBLE_OVERRIDE;
+        virtual void        visit(Program& node) NIMBLE_OVERRIDE;
+
+        //! Visits all statments nested inside a statement block.
+        virtual void        visit(StatementBlock& node) NIMBLE_OVERRIDE;
+
+        //! Visits all lhs and rhs operands
+        virtual void        visit(Operator& node) NIMBLE_OVERRIDE;
     };
     
 } // namespace Cg

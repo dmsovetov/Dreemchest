@@ -49,6 +49,19 @@ namespace Cg
     class Operator : public Expression
     {
     friend class Parser;
+    public:
+
+        //! Returns an operator type.
+        OperatorType        type() const;
+
+        //! Returns a left hand side expression.
+        const Expression*   lhs() const;
+        Expression*         lhs();
+
+        //! Returns a right hand side expression.
+        const Expression*   rhs() const;
+        Expression*         rhs();
+
     private:
         
                             //! Constructs an Operator instance.
