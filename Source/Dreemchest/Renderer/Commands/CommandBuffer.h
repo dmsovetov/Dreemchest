@@ -98,7 +98,7 @@ namespace Renderer
     {
         if (m_commands.capacity() == m_commands.size())
         {
-            s32 growBy = max2<s32>(5, m_commands.capacity() * 0.1f);
+            s32 growBy = max2<s32>(5, static_cast<s32>(m_commands.capacity() * 0.1f));
             m_commands.reserve(m_commands.capacity() + growBy);
         }
         
