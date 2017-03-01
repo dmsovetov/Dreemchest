@@ -57,6 +57,22 @@ def platform_name():
         return 'linux'
 
 
+def env_variable(name):
+    """Returns an environment variable value if it exists, otherwise returns None"""
+
+    if name in os.environ.keys():
+        return os.environ[name]
+
+    return None
+
+
+def executable_exists(path):
+    if platform_name() == 'windows':
+        path += '.exe'
+
+    return os.path.exists(path)
+
+
 class Environment:
     """A base class for all environment configurations"""
 
@@ -264,7 +280,7 @@ def download(url, file_name):
     f.close()
 
 
-def extract(file_name, path):
+def extract(file_name, path, directory=None, preserve_permissions=True):
     """Extracts all files from an archive"""
     name, ext = os.path.splitext(file_name)
 
@@ -278,11 +294,15 @@ def extract(file_name, path):
         name, ext = os.path.splitext(name)
     elif ext == '.zip':
         def extract_file(zf, info, extract_dir):
+            if directory:
+                extract_dir = os.path.join(extract_dir, directory)
+
             zf.extract(info.filename, path=extract_dir)
             out_path = os.path.join(extract_dir, info.filename)
 
-            perm = info.external_attr >> 16L
-            os.chmod(out_path, perm)
+            if preserve_permissions:
+                perm = info.external_attr >> 16L
+                os.chmod(out_path, perm)
 
         with zipfile.ZipFile(file_name, "r") as z:
             for info in z.infolist():
@@ -351,11 +371,12 @@ def install_cmake(version):
             cmake_bin = os.environ[DREEMCHEST_CMAKE_BIN]
             cmake_command = os.path.join(cmake_bin, 'cmake --version')
 
-            if not os.path.exists(os.path.join(cmake_bin, 'cmake')):
+            if not executable_exists(os.path.join(cmake_bin, 'cmake')):
                 raise Exception('cmake executable does not exist')
 
             result = subprocess.check_output(cmake_command, shell=True)
-            cmake_version = result.split("\n\n")[0].split(' ')[2]
+            cmake_version = result.split("\n")[0].split(' ')[2]
+            cmake_version = cmake_version.strip()
 
             if cmake_version == version:
                 print 'Found existing CMake %s executable at %s' % (cmake_version, cmake_bin)
@@ -447,20 +468,26 @@ def install_emscripten(version):
         print 'Emscripten installation found at %s' % os.environ[EMSCRIPTEN]
         return os.environ[EMSCRIPTEN]
 
+    platform = platform_name()
+
     # Download an Emscripten SDK
     url = dict(
         windows='https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-1.35.0-portable-64bit.zip',
         linux='https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-portable.tar.gz',
         mac='https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-portable.tar.gz',
-    )[platform_name()]
+    )[platform]
 
     file_name = url.split('/')[-1]
 
     download(url, file_name)
 
     # Extract contents
-    emscripten_home = extract(file_name, 'Tools')
-    emscripten_home = emscripten_home.replace('emsdk-portable', 'emsdk_portable')  # HOTFIX
+    if platform == 'windows':
+        name, ext = os.path.splitext(file_name)
+        emscripten_home = extract(file_name, 'Tools', directory=name, preserve_permissions=False)
+    else:
+        emscripten_home = extract(file_name, 'Tools')
+        emscripten_home = emscripten_home.replace('emsdk-portable', 'emsdk_portable')  # HOTFIX
 
     # Install Emscripten SDK
     emsdk = os.path.join(emscripten_home, 'emsdk')
@@ -477,6 +504,20 @@ def install_emscripten(version):
     shutil.copyfile(source_toolchain, dest_toolchain)
 
     return emscripten_path
+
+
+def install_yaml():
+    try:
+        import yaml
+        print 'Found existing PyYAML installation'
+    except:
+        url = 'http://pyyaml.org/download/pyyaml/PyYAML-3.12.zip'
+        file_name = url.split('/')[-1]
+
+        download(url, file_name)
+        extract(file_name, 'Tools')
+
+        subprocess.check_call('python setup.py install', shell=True, cwd='Tools/PyYAML-3.12')
 
 
 def main():
@@ -506,6 +547,13 @@ def main():
                                     default=True)
 
     args = parser.parse_args()
+
+    if env_variable('JAVA_HOME') is None:
+        print 'Warning: JAVA_HOME environment variable is not set, disabling Android SDK installation'
+        args.no_android = True
+
+    # Install YAML
+    install_yaml()
 
     # Download CMake
     cmake_path = install_cmake(args.cmake)
