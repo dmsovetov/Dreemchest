@@ -79,7 +79,7 @@ class PlatformConfigurationCommand(cmake.Command):
             DC_OPENGL_ENABLED=cmake.disable_option(options.no_renderer),
             DC_SOUND_ENABLED=cmake.disable_option(options.no_sound),
             DC_WITH_RELIGHT=cmake.disable_option(options.no_relight),
-            DC_BUILD_TESTS=cmake.disable_option(options.no_tests and not options.tests),
+            DC_BUILD_TESTS=cmake.disable_option(options.no_tests),
             DC_BUILD_EXAMPLES=cmake.disable_option(options.no_examples),
             CMAKE_CXX_STANDARD=options.cpp,
             DC_QT_SUPPORT=('disabled' if not hasattr(options, 'no_qt') or options.no_qt else options.qt).capitalize(),

@@ -27,6 +27,35 @@
 #include <gtest/gtest.h>
 #include <Dreemchest.h>
 
-DC_USE_DREEMCHEST
+class TestableObject : public mvvm::GenericObject<TestableObject> {
+public:
+
+	template<typename TValue>
+	typename WeakPtr<TValue> add( const String& name/*, const TValue& defaultValue = TValue()*/ )
+	{
+		return GenericObject::add<TValue>( name/*, defaultValue*/ );
+	}
+};
+
+class UserInfo : public mvvm::GenericObject<UserInfo> {
+public:
+
+	UserInfo( void )
+	{
+		add<mvvm::Text>( "name" );
+		add<mvvm::Float>( "level" );
+		add<mvvm::Float>( "health" );
+	}
+};
+
+class Session : public mvvm::GenericObject<Session> {
+public:
+
+	Session( void )
+	{
+		add<mvvm::Text>( "id"/*, "session identifier"*/ );
+		add<UserInfo>( "userInfo" );
+	}
+};
 
 static const String kTestString = "hello world";

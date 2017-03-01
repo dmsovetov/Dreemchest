@@ -32,7 +32,7 @@ int main( int argc, char *argv[] )
     int res = RUN_ALL_TESTS();
 
 #ifndef NDEBUG
-	NIMBLE_BREAK
+	DC_BREAK
 #endif
 
 	return res;
