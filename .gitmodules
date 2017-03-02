@@ -40,3 +40,6 @@
 [submodule "Externals/lua"]
 	path = Externals/lua
 	url = https://github.com/dmsovetov/lua
+[submodule "Externals/assimp"]
+	path = Externals/assimp
+	url = https://github.com/assimp/assimp.git
