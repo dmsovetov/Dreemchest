@@ -24,6 +24,14 @@
 #
 #################################################################################
 
+- name: nvtt
+  ios:
+    disabled: True
+  android:
+    disabled: True
+  emscripten:
+    disabled: True
+    
 - name: assimp
   options:
     ASSIMP_BUILD_ASSIMP_TOOLS: False
@@ -31,6 +39,8 @@
   ios:
     disabled: True
   emscripten:
+    disabled: True
+  android:
     disabled: True
       
 - name: curl
