@@ -49,6 +49,7 @@ add_files(Platform/${DC_PLATFORM} PLATFORM_IMPL_SRCS)
 # Renderer module sources
 add_files(Renderer RENDERER_SRCS)
 add_files(Renderer/Commands RENDERER_COMMANDS_SRCS)
+add_directories(Renderer/Cg RENDERER_CG_SRCS)
 
 if (DC_OPENGL_ENABLED)
     if (DC_PLATFORM MATCHES "iOS")
@@ -131,6 +132,7 @@ add_library(Dreemchest STATIC
     ${PLATFORM_SRCS}
     ${RENDERER_SRCS}
     ${RENDERER_COMMANDS_SRCS}
+	${RENDERER_CG_SRCS}
     ${FX_SRCS}
     ${SOUND_SRCS}
     ${ASSETS_SRCS}
