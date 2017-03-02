@@ -38,17 +38,43 @@ namespace Cg
 // ------------------------------------------------------------- Expression ------------------------------------------------------------- //
  
 // ** Expression::Expression
-Expression::Expression(NodeType type, s32 line, u16 column)
-    : Statement(type, line, column)
+Expression::Expression(s32 line, u16 column)
+    : Statement(line, column)
+    , m_type(TypeUserDefined)
+    , m_isConstant(true)
 {
     
+}
+
+// ** Expression::type
+BuiltInType Expression::type() const
+{
+    return m_type;
+}
+
+// ** Expression::setType
+void Expression::setType(BuiltInType value)
+{
+    m_type = value;
+}
+
+// ** Expression::isConstant
+bool Expression::isConstant() const
+{
+    return m_isConstant;
+}
+
+// ** Expression::setConstant
+void Expression::setConstant(bool value)
+{
+    m_isConstant = value;
 }
     
 // -------------------------------------------------------------- Operator -------------------------------------------------------------- //
     
 // ** Operator::Operator
 Operator::Operator(OperatorType type, Expression* lhs, Expression* rhs, s32 line, u16 column)
-    : Expression(OperatorNode, line, column)
+    : Expression(line, column)
     , m_type(type)
     , m_lhs(lhs)
     , m_rhs(rhs)
@@ -96,10 +122,16 @@ void Operator::accept(Visitor& visitor)
     
 // ** ConstantTerm::ConstantTerm
 ConstantTerm::ConstantTerm(const StringView& value, s32 line, u16 column)
-    : Expression(ConstantTermNode, line, column)
+    : Expression(line, column)
     , m_value(value)
 {
     
+}
+
+// ** ConstantTerm::value
+const StringView& ConstantTerm::value() const
+{
+    return m_value;
 }
 
 // ** ConstantTerm::accept
@@ -112,10 +144,16 @@ void ConstantTerm::accept(Visitor& visitor)
     
 // ** VariableTerm::VariableTerm
 VariableTerm::VariableTerm(const StringView& value, s32 line, u16 column)
-    : Expression(VariableTermNode, line, column)
+    : Expression(line, column)
     , m_value(value)
 {
         
+}
+
+// ** VariableTerm::name
+const StringView& VariableTerm::name() const
+{
+    return m_value;
 }
 
 // ** VariableTerm::accept
@@ -127,11 +165,36 @@ void VariableTerm::accept(Visitor& visitor)
 // ------------------------------------------------------------- FunctionCall ----------------------------------------------------------- //
     
 // ** FunctionCall::FunctionCall
-FunctionCall::FunctionCall(const Identifier* identifier, s32 line, u16 column)
-    : Expression(FunctionCallNode, line, column)
+FunctionCall::FunctionCall(const Identifier& identifier, BuiltInType builtInType, s32 line, u16 column)
+    : Expression(line, column)
     , m_identifier(identifier)
+    , m_builtInType(builtInType)
 {
     
+}
+
+// ** FunctionCall::builtInType
+BuiltInType FunctionCall::builtInType() const
+{
+    return m_builtInType;
+}
+
+// ** FunctionCall::name
+const StringView& FunctionCall::name() const
+{
+    return m_identifier.value();
+}
+
+// ** FunctionCall::arguments
+const FunctionCall::Arguments& FunctionCall::arguments() const
+{
+    return m_arguments;
+}
+
+// ** FunctionCall::arguments
+FunctionCall::Arguments& FunctionCall::arguments()
+{
+    return m_arguments;
 }
 
 // ** FunctionCall::addArgument
@@ -150,7 +213,7 @@ void FunctionCall::accept(Visitor& visitor)
 
 // ** ObjectInitializer::ObjectInitializer
 ObjectInitializer::ObjectInitializer(s32 line, u16 column)
-    : Expression(ObjectInitializerNode, line, column)
+    : Expression(line, column)
 {
 }
         

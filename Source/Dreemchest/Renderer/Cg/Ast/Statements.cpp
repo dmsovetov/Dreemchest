@@ -38,8 +38,8 @@ namespace Cg
 // ---------------------------------------------------------------- Statement ---------------------------------------------------------------- //
 
 // ** Statement::Statement
-Statement::Statement(NodeType type, s32 line, u16 column)
-    : Ast(type, line, column)
+Statement::Statement(s32 line, u16 column)
+    : Ast(line, column)
 {
     
 }
@@ -47,8 +47,9 @@ Statement::Statement(NodeType type, s32 line, u16 column)
 // -------------------------------------------------------------- StatementBlock ------------------------------------------------------------- //
     
 // ** StatementBlock::StatementBlock
-StatementBlock::StatementBlock(s32 line, u16 column)
-    : Statement(StatementsNode, line, column)
+StatementBlock::StatementBlock(const Scope* scope, s32 line, u16 column)
+    : Statement(line, column)
+    , m_declarations(scope)
 {
     
 }
@@ -63,6 +64,18 @@ const StatementBlock::Statements& StatementBlock::statements() const
 StatementBlock::Statements& StatementBlock::statements()
 {
     return m_children;
+}
+
+// ** StatementBlock::declarations
+const Scope& StatementBlock::declarations() const
+{
+    return m_declarations;
+}
+
+// ** StatementBlock::declarations
+Scope& StatementBlock::declarations()
+{
+    return m_declarations;
 }
 
 // ** StatementBlock::addStatement
@@ -81,7 +94,7 @@ void StatementBlock::accept(Visitor& visitor)
     
 // ** If::If
 If::If(Expression* condition, Statement* then, Statement* otherwise, s32 line, u16 column)
-    : Statement(IfNode, line, column)
+    : Statement(line, column)
     , m_condition(condition)
     , m_then(then)
     , m_otherwise(otherwise)
@@ -99,7 +112,7 @@ void If::accept(Visitor& visitor)
 
 // ** While::While
 While::While(Expression* condition, Statement* body, s32 line, u16 column)
-    : Statement(WhileNode, line, column)
+    : Statement(line, column)
     , m_condition(condition)
     , m_body(body)
 {
@@ -116,7 +129,7 @@ void While::accept(Visitor& visitor)
 
 // ** For::For
 For::For(Expression* initial, Expression* condition, Expression* increment, Statement* body, s32 line, u16 column)
-    : Statement(ForNode, line, column)
+    : Statement(line, column)
     , m_initial(initial)
     , m_condition(condition)
     , m_increment(increment)
@@ -135,10 +148,16 @@ void For::accept(Visitor& visitor)
 
 // ** Return::Return
 Return::Return(Expression* value, s32 line, u16 column)
-    : Statement(ReturnNode, line, column)
+    : Statement(line, column)
     , m_value(value)
 {
     
+}
+
+// ** Return::value
+Expression* Return::value()
+{
+    return m_value;
 }
 
 // ** Return::accept
@@ -151,7 +170,7 @@ void Return::accept(Visitor& visitor)
 
 // ** Discard::Discard
 Discard::Discard(s32 line, u16 column)
-    : Statement(DiscardNode, line, column)
+    : Statement(line, column)
 {
     
 }

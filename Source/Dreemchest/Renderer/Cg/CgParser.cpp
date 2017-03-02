@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "CgParser.h"
+#include "CgExpressionEvaluator.h"
 
 #define newAst(T, ...) new (m_allocator.allocate(sizeof(T))) T(__VA_ARGS__)
 
@@ -63,12 +64,12 @@ Parser::Parser(LinearAllocator& allocator)
     , m_allocator(allocator)
     , m_tokenizer(allocator)
 {
-    m_tokenizer.addKeyword("void", TokenBuiltInType);
-    m_tokenizer.addKeyword("float", TokenBuiltInType);
-    m_tokenizer.addKeyword("float2", TokenBuiltInType);
-    m_tokenizer.addKeyword("float3", TokenBuiltInType);
-    m_tokenizer.addKeyword("float4", TokenBuiltInType);
-    m_tokenizer.addKeyword("float4x4", TokenBuiltInType);
+    m_tokenizer.addKeyword("void", TokenBuiltInType, TypeVoid);
+    m_tokenizer.addKeyword("float", TokenBuiltInType, TypeFloat);
+    m_tokenizer.addKeyword("float2", TokenBuiltInType, TypeFloat2);
+    m_tokenizer.addKeyword("float3", TokenBuiltInType, TypeFloat3);
+    m_tokenizer.addKeyword("float4", TokenBuiltInType, TypeFloat4);
+    m_tokenizer.addKeyword("float4x4", TokenBuiltInType, TypeFloat4x4);
     m_tokenizer.addKeyword("struct", TokenStruct);
     m_tokenizer.addKeyword("if", TokenIf);
     m_tokenizer.addKeyword("else", TokenElse);
@@ -80,9 +81,17 @@ Parser::Parser(LinearAllocator& allocator)
     m_tokenizer.addKeyword("NORMAL", TokenInputSemantic);
     m_tokenizer.addKeyword("POSITION", TokenInputSemantic);
     m_tokenizer.addKeyword("TEXCOORD0", TokenInputSemantic);
+	m_tokenizer.addKeyword("COLOR", TokenInputSemantic);
     m_tokenizer.addKeyword("COLOR0", TokenOutputSemantic);
     m_tokenizer.addKeyword("COLOR1", TokenOutputSemantic);
-    
+
+    m_tokenizer.addKeyword("#pragma", TokenPreprocessorPragma);
+    m_tokenizer.addKeyword("#define", TokenPreprocessorDefine);
+    m_tokenizer.addKeyword("#if", TokenPreprocessorIf);
+    m_tokenizer.addKeyword("#elif", TokenPreprocessorElif);
+    m_tokenizer.addKeyword("#else", TokenPreprocessorElse);
+    m_tokenizer.addKeyword("#endif", TokenPreprocessorEndif);
+
     m_tokenizer.addPunctuation(";", TokenSemicolon);
     m_tokenizer.addPunctuation(":", TokenColon);
     m_tokenizer.addPunctuation("{", TokenBraceOpen);
@@ -99,8 +108,22 @@ Parser::Parser(LinearAllocator& allocator)
     m_tokenizer.addOperator("/", OpDivide);
     m_tokenizer.addOperator("*", OpMultiply);
     m_tokenizer.addOperator("<", OpLess);
+
+	registerSemantic("NORMAL", NULL, NORMAL);
+	registerSemantic("POSITION", NULL, POSITION);
+	registerSemantic("COLOR", NULL, COLOR);
+	registerSemantic("COLOR0", NULL, COLOR0);
+	registerSemantic("COLOR1", NULL, COLOR1);
+	registerSemantic("TEXCOORD0", NULL, TEXCOORD0);
     
-    registerSemantic("s0", TEXUNIT0);
+    registerSemantic("TEXUNIT0", "s0", TEXUNIT0);
+	registerSemantic("TEXUNIT1", "s1", TEXUNIT1);
+	registerSemantic("TEXUNIT2", "s2", TEXUNIT2);
+	registerSemantic("TEXUNIT3", "s3", TEXUNIT3);
+	registerSemantic("TEXUNIT4", "s4", TEXUNIT4);
+	registerSemantic("TEXUNIT5", "s5", TEXUNIT5);
+	registerSemantic("TEXUNIT6", "s6", TEXUNIT6);
+	registerSemantic("TEXUNIT7", "s7", TEXUNIT7);
 }
     
 // ** Parser::expect
@@ -144,8 +167,13 @@ Program* Parser::parseProgramSource(const s8* input)
 {
     prepare(input);
     
+    // Allocate a program instance
     Program* program = newAst(Program);
+
+    // Push program root scope onto the stack
+    pushDeclarationScope(program->scope());
     
+    // Parse program source until the end of a file
     while (hasTokens())
     {
         const Token& token = current();
@@ -167,13 +195,51 @@ Program* Parser::parseProgramSource(const s8* input)
             case TokenStruct:
                 program->addDeclaration(parseStructure());
                 break;
+            case TokenPreprocessorPragma:
+                parsePragma(program);
+                break;
             default:
                 emitError("unexpected token '%s'", token.str().c_str());
                 next();
         }
     }
+
+    // Pop program scope
+    popDeclarationScope();
+
+    // Evaluate expression types
+    program->accept(ProgramVisitor(ExpressionTypeEvaluator()));
     
     return program;
+}
+
+// ** Parser::parsePragma
+void Parser::parsePragma(Program* program)
+{
+    expect(TokenPreprocessorPragma);
+
+    Token option = read();
+
+    if (option == "vertex")
+    {
+        if (Identifier* name = expectIdentifier())
+        {
+            program->setShaderFunction(VertexShader, name);
+        }
+    }
+    else if (option == "fragment")
+    {
+        if (Identifier* name = expectIdentifier())
+        {
+            program->setShaderFunction(FragmentShader, name);
+        }
+    }
+
+    // Make sure that a pragma statement ends with a new line
+    if (option.line() == current().line())
+    {
+        emitExpected("new line");
+    }
 }
 
 // ** Parser::parseVariableDeclaration
@@ -214,7 +280,8 @@ Variable* Parser::parseVariableDeclaration()
     }
     
     // Allocate a variable instance
-    Variable* variable = newAst(Variable, identifier, type, initializer, semantic);
+    Variable* variable = newAst(Variable, *identifier, *type, initializer, semantic);
+    addDeclaration(variable);
 
     return variable;
 }
@@ -259,7 +326,11 @@ Function* Parser::parseFunctionDeclaration()
     }
     
     // Allocate function instance
-    Function* function = newAst(Function, identifier, type);
+    Function* function = newAst(Function, scope(), *identifier, type);
+    addDeclaration(function);
+
+    // Push function declaration scope
+    pushDeclarationScope(function->declarations());
     
     // Parse function arguments
     expect(TokenParenthesesOpen);
@@ -280,6 +351,9 @@ Function* Parser::parseFunctionDeclaration()
     StatementBlock* body = parseStatementBlock();
     function->setBody(body);
 
+    // Pop declaration scope
+    popDeclarationScope();
+
     return function;
 }
     
@@ -298,7 +372,11 @@ Structure* Parser::parseStructure()
     }
     
     // Allocate a structure instance
-    Structure* structure = newAst(Structure, identifier);
+    Structure* structure = newAst(Structure, scope(), *identifier);
+    addDeclaration(structure);
+
+    // Push declaration scope
+    pushDeclarationScope(structure->declarations());
     
     expect(TokenBraceOpen);
     while (!check(TokenBraceClose))
@@ -310,7 +388,10 @@ Structure* Parser::parseStructure()
         expect(TokenSemicolon);
     }
     expect(TokenBraceClose);
-    
+
+    // Pop declaration scope
+    popDeclarationScope();
+
     // Structure declarations ends with a ';' token
     expect(TokenSemicolon);
     
@@ -344,18 +425,11 @@ SemanticType Parser::parseRegisterSemantic()
     expect(TokenIdentifier);
     
     // Lookup semantic by name
-    SemanticType semantic = INVALID_SEMANTIC;
-    
-    //const s8* name = token.text();
-    RegisterSemanticTypes::const_iterator i = m_registerSemantics.find(String64(token.str().c_str()));
-    
-    if (i == m_registerSemantics.end())
+    SemanticType semantic = findSemanticByToken(token);
+
+    if (semantic == INVALID_SEMANTIC)
     {
         emitError("unknown semantic '%s'", token.str().c_str());
-    }
-    else
-    {
-        semantic = i->second;
     }
     
     // Register semanti ends with a ')' token
@@ -431,12 +505,14 @@ StatementBlock* Parser::parseStatementBlock()
     expect(TokenBraceOpen);
     
     // Allocate statement block instance
-    StatementBlock* block = newAst(StatementBlock, line, column);
+    StatementBlock* block = newAst(StatementBlock, scope(), line, column);
     
+    pushDeclarationScope(block->declarations());
     while (!check(TokenBraceClose))
     {
         block->addStatement(parseStatement());
     }
+    popDeclarationScope();
     
     // Statement block ends with a '}' token
     expect(TokenBraceClose);
@@ -591,9 +667,10 @@ For* Parser::parseFor()
 // ** Parser::parseFunctionCall
 FunctionCall* Parser::parseFunctionCall()
 {
-    Identifier* identifier = expectIdentifier();
+    BuiltInType builtInType = TypeUserDefined;
+    Identifier* identifier  = expectFunctionIdentifier(builtInType);
     
-    FunctionCall* call = newAst(FunctionCall, identifier, identifier->line(), identifier->column());
+    FunctionCall* call = newAst(FunctionCall, *identifier, builtInType, identifier->line(), identifier->column());
     
     expect(TokenParenthesesOpen);
     do
@@ -661,6 +738,10 @@ Expression* Parser::parseTerm()
             }
             break;
 
+		case TokenBuiltInType:
+			term = parseFunctionCall();
+			break;
+
         case TokenNumber:
             term = newAst(ConstantTerm, token.text(), token.line(), token.column());
             next();
@@ -717,7 +798,7 @@ Type* Parser::expectType()
     }
     else if(parse(TokenIdentifier))
     {
-        return newAst(Type, newIdentifier(token), TypeInvalid, token.line(), token.column());
+        return newAst(Type, newIdentifier(token), TypeUserDefined, token.line(), token.column());
     }
     
     emitExpected("type");
@@ -755,17 +836,46 @@ Identifier* Parser::expectIdentifier()
     
     return NULL;
 }
+
+// ** Parser::expectFunctionIdentifier
+Identifier* Parser::expectFunctionIdentifier(BuiltInType& builtInType)
+{
+	Token token = current();
+
+	if (parse(TokenBuiltInType))
+	{
+        builtInType = static_cast<BuiltInType>(token.subtype());
+		return newIdentifier(token);
+	}
+	else if (parse(TokenIdentifier))
+	{
+        builtInType = TypeUserDefined;
+		return newIdentifier(token);
+	}
+
+	emitExpected("identifier");
+	next();
+
+	return NULL;
+}
     
 // ** Parser::expectSemantic
 SemanticType Parser::expectSemantic()
 {
+	const Token& token = current();
     SemanticType type = INVALID_SEMANTIC;
     
-    switch (current().type())
+    switch (token.type())
     {
         case TokenInputSemantic:
         case TokenOutputSemantic:
-            type = static_cast<SemanticType>(current().subtype());
+			type = findSemanticByToken(token);
+
+			if (type == INVALID_SEMANTIC)
+			{
+				emitError("unknown semantic '%s'", token.str().c_str());
+			}
+
             next();
             return type;
             
@@ -774,13 +884,82 @@ SemanticType Parser::expectSemantic()
     }
 
     emitExpected("input semantic");
+	next();
+
     return type;
 }
     
 // ** Parser::registerSemantic
-void Parser::registerSemantic(const s8* name, SemanticType semantic)
+void Parser::registerSemantic(const s8* name, const s8* shortName, SemanticType semantic)
 {
     m_registerSemantics[String64(name)] = semantic;
+
+	if (shortName)
+	{
+		m_registerSemantics[String64(shortName)] = semantic;
+	}
+}
+
+// ** Parser::findSemanticByToken
+SemanticType Parser::findSemanticByToken(const Token& token) const
+{
+	// Lookup semantic by name
+	SemanticType semantic = INVALID_SEMANTIC;
+
+	//const s8* name = token.text();
+	RegisterSemanticTypes::const_iterator i = m_registerSemantics.find(String64(token.str().c_str()));
+
+	if (i != m_registerSemantics.end())
+	{
+		semantic = i->second;
+	}
+
+	return semantic;
+}
+
+// ** Parser::findDeclaration
+const Declaration* Parser::findDeclaration(const Identifier* identifier) const
+{
+    Scope* topmost = scope();
+    const Declaration* declaration = topmost->findInScopeChain(identifier->value());
+    return declaration;
+}
+
+// ** Parser::addDeclaration
+void Parser::addDeclaration(const Declaration* declaration)
+{
+    Scope* topmost = scope();
+    const StringView& name = declaration->name();
+
+    if (const Declaration* prev = topmost->find(name))
+    {
+        emitError("'%s' is already declared on line %d:%d", name.str().c_str(), prev->line(), prev->column());
+    }
+    else
+    {
+        topmost->add(declaration);
+    }
+}
+
+// ** Parser::scope
+Scope* Parser::scope() const
+{
+    NIMBLE_ABORT_IF(m_scopeStack.empty(), "scope stack is empty");
+    Scope* scope = m_scopeStack.top();
+    return scope;
+}
+
+// ** Parser::pushDeclarationScope
+void Parser::pushDeclarationScope(Scope& scope)
+{
+    m_scopeStack.push(&scope);
+}
+
+// ** Parser::popDeclarationScope
+void Parser::popDeclarationScope()
+{
+    NIMBLE_ABORT_IF(m_scopeStack.empty(), "stack underflow");
+    m_scopeStack.pop();
 }
 
 // ** Parser::emitError

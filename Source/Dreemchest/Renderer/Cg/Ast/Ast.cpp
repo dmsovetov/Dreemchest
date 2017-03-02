@@ -25,6 +25,7 @@
  **************************************************************************/
 
 #include "Ast.h"
+#include "Declarations.h"
 #include "AstVisitor.h"
 
 DC_BEGIN_DREEMCHEST
@@ -38,9 +39,8 @@ namespace Cg
 // ---------------------------------------------------------------- Ast ---------------------------------------------------------------- //
     
 // ** Ast::Ast
-Ast::Ast(NodeType type, s32 line, u16 column)
-    : m_type(type)
-    , m_line(line)
+Ast::Ast(s32 line, u16 column)
+    : m_line(line)
     , m_column(column)
 {
     
@@ -49,12 +49,6 @@ Ast::Ast(NodeType type, s32 line, u16 column)
 // ** Ast::~Ast
 Ast::~Ast()
 {
-}
-
-// ** Ast::type
-Ast::NodeType Ast::type() const
-{
-    return m_type;
 }
 
 // ** Ast::type
@@ -68,14 +62,60 @@ u16 Ast::column() const
 {
     return m_column;
 }
+
+// ---------------------------------------------------------------- Scope --------------------------------------------------------------- //
+
+// ** Scope::Scope
+Scope::Scope(const Scope* parent)
+    : m_parent(parent)
+{
+
+}
+
+// ** Scope::find
+const Declaration* Scope::find(const StringView& name) const
+{
+    Declarations::const_iterator i = m_declarations.find(String64(name, name.length()));
+
+    if (i != m_declarations.end())
+    {
+        return i->second;
+    }
+
+    return NULL;
+}
+
+// ** Scope::add
+void Scope::add(const Declaration* declaration)
+{
+    const StringView& name = declaration->name();
+    NIMBLE_ABORT_IF(find(name), "already declared");
+    m_declarations[String64(name, name.length())] = declaration;
+}
+
+// ** Scope::findInScopeChain
+const Declaration* Scope::findInScopeChain(const StringView& name) const
+{
+    if (const Declaration* declaration = find(name))
+    {
+        return declaration;
+    }
+
+    if (m_parent)
+    {
+        return m_parent->findInScopeChain(name);
+    }
+
+    return NULL;
+}
     
 // --------------------------------------------------------------- Program -------------------------------------------------------------- //
     
 // ** Program::Program
 Program::Program()
-    : Ast(Ast::ProgramNode, 0, 0)
+    : Ast(0, 0)
 {
-    
+    memset(m_shaders, NULL, sizeof(m_shaders));
 }
     
 // ** Program::declarations
@@ -89,11 +129,35 @@ Program::Declarations& Program::declarations()
 {
     return m_declarations;
 }
+
+// ** Program::declarations
+const Scope& Program::scope() const
+{
+    return m_scope;
+}
+
+// ** Program::declarations
+Scope& Program::scope()
+{
+    return m_scope;
+}
     
 // ** Program::addDeclaration
 void Program::addDeclaration(Declaration* declaration)
 {
     m_declarations.push_back(declaration);
+}
+
+// ** Program::functionForShader
+const Identifier* Program::functionForShader(ShaderType shader) const
+{
+    return m_shaders[shader];
+}
+
+// ** Program::setShaderFunction
+void Program::setShaderFunction(ShaderType shader, const Identifier* name)
+{
+    m_shaders[shader] = name;
 }
 
 // ** Program::accept
@@ -106,7 +170,7 @@ void Program::accept(Visitor& visitor)
     
 // ** Identifier::Identifier
 Identifier::Identifier(const StringView& value, s32 line, u16 column)
-    : Ast(Ast::IdentifierNode, line, column)
+    : Ast(line, column)
     , m_value(value)
 {
     
@@ -128,7 +192,7 @@ void Identifier::accept(Visitor& visitor)
 
 // ** Type::Type
 Type::Type(const Identifier* name, BuiltInType builtInType, s32 line, u16 column)
-    : Ast(TypeNode, line, column)
+    : Ast(line, column)
     , m_name(name)
     , m_builtInType(builtInType)
 {

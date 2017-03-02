@@ -54,7 +54,7 @@ namespace Cg
         const StringView&   name() const;
 
         //! Returns a variable type.
-        const Type*         type() const;
+        const Type&         type() const;
 
         //! Returns a variable initializer expression.
         const Expression*   initializer() const;
@@ -66,15 +66,15 @@ namespace Cg
     private:
         
                             //! Constructs Variable node instance.
-                            Variable(const Identifier* identifier, const Type* type, Expression* initializer, SemanticType semantic);
+                            Variable(const Identifier& identifier, const Type& type, Expression* initializer, SemanticType semantic);
 
         //! Invokes visitor's method to process this variable.
         virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
         
     private:
         
-        const Identifier*   m_identifier;   //!< A variable name identifier.
-        const Type*         m_type;         //!< A variable data type.
+        const Identifier&   m_identifier;   //!< A variable name identifier.
+        const Type&         m_type;         //!< A variable data type.
         Expression*         m_initializer;  //!< An initializer expression.
         SemanticType        m_semantic;     //!< An input semantic name.
     };
@@ -83,6 +83,18 @@ namespace Cg
     class Structure : public Declaration
     {
     friend class Parser;
+	public:
+
+		//! A container type to store structure fields.
+		typedef List<Variable*> Fields;
+
+		//! Returns structure fields.
+		const Fields&		fields() const;
+		Fields&				fields();
+
+		//! Returns a structure name.
+		const StringView&	name() const;
+
     private:
         
                             //! Constructs a Structure node instance.
@@ -97,7 +109,7 @@ namespace Cg
     private:
         
         const Identifier*   m_identifier;   //!< A structure identifier.
-        Array<Variable*>    m_fields;       //!< Fields declared inside this structure.
+		Fields				m_fields;       //!< Fields declared inside this structure.
     };
     
     //! Function declaration node.
@@ -126,6 +138,9 @@ namespace Cg
         const Statement*    body() const;
         Statement*          body();
 
+        //! Invokes visitor's method to process this function.
+        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
+
     private:
         
                             //! Constructs a function instance.
@@ -139,9 +154,6 @@ namespace Cg
         
         //! Sets a function semantic.
         void                setSemantic(SemanticType value);
-
-        //! Invokes visitor's method to process this function.
-        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
         
     private:
         

@@ -47,8 +47,8 @@ Declaration::Declaration(NodeType type, s32 line, u16 column)
 // -------------------------------------------------------------- Variable -------------------------------------------------------------- //
     
 // ** Variable::Variable
-Variable::Variable(const Identifier* identifier, const Type* type, Expression* initializer, SemanticType semantic)
-    : Declaration(VariableNode, type->line(), type->column())
+Variable::Variable(const Identifier& identifier, const Type& type, Expression* initializer, SemanticType semantic)
+    : Declaration(VariableNode, type.line(), type.column())
     , m_identifier(identifier)
     , m_type(type)
     , m_initializer(initializer)
@@ -60,11 +60,11 @@ Variable::Variable(const Identifier* identifier, const Type* type, Expression* i
 // ** Variable::name
 const StringView& Variable::name() const
 {
-    return m_identifier->value();
+    return m_identifier.value();
 }
 
 // ** Variable::type
-const Type* Variable::type() const
+const Type& Variable::type() const
 {
     return m_type;
 }
@@ -98,8 +98,27 @@ void Variable::accept(Visitor& visitor)
 // ** Structure::Structure
 Structure::Structure(const Identifier* identifier)
     : Declaration(StructureNode, identifier->line(), identifier->column())
+	, m_identifier(identifier)
 {
     
+}
+
+// ** Structure::fields
+const Structure::Fields& Structure::fields() const
+{
+	return m_fields;
+}
+
+// ** Structure::fields
+Structure::Fields& Structure::fields()
+{
+	return m_fields;
+}
+
+// Structure::name
+const StringView& Structure::name() const
+{
+	return m_identifier->value();
 }
 
 // ** Structure::addField

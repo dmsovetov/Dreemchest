@@ -60,6 +60,15 @@ void TreeVisitor::visit(StatementBlock& node)
 }
 
 // ** TreeVisitor::visit
+void TreeVisitor::visit(Function& node)
+{
+    if (Statement* body = node.body())
+    {
+        body->accept(*this);
+    }
+}
+
+// ** TreeVisitor::visit
 void TreeVisitor::visit(Operator& node)
 {
     if (Expression* lhs = node.lhs())

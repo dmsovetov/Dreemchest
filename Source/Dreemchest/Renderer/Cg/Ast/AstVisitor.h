@@ -109,6 +109,9 @@ namespace Cg
 
         //! Visits all lhs and rhs operands
         virtual void        visit(Operator& node) NIMBLE_OVERRIDE;
+
+        //! Visits a function body statement block.
+        virtual void        visit(Cg::Function& node) NIMBLE_OVERRIDE;
     };
     
 } // namespace Cg

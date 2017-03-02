@@ -39,10 +39,29 @@ namespace Cg
     //! An expression is a base class for a function call, operator, constant or variable term.
     class Expression : public Statement
     {
+    public:
+
+        //! Returns an expression resulting type.
+        BuiltInType         type() const;
+
+        //! Sets an expression resulting type.
+        void                setType(BuiltInType value);
+
+        //! Returns true if an expression is constant.
+        bool                isConstant() const;
+
+        //! Sets expression constant flag.
+        void                setConstant(bool value);
+
     protected:
         
                             //! Constructs an Expression instance.
-                            Expression(NodeType type, s32 line, u16 column);
+                            Expression(s32 line, u16 column);
+
+    private:
+
+        BuiltInType         m_type;         //!< Expression resulting type.
+        bool                m_isConstant;   //!< Indicates that an expression is constant and can't be modified by operator '=', '+=', etc.
     };
     
     //! A binary/unary operator node.
@@ -62,13 +81,13 @@ namespace Cg
         const Expression*   rhs() const;
         Expression*         rhs();
 
+        //! Invokes visitor's method to process this operator.
+        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
+
     private:
         
                             //! Constructs an Operator instance.
                             Operator(OperatorType type, Expression* lhs, Expression* rhs, s32 line, u16 column);
-
-        //! Invokes visitor's method to process this operator.
-        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
         
     private:
         
@@ -81,13 +100,18 @@ namespace Cg
     class ConstantTerm : public Expression
     {
     friend class Parser;
+    public:
+
+        //! Returns a constant term value.
+        const StringView&   value() const;
+
+        //! Invokes visitor's method to process this constant term.
+        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
+
     private:
         
                             //! Constructs a ConstantTerm instance.
                             ConstantTerm(const StringView& value, s32 line, u16 column);
-
-        //! Invokes visitor's method to process this constant term.
-        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
         
     private:
         
@@ -98,13 +122,18 @@ namespace Cg
     class VariableTerm : public Expression
     {
     friend class Parser;
+    public:
+
+        //! Invokes visitor's method to process this variable term.
+        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
+
+        //! Returns a variable term name.
+        const StringView&   name() const;
+
     private:
         
                             //! Constructs a VariableTerm instance.
                             VariableTerm(const StringView& value, s32 line, u16 column);
-
-        //! Invokes visitor's method to process this variable term.
-        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
         
     private:
         
@@ -115,27 +144,48 @@ namespace Cg
     class FunctionCall : public Expression
     {
     friend class Parser;
-    private:
-        
-                            //! Constructs a FunctionCall instance.
-                            FunctionCall(const Identifier* identifier, s32 line, u16 column);
-        
-        //! Adds a function call argument.
-        void                addArgument(Expression* expression);
+    public:
+
+        //! A container type to store function call arguments.
+        typedef List<Expression*> Arguments;
+
+        //! Returns an identifier of a function being called.
+        const StringView&   name() const;
+
+        //! Returns a built-in type being constructed (if any).
+        BuiltInType         builtInType() const;
+
+        //! Returns a function call arguments.
+        const Arguments&    arguments() const;
+        Arguments&          arguments();
 
         //! Invokes visitor's method to process this function call.
         virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
+
+    private:
+        
+                            //! Constructs a FunctionCall instance.
+                            FunctionCall(const Identifier& identifier, BuiltInType builtInType, s32 line, u16 column);
+        
+        //! Adds a function call argument.
+        void                addArgument(Expression* expression);
         
     private:
         
-        const Identifier*   m_identifier;   //!< A function identifier.
-        Array<Expression*>  m_arguments;    //!< A list of expressions that are passed to a function call.
+        const Identifier&   m_identifier;   //!< A function identifier.
+        BuiltInType         m_builtInType;  //!< Indicates that this is a built-in type construction.
+        Arguments           m_arguments;    //!< A list of expressions that are passed to a function call.
     };
 
     //! An object initializer expression.
     class ObjectInitializer : public Expression
     {
     friend class Parser;
+    public:
+
+        //! Invokes visitor's method to process this object initializer.
+        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
+
     private:
 
                             //! Constructs a ObjectInitializer instance.
@@ -143,9 +193,6 @@ namespace Cg
         
         //! Adds a new field initializer expression.
         void                addFieldInitializer(Expression* expression);
-
-        //! Invokes visitor's method to process this object initializer.
-        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
         
     private:
 

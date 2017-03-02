@@ -79,6 +79,12 @@ namespace Cg
             , TokenColon
             , TokenSemicolon
             , TokenComma
+            , TokenPreprocessorPragma
+            , TokenPreprocessorDefine
+            , TokenPreprocessorIf
+            , TokenPreprocessorElif
+            , TokenPreprocessorElse
+            , TokenPreprocessorEndif
         };
 
         //! Describes an operator priority and associativity.
@@ -138,6 +144,9 @@ namespace Cg
         //! Parses a statement block.
         StatementBlock*         parseStatementBlock();
 
+        //! Parses a pragma definition.
+        void                    parsePragma(Program* program);
+
         //! Returns an operator info by a current token
         bool                    checkOperator(OperatorInfo& op) const;
         
@@ -146,6 +155,9 @@ namespace Cg
         
         //! Expects to read an identifier.
         Identifier*             expectIdentifier();
+
+		//! Expects to read an identifier of a type name.
+		Identifier*				expectFunctionIdentifier(BuiltInType& builtInType);
         
         //! Expects to read an operator.
         OperatorType            expectOperator();
@@ -169,16 +181,35 @@ namespace Cg
         void                    emitExpected(const s8* expected);
         
         //! Registers a register semantic type.
-        void                    registerSemantic(const s8* name, SemanticType semantic);
+        void                    registerSemantic(const s8* name, const s8* shortName, SemanticType semantic);
+
+		//! Searches for a semantic by it's name.
+		SemanticType			findSemanticByToken(const Token& token) const;
+
+        //! Searches for a declaration in a scope chain.
+        const Declaration*      findDeclaration(const Identifier* identifier) const;
+
+        //! Adds a new declaration to a topmost scope.
+        void                    addDeclaration(const Declaration* declaration);
+
+        //! Returns the topmost declaration scope.
+        Scope*                  scope() const;
+
+        //! Pushes a declaration scope.
+        void                    pushDeclarationScope(Scope& scope);
+
+        //! Pops a declaration scope.
+        void                    popDeclarationScope();
         
     private:
         
         //! A container type to map from an identifier to a semantic name.
         typedef HashMap<String64, SemanticType> RegisterSemanticTypes;
         
-        LinearAllocator&        m_allocator;
-        ExpressionTokenizer     m_tokenizer;
-        RegisterSemanticTypes   m_registerSemantics;
+        LinearAllocator&        m_allocator;            //!< A linear allocator to be used for allocations.
+        ExpressionTokenizer     m_tokenizer;            //!< Input stream tokenizer.
+        RegisterSemanticTypes   m_registerSemantics;    //!< Mapping from a string to a semantic type.
+        Stack<Scope*>           m_scopeStack;           //!< A scope stack.
         static OperatorInfo     s_operators[TotalOperatorTypes + 1];
     };
     

@@ -67,33 +67,8 @@ namespace Cg
     {
     public:
         
-        //! Available AST node types.
-        enum NodeType
-        {
-              ProgramNode       //!< An AST type for a root node.
-            , StructureNode     //!< Structure declaration node type.
-            , FunctionNode      //!< Function declaration node type.
-            , VariableNode      //!< Variable declaration node type.
-            , IdentifierNode    //!< Identifier node type.
-            , TypeNode          //!< Data type node.
-            , StatementsNode    //!< A statement block.
-            , IfNode
-            , WhileNode
-            , ForNode
-            , ReturnNode
-            , DiscardNode
-            , OperatorNode
-            , ConstantTermNode
-            , VariableTermNode
-            , FunctionCallNode
-            , ObjectInitializerNode
-        };
-        
         virtual             ~Ast();
-        
-        //! Returns a node type.
-        NodeType            type() const;
-        
+
         //! Returns node line number.
         s32                 line() const;
         
@@ -106,11 +81,10 @@ namespace Cg
     protected:
         
                             //! Constructs an Ast node instance.
-                            Ast(NodeType type, s32 line, u16 column);
+                            Ast(s32 line, u16 column);
         
     private:
         
-        NodeType            m_type;     //!< Actual node type.
         s32                 m_line;     //!< A line number of this node within a source code.
         u16                 m_column;   //!< A column number of this node within a source code.
     };
@@ -162,6 +136,32 @@ namespace Cg
         const Identifier*   m_name;         //!< A user-defined type name, will be null for built-in types.
         BuiltInType         m_builtInType;  //!< A built-in type id.
     };
+
+    //! Declaration scope contains a parent declaration scope and mapping from a string to declaration.
+    class Scope
+    {
+    public:
+
+                                //!< Constructs a Scope instance.
+                                Scope(const Scope* parent = NULL);
+
+        //! Searches for a declaration with a given name inside this scope only.
+        const Declaration*      find(const StringView& name) const;
+
+        //! Adds a new declaration.
+        void                    add(const Declaration* declaration);
+
+        //! Searches for a declaration with a given name first inside this scope and then in a parent scopes.
+        const Declaration*      findInScopeChain(const StringView& name) const;
+
+    private:
+
+        //! A container type to store declarations.
+        typedef HashMap<String64, const Declaration*> Declarations;
+
+        const Scope*            m_parent;       //!< Parent scope.
+        Declarations            m_declarations; //!< Exposed declarations.
+    };
     
     //! Program is a root node of an AST.
     class Program : public Ast
@@ -173,23 +173,35 @@ namespace Cg
         typedef List<Declaration*> Declarations;
 
         //! Returns a list of nested declarations.
-        const Declarations& declarations() const;
-        Declarations&       declarations();
+        const Declarations&     declarations() const;
+        Declarations&           declarations();
+
+        //! Returns a declaration scope.
+        const Scope&            scope() const;
+        Scope&                  scope();
+
+        //! Returns a shader function name.
+        const Identifier*       functionForShader(ShaderType shader) const;
 
         //! Invokes visitor's method to process this program.
-        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
+        virtual void            accept(Visitor& visitor) NIMBLE_OVERRIDE;
         
     private:
         
-                            //! Constructs a Program node instance.
-                            Program();
+                                //! Constructs a Program node instance.
+                                Program();
         
         //! Adds a new declaration instance to program.
-        void                addDeclaration(Declaration* declaration);
+        void                    addDeclaration(Declaration* declaration);
+
+        //! Sets a shader function name.
+        void                    setShaderFunction(ShaderType shader, const Identifier* name);
         
     private:
         
-        Declarations        m_declarations; //!< An list of declarations.
+        Declarations            m_declarations;                 //!< An list of declarations.
+        const Identifier*       m_shaders[TotalShaderTypes];    //!< A vertex shader function.
+        Scope                   m_scope;                        //!< Root declaration scope.
     };
     
 } // namespace Cg

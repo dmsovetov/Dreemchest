@@ -42,7 +42,7 @@ namespace Cg
     protected:
         
                             //! Constructs a Statement node instance.
-                            Statement(NodeType type, s32 line, u16 column);
+                            Statement(s32 line, u16 column);
     };
     
     //! Statement block containes a list of child statements.
@@ -58,10 +58,14 @@ namespace Cg
         const Statements&   statements() const;
         Statements&         statements();
 
+        //! Returns a declaration scope.
+        const Scope&        declarations() const;
+        Scope&              declarations();
+
     protected:
         
                             //! Constructs a statement block node.
-                            StatementBlock(s32 line, u16 column);
+                            StatementBlock(const Scope* scope, s32 line, u16 column);
      
         //! Adds a new statement to this block.
         void                addStatement(Statement* statment);
@@ -71,7 +75,8 @@ namespace Cg
         
     private:
         
-        Statements          m_children; //!< Child statement nodes.
+        Statements          m_children;     //!< Child statement nodes.
+        Scope               m_declarations; //!< Variable declaration scope.
     };
     
     //! If control statement node.
@@ -135,13 +140,18 @@ namespace Cg
     class Return : public Statement
     {
     friend class Parser;
+    public:
+
+        //! Returns an expression that is returned.
+        Expression*         value();
+
+        //! Invokes visitor's method to process this 'return' statement.
+        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
+
     private:
         
                             //! Constructs Return statement instance.
                             Return(Expression* value, s32 line, u16 column);
-
-        //! Invokes visitor's method to process this 'return' statement.
-        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
         
     private:
         

@@ -61,11 +61,37 @@ namespace Cg
     //! Available built-in types.
     enum BuiltInType
     {
-          TypeInvalid
+          TypeUserDefined
         , TypeVoid
         , TypeBool
         , TypeInt
         , TypeFloat
+		, TypeFloat2
+		, TypeFloat3
+		, TypeFloat4
+		, TypeHalf
+		, TypeHalf2
+		, TypeHalf3
+		, TypeHalf4
+		, TypeFixed
+		, TypeFixed2
+		, TypeFixed3
+		, TypeFixed4
+		, TypeFloat4x4
+		, TypeHalf4x4
+		, TypeFixed4x4
+		, TotalBuiltInTypes
+    };
+
+    //! Supported shader types.
+    enum ShaderType
+    {
+          VertexShader
+        , FragmentShader
+        , GeometryShader
+        , HullShader
+        , DomainShader
+        , TotalShaderTypes
     };
     
     //! Built-in input semantic types.
