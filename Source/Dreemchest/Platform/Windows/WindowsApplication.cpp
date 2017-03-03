@@ -54,7 +54,7 @@ IApplication* createServiceApplication( void )
 // ** currentTime
 u64 currentTime( void )
 {
-	return timeGetTime();
+    return timeGetTime();
 }
 
 // ------------------------------------------------------------------------ WindowsApplication ------------------------------------------------------------------------ //
@@ -71,41 +71,41 @@ s32 WindowsApplication::launch( Application* application )
     // Save the application instance
     m_application = application;
 
-	// Notify application about a launch.
+    // Notify application about a launch.
     application->notifyLaunched();
 
-	// Start an event loop
-	loop();
+    // Start an event loop
+    loop();
 
-	return 0;
+    return 0;
 }
 
 // ** WindowsApplication::loop
 void WindowsApplication::loop( void )
 {
-	MSG msg;
+    MSG msg;
 
-	while( 1 ) {
-		if( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) ) {
-			if( msg.message == WM_QUIT ) {
-				break;
-			}
+    while( 1 ) {
+        if( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) ) {
+            if( msg.message == WM_QUIT ) {
+                break;
+            }
 
-			TranslateMessage( &msg );
-			DispatchMessage( &msg );
-		}
-		else {
+            TranslateMessage( &msg );
+            DispatchMessage( &msg );
+        }
+        else {
             // Update an application
             m_application->notifyUpdate();
 
             renderView->notifyUpdate();
 
             // Update all windows
-			for( WindowsWindow::Windows::iterator i = WindowsWindow::s_windows.begin(), end = WindowsWindow::s_windows.end(); i != end; ++i ) {
-				i->second->owner()->notifyUpdate();
-			}
-		}
-	}
+            for( WindowsWindow::Windows::iterator i = WindowsWindow::s_windows.begin(), end = WindowsWindow::s_windows.end(); i != end; ++i ) {
+                i->second->owner()->notifyUpdate();
+            }
+        }
+    }
 }
 
 // ** WindowsApplication::resourcePath
@@ -176,7 +176,7 @@ s32 WindowsService::launch( Application* application )
         return GetLastError();
     }
 
-	return 0;
+    return 0;
 }
 
 // ** WindowsService::resourcePath
@@ -244,7 +244,7 @@ void WindowsService::switchToState( DWORD controlsAccepted, DWORD state, DWORD c
  
     if( SetServiceStatus( m_statusHandle, &m_status ) == FALSE ) {
         LogWarning( "service", "failed to set service status to %d\n", state );
-	}
+    }
 }
 
 // ** WindowsService::launchServiceThread

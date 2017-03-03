@@ -42,10 +42,10 @@ namespace Platform {
         virtual s32                 launch( Application* application ) NIMBLE_OVERRIDE;
         virtual const String&       resourcePath( void ) const NIMBLE_OVERRIDE;
 
-	private:
+    private:
 
-		//! Windows application event loop.
-		void						loop( void );
+        //! Windows application event loop.
+        void                        loop( void );
 
     private:
 

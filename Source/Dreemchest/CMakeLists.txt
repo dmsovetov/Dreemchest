@@ -132,7 +132,7 @@ add_library(Dreemchest STATIC
     ${PLATFORM_SRCS}
     ${RENDERER_SRCS}
     ${RENDERER_COMMANDS_SRCS}
-	${RENDERER_CG_SRCS}
+    ${RENDERER_CG_SRCS}
     ${FX_SRCS}
     ${SOUND_SRCS}
     ${ASSETS_SRCS}

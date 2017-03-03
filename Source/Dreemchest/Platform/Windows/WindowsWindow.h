@@ -37,17 +37,17 @@ namespace Platform {
 
     // ** class WindowsWindow
     class WindowsWindow : public IWindow {
-	friend class WindowsApplication;
+    friend class WindowsApplication;
     public:
 
                             WindowsWindow( void );
         virtual             ~WindowsWindow( void );
 
         // ** IWindow
-		virtual void		close( void );
+        virtual void        close( void );
         virtual u32         width( void ) const;
         virtual u32         height( void ) const;
-		virtual void		mapCursorToWindow( s32& x, s32& y ) const;
+        virtual void        mapCursorToWindow( s32& x, s32& y ) const;
         virtual String      caption( void ) const;
         virtual void        setCaption( const String& value );
         virtual void*       handle( void ) const;
@@ -57,42 +57,42 @@ namespace Platform {
         // ** WindowsWindow
         bool                create( u32 width, u32 height );
 
-	private:
+    private:
 
-		//! Calculates the window size based on client area size.
-		static void			adjustWindowSize( u32 style, u32& width, u32& height );
+        //! Calculates the window size based on client area size.
+        static void            adjustWindowSize( u32 style, u32& width, u32& height );
 
-		//! Window procedure.
-		static LRESULT		windowProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
+        //! Window procedure.
+        static LRESULT        windowProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 
-		//! Translates a Windows virtual key to Dreemchest key enum.
-		static Key			translateKey( u32 key );
+        //! Translates a Windows virtual key to Dreemchest key enum.
+        static Key            translateKey( u32 key );
 
     private:
 
-		//! Window registry type
-		typedef std::map<HWND, WindowsWindow*>	Windows;
+        //! Window registry type
+        typedef std::map<HWND, WindowsWindow*>    Windows;
 
         //! Implementation owner
         Window*             m_owner;
 
         //! Native window.
-        HWND				m_window;
+        HWND                m_window;
 
-		//! Application instance handle.
-		HINSTANCE			m_applicationInstance;
+        //! Application instance handle.
+        HINSTANCE            m_applicationInstance;
 
-		//! Window class.
-		WNDCLASS			m_windowClass;
+        //! Window class.
+        WNDCLASS            m_windowClass;
 
-		//! Window class name.
-		String				m_className;
+        //! Window class name.
+        String                m_className;
 
-		//! A windows counter to generate a unique class name.
-		static u32			s_windowCount;
+        //! A windows counter to generate a unique class name.
+        static u32            s_windowCount;
 
-		//! Window registry.
-		static Windows		s_windows;
+        //! Window registry.
+        static Windows        s_windows;
     };
 
 } // namespace Platform

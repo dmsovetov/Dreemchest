@@ -37,34 +37,34 @@ WindowsThread::WindowsThread( void ) : m_handle( NULL )
 
 WindowsThread::~WindowsThread( void )
 {
-	TerminateThread( m_handle, 0 );
+    TerminateThread( m_handle, 0 );
 
-	if( m_handle ) {
-		CloseHandle( m_handle );
-	}
+    if( m_handle ) {
+        CloseHandle( m_handle );
+    }
 }
 
 // ** WindowsThread::start
 void WindowsThread::start( const ThreadCallback& callback, void *userData )
 {
-	Thread::start( callback, userData );
-	m_handle = CreateThread( NULL, 0, ( LPTHREAD_START_ROUTINE )threadProc, this, 0, NULL );
-	SetThreadPriority( m_handle, THREAD_PRIORITY_NORMAL );
+    Thread::start( callback, userData );
+    m_handle = CreateThread( NULL, 0, ( LPTHREAD_START_ROUTINE )threadProc, this, 0, NULL );
+    SetThreadPriority( m_handle, THREAD_PRIORITY_NORMAL );
 }
 
 // ** WindowsThread::wait
 void WindowsThread::wait( void ) const
 {
-	WaitForSingleObject( m_handle, INFINITE );
+    WaitForSingleObject( m_handle, INFINITE );
 }
 
 // ** WindowsThread::threadProc
 void WindowsThread::threadProc( void *data )
 {
-	WindowsThread* thread = reinterpret_cast<WindowsThread*>( data );
-	thread->m_callback( thread->m_userData );
+    WindowsThread* thread = reinterpret_cast<WindowsThread*>( data );
+    thread->m_callback( thread->m_userData );
 
-	Sleep( 0 );
+    Sleep( 0 );
 }
 
 // ----------------------------- WindowsMutex ----------------------------- //
@@ -72,30 +72,30 @@ void WindowsThread::threadProc( void *data )
 // ** WindowsMutex::WindowsMutex
 WindowsMutex::WindowsMutex( void )
 {
-	InitializeCriticalSection( &m_criticalSection );
+    InitializeCriticalSection( &m_criticalSection );
 }
 
 WindowsMutex::~WindowsMutex( void )
 {
-	DeleteCriticalSection( &m_criticalSection );
+    DeleteCriticalSection( &m_criticalSection );
 }
 
 // ** WindowsMutex::lock
 void WindowsMutex::lock( void )
 {
-	EnterCriticalSection( &m_criticalSection );
+    EnterCriticalSection( &m_criticalSection );
 }
 
 // ** WindowsMutex::unlock
 void WindowsMutex::unlock( void )
 {
-	LeaveCriticalSection( &m_criticalSection );
+    LeaveCriticalSection( &m_criticalSection );
 }
 
 // ** WindowsMutex::tryLock
 bool WindowsMutex::tryLock( void )
 {
-	return TryEnterCriticalSection( &m_criticalSection ) == TRUE;
+    return TryEnterCriticalSection( &m_criticalSection ) == TRUE;
 }
 
 // ----------------------------- WindowsCondition ----------------------------- //
@@ -103,29 +103,29 @@ bool WindowsMutex::tryLock( void )
 // ** WindowsCondition::WindowsCondition
 WindowsCondition::WindowsCondition( void )
 {
-	InitializeCriticalSection( &m_criticalSection );
-	InitializeConditionVariable( &m_condition );
+    InitializeCriticalSection( &m_criticalSection );
+    InitializeConditionVariable( &m_condition );
 }
 
 WindowsCondition::~WindowsCondition( void )
 {
-	DeleteCriticalSection( &m_criticalSection );
+    DeleteCriticalSection( &m_criticalSection );
 }
 
 // ** WindowsCondition::wait
 void WindowsCondition::wait( void )
 {
-	EnterCriticalSection( &m_criticalSection );
-	SleepConditionVariableCS( &m_condition, &m_criticalSection, INFINITE );
-	LeaveCriticalSection( &m_criticalSection );
+    EnterCriticalSection( &m_criticalSection );
+    SleepConditionVariableCS( &m_condition, &m_criticalSection, INFINITE );
+    LeaveCriticalSection( &m_criticalSection );
 }
 
 // ** WindowsCondition::trigger
 void WindowsCondition::trigger( void )
 {
-	EnterCriticalSection( &m_criticalSection );
-	WakeConditionVariable( &m_condition );
-	LeaveCriticalSection( &m_criticalSection );
+    EnterCriticalSection( &m_criticalSection );
+    WakeConditionVariable( &m_condition );
+    LeaveCriticalSection( &m_criticalSection );
 }
 
 } // namespace Threads

@@ -38,29 +38,36 @@ namespace Cg
 // ------------------------------------------------------------- Declaration ------------------------------------------------------------ //
 
 // ** Declaration::Declaration
-Declaration::Declaration(NodeType type, s32 line, u16 column)
-    : Statement(type, line, column)
+Declaration::Declaration(DeclarationType declarationType, const Identifier& identifier, s32 line, u16 column)
+    : Statement(line, column)
+    , m_identifier(identifier)
+    , m_declarationType(declarationType)
 {
     
+}
+
+// ** Declaration::name
+const StringView& Declaration::name() const
+{
+    return m_identifier.value();
+}
+
+// ** Declaration::declarationType
+Declaration::DeclarationType Declaration::declarationType() const
+{
+    return m_declarationType;
 }
     
 // -------------------------------------------------------------- Variable -------------------------------------------------------------- //
     
 // ** Variable::Variable
 Variable::Variable(const Identifier& identifier, const Type& type, Expression* initializer, SemanticType semantic)
-    : Declaration(VariableNode, type.line(), type.column())
-    , m_identifier(identifier)
+    : Declaration(VariableDeclaration, identifier, type.line(), type.column())
     , m_type(type)
     , m_initializer(initializer)
     , m_semantic(semantic)
 {
     
-}
-    
-// ** Variable::name
-const StringView& Variable::name() const
-{
-    return m_identifier.value();
 }
 
 // ** Variable::type
@@ -96,9 +103,9 @@ void Variable::accept(Visitor& visitor)
 // -------------------------------------------------------------- Structure ------------------------------------------------------------- //
 
 // ** Structure::Structure
-Structure::Structure(const Identifier* identifier)
-    : Declaration(StructureNode, identifier->line(), identifier->column())
-	, m_identifier(identifier)
+Structure::Structure(const Scope* scope, const Identifier& identifier)
+    : Declaration(StructureDeclaration, identifier, identifier.line(), identifier.column())
+    , m_declarations(scope)
 {
     
 }
@@ -106,19 +113,25 @@ Structure::Structure(const Identifier* identifier)
 // ** Structure::fields
 const Structure::Fields& Structure::fields() const
 {
-	return m_fields;
+    return m_fields;
 }
 
 // ** Structure::fields
 Structure::Fields& Structure::fields()
 {
-	return m_fields;
+    return m_fields;
 }
 
-// Structure::name
-const StringView& Structure::name() const
+// ** Structure::declarations
+const Scope& Structure::declarations() const
 {
-	return m_identifier->value();
+    return m_declarations;
+}
+
+// ** Structure::declarations
+Scope& Structure::declarations()
+{
+    return m_declarations;
 }
 
 // ** Structure::addField
@@ -136,20 +149,14 @@ void Structure::accept(Visitor& visitor)
 // -------------------------------------------------------------- Function -------------------------------------------------------------- //
     
 // ** Function::Function
-Function::Function(const Identifier* identifier, const Type* type)
-    : Declaration(FunctionNode, type->line(), type->column())
-    , m_identifier(identifier)
+Function::Function(const Scope* scope, const Identifier& identifier, const Type* type)
+    : Declaration(FunctionDeclaration, identifier, type->line(), type->column())
     , m_type(type)
     , m_semantic(INVALID_SEMANTIC)
     , m_body(NULL)
+    , m_declarations(scope)
 {
     
-}
-
-// ** Function::name
-const StringView& Function::name() const
-{
-    return m_identifier->value();
 }
 
 // ** Function::type
@@ -186,6 +193,18 @@ const Statement* Function::body() const
 Statement* Function::body()
 {
     return m_body;
+}
+
+// ** Function::declarations
+const Scope& Function::declarations() const
+{
+    return m_declarations;
+}
+
+// ** Function::declarations
+Scope& Function::declarations()
+{
+    return m_declarations;
 }
 
 // ** Function::addArgument

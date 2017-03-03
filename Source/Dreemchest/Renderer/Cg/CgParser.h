@@ -156,8 +156,8 @@ namespace Cg
         //! Expects to read an identifier.
         Identifier*             expectIdentifier();
 
-		//! Expects to read an identifier of a type name.
-		Identifier*				expectFunctionIdentifier(BuiltInType& builtInType);
+        //! Expects to read an identifier of a type name.
+        Identifier*                expectFunctionIdentifier(BuiltInType& builtInType);
         
         //! Expects to read an operator.
         OperatorType            expectOperator();
@@ -183,8 +183,8 @@ namespace Cg
         //! Registers a register semantic type.
         void                    registerSemantic(const s8* name, const s8* shortName, SemanticType semantic);
 
-		//! Searches for a semantic by it's name.
-		SemanticType			findSemanticByToken(const Token& token) const;
+        //! Searches for a semantic by it's name.
+        SemanticType            findSemanticByToken(const Token& token) const;
 
         //! Searches for a declaration in a scope chain.
         const Declaration*      findDeclaration(const Identifier* identifier) const;

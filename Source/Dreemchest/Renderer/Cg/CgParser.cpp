@@ -81,7 +81,7 @@ Parser::Parser(LinearAllocator& allocator)
     m_tokenizer.addKeyword("NORMAL", TokenInputSemantic);
     m_tokenizer.addKeyword("POSITION", TokenInputSemantic);
     m_tokenizer.addKeyword("TEXCOORD0", TokenInputSemantic);
-	m_tokenizer.addKeyword("COLOR", TokenInputSemantic);
+    m_tokenizer.addKeyword("COLOR", TokenInputSemantic);
     m_tokenizer.addKeyword("COLOR0", TokenOutputSemantic);
     m_tokenizer.addKeyword("COLOR1", TokenOutputSemantic);
 
@@ -109,21 +109,21 @@ Parser::Parser(LinearAllocator& allocator)
     m_tokenizer.addOperator("*", OpMultiply);
     m_tokenizer.addOperator("<", OpLess);
 
-	registerSemantic("NORMAL", NULL, NORMAL);
-	registerSemantic("POSITION", NULL, POSITION);
-	registerSemantic("COLOR", NULL, COLOR);
-	registerSemantic("COLOR0", NULL, COLOR0);
-	registerSemantic("COLOR1", NULL, COLOR1);
-	registerSemantic("TEXCOORD0", NULL, TEXCOORD0);
+    registerSemantic("NORMAL", NULL, NORMAL);
+    registerSemantic("POSITION", NULL, POSITION);
+    registerSemantic("COLOR", NULL, COLOR);
+    registerSemantic("COLOR0", NULL, COLOR0);
+    registerSemantic("COLOR1", NULL, COLOR1);
+    registerSemantic("TEXCOORD0", NULL, TEXCOORD0);
     
     registerSemantic("TEXUNIT0", "s0", TEXUNIT0);
-	registerSemantic("TEXUNIT1", "s1", TEXUNIT1);
-	registerSemantic("TEXUNIT2", "s2", TEXUNIT2);
-	registerSemantic("TEXUNIT3", "s3", TEXUNIT3);
-	registerSemantic("TEXUNIT4", "s4", TEXUNIT4);
-	registerSemantic("TEXUNIT5", "s5", TEXUNIT5);
-	registerSemantic("TEXUNIT6", "s6", TEXUNIT6);
-	registerSemantic("TEXUNIT7", "s7", TEXUNIT7);
+    registerSemantic("TEXUNIT1", "s1", TEXUNIT1);
+    registerSemantic("TEXUNIT2", "s2", TEXUNIT2);
+    registerSemantic("TEXUNIT3", "s3", TEXUNIT3);
+    registerSemantic("TEXUNIT4", "s4", TEXUNIT4);
+    registerSemantic("TEXUNIT5", "s5", TEXUNIT5);
+    registerSemantic("TEXUNIT6", "s6", TEXUNIT6);
+    registerSemantic("TEXUNIT7", "s7", TEXUNIT7);
 }
     
 // ** Parser::expect
@@ -738,9 +738,9 @@ Expression* Parser::parseTerm()
             }
             break;
 
-		case TokenBuiltInType:
-			term = parseFunctionCall();
-			break;
+        case TokenBuiltInType:
+            term = parseFunctionCall();
+            break;
 
         case TokenNumber:
             term = newAst(ConstantTerm, token.text(), token.line(), token.column());
@@ -840,41 +840,41 @@ Identifier* Parser::expectIdentifier()
 // ** Parser::expectFunctionIdentifier
 Identifier* Parser::expectFunctionIdentifier(BuiltInType& builtInType)
 {
-	Token token = current();
+    Token token = current();
 
-	if (parse(TokenBuiltInType))
-	{
+    if (parse(TokenBuiltInType))
+    {
         builtInType = static_cast<BuiltInType>(token.subtype());
-		return newIdentifier(token);
-	}
-	else if (parse(TokenIdentifier))
-	{
+        return newIdentifier(token);
+    }
+    else if (parse(TokenIdentifier))
+    {
         builtInType = TypeUserDefined;
-		return newIdentifier(token);
-	}
+        return newIdentifier(token);
+    }
 
-	emitExpected("identifier");
-	next();
+    emitExpected("identifier");
+    next();
 
-	return NULL;
+    return NULL;
 }
     
 // ** Parser::expectSemantic
 SemanticType Parser::expectSemantic()
 {
-	const Token& token = current();
+    const Token& token = current();
     SemanticType type = INVALID_SEMANTIC;
     
     switch (token.type())
     {
         case TokenInputSemantic:
         case TokenOutputSemantic:
-			type = findSemanticByToken(token);
+            type = findSemanticByToken(token);
 
-			if (type == INVALID_SEMANTIC)
-			{
-				emitError("unknown semantic '%s'", token.str().c_str());
-			}
+            if (type == INVALID_SEMANTIC)
+            {
+                emitError("unknown semantic '%s'", token.str().c_str());
+            }
 
             next();
             return type;
@@ -884,7 +884,7 @@ SemanticType Parser::expectSemantic()
     }
 
     emitExpected("input semantic");
-	next();
+    next();
 
     return type;
 }
@@ -894,27 +894,27 @@ void Parser::registerSemantic(const s8* name, const s8* shortName, SemanticType 
 {
     m_registerSemantics[String64(name)] = semantic;
 
-	if (shortName)
-	{
-		m_registerSemantics[String64(shortName)] = semantic;
-	}
+    if (shortName)
+    {
+        m_registerSemantics[String64(shortName)] = semantic;
+    }
 }
 
 // ** Parser::findSemanticByToken
 SemanticType Parser::findSemanticByToken(const Token& token) const
 {
-	// Lookup semantic by name
-	SemanticType semantic = INVALID_SEMANTIC;
+    // Lookup semantic by name
+    SemanticType semantic = INVALID_SEMANTIC;
 
-	//const s8* name = token.text();
-	RegisterSemanticTypes::const_iterator i = m_registerSemantics.find(String64(token.str().c_str()));
+    //const s8* name = token.text();
+    RegisterSemanticTypes::const_iterator i = m_registerSemantics.find(String64(token.str().c_str()));
 
-	if (i != m_registerSemantics.end())
-	{
-		semantic = i->second;
-	}
+    if (i != m_registerSemantics.end())
+    {
+        semantic = i->second;
+    }
 
-	return semantic;
+    return semantic;
 }
 
 // ** Parser::findDeclaration

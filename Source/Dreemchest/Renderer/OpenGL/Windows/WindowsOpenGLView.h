@@ -53,14 +53,14 @@ namespace Renderer {
 
     private:
 
-		//! Parent window handle.
-		HWND				m_window;
+        //! Parent window handle.
+        HWND                m_window;
 
-		//! Device context handle.
-        HDC					m_deviceContext;
+        //! Device context handle.
+        HDC                    m_deviceContext;
 
-		//! OpenGL rendering context.
-		HGLRC				m_renderingContext;
+        //! OpenGL rendering context.
+        HGLRC                m_renderingContext;
     };
 
 } // namespace Renderer
