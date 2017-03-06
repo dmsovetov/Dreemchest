@@ -74,6 +74,10 @@ namespace Cg
         //! Returns a variable type.
         const Type&         type() const;
 
+        //! Returns variable flags.
+        const FlagSet8&     flags() const;
+        FlagSet8&           flags();
+
         //! Returns a variable initializer expression.
         const Expression*   initializer() const;
         Expression*         initializer();
@@ -81,19 +85,20 @@ namespace Cg
         //! Returns variable binding semantic.
         SemanticType        semantic() const;
 
+        //! Invokes visitor's method to process this variable.
+        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
+
     private:
         
                             //! Constructs Variable node instance.
-                            Variable(const Identifier& identifier, const Type& type, Expression* initializer, SemanticType semantic);
-
-        //! Invokes visitor's method to process this variable.
-        virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
+                            Variable(const Identifier& identifier, const Type& type, Expression* initializer, SemanticType semantic, u8 flags = 0);
         
     private:
 
         const Type&         m_type;         //!< A variable data type.
         Expression*         m_initializer;  //!< An initializer expression.
         SemanticType        m_semantic;     //!< An input semantic name.
+        FlagSet8            m_flags;        //!< Variable flags.
     };
     
     //! Structure declaration node.
@@ -106,12 +111,15 @@ namespace Cg
         typedef List<Variable*> Fields;
 
         //! Returns structure fields.
-        const Fields&        fields() const;
-        Fields&                fields();
+        const Fields&       fields() const;
+        Fields&             fields();
 
         //! Returns a declaration scope.
         const Scope&        declarations() const;
         Scope&              declarations();
+
+        //! Returns true if any field has a semantic binding.
+        bool                hasSemantics() const;
 
     private:
         
@@ -126,7 +134,7 @@ namespace Cg
         
     private:
   
-        Fields                m_fields;       //!< Fields declared inside this structure.
+        Fields              m_fields;       //!< Fields declared inside this structure.
         Scope               m_declarations; //!< Variable declaration scope.
     };
     
@@ -157,13 +165,25 @@ namespace Cg
         const Statement*    body() const;
         Statement*          body();
 
+        //! Returns a constructed type.
+        BuiltInType         constructor() const;
+
+        //! Sets a shader function type.
+        void                setShader(ShaderType value);
+
+        //! Returns a shader type associated with this function with #pragma option.
+        ShaderType          shader() const;
+
+        //! Returns true if this function is marked as a shader entry point.
+        bool                isShader() const;
+
         //! Invokes visitor's method to process this function.
         virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
 
     private:
         
                             //! Constructs a function instance.
-                            Function(const Scope* scope, const Identifier& identifier, const Type* type);
+                            Function(const Scope* scope, const Identifier& identifier, const Type* type, BuiltInType constructor = TypeUserDefined);
         
         //! Adds a function argument.
         void                addArgument(Variable* argument);
@@ -181,6 +201,8 @@ namespace Cg
         SemanticType        m_semantic;     //!< An output function semantic.
         Statement*          m_body;         //!< A function body instance.
         Scope               m_declarations; //!< Variable declaration scope.
+        BuiltInType         m_constructor;  //!< Valid only for constructor functions.
+        ShaderType          m_shader;       //!< A shader function type.
     };
     
 } // namespace Cg

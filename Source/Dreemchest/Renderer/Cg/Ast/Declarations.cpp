@@ -61,11 +61,12 @@ Declaration::DeclarationType Declaration::declarationType() const
 // -------------------------------------------------------------- Variable -------------------------------------------------------------- //
     
 // ** Variable::Variable
-Variable::Variable(const Identifier& identifier, const Type& type, Expression* initializer, SemanticType semantic)
+Variable::Variable(const Identifier& identifier, const Type& type, Expression* initializer, SemanticType semantic, u8 flags)
     : Declaration(VariableDeclaration, identifier, type.line(), type.column())
     , m_type(type)
     , m_initializer(initializer)
     , m_semantic(semantic)
+    , m_flags(flags)
 {
     
 }
@@ -74,6 +75,18 @@ Variable::Variable(const Identifier& identifier, const Type& type, Expression* i
 const Type& Variable::type() const
 {
     return m_type;
+}
+
+// ** Variable::flags
+const FlagSet8& Variable::flags() const
+{
+    return m_flags;
+}
+
+// **  Variable::flags
+FlagSet8& Variable::flags()
+{
+    return m_flags;
 }
 
 // ** Variable::initializer
@@ -140,6 +153,19 @@ void Structure::addField(Variable* field)
     m_fields.push_back(field);
 }
 
+// ** Structure::hasSemantics
+bool Structure::hasSemantics() const
+{
+    for (Fields::const_iterator i = m_fields.begin(), end = m_fields.end(); i != end; ++i)
+    {
+        if ((*i)->semantic())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 // ** Structure::accept
 void Structure::accept(Visitor& visitor)
 {
@@ -149,12 +175,14 @@ void Structure::accept(Visitor& visitor)
 // -------------------------------------------------------------- Function -------------------------------------------------------------- //
     
 // ** Function::Function
-Function::Function(const Scope* scope, const Identifier& identifier, const Type* type)
+Function::Function(const Scope* scope, const Identifier& identifier, const Type* type, BuiltInType constructor)
     : Declaration(FunctionDeclaration, identifier, type->line(), type->column())
     , m_type(type)
     , m_semantic(INVALID_SEMANTIC)
     , m_body(NULL)
     , m_declarations(scope)
+    , m_constructor(constructor)
+    , m_shader(TotalShaderTypes)
 {
     
 }
@@ -223,6 +251,30 @@ void Function::setBody(Statement* value)
 void Function::setSemantic(SemanticType value)
 {
     m_semantic = value;
+}
+
+// ** Function::constructor
+BuiltInType Function::constructor() const
+{
+    return m_constructor;
+}
+
+// ** Function::setShader
+void Function::setShader(ShaderType value)
+{
+    m_shader = value;
+}
+
+// ** Function::setShader
+ShaderType Function::shader() const
+{
+    return m_shader;
+}
+
+// ** Function::isShader
+bool Function::isShader() const
+{
+    return shader() != TotalShaderTypes;
 }
 
 // ** Function::accept

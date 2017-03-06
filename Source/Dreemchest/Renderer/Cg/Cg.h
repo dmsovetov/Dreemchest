@@ -57,6 +57,25 @@ namespace Cg
         , OpMember
         , TotalOperatorTypes
     };
+
+    //! Operator flags.
+    enum OperatorFlags
+    {
+          OpFlagRight       = BIT(0)    //!< Indicates that an operator is right-associative.
+        , OpFlagBinary      = BIT(1)    //!< Indicates that an operator is binary.
+        , OpFlagLeftLValue  = BIT(2)    //!< Indicates that an operator request an lvalue on the left hand side.
+        , OpFlagRightLValue = BIT(3)    //!< Indicates that an operator request an lvalue on the right hand side.
+    };
+
+	//! Available variable flags.
+	enum VariableFlags
+	{
+		  VariableField	    = BIT(0)    //!< This variable describes a structure field.
+		, VariableArgument  = BIT(1)    //!< This variable describes a function argument.
+		, VariableConstant  = BIT(2)    //!< This variable is constant.
+		, VariableInput		= BIT(3)	//!< An input variable.
+		, VariableOutput	= BIT(4)	//!< An output variable.
+	};
     
     //! Available built-in types.
     enum BuiltInType
@@ -146,6 +165,8 @@ namespace Cg
         , CBUFFER5
         , CBUFFER6
         , CBUFFER7
+
+        , TOTAL_SEMANTICS
     };
     
 } // namespace Cg

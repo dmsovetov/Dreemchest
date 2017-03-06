@@ -191,24 +191,40 @@ void Identifier::accept(Visitor& visitor)
 // ------------------------------------------------------------------ Type ---------------------------------------------------------------- //
 
 // ** Type::Type
-Type::Type(const Identifier* name, BuiltInType builtInType, s32 line, u16 column)
+Type::Type(const Identifier& name, BuiltInType builtInType, s32 line, u16 column)
     : Ast(line, column)
     , m_name(name)
     , m_builtInType(builtInType)
+    , m_structure(NULL)
 {
-    NIMBLE_ABORT_IF(m_name == NULL, "invalid type name");
+}
+
+// ** Type::Type
+Type::Type(const Identifier& name, const Structure* structure, s32 line, u16 column)
+    : Ast(line, column)
+    , m_name(name)
+    , m_builtInType(TypeUserDefined)
+    , m_structure(structure)
+{
+
 }
 
 // ** Type::name
 const StringView& Type::name() const
 {
-    return m_name->value();
+    return m_name.value();
 }
 
 // ** Type::builtInType
 BuiltInType Type::builtInType() const
 {
     return m_builtInType;
+}
+
+// ** Type::structure
+const Structure* Type::structure() const
+{
+    return m_structure;
 }
 
 // ** Type::accept

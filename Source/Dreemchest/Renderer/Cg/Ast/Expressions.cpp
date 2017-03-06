@@ -26,6 +26,7 @@
 
 #include "Expressions.h"
 #include "AstVisitor.h"
+#include "Declarations.h"
 
 DC_BEGIN_DREEMCHEST
 
@@ -40,20 +41,20 @@ namespace Cg
 // ** Expression::Expression
 Expression::Expression(s32 line, u16 column)
     : Statement(line, column)
-    , m_type(TypeUserDefined)
+    , m_type(NULL)
     , m_isConstant(true)
 {
     
 }
 
 // ** Expression::type
-BuiltInType Expression::type() const
+const Type* Expression::type() const
 {
     return m_type;
 }
 
 // ** Expression::setType
-void Expression::setType(BuiltInType value)
+void Expression::setType(const Type* value)
 {
     m_type = value;
 }
@@ -146,8 +147,42 @@ void ConstantTerm::accept(Visitor& visitor)
 VariableTerm::VariableTerm(const StringView& value, s32 line, u16 column)
     : Expression(line, column)
     , m_value(value)
+    , m_variable(NULL)
 {
         
+}
+
+// ** VariableTerm::flags
+const FlagSet8& VariableTerm::flags() const
+{
+	return m_flags;
+}
+
+// ** VariableTerm::flags
+FlagSet8& VariableTerm::flags()
+{
+	return m_flags;
+}
+
+// ** VariableTerm::variable
+const Variable* VariableTerm::variable() const
+{
+    return m_variable;
+}
+
+// ** VariableTerm::setVariable
+void VariableTerm::setVariable(const Variable* value)
+{
+    m_variable = value;
+
+    if (value)
+    {
+		// Combine term flags with variable ones.
+		m_flags = m_flags | value->flags();
+
+		// Inherit type from a variable instance.
+        setType(&value->type());
+    }
 }
 
 // ** VariableTerm::name
@@ -161,22 +196,45 @@ void VariableTerm::accept(Visitor& visitor)
 {
     visitor.visit(*this);
 }
+
+// ** VariableTerm::isVariable
+const VariableTerm* VariableTerm::isVariable() const
+{
+    return this;
+}
+
+// ** VariableTerm::isVariable
+VariableTerm* VariableTerm::isVariable()
+{
+    return this;
+}
     
 // ------------------------------------------------------------- FunctionCall ----------------------------------------------------------- //
     
 // ** FunctionCall::FunctionCall
-FunctionCall::FunctionCall(const Identifier& identifier, BuiltInType builtInType, s32 line, u16 column)
+FunctionCall::FunctionCall(const Identifier& identifier, s32 line, u16 column)
     : Expression(line, column)
     , m_identifier(identifier)
-    , m_builtInType(builtInType)
+    , m_function(NULL)
 {
     
 }
 
-// ** FunctionCall::builtInType
-BuiltInType FunctionCall::builtInType() const
+// ** FunctionCall::function
+const Function* FunctionCall::function() const
 {
-    return m_builtInType;
+    return m_function;
+}
+
+// ** FunctionCall::setFunction
+void FunctionCall::setFunction(const Function* value)
+{
+    m_function = value;
+
+    if (value)
+    {
+        setType(&value->type());
+    }
 }
 
 // ** FunctionCall::name

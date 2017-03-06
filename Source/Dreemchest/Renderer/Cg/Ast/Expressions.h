@@ -42,16 +42,20 @@ namespace Cg
     public:
 
         //! Returns an expression resulting type.
-        BuiltInType         type() const;
+        const Type*         type() const;
 
         //! Sets an expression resulting type.
-        void                setType(BuiltInType value);
+        void                setType(const Type* value);
 
         //! Returns true if an expression is constant.
         bool                isConstant() const;
 
         //! Sets expression constant flag.
         void                setConstant(bool value);
+
+        //! Returns an VariableTerm instance if this expression is a variable.
+        virtual const VariableTerm* isVariable() const { return NULL; }
+        virtual VariableTerm*       isVariable() { return NULL; }
 
     protected:
         
@@ -60,7 +64,7 @@ namespace Cg
 
     private:
 
-        BuiltInType         m_type;         //!< Expression resulting type.
+        const Type*         m_type;         //!< Expression resulting type.
         bool                m_isConstant;   //!< Indicates that an expression is constant and can't be modified by operator '=', '+=', etc.
     };
     
@@ -130,6 +134,20 @@ namespace Cg
         //! Returns a variable term name.
         const StringView&   name() const;
 
+        //! Returns a referenced variable.
+        const Variable*     variable() const;
+
+        //! Sets a referenced variable.
+        void                setVariable(const Variable* value);
+
+		//! Returns variable term flags.
+		const FlagSet8&		flags() const;
+		FlagSet8&			flags();
+
+        //! Returns an VariableTerm instance if this expression is a variable.
+        virtual const VariableTerm* isVariable() const;
+        virtual VariableTerm*       isVariable();
+
     private:
         
                             //! Constructs a VariableTerm instance.
@@ -137,7 +155,9 @@ namespace Cg
         
     private:
         
-        StringView          m_value;    //!< A constant term value.
+        StringView          m_value;        //!< A variable term identifier.
+        const Variable*     m_variable;     //!< A referenced variable.
+		FlagSet8			m_flags;		//!< Variable term flags.
     };
     
     //! A function call wrapps an identifier of function being called and a list of passed arguments.
@@ -152,12 +172,15 @@ namespace Cg
         //! Returns an identifier of a function being called.
         const StringView&   name() const;
 
-        //! Returns a built-in type being constructed (if any).
-        BuiltInType         builtInType() const;
-
         //! Returns a function call arguments.
         const Arguments&    arguments() const;
         Arguments&          arguments();
+
+        //! Returns a referenced function.
+        const Function*     function() const;
+
+        //! Sets a referenced function.
+        void                setFunction(const Function* value);
 
         //! Invokes visitor's method to process this function call.
         virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
@@ -165,7 +188,7 @@ namespace Cg
     private:
         
                             //! Constructs a FunctionCall instance.
-                            FunctionCall(const Identifier& identifier, BuiltInType builtInType, s32 line, u16 column);
+                            FunctionCall(const Identifier& identifier, s32 line, u16 column);
         
         //! Adds a function call argument.
         void                addArgument(Expression* expression);
@@ -173,8 +196,8 @@ namespace Cg
     private:
         
         const Identifier&   m_identifier;   //!< A function identifier.
-        BuiltInType         m_builtInType;  //!< Indicates that this is a built-in type construction.
         Arguments           m_arguments;    //!< A list of expressions that are passed to a function call.
+        const Function*     m_function;     //!< A referenced function.
     };
 
     //! An object initializer expression.

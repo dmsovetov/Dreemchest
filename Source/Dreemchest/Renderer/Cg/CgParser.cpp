@@ -25,7 +25,7 @@
  **************************************************************************/
 
 #include "CgParser.h"
-#include "CgExpressionEvaluator.h"
+#include "Ast/AstVisitor.h"
 
 #define newAst(T, ...) new (m_allocator.allocate(sizeof(T))) T(__VA_ARGS__)
 
@@ -36,26 +36,159 @@ namespace Renderer
     
 namespace Cg
 {
+
+// ---------------------------------------------- Parser::DeclarationResolver --------------------------------------------- //
+
+//! Resolves declarations used by expression variable terms.
+class Parser::DeclarationResolver : public ExpressionVisitor
+{
+public:
+
+                        //! Constructs an DeclarationResolver instance.
+                        DeclarationResolver(Scope& scope, Parser& parser);
+
+    //! Resolves a variable referenced by a term node.
+    virtual void        visit(VariableTerm& node) NIMBLE_OVERRIDE;
+
+    //! Resolves a function referenced by a term node.
+    virtual void        visit(FunctionCall& node) NIMBLE_OVERRIDE;
+    
+    //! Blocks a variable resolution process for '.' operator.
+    virtual void        visit(Operator& node) NIMBLE_OVERRIDE;
+
+private:
+
+    Scope&              m_scope;    //!< A topmost declaration scope to be used to lookup variables.
+    Parser&             m_parser;   //!< A parent parser.
+};
+
+// ** Parser::DeclarationResolver::DeclarationResolver
+Parser::DeclarationResolver::DeclarationResolver(Scope& scope, Parser& parser)
+    : m_scope(scope)
+    , m_parser(parser)
+{
+
+}
+
+// ** Parser::DeclarationResolver::visit
+void Parser::DeclarationResolver::visit(VariableTerm& node)
+{
+    const Declaration* declaration = m_scope.findInScopeChain(node.name());
+
+    if (!declaration)
+    {
+        m_parser.emitError(node.line(), node.column(), "undeclared identifier '%s'", node.name().str().c_str());
+    }
+    else if (declaration->declarationType() == Declaration::VariableDeclaration)
+    {
+        node.setVariable(static_cast<const Variable*>(declaration));
+    }
+    else
+    {
+        m_parser.emitError(node.line(), node.column(), "variable identifier expected instead of '%s'", node.name().str().c_str());
+    }
+}
+
+// ** Parser::DeclarationResolver::visit
+void Parser::DeclarationResolver::visit(FunctionCall& node)
+{
+    const Declaration* declaration = m_scope.findInScopeChain(node.name());
+
+    if (!declaration)
+    {
+        m_parser.emitError(node.line(), node.column(), "undeclared identifier '%s'", node.name().str().c_str());
+    }
+    else if (declaration->declarationType() == Declaration::FunctionDeclaration)
+    {
+        node.setFunction(static_cast<const Function*>(declaration));
+    }
+    else
+    {
+        m_parser.emitError(node.line(), node.column(), "'%s' is not a function", node.name().str().c_str());
+    }
+}
+
+// ** Parser::DeclarationResolver::visit
+void Parser::DeclarationResolver::visit(Operator& node)
+{
+    // Process all operators other than '.' as always
+    if (node.type() != OpMember)
+    {
+        ExpressionVisitor::visit(node);
+        return;
+    }
+
+    NIMBLE_ABORT_IF(node.lhs() == NULL, "invalid lhs operator");
+    NIMBLE_ABORT_IF(node.rhs() == NULL, "invalid rhs operator");
+
+    // So this is a member access operator, this means that on a left hand side
+    // we have a target object and a field on a right hand side.
+
+    // First process a left hand side
+    node.lhs()->accept(*this);
+
+    // Now resolve a member by name
+
+    // Get the lhs side type and the rhs side variable
+    const Type*   lhs = node.lhs()->type();
+	VariableTerm* obj = node.lhs()->isVariable();
+    VariableTerm* rhs = node.rhs()->isVariable();
+
+    NIMBLE_ABORT_IF(lhs == NULL, "unhandled lhs type");
+	NIMBLE_ABORT_IF(obj == NULL, "lhs is not a structure");
+
+    // Is this a variable term on a right hand side?
+    if (rhs == NULL)
+    {
+        m_parser.emitError(rhs->line(), rhs->column(), "field name expected");
+        return;
+    }
+
+    // Get the field name
+    const StringView& name = rhs->name();
+    const Structure* structure = lhs->structure();
+    const Variable* field = structure ? static_cast<const Variable*>(structure->declarations().find(name)) : NULL;
+
+    if (structure == NULL)
+    {
+        m_parser.emitError(rhs->line(), rhs->column(), "'%s' is not a member of '%s'", name.str().c_str(), lhs->name().str().c_str());
+        return;
+    }
+
+    // Finally set the referenced variable.
+    rhs->setVariable(field);
+
+	// Any member of an input structure is also an input.
+	if (obj->flags().is(VariableInput))
+	{
+		rhs->flags().on(VariableInput);
+	}
+
+    // And the resulting expression type
+    node.setType(&field->type());
+}
+
+// ---------------------------------------------------------- Parser ---------------------------------------------------------- //
     
 // ** Parser::s_operators
 Parser::OperatorInfo Parser::s_operators[TotalOperatorTypes + 1] =
 {
-      { OpPlusEqual,         0, false, true }
-    , { OpMinusEqual,        0, false, true }
-    , { OpDevideEqual,       2, false, true }
-    , { OpMultiplyEqual,     2, false, true }
-    , { OpEqual,             3, false, true }
-    , { OpPlus,              4, false, true }
-    , { OpMinus,             4, false, true }
-    , { OpDivide,            5, false, true }
-    , { OpMultiply,          5, false, true }
-    , { OpCompare,           6, false, true }
-    , { OpLess,              7, false, true }
-    , { OpLessEqual,         7, false, true }
-    , { OpGreater,           7, false, true }
-    , { OpGreaterEqual,      7, false, true }
-    , { OpMember,            8, false, true }
-    , { TotalOperatorTypes, -1, false, true }
+      { OpPlusEqual,         0, OpFlagBinary | OpFlagRight | OpFlagLeftLValue }
+    , { OpMinusEqual,        0, OpFlagBinary | OpFlagRight | OpFlagLeftLValue }
+    , { OpDevideEqual,       2, OpFlagBinary | OpFlagRight | OpFlagLeftLValue }
+    , { OpMultiplyEqual,     2, OpFlagBinary | OpFlagRight | OpFlagLeftLValue }
+    , { OpEqual,             3, OpFlagBinary | OpFlagRight | OpFlagLeftLValue }
+    , { OpPlus,              4, OpFlagBinary }
+    , { OpMinus,             4, OpFlagBinary }
+    , { OpDivide,            5, OpFlagBinary }
+    , { OpMultiply,          5, OpFlagBinary }
+    , { OpCompare,           6, OpFlagBinary }
+    , { OpLess,              7, OpFlagBinary }
+    , { OpLessEqual,         7, OpFlagBinary }
+    , { OpGreater,           7, OpFlagBinary }
+    , { OpGreaterEqual,      7, OpFlagBinary }
+    , { OpMember,            8, OpFlagBinary }
+    , { TotalOperatorTypes, -1, 0            }
 };
 
 // ** Parser::Parser
@@ -125,6 +258,12 @@ Parser::Parser(LinearAllocator& allocator)
     registerSemantic("TEXUNIT6", "s6", TEXUNIT6);
     registerSemantic("TEXUNIT7", "s7", TEXUNIT7);
 }
+
+// ** Parser::messages
+const OutputMessages& Parser::messages() const
+{
+    return m_messages;
+}
     
 // ** Parser::expect
 void Parser::expect(TokenType type)
@@ -161,6 +300,34 @@ void Parser::expect(TokenType type)
     emitExpected(token);
     next();
 }
+
+// ** Parser::registerBuiltIns
+void Parser::registerBuiltIns(Scope& scope)
+{
+    registerBuiltInType(scope, "bool", TypeBool);
+    registerBuiltInType(scope, "int", TypeInt);
+    registerBuiltInType(scope, "float", TypeFloat);
+    registerBuiltInType(scope, "float2", TypeFloat2);
+    registerBuiltInType(scope, "float3", TypeFloat3);
+    registerBuiltInType(scope, "float4", TypeFloat4);
+    registerBuiltInType(scope, "float4x4", TypeFloat4x4);
+}
+
+// ** Parser::registerBuiltInType
+void Parser::registerBuiltInType(Scope& scope, const s8* name, BuiltInType builtInType)
+{
+    // Allocate type identifier
+    const Identifier* identifier = internString(name);
+
+    // Allocate type
+    Type* type = newAst(Type, *identifier, builtInType, 0, 0);
+
+    // Declare built-in type constructor
+    Function* construct = newAst(Function, &scope, *identifier, type, builtInType);
+
+    // Finally register this type
+    scope.add(construct);
+}
     
 // ** Parser::parseProgramSource
 Program* Parser::parseProgramSource(const s8* input)
@@ -169,6 +336,9 @@ Program* Parser::parseProgramSource(const s8* input)
     
     // Allocate a program instance
     Program* program = newAst(Program);
+
+    // Declare built-in identifiers
+    registerBuiltIns(program->scope());
 
     // Push program root scope onto the stack
     pushDeclarationScope(program->scope());
@@ -207,8 +377,44 @@ Program* Parser::parseProgramSource(const s8* input)
     // Pop program scope
     popDeclarationScope();
 
-    // Evaluate expression types
-    program->accept(ProgramVisitor(ExpressionTypeEvaluator()));
+    // Setup shader entry-point functions
+    const s8* k_shaderName[] =
+    {
+          "vertex"
+        , "fragment"
+        , "geometry"
+        , "hull"
+        , "domain"
+    };
+
+    for (s32 i = 0; i < TotalShaderTypes; i++)
+    {
+        ShaderType        shader = static_cast<ShaderType>(i);
+        const Identifier* name   = program->functionForShader(shader);
+
+        if (name == NULL)
+        {
+            continue;
+        }
+
+        const Declaration* declaration = program->scope().find(name->value());
+
+        if (declaration == NULL)
+        {
+            emitError(name->line(), name->column(), "undeclared %s shader function '%s'", k_shaderName[shader], name->value().str().c_str());
+            continue;
+        }
+        else if (declaration->declarationType() != Declaration::FunctionDeclaration)
+        {
+            emitError(name->line(), name->column(), "'%s' is not a valid %s shader function", name->value().str().c_str(), k_shaderName[shader]);
+            continue;
+        }
+
+        const_cast<Function*>(static_cast<const Function*>(declaration))->setShader(shader);
+    }
+
+    // Sort recorded messages
+    m_messages.sort();
     
     return program;
 }
@@ -243,7 +449,7 @@ void Parser::parsePragma(Program* program)
 }
 
 // ** Parser::parseVariableDeclaration
-Variable* Parser::parseVariableDeclaration()
+Variable* Parser::parseVariableDeclaration(u8 flags)
 {
     // Type name is expected
     Type* type = expectType();
@@ -280,7 +486,7 @@ Variable* Parser::parseVariableDeclaration()
     }
     
     // Allocate a variable instance
-    Variable* variable = newAst(Variable, *identifier, *type, initializer, semantic);
+    Variable* variable = newAst(Variable, *identifier, *type, initializer, semantic, flags);
     addDeclaration(variable);
 
     return variable;
@@ -338,7 +544,7 @@ Function* Parser::parseFunctionDeclaration()
     {
         do
         {
-            function->addArgument(parseVariableDeclaration());
+            function->addArgument(parseVariableDeclaration(VariableArgument | VariableInput));
         } while (parse(TokenComma));
         expect(TokenParenthesesClose);
     }
@@ -382,7 +588,7 @@ Structure* Parser::parseStructure()
     while (!check(TokenBraceClose))
     {
         // Parse variable declaration
-        structure->addField(parseVariableDeclaration());
+        structure->addField(parseVariableDeclaration(VariableField));
         
         // Each field ends with a semicolon
         expect(TokenSemicolon);
@@ -667,10 +873,9 @@ For* Parser::parseFor()
 // ** Parser::parseFunctionCall
 FunctionCall* Parser::parseFunctionCall()
 {
-    BuiltInType builtInType = TypeUserDefined;
-    Identifier* identifier  = expectFunctionIdentifier(builtInType);
+    Identifier* identifier = expectFunctionIdentifier();
     
-    FunctionCall* call = newAst(FunctionCall, *identifier, builtInType, identifier->line(), identifier->column());
+    FunctionCall* call = newAst(FunctionCall, *identifier, identifier->line(), identifier->column());
     
     expect(TokenParenthesesOpen);
     do
@@ -698,7 +903,7 @@ Expression* Parser::parseExpression(s32 precedence)
     while (checkOperator(op))
     {
         // Should we consume the next operator?
-        if (!op.binary || op.precedence < precedence)
+        if ((op.flags & OpFlagBinary) == 0 || op.precedence < precedence)
         {
             break;
         }
@@ -707,13 +912,20 @@ Expression* Parser::parseExpression(s32 precedence)
         next();
 
         // Calculate next precedence value
-        s32 nextPrecedence = op.left ? op.precedence + 1 : op.precedence;
+        s32 nextPrecedence = op.flags & OpFlagRight ? op.precedence : op.precedence + 1;
         
         // Parse a right hand side expression
         Expression* rhs = parseExpression(nextPrecedence);
         
         // Compose an operator
         lhs = newAst(Operator, op.type, lhs, rhs, line, column);
+    }
+
+    // Post-process finished expression
+    if (precedence == 0)
+    {
+        // First resolve declarations used by variable terms
+        lhs->accept(DeclarationResolver(*scope(), *this));
     }
     
     return lhs;
@@ -794,11 +1006,28 @@ Type* Parser::expectType()
     
     if (parse(TokenBuiltInType))
     {
-        return newAst(Type, newIdentifier(token), static_cast<BuiltInType>(token.subtype()), token.line(), token.column());
+        return newAst(Type, *newIdentifier(token), static_cast<BuiltInType>(token.subtype()), token.line(), token.column());
     }
     else if(parse(TokenIdentifier))
     {
-        return newAst(Type, newIdentifier(token), TypeUserDefined, token.line(), token.column());
+        Scope* topmost = scope();
+
+        // Lookup a declaration by it's name
+        const Declaration* declaration = topmost->findInScopeChain(token.text());
+
+        if (!declaration)
+        {
+            emitError("undeclared type '%s'", token.text().str().c_str());
+        }
+        else if (declaration->declarationType() == Declaration::StructureDeclaration)
+        {
+            return newAst(Type, *newIdentifier(token), static_cast<const Structure*>(declaration), token.line(), token.column());
+        }
+        else
+        {
+            emitExpected("type");
+            return newAst(Type, *newIdentifier(token), NULL, token.line(), token.column());
+        }
     }
     
     emitExpected("type");
@@ -838,18 +1067,16 @@ Identifier* Parser::expectIdentifier()
 }
 
 // ** Parser::expectFunctionIdentifier
-Identifier* Parser::expectFunctionIdentifier(BuiltInType& builtInType)
+Identifier* Parser::expectFunctionIdentifier()
 {
     Token token = current();
 
     if (parse(TokenBuiltInType))
     {
-        builtInType = static_cast<BuiltInType>(token.subtype());
         return newIdentifier(token);
     }
     else if (parse(TokenIdentifier))
     {
-        builtInType = TypeUserDefined;
         return newIdentifier(token);
     }
 
@@ -966,9 +1193,26 @@ void Parser::popDeclarationScope()
 void Parser::emitError(const s8* format, ...)
 {
     NIMBLE_LOGGER_FORMAT(format);
-    LogError("cg", "ERROR: %d:%d: %s\n", current().line(), current().column(), buffer);
+
+    s32 size = static_cast<s32>(strlen(buffer)) + 1;
+    s8* message = reinterpret_cast<s8*>(m_allocator.allocate(size));
+    memcpy(message, buffer, size);
+
+    m_messages.error(current().line(), current().column(), message);
 }
-    
+
+// ** Parser::emitError
+void Parser::emitError(s32 line, u16 column, const s8* format, ...)
+{
+    NIMBLE_LOGGER_FORMAT(format);
+
+    s32 size = static_cast<s32>(strlen(buffer)) + 1;
+    s8* message = reinterpret_cast<s8*>(m_allocator.allocate(size));
+    memcpy(message, buffer, size);
+
+    m_messages.error(line, column, message);
+}
+
 // ** Parser::emitExpected
 void Parser::emitExpected(const s8* expected)
 {
@@ -980,6 +1224,89 @@ Identifier* Parser::newIdentifier(const Token& token)
 {
     u8* pointer = m_allocator.allocate(sizeof(Identifier));
     return new (pointer) Identifier(token.text(), token.line(), token.column());
+}
+
+// ** Parser::internString
+const Identifier* Parser::internString(const s8* value)
+{
+    s32 length = static_cast<s32>(strlen(value) + 1);
+
+    s8* str = reinterpret_cast<s8*>(m_allocator.allocate(length));
+    memcpy(str, value, length);
+
+    Identifier* identifier = newAst(Identifier, StringView(str, length - 1), 0, 0);
+    return identifier;
+}
+
+// --------------------------------------------------- OutputMessages --------------------------------------------------- //
+
+// ** OutputMessages::OutputMessages
+OutputMessages::OutputMessages()
+    : m_errors(0)
+{
+
+}
+
+// ** OutputMessages::pushMessage
+void OutputMessages::pushMessage(MessageType type, s32 line, u16 column, const s8* text)
+{
+    Message msg;
+    msg.line = line;
+    msg.column = column;
+    msg.type = type;
+    msg.text = text;
+    m_messages.push_back(msg);
+}
+
+// ** OutputMessages::error
+void OutputMessages::error(s32 line, u16 column, const s8* text)
+{
+    m_errors++;
+    pushMessage(ErrorMessage, line, column, text);
+}
+
+// ** OutputMessages::warning
+void OutputMessages::warning(s32 line, u16 column, const s8* text)
+{
+    pushMessage(WarningMessage, line, column, text);
+}
+
+// ** OutputMessages::verbose
+void OutputMessages::verbose(s32 line, u16 column, const s8* text)
+{
+    pushMessage(VerboseMessage, line, column, text);
+}
+
+// ** OutputMessages::error
+void OutputMessages::sort()
+{
+    // Local sorting predicate
+    struct Predicate
+    {
+        static bool less(const Message& a, const Message& b)
+        {
+            if (a.line != b.line)
+            {
+                return a.line < b.line;
+            }
+
+            return a.column < b.column;
+        }
+    };
+
+    m_messages.sort(Predicate::less);
+}
+
+// ** OutputMessages::messages
+const OutputMessages::Messages& OutputMessages::messages() const
+{
+    return m_messages;
+}
+
+// ** OutputMessages::errorCount
+s32 OutputMessages::errorCount() const
+{
+    return m_errors;
 }
     
 } // namespace Cg

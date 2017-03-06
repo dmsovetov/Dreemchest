@@ -122,19 +122,26 @@ namespace Cg
         
         //! Returns a built-in type id.
         BuiltInType         builtInType() const;
+
+        //! Returns a user-defined structure pointer.
+        const Structure*    structure() const;
         
     private:
         
-                            //! Constructs a Type node instance.
-                            Type(const Identifier* name, BuiltInType builtInType, s32 line, u16 column);
+                            //! Constructs a built-in Type node instance.
+                            Type(const Identifier& name, BuiltInType builtInType, s32 line, u16 column);
+
+                            //! Constructs a user-defined Type node instance.
+                            Type(const Identifier& name, const Structure* structure, s32 line, u16 column);
 
         //! Invokes visitor's method to process this type.
         virtual void        accept(Visitor& visitor) NIMBLE_OVERRIDE;
         
     private:
         
-        const Identifier*   m_name;         //!< A user-defined type name, will be null for built-in types.
+        const Identifier&   m_name;         //!< A user-defined type name, will be null for built-in types.
         BuiltInType         m_builtInType;  //!< A built-in type id.
+        const Structure*    m_structure;    //!< A structure pointer for user-defined types.
     };
 
     //! Declaration scope contains a parent declaration scope and mapping from a string to declaration.
@@ -180,7 +187,7 @@ namespace Cg
         const Scope&            scope() const;
         Scope&                  scope();
 
-        //! Returns a shader function name.
+        //! Returns a shader function.
         const Identifier*       functionForShader(ShaderType shader) const;
 
         //! Invokes visitor's method to process this program.
