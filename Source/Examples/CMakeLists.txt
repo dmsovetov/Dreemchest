@@ -20,11 +20,19 @@ function(create_examples dir)
 			    endif ()
                 set_target_properties(${target_name} PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${IOS_CODESIGN_IDENTITY}")
 			endif ()
+			
+			if (MSVC)
+				configure_file(${VS_USER_OPTIONS} ${target_name}.vcxproj.user @ONLY)
+			endif ()
 
 			install(TARGETS ${target_name} DESTINATION bin)
 		endif()
 	endforeach()
 endfunction()
+
+set(EXAMPLES_WORKING_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../Build/Examples")
+set(EXAMPLES_ADDITIONAL_BINARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../Build/Dependencies/${DC_PLATFORM}/bin")
+set(VS_USER_OPTIONS "${CMAKE_CURRENT_SOURCE_DIR}/VisualStudio.user.in")
 
 add_subdirectory(1_Introduction)
 #add_subdirectory(2_Scene)

@@ -38,15 +38,15 @@ namespace Platform {
     public:
 
         // ** IInput
-        virtual bool		keyDown( const Key& key );
-		virtual void		setMouse( s32 x, s32 y );
-		virtual s32			mouseX( void ) const;
-		virtual s32			mouseY( void ) const;
+        virtual bool        keyDown( const Key& key );
+        virtual void        setMouse( s32 x, s32 y );
+        virtual s32            mouseX( void ) const;
+        virtual s32            mouseY( void ) const;
 
-	private:
+    private:
 
-		//! Windows virtual keys mapping.
-		static s32			s_virtualKeysWinAPI[];
+        //! Windows virtual keys mapping.
+        static s32            s_virtualKeysWinAPI[];
     };
 
 } // namespace Platform

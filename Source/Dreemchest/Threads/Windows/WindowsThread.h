@@ -36,62 +36,62 @@ DC_BEGIN_DREEMCHEST
 
 namespace Threads {
 
-	// ** class WindowsThread
-	class WindowsThread : public Thread {
-	public:
+    // ** class WindowsThread
+    class WindowsThread : public Thread {
+    public:
 
-							WindowsThread( void );
-		virtual				~WindowsThread( void ) NIMBLE_OVERRIDE;
+                            WindowsThread( void );
+        virtual                ~WindowsThread( void ) NIMBLE_OVERRIDE;
 
-		// ** Thread
-		virtual void		start( const ThreadCallback& callback, void *userData ) NIMBLE_OVERRIDE;
-		virtual void		wait( void ) const NIMBLE_OVERRIDE;
+        // ** Thread
+        virtual void        start( const ThreadCallback& callback, void *userData ) NIMBLE_OVERRIDE;
+        virtual void        wait( void ) const NIMBLE_OVERRIDE;
 
-	private:
+    private:
 
-		static void			threadProc( void *data );
+        static void            threadProc( void *data );
 
-	private:
+    private:
 
-		HANDLE				m_handle;
-	};
+        HANDLE                m_handle;
+    };
 
-	// ** class WindowsMutex
-	class WindowsMutex : public Mutex {
-	public:
+    // ** class WindowsMutex
+    class WindowsMutex : public Mutex {
+    public:
 
-							WindowsMutex( void );
-		virtual				~WindowsMutex( void ) NIMBLE_OVERRIDE;
+                            WindowsMutex( void );
+        virtual                ~WindowsMutex( void ) NIMBLE_OVERRIDE;
 
-		// ** Mutex
-		virtual bool		tryLock( void ) NIMBLE_OVERRIDE;
-		virtual void		lock( void ) NIMBLE_OVERRIDE;
-		virtual void		unlock( void ) NIMBLE_OVERRIDE;
+        // ** Mutex
+        virtual bool        tryLock( void ) NIMBLE_OVERRIDE;
+        virtual void        lock( void ) NIMBLE_OVERRIDE;
+        virtual void        unlock( void ) NIMBLE_OVERRIDE;
 
-	private:
+    private:
 
-		CRITICAL_SECTION	m_criticalSection;
-	};
+        CRITICAL_SECTION    m_criticalSection;
+    };
 
-	// ** class WindowsCondition
-	class WindowsCondition : public Condition {
-	public:
+    // ** class WindowsCondition
+    class WindowsCondition : public Condition {
+    public:
 
-							WindowsCondition( void );
-		virtual             ~WindowsCondition( void );
+                            WindowsCondition( void );
+        virtual             ~WindowsCondition( void );
 
-		// ** Condition
+        // ** Condition
         virtual void        wait( void ) NIMBLE_OVERRIDE;
         virtual void        trigger( void ) NIMBLE_OVERRIDE;
 
-	private:
+    private:
 
-		CRITICAL_SECTION	m_criticalSection;
-		CONDITION_VARIABLE	m_condition;
-	};
+        CRITICAL_SECTION    m_criticalSection;
+        CONDITION_VARIABLE    m_condition;
+    };
 
 } // namespace Threads
 
 DC_END_DREEMCHEST
 
-#endif		/*	!__DC_Threads_Win32Thread_H__	*/
+#endif        /*    !__DC_Threads_Win32Thread_H__    */

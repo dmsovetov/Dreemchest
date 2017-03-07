@@ -40,3 +40,9 @@
 [submodule "Externals/lua"]
 	path = Externals/lua
 	url = https://github.com/dmsovetov/lua
+[submodule "Externals/assimp"]
+	path = Externals/assimp
+	url = https://github.com/assimp/assimp.git
+[submodule "Externals/nvtt"]
+	path = Externals/nvtt
+	url = https://github.com/castano/nvidia-texture-tools.git

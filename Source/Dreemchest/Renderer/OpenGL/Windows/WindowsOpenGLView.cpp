@@ -45,59 +45,59 @@ RenderViewPtr createOpenGLView(void* window, u32 options)
 // ** WindowsOpenGLView::~WindowsOpenGLView
 WindowsOpenGLView::~WindowsOpenGLView( void )
 {
-	wglMakeCurrent( m_deviceContext, NULL );
-	wglDeleteContext( m_renderingContext );
-	ReleaseDC( m_window, m_deviceContext );
+    wglMakeCurrent( m_deviceContext, NULL );
+    wglDeleteContext( m_renderingContext );
+    ReleaseDC( m_window, m_deviceContext );
 }
 
 // ** WindowsOpenGLView::initialize
 bool WindowsOpenGLView::initialize( HWND window, u32 options )
 {
-	PIXELFORMATDESCRIPTOR   pfd;
-	int                     pixelFormat;
+    PIXELFORMATDESCRIPTOR   pfd;
+    int                     pixelFormat;
 
-	int stencil = Private::stencilBitsFromOptions(options);
-	int depth   = Private::depthBitsFromOptions(options);
+    int stencil = Private::stencilBitsFromOptions(options);
+    int depth   = Private::depthBitsFromOptions(options);
 
-	memset( &pfd, 0, sizeof( pfd ) );
-	pfd.nSize           = sizeof( pfd );
-	pfd.nVersion        = 1;
-	pfd.dwFlags         = PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER | PFD_DRAW_TO_WINDOW;
-	pfd.iPixelType      = PFD_TYPE_RGBA;
-	pfd.iLayerType      = PFD_MAIN_PLANE;
-	pfd.cColorBits      = 24;
-	pfd.cAlphaBits      = 8;
-	pfd.cDepthBits      = depth;
-	pfd.cStencilBits    = stencil;
+    memset( &pfd, 0, sizeof( pfd ) );
+    pfd.nSize           = sizeof( pfd );
+    pfd.nVersion        = 1;
+    pfd.dwFlags         = PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER | PFD_DRAW_TO_WINDOW;
+    pfd.iPixelType      = PFD_TYPE_RGBA;
+    pfd.iLayerType      = PFD_MAIN_PLANE;
+    pfd.cColorBits      = 24;
+    pfd.cAlphaBits      = 8;
+    pfd.cDepthBits      = depth;
+    pfd.cStencilBits    = stencil;
 
-	m_window		= window;
-	m_deviceContext = GetDC( window );
+    m_window        = window;
+    m_deviceContext = GetDC( window );
 
-	if( !m_deviceContext ) {
-		return false;
-	}
+    if( !m_deviceContext ) {
+        return false;
+    }
 
-	if( (pixelFormat = ChoosePixelFormat( m_deviceContext, &pfd )) == 0 ) {
-		return false;
-	}
+    if( (pixelFormat = ChoosePixelFormat( m_deviceContext, &pfd )) == 0 ) {
+        return false;
+    }
 
-	if( SetPixelFormat( m_deviceContext, pixelFormat, &pfd ) == FALSE ) {
-		return false;
-	}
+    if( SetPixelFormat( m_deviceContext, pixelFormat, &pfd ) == FALSE ) {
+        return false;
+    }
 
-	m_renderingContext = wglCreateContext( m_deviceContext );
+    m_renderingContext = wglCreateContext( m_deviceContext );
 
-	if( !m_renderingContext ) {
-		return false;
-	}
+    if( !m_renderingContext ) {
+        return false;
+    }
 
-	return makeCurrent();
+    return makeCurrent();
 }
 
 // ** WindowsOpenGLView::beginFrame
 bool WindowsOpenGLView::beginFrame( void )
 {
-	return makeCurrent();
+    return makeCurrent();
 }
 
 // ** WindowsOpenGLView::endFrame
@@ -114,14 +114,30 @@ void WindowsOpenGLView::endFrame(bool wait)
 // ** WindowsOpenGLView::makeCurrent
 bool WindowsOpenGLView::makeCurrent( void )
 {
-	bool result = wglMakeCurrent( m_deviceContext, m_renderingContext ) != FALSE;
+    bool result = wglMakeCurrent( m_deviceContext, m_renderingContext ) != FALSE;
 
     if( !result ) {
         LogError( "opengl", "failed to make context current" );
         NIMBLE_BREAK
     }
 
-	return result;
+    return result;
+}
+
+// ** WindowsOpenGLView::width
+s32 WindowsOpenGLView::width() const
+{
+    RECT rect;
+    GetClientRect(m_window, &rect);
+    return rect.right - rect.left;
+}
+
+// ** WindowsOpenGLView::height
+s32 WindowsOpenGLView::height() const
+{
+    RECT rect;
+    GetClientRect(m_window, &rect);
+    return rect.bottom - rect.top;
 }
 
 } // namespace Renderer
