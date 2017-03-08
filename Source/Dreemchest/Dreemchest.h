@@ -141,7 +141,6 @@ DC_END_DREEMCHEST
     #include <Network/Network.h>
     #include <Io/Io.h>
     #include <Assets/Assets.h>
-    #include <Event/Event.h>
     #include <Threads/Threads.h>
     #include <Reflection/Reflection.h>
     #include <Ecs/Ecs.h>
