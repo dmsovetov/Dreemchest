@@ -214,7 +214,7 @@ bool TCPSocketListener::bind( u16 port )
 
     m_descriptor = result;
 
-    sockaddr_in addr = Network::toSockaddr( Address::Null, port );
+    sockaddr_in addr = toSockaddr( Address::Null, port );
     result = ::bind( m_descriptor, ( const sockaddr* )&addr, sizeof( addr ) );
 
     if( result.isError() ) {

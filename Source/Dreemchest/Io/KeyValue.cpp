@@ -28,6 +28,10 @@
 
 #include "streams/Stream.h"
 
+#ifdef JSONCPP_FOUND
+	#include <json/json.h>
+#endif    /*    #ifdef JSONCPP_FOUND    */
+
 DC_BEGIN_DREEMCHEST
 
 namespace Io {
@@ -36,8 +40,10 @@ namespace Io {
 String VariantTextStream::stringify( const Variant& kv, bool formatted )
 {
 #ifdef JSONCPP_FOUND
-    Json::Value json = toJson( kv );
-    return formatted ? json.toStyledString() : Json::FastWriter().write( json );
+	LogError("variant", "%s", "failed to convert to string, JSON support is depreacted.\n");
+	return "";
+    //Json::Value json = toJson( kv );
+    //return formatted ? json.toStyledString() : Json::FastWriter().write( json );
 #else
     LogError( "variant", "%s", "failed to convert to string, built with no JSON support.\n" );
     return "";
@@ -48,7 +54,7 @@ String VariantTextStream::stringify( const Variant& kv, bool formatted )
 Variant VariantTextStream::parse( const String& text )
 {
 #ifdef JSONCPP_FOUND
-    Json::Value json;
+    /*Json::Value json;
     Json::Reader reader;
     
     if( !reader.parse( text, json ) ) {
@@ -56,7 +62,9 @@ Variant VariantTextStream::parse( const String& text )
         return Variant();
     }
 
-    return fromJson( json );
+    return fromJson( json );*/
+	LogError("variant", "%s", "failed to parse from string, JSON support deprecated.\n");
+	return Variant();
 #else
     LogError( "variant", "%s", "failed to parse from string, built with no JSON support.\n" );
     return Variant();
@@ -66,7 +74,7 @@ Variant VariantTextStream::parse( const String& text )
 #ifdef JSONCPP_FOUND
 
 // ** VariantTextStream::toJson
-Json::Value VariantTextStream::toJson( const Variant& value )
+/*Json::Value VariantTextStream::toJson( const Variant& value )
 {
     const Type* type = value.type();
 
@@ -297,7 +305,7 @@ Variant VariantTextStream::fromJson( const Json::Value& json )
     }
 
     return Variant();
-}
+}*/
 
 #endif    /*    #ifdef JSONCPP_FOUND   */
 

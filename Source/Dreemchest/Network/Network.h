@@ -35,31 +35,36 @@
 
 #include <Reflection/Serialization/Serializer.h>
 
-#if defined( DC_PLATFORM_WINDOWS )
-    #define     _WINSOCK_DEPRECATED_NO_WARNINGS
-    #include    <winsock2.h>
-    #include    <Ws2tcpip.h>
+#ifdef DC_BUILD_LIBRARY
+	#if defined( DC_PLATFORM_WINDOWS )
+		#define     _WINSOCK_DEPRECATED_NO_WARNINGS
+		#include    <winsock2.h>
+		#include    <Ws2tcpip.h>
+	#else
+		#include    <netinet/in.h>
+		#include    <netinet/tcp.h>
+		#include    <arpa/inet.h>
+		#include    <sys/socket.h>
+		#include    <sys/select.h>
+
+		#if defined(DC_PLATFORM_EMSCRIPTEN)
+			#include    <poll.h>
+		#else
+			#include    <sys/poll.h>
+		#endif  // #if defined( DC_PLATFORM_EMSCRIPTEN)
+		#include    <fcntl.h>
+		#include    <netdb.h>
+		#include    <errno.h>
+		#include    <unistd.h>
+
+		#if !defined( DC_PLATFORM_ANDROID )
+			#include    <ifaddrs.h>
+		#endif
+	#endif
 #else
-    #include    <netinet/in.h>
-    #include    <netinet/tcp.h>
-    #include    <arpa/inet.h>
-    #include    <sys/socket.h>
-    #include    <sys/select.h>
-
-    #if defined(DC_PLATFORM_EMSCRIPTEN)
-        #include    <poll.h>
-    #else
-        #include    <sys/poll.h>
-    #endif  // #if defined( DC_PLATFORM_EMSCRIPTEN)
-    #include    <fcntl.h>
-    #include    <netdb.h>
-    #include    <errno.h>
-    #include    <unistd.h>
-
-    #if !defined( DC_PLATFORM_ANDROID )
-        #include    <ifaddrs.h>
-    #endif
-#endif
+	struct WSAData;
+	struct fd_set;
+#endif	//	#ifdef DC_BUILD_LIBRARY
 
 DC_BEGIN_DREEMCHEST
 
@@ -190,6 +195,11 @@ namespace Network {
         return buffer;
     }
 
+#ifdef DC_BUILD_LIBRARY
+	//! Converts the network address and port to a sockaddr_in structure.
+	sockaddr_in	toSockaddr(const Address& address, u16 port);
+#endif	//	#ifdef DC_BUILD_LIBRARY
+
     //! Network interface class.
     class Network {
     public:
@@ -207,9 +217,6 @@ namespace Network {
         //! Returns current host name.
         CString                            hostName( void ) const;
 
-        //! Converts the network address and port to a sockaddr_in structure.
-        static sockaddr_in                toSockaddr( const Address& address, u16 port );
-
     private:
 
         //! Performs network initialization.
@@ -223,10 +230,10 @@ namespace Network {
 
     private:
 
-        String                            m_hostName;     //!< Local host name.
-        Address                  m_host;         //!< Local host address.
-        Address                  m_broadcast;    //!< Broadcast address.
-        Address                  m_mask;         //!< Network mask.
+        String							m_hostName;     //!< Local host name.
+        Address							m_host;         //!< Local host address.
+        Address							m_broadcast;    //!< Broadcast address.
+        Address							m_mask;         //!< Network mask.
         bool                            m_isAvailable;  //!< Indicates that network was successfully initialized.
 
     #if defined( DC_PLATFORM_WINDOWS )

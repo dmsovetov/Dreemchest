@@ -131,6 +131,8 @@ bool MeshFormatRaw::constructFromStream( Io::StreamPtr stream, Assets::Assets& a
 bool MaterialSourceKeyValue::constructFromStream( Io::StreamPtr stream, Assets::Assets& assets, Material& asset )
 {
 #ifdef JSONCPP_FOUND
+
+#if 0
     String json;
     json.resize( stream->length() );
 
@@ -170,6 +172,9 @@ bool MaterialSourceKeyValue::constructFromStream( Io::StreamPtr stream, Assets::
     asset.setTexture( Material::Diffuse, assets.find<Image>( diffuseTexture["asset"].asString() ) );
 
     return true;
+#else
+	return 0;
+#endif
 #else
     return false;
 #endif    /*    #ifdef JSONCPP_FOUND    */

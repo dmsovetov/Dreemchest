@@ -80,7 +80,7 @@ bool TCPSocket::connect( const Address& address, u16 port )
 
     m_address = address;
 
-    sockaddr_in addr = Network::toSockaddr( address, port );
+    sockaddr_in addr = toSockaddr( address, port );
 
     // Connect to a remote host
     SocketResult result = ::connect( m_descriptor, ( const sockaddr* )&addr, sizeof( addr ) );

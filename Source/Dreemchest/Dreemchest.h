@@ -73,10 +73,6 @@
 #define LogFatal( prefix, message, ... )     Log::fatal( NIMBLE_LOGGER_CONTEXT_FULL, prefix, message, __VA_ARGS__ )
 #define LogInternal( prefix, message, ... )  Log::internalError( NIMBLE_LOGGER_CONTEXT_FULL, prefix, message, __VA_ARGS__ )
 
-#ifdef JSONCPP_FOUND
-    #include <json/json.h>
-#endif    /*    #ifdef JSONCPP_FOUND    */
-
 DC_BEGIN_DREEMCHEST
 
     namespace Platform {
@@ -148,7 +144,9 @@ DC_END_DREEMCHEST
     #include <Threads/Threads.h>
     #include <Scene/Scene.h>
     #include <Renderer/Renderer.h>
-    #include <Sound/Sound.h>
+	#ifdef DC_SOUND_ENABLED
+		#include <Sound/Sound.h>
+	#endif	//	#ifdef DC_SOUND_ENABLED
     #include <Fx/Fx.h>
 #endif
 

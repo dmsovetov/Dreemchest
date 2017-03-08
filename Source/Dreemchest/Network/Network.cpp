@@ -259,8 +259,8 @@ const char* Network::hostName( void ) const
     return m_hostName.c_str();
 }
 
-// ** Network::toSockaddr
-sockaddr_in Network::toSockaddr( const Address& address, u16 port )
+// ** toSockaddr
+sockaddr_in toSockaddr( const Address& address, u16 port )
 {
     sockaddr_in addr;
 
