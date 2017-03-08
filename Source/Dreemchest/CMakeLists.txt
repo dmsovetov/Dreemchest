@@ -219,9 +219,22 @@ get_target_property(SOURCES Dreemchest SOURCES)
 foreach(ABSOLUTE_FILE_PATH ${SOURCES})
     get_filename_component(FILE_EXT "${ABSOLUTE_FILE_PATH}" EXT)
 
-    if (FILE_EXT STREQUAL ".h")
+    if (FILE_EXT STREQUAL ".h" OR FILE_EXT STREQUAL ".hpp")
         string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" SOURCE_FILE ${ABSOLUTE_FILE_PATH})
         get_filename_component(HEADER_INSTALL_DIR "${SOURCE_FILE}" DIRECTORY)
         install(FILES "${ABSOLUTE_FILE_PATH}" DESTINATION include/Dreemchest/${HEADER_INSTALL_DIR})
+    endif ()
+endforeach ()
+
+# Install Nimble
+get_target_property(SOURCES Nimble SOURCES)
+
+foreach(ABSOLUTE_FILE_PATH ${SOURCES})
+    get_filename_component(FILE_EXT "${ABSOLUTE_FILE_PATH}" EXT)
+
+    if (FILE_EXT STREQUAL ".h" OR FILE_EXT STREQUAL ".hpp")
+        string(REPLACE "${CMAKE_SOURCE_DIR}/Nimble" "" SOURCE_FILE ${ABSOLUTE_FILE_PATH})
+        get_filename_component(HEADER_INSTALL_DIR "${SOURCE_FILE}" DIRECTORY)
+        install(FILES "${ABSOLUTE_FILE_PATH}" DESTINATION include/Nimble/${HEADER_INSTALL_DIR})
     endif ()
 endforeach ()
