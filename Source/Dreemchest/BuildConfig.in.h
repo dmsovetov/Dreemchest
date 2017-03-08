@@ -33,6 +33,9 @@
 //! A library namespace.
 #cmakedefine DC_NAMESPACE ${DC_NAMESPACE}
 
+//! A Nimble library namespace.
+#cmakedefine NIMBLE_NAMESPACE ${NIMBLE_NAMESPACE}
+
 //! A target platform identifier string.
 #cmakedefine DC_PLATFORM "${DC_PLATFORM}"
 

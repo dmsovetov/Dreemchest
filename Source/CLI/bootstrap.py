@@ -193,6 +193,10 @@ class BootstrapCommand(cmake.Command):
                              prefix_path=prefix_path,
                              )
 
+            # Options
+            parameters = self.platform_options(platform)
+            parameters['DC_BUILD_EXAMPLES'] = cmake.disable_option(False)
+
             # Generate project
             cm.configure(self.platform_generator(platform), self.env.source, binary_dir, self.platform_options(platform))
 
@@ -202,6 +206,15 @@ class BootstrapCommand(cmake.Command):
                     cm.build_tree(binary_dir)
                 except Exception:
                     pass
+
+        # Finally build a python native module
+        if os.name == 'nt':
+            cm = cmake.CMake(self.env.cmake, prefix_path=os.path.join(self.env.prebuilt, 'Windows'))
+            cm.build('Visual Studio 14 2015 Win64',
+                     os.path.join(self.env.source, 'CLI', 'makedata', 'dreemchest'),
+                     self.env.bootstrap_temp_dir)
+        else:
+            raise Exception('Python native module building is not implemented on current platform')
 
 
 class MacOSBootstrapCommand(BootstrapCommand):

@@ -27,7 +27,8 @@ set(DC_QT_SUPPORT "Disabled" CACHE STRING "Build with Qt support Disabled|Qt4|Qt
 set_property(CACHE DC_QT_SUPPORT PROPERTY STRINGS "Disabled" "Auto" "Qt4" "Qt5")
 
 # Set the namespace
-add_definitions(-DNIMBLE_NAMESPACE=DC_NAMESPACE)
+#add_definitions(-DNIMBLE_NAMESPACE=DC_NAMESPACE)
+set(NIMBLE_NAMESPACE ${DC_NAMESPACE})
 
 if (MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
