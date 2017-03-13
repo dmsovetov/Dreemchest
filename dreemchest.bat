@@ -1,2 +1,2 @@
 @echo off
-@python "./Source/CLI/command_line/main.py" %*
+@python "%DREEMCHEST_HOME%/Source/CLI/command_line/main.py" %*

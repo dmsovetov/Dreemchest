@@ -127,7 +127,7 @@ class BootstrapCommand(cmake.Command):
 
     def build_externals(self, options):
         # Make sure to pull all submodules before building them
-        git.checkout_submodules()
+        git.checkout_submodules(self.env.home)
 
         if self.env.emscripten is None:
             print "Warning: '%s' environment variable is not set, Emscripten is disabled." % env.DREEMCHEST_EMSCRIPTEN

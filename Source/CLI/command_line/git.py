@@ -25,6 +25,7 @@
 #################################################################################
 
 import subprocess
+import os
 
 
 def invoke(command):
@@ -52,8 +53,14 @@ def checkout_submodule(directory):
     return invoke('git submodule update --init -- %s' % directory)
 
 
-def checkout_submodules():
+def checkout_submodules(directory):
     """Initializes and pulls all submodules"""
 
+    cwd = os.getcwd()
+    os.chdir(directory)
+	
     print 'Updating submodules...'
-    return invoke('git submodule update --init --recursive')
+    result = invoke('git submodule update --init --recursive')
+	
+    os.chdir(cwd);
+    return result
